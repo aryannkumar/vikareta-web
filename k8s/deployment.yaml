@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vikareta-web
+  namespace: vikareta
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vikareta-web
+  template:
+    metadata:
+      labels:
+        app: vikareta-web
+    spec:
+      containers:
+      - name: vikareta-web
+        image: ghcr.io/aryannkumar/vikareta-web:main
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
