@@ -43,7 +43,7 @@ class CSRFManager {
 class ApiClient {
   private baseURL: string;
 
-  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api') {
+  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api') {
     this.baseURL = baseURL;
   }
 
