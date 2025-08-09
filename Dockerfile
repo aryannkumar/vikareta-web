@@ -4,13 +4,13 @@ WORKDIR /app
 
 # Set npm configuration for SSL issues
 RUN npm config set strict-ssl false
-RUN npm config set registry https://registry.npmjs.org/
+RUN npm config set registry http://registry.npmjs.org/
 RUN npm config set fetch-retry-mintimeout 20000
 RUN npm config set fetch-retry-maxtimeout 120000
 
 # Install dependencies based on the preferred package manager
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm install --production --no-optional
 
 # Rebuild the source code only when needed
 FROM node:20-alpine AS builder
