@@ -10,7 +10,7 @@ RUN npm config set fetch-retry-maxtimeout 120000
 
 # Install dependencies based on the preferred package manager
 COPY package.json package-lock.json* ./
-RUN npm install --production --no-optional
+RUN npm ci --only=production
 
 # Rebuild the source code only when needed
 FROM node:20-alpine AS builder
@@ -20,7 +20,10 @@ WORKDIR /app
 RUN npm config set strict-ssl false
 RUN npm config set registry https://registry.npmjs.org/
 
-COPY --from=deps /app/node_modules ./node_modules
+# Install ALL dependencies (including devDependencies) for build
+COPY package.json package-lock.json* ./
+RUN npm ci
+
 COPY . .
 
 # Build the application
