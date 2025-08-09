@@ -6,4 +6,5 @@ Vikareta Web Frontend - React/Next.js Application
 - ✅ ArgoCD Image Updater Support
 - ✅ Automatic Deployment Pipeline
 
-<!-- Build trigger: Sat Aug  9 22:48:00 IST 2025 -->
+<!-- Build trigger: Sat Aug  9 23:05:00 IST 2025 -->
+<!-- Force Docker build for vikareta-web -->
