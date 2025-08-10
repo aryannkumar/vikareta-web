@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Crown, Sparkles, Star, X, Calendar, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { featuredApi } from '@/lib/api/featuredProducts';
+import { featuredProductsApi } from '@/lib/api/featuredProducts';
 import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
 
@@ -97,7 +97,7 @@ export function PromoteProductModal({
 
     setIsPromoting(true);
     try {
-      await featuredApi.promoteProduct({
+      await featuredProductsApi.promoteProduct({
         productId: product.id,
         promotionType: selectedPlan.type,
         duration: selectedPlan.duration,

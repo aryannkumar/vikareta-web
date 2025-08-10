@@ -52,7 +52,7 @@ export interface FeaturedStatsResponse {
   };
 }
 
-export const featuredApi = {
+export const featuredProductsApi = {
   // Get all featured products
   getFeaturedProducts: async (params?: {
     limit?: number;
@@ -67,7 +67,7 @@ export const featuredApi = {
     if (params?.minPrice) searchParams.append('minPrice', params.minPrice.toString());
     if (params?.maxPrice) searchParams.append('maxPrice', params.maxPrice.toString());
 
-    const response = await apiClient.get(`/featured/products?${searchParams.toString()}`);
+    const response = await apiClient.get(`/products?featured=true&${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch featured products');
     }
@@ -83,7 +83,7 @@ export const featuredApi = {
 
   // Get specific featured product
   getFeaturedProduct: async (id: string): Promise<FeaturedProductResponse> => {
-    const response = await apiClient.get(`/featured/products/${id}`);
+    const response = await apiClient.get(`/products/${id}`);
     return {
       success: response.success,
       data: response.data as FeaturedProduct,

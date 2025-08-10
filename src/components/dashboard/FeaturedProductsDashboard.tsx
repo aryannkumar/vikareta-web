@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { PromoteProductModal } from './PromoteProductModal';
-import { featuredApi } from '@/lib/api/featuredProducts';
+import { featuredProductsApi } from '@/lib/api/featuredProducts';
 import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
 
@@ -84,7 +84,7 @@ export function FeaturedProductsDashboard({ supplierId }: { supplierId: string }
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const response = await featuredApi.getFeaturedStats(supplierId);
+      const response = await featuredProductsApi.getFeaturedStats(supplierId);
       if (response.success) {
         setStats(response.data);
       }
@@ -103,7 +103,7 @@ export function FeaturedProductsDashboard({ supplierId }: { supplierId: string }
 
   const handleRemoveFeatured = async (productId: string) => {
     try {
-      await featuredApi.removeFeaturedStatus(productId, supplierId);
+      await featuredProductsApi.removeFeaturedStatus(productId, supplierId);
       setFeaturedProducts(prev => prev.filter(p => p.id !== productId));
       toast.success('Success', 'Product removed from featured listings');
       fetchStats(); // Refresh stats

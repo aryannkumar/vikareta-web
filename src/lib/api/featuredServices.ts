@@ -72,7 +72,7 @@ export const featuredServicesApi = {
     if (params?.maxPrice) searchParams.append('maxPrice', params.maxPrice.toString());
     if (params?.serviceType) searchParams.append('serviceType', params.serviceType);
 
-    const response = await apiClient.get(`/featured-services?${searchParams.toString()}`);
+    const response = await apiClient.get(`/services?featured=true&${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch featured services');
     }
@@ -88,7 +88,7 @@ export const featuredServicesApi = {
 
   // Get specific featured service
   getFeaturedService: async (id: string): Promise<FeaturedServiceResponse> => {
-    const response = await apiClient.get(`/featured-services/${id}`);
+    const response = await apiClient.get(`/services/${id}`);
     return {
       success: response.success,
       data: response.data as FeaturedService,

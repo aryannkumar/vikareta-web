@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useCartStore } from '@/lib/stores/cart';
 import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
-import { featuredApi, type FeaturedProduct } from '@/lib/api/featuredProducts';
+import { featuredProductsApi, type FeaturedProduct } from '@/lib/api/featuredProducts';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
 
@@ -31,7 +31,7 @@ export function FeaturedProducts() {
       setError(null);
       
       // Try featured products first, then fallback to regular products
-      let response = await featuredApi.getFeaturedProducts({ limit: 8 });
+      let response = await featuredProductsApi.getFeaturedProducts({ limit: 8 });
       
       if (!response.success || !response.data.products || response.data.products.length === 0) {
         // Fallback to regular products API

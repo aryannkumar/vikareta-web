@@ -128,11 +128,11 @@ export const productsApi = {
         brands: Array<{ name: string; count: number }>;
         priceRange: { min: number; max: number };
       };
-    }>('/api/products', filters);
+    }>('/products', filters);
   },
 
   async getProduct(id: string) {
-    return apiClient.get<Product>(`/api/products/${id}`);
+    return apiClient.get<Product>(`/products/${id}`);
   },
 
   async getProductReviews(productId: string, page: number = 1, limit: number = 10) {
@@ -141,7 +141,7 @@ export const productsApi = {
       total: number;
       page: number;
       totalPages: number;
-    }>(`/api/products/${productId}/reviews`, { page, limit });
+    }>(`/products/${productId}/reviews`, { page, limit });
   },
 
   async addProductReview(productId: string, review: {
@@ -150,11 +150,11 @@ export const productsApi = {
     comment: string;
     images?: string[];
   }) {
-    return apiClient.post<ProductReview>(`/api/products/${productId}/reviews`, review);
+    return apiClient.post<ProductReview>(`/products/${productId}/reviews`, review);
   },
 
   async getRelatedProducts(productId: string, limit: number = 8) {
-    return apiClient.get<Product[]>(`/api/products/${productId}/related`, { limit });
+    return apiClient.get<Product[]>(`/products/${productId}/related`, { limit });
   },
 
   async searchProducts(query: string, filters?: Omit<ProductFilters, 'search'>) {
@@ -162,11 +162,11 @@ export const productsApi = {
       products: Product[];
       total: number;
       suggestions: string[];
-    }>('/api/products/search', { q: query, ...filters });
+    }>('/products/search', { q: query, ...filters });
   },
 
   async getFeaturedProducts(limit: number = 12) {
-    return apiClient.get<Product[]>('/featured/products', { limit });
+    return apiClient.get<Product[]>('/products', { featured: true, limit });
   },
 
   async getProductsByCategory(categoryId: string, filters?: Omit<ProductFilters, 'category'>) {
@@ -181,19 +181,19 @@ export const productsApi = {
         description: string;
         image?: string;
       };
-    }>(`/api/categories/${categoryId}/products`, filters);
+    }>(`/categories/${categoryId}/products`, filters);
   },
 
   async addToWishlist(productId: string) {
-    return apiClient.post(`/api/products/${productId}/wishlist`);
+    return apiClient.post(`/products/${productId}/wishlist`);
   },
 
   async removeFromWishlist(productId: string) {
-    return apiClient.delete(`/api/products/${productId}/wishlist`);
+    return apiClient.delete(`/products/${productId}/wishlist`);
   },
 
   async reportProduct(productId: string, reason: string, description?: string) {
-    return apiClient.post(`/api/products/${productId}/report`, { reason, description });
+    return apiClient.post(`/products/${productId}/report`, { reason, description });
   },
 
   async contactSupplier(productId: string, data: {
@@ -206,7 +206,7 @@ export const productsApi = {
       phone: string;
     };
   }) {
-    return apiClient.post(`/api/products/${productId}/contact-supplier`, data);
+    return apiClient.post(`/products/${productId}/contact-supplier`, data);
   },
 
   async requestQuote(productId: string, data: {
@@ -220,7 +220,7 @@ export const productsApi = {
       phone: string;
     };
   }) {
-    return apiClient.post(`/api/products/${productId}/request-quote`, data);
+    return apiClient.post(`/products/${productId}/request-quote`, data);
   },
 
   async checkAvailability(productId: string, quantity: number, variantId?: string) {
@@ -228,6 +228,6 @@ export const productsApi = {
       available: boolean;
       maxQuantity: number;
       estimatedDelivery: string;
-    }>(`/api/products/${productId}/availability`, { quantity, variantId });
+    }>(`/products/${productId}/availability`, { quantity, variantId });
   }
 };
