@@ -121,6 +121,10 @@ export const useAuthStore = create<AuthState>()(
             if (refreshToken) {
               localStorage.setItem('refresh_token', refreshToken);
             }
+            
+            // Sync authentication across domains
+            const { syncAuthAcrossDomains } = await import('../utils/cross-domain-auth');
+            syncAuthAcrossDomains({ user, tokens: { accessToken: token, refreshToken } });
           }
 
           set({
@@ -141,10 +145,14 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      logout: () => {
+      logout: async () => {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('auth_token');
           localStorage.removeItem('refresh_token');
+          
+          // Sync logout across domains
+          const { syncAuthAcrossDomains } = await import('../utils/cross-domain-auth');
+          syncAuthAcrossDomains(null);
         }
         set({ 
           user: null, 

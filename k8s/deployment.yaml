@@ -18,6 +18,11 @@ spec:
         image: ghcr.io/aryannkumar/vikareta-web:main
         ports:
         - containerPort: 3000
+        env:
+        - name: PORT
+          value: "3000"
+        - name: NODE_ENV
+          value: "production"
         resources:
           requests:
             memory: "256Mi"
