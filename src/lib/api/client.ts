@@ -55,12 +55,19 @@ class ApiClient {
     
     const config: RequestInit = {
       headers: {
-        'Content-Type': 'application/json',
         ...options.headers,
       },
       credentials: 'include',
       ...options,
     };
+
+    // Only add Content-Type header for requests with body data
+    if (['POST', 'PUT', 'PATCH'].includes(options.method || 'GET') && options.body) {
+      config.headers = {
+        ...config.headers,
+        'Content-Type': 'application/json',
+      };
+    }
 
     // Add auth token if available
     const token = localStorage.getItem('auth_token');
@@ -146,16 +153,19 @@ class ApiClient {
   }
 
   async get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
-    const url = new URL(`${this.baseURL}${endpoint}`);
+    let finalEndpoint = endpoint;
+    
     if (params) {
+      const url = new URL(`${this.baseURL}${endpoint}`);
       Object.keys(params).forEach(key => {
         if (params[key] !== undefined && params[key] !== null) {
           url.searchParams.append(key, String(params[key]));
         }
       });
+      finalEndpoint = url.pathname.replace(new URL(this.baseURL).pathname, '') + url.search;
     }
 
-    return this.request<T>(url.pathname + url.search);
+    return this.request<T>(finalEndpoint, { method: 'GET' });
   }
 
   async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
