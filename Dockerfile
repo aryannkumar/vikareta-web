@@ -27,10 +27,6 @@ RUN apk add --no-cache curl
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Set environment variables before copying files
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
-
 # Copy the standalone output
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
@@ -41,10 +37,13 @@ RUN chown -R nextjs:nodejs /app
 USER nextjs
 
 # Expose port
-EXPOSE 3000
+EXPOSE 5731
+
+ENV PORT 5731
+ENV HOSTNAME "0.0.0.0"
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
+  CMD curl -f http://localhost:5731/health || exit 1
 
-CMD ["sh", "-c", "PORT=3000 node server.js"]
+CMD ["node", "server.js"]
