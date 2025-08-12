@@ -6,23 +6,25 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatPrice(
-  price: number,
+  price: number | null | undefined,
   currency: string = 'INR',
   locale: string = 'en-IN'
 ): string {
+  const safePrice = price || 0;
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
-  }).format(price);
+  }).format(safePrice);
 }
 
 export function formatNumber(
-  number: number,
+  number: number | null | undefined,
   locale: string = 'en-IN'
 ): string {
-  return new Intl.NumberFormat(locale).format(number);
+  const safeNumber = number || 0;
+  return new Intl.NumberFormat(locale).format(safeNumber);
 }
 
 export function formatDate(
@@ -144,14 +146,14 @@ export function copyToClipboard(text: string): Promise<void> {
   if (navigator.clipboard) {
     return navigator.clipboard.writeText(text);
   }
-  
+
   // Fallback for older browsers
   const textArea = document.createElement('textarea');
   textArea.value = text;
   document.body.appendChild(textArea);
   textArea.focus();
   textArea.select();
-  
+
   try {
     document.execCommand('copy');
     return Promise.resolve();
@@ -191,7 +193,7 @@ export function getColorFromString(str: string): string {
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
-  
+
   const hue = hash % 360;
   return `hsl(${hue}, 70%, 50%)`;
 }
@@ -199,22 +201,22 @@ export function getColorFromString(str: string): string {
 export function parseQueryString(queryString: string): Record<string, string> {
   const params = new URLSearchParams(queryString);
   const result: Record<string, string> = {};
-  
+
   params.forEach((value, key) => {
     result[key] = value;
   });
-  
+
   return result;
 }
 
 export function buildQueryString(params: Record<string, any>): string {
   const searchParams = new URLSearchParams();
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       searchParams.append(key, String(value));
     }
   });
-  
+
   return searchParams.toString();
 }

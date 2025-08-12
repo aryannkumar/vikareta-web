@@ -197,7 +197,7 @@ export default function CategoriesPage() {
                           </p>
                           <div className="flex items-center justify-between mt-3">
                             <Badge variant="secondary">
-                              {category.productCount.toLocaleString()} products
+                              {(category.productCount || 0).toLocaleString()} products
                             </Badge>
                             <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300">
                               Featured
@@ -250,7 +250,7 @@ export default function CategoriesPage() {
                         </p>
                         <div className="mt-4">
                           <Badge variant="secondary">
-                            {category.productCount.toLocaleString()} products
+                            {(category.productCount || 0).toLocaleString()} products
                           </Badge>
                         </div>
                         <div className="mt-3">
@@ -293,7 +293,7 @@ export default function CategoriesPage() {
                         </div>
                         <div className="flex items-center space-x-4 mt-3">
                           <Badge variant="secondary">
-                            {category.productCount.toLocaleString()} products
+                            {(category.productCount || 0).toLocaleString()} products
                           </Badge>
                           <Badge variant="outline">
                             {category.isActive ? 'Active' : 'Inactive'}

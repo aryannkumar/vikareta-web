@@ -191,7 +191,7 @@ export function FeaturedProductsDashboard({ supplierId }: { supplierId: string }
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total Views</p>
-                  <p className="text-2xl font-bold">{stats.totalViews.toLocaleString()}</p>
+                  <p className="text-2xl font-bold">{(stats.totalViews || 0).toLocaleString()}</p>
                 </div>
                 <Eye className="h-8 w-8 text-blue-500" />
               </div>
@@ -203,7 +203,7 @@ export function FeaturedProductsDashboard({ supplierId }: { supplierId: string }
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total Clicks</p>
-                  <p className="text-2xl font-bold">{stats.totalClicks.toLocaleString()}</p>
+                  <p className="text-2xl font-bold">{(stats.totalClicks || 0).toLocaleString()}</p>
                 </div>
                 <MousePointer className="h-8 w-8 text-green-500" />
               </div>
@@ -280,7 +280,7 @@ export function FeaturedProductsDashboard({ supplierId }: { supplierId: string }
                       <div className="mt-3 space-y-2">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-muted-foreground">Views</span>
-                          <span className="font-medium">{product.views.toLocaleString()}</span>
+                          <span className="font-medium">{(product.views || 0).toLocaleString()}</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-muted-foreground">Clicks</span>

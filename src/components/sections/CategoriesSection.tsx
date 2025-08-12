@@ -128,7 +128,7 @@ export function CategoriesSection() {
                   <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                       <Package className="h-4 w-4 text-blue-500" />
-                      <span className="font-semibold">{category.productCount?.toLocaleString() || '0'} Products</span>
+                      <span className="font-semibold">{(category.productCount || 0).toLocaleString()} Products</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                       <Users className="h-4 w-4 text-orange-500" />

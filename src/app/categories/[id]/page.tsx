@@ -187,7 +187,7 @@ export default function CategoryDetailPage() {
                 <div className="flex items-center gap-3">
                   <Package className="h-5 w-5 text-primary" />
                   <div>
-                    <div className="font-semibold">{categoryData.productCount.toLocaleString()}</div>
+                    <div className="font-semibold">{(categoryData.productCount || 0).toLocaleString()}</div>
                     <div className="text-sm text-muted-foreground">Products</div>
                   </div>
                 </div>

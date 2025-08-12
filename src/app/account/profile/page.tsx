@@ -536,7 +536,7 @@ export default function ProfilePage() {
 
             <div className="bg-card rounded-lg border p-6 text-center">
               <div className="text-2xl font-bold text-primary mb-2">
-                ₹{profile.stats.totalSpent.toLocaleString()}
+                ₹{(profile.stats.totalSpent || 0).toLocaleString()}
               </div>
               <div className="text-sm text-muted-foreground">Total Spent</div>
             </div>

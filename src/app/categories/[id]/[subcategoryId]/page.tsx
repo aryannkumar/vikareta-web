@@ -342,7 +342,7 @@ export default function SubcategoryPage() {
                 <div className="flex items-center gap-3">
                   <Package className="h-5 w-5 text-primary" />
                   <div>
-                    <div className="font-semibold">{subcategory?.productCount?.toLocaleString() || '0'}</div>
+                    <div className="font-semibold">{(subcategory?.productCount || 0).toLocaleString()}</div>
                     <div className="text-sm text-muted-foreground">Products</div>
                   </div>
                 </div>
@@ -609,11 +609,11 @@ export default function SubcategoryPage() {
                     <div className="mb-3">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-lg text-primary">
-                          ₹{product.price.toLocaleString()}
+                          ₹{(product.price || 0).toLocaleString()}
                         </span>
                         {product.originalPrice && (
                           <span className="text-sm text-muted-foreground line-through">
-                            ₹{product.originalPrice.toLocaleString()}
+                            ₹{(product.originalPrice || 0).toLocaleString()}
                           </span>
                         )}
                       </div>
