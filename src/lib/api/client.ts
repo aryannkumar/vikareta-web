@@ -16,7 +16,10 @@ class CSRFManager {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/csrf-token`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api';
+      // Remove /api suffix if present to avoid double /api/api
+      const baseUrl = apiUrl.replace(/\/api$/, '');
+      const response = await fetch(`${baseUrl}/csrf-token`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -44,7 +47,8 @@ class ApiClient {
   private baseURL: string;
 
   constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api') {
-    this.baseURL = baseURL;
+    // Ensure baseURL doesn't have double /api
+    this.baseURL = baseURL.replace(/\/api\/api$/, '/api');
   }
 
   private async request<T>(
@@ -96,7 +100,10 @@ class ApiClient {
         // Handle CSRF token errors
         if (response.status === 403) {
           const errorData = await response.json().catch(() => ({}));
-          if (errorData.message?.includes('CSRF') || errorData.error?.includes('CSRF')) {
+          const message = errorData.message || '';
+          const error = errorData.error || '';
+          if ((typeof message === 'string' && message.includes('CSRF')) || 
+              (typeof error === 'string' && error.includes('CSRF'))) {
             CSRFManager.clearToken();
             // Retry the request once with a fresh CSRF token
             return this.request<T>(endpoint, options);

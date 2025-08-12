@@ -53,9 +53,25 @@ export default function LoginPage() {
       });
       
       if (success) {
-        window.location.href = process.env.NODE_ENV === 'development' 
-          ? 'http://localhost:3001/dashboard' 
-          : 'https://dashboard.vikareta.com/dashboard';
+        // Show success message
+        toast.success('Login Successful!', 'Welcome back!');
+        
+        // Redirect to dashboard after a short delay
+        setTimeout(() => {
+          const dashboardUrl = process.env.NODE_ENV === 'development' 
+            ? 'http://localhost:3001/dashboard' 
+            : 'https://dashboard.vikareta.com/dashboard';
+          
+          // Add auth token as URL parameter for cross-domain auth
+          const token = localStorage.getItem('auth_token');
+          if (token) {
+            const urlWithAuth = `${dashboardUrl}?token=${encodeURIComponent(token)}`;
+            window.location.href = urlWithAuth;
+          } else {
+            // Fallback to dashboard without token
+            window.location.href = dashboardUrl;
+          }
+        }, 1000);
       }
     } catch (error) {
       console.error('Login error:', error);

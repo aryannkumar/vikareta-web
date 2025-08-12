@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api';
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api').replace(/\/api\/api$/, '/api');
 
 export interface User {
   id: string;
@@ -83,12 +83,13 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
     }
 
     if (!response.ok) {
-      throw new Error(data.error?.message || `Request failed with status ${response.status}`);
+      const errorMessage = data.error?.message || data.message || `Request failed with status ${response.status}`;
+      throw new Error(typeof errorMessage === 'string' ? errorMessage : 'Request failed');
     }
 
     return data;
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('fetch')) {
+    if (error instanceof TypeError && typeof error.message === 'string' && error.message.includes('fetch')) {
       throw new Error('Network error - please check your connection');
     }
     throw error;

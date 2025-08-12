@@ -23,6 +23,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const router = useRouter();
@@ -94,9 +95,26 @@ export default function RegisterPage() {
       });
       
       if (success) {
-        window.location.href = process.env.NODE_ENV === 'development' 
-          ? 'http://localhost:3001/dashboard' 
-          : 'https://dashboard.vikareta.com/dashboard';
+        // Show success message
+        toast.success('Registration Successful!', 'Your account has been created successfully.');
+        setRedirecting(true);
+        
+        // Redirect to dashboard after a short delay
+        setTimeout(() => {
+          const dashboardUrl = process.env.NODE_ENV === 'development' 
+            ? 'http://localhost:3001/dashboard' 
+            : 'https://dashboard.vikareta.com/dashboard';
+          
+          // Add auth token as URL parameter for cross-domain auth
+          const token = localStorage.getItem('auth_token');
+          if (token) {
+            const urlWithAuth = `${dashboardUrl}?token=${encodeURIComponent(token)}`;
+            window.location.href = urlWithAuth;
+          } else {
+            // Fallback to dashboard without token
+            window.location.href = dashboardUrl;
+          }
+        }, 1500);
       }
     } catch (error) {
       console.error('Registration error:', error);
@@ -393,9 +411,14 @@ export default function RegisterPage() {
           <Button
             type="submit"
             className="w-full btn-primary"
-            disabled={loading}
+            disabled={loading || redirecting}
           >
-            {loading ? (
+            {redirecting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Redirecting to dashboard...
+              </>
+            ) : loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Creating account...
