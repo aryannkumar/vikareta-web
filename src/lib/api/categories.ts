@@ -41,7 +41,8 @@ export interface Subcategory {
 
 export async function getCategoryById(id: string): Promise<Category | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/categories/${id}`);
+    // Try to fetch by slug first (since routes now use slugs)
+    const response = await fetch(`${API_BASE_URL}/categories/slug/${id}`);
     if (!response.ok) {
       if (response.status === 404) return null;
       throw new Error(`Failed to fetch category: ${response.statusText}`);
@@ -50,6 +51,21 @@ export async function getCategoryById(id: string): Promise<Category | null> {
     return data.success ? data.data : null;
   } catch (error) {
     console.error('Error fetching category:', error);
+    return null;
+  }
+}
+
+export async function getCategoryBySlug(slug: string): Promise<Category | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/categories/slug/${slug}`);
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error(`Failed to fetch category: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.success ? data.data : null;
+  } catch (error) {
+    console.error('Error fetching category by slug:', error);
     return null;
   }
 }
@@ -136,6 +152,7 @@ export async function getCategoryWithProducts(categoryId: string, options?: {
 // Legacy API object for backward compatibility
 export const categoriesApi = {
   getCategoryById,
+  getCategoryBySlug,
   getSubcategoryById,
   getCategoriesWithSubcategories,
   getSubcategoriesByCategoryId,

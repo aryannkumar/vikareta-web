@@ -18,6 +18,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { CategoryIcon } from '@/components/ui/dynamic-icon';
+import { PlaceholderImage } from '@/components/ui/placeholder-image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
@@ -343,15 +344,25 @@ export default function CategoryDetailPage() {
                 }`}
               >
                 <div className={`relative ${viewMode === 'list' ? 'w-32 h-32 flex-shrink-0' : ''}`}>
-                  <Image
-                    src={product.images[0] || '/api/placeholder/300/200'}
-                    alt={product.name}
-                    width={viewMode === 'list' ? 128 : 300}
-                    height={viewMode === 'list' ? 128 : 200}
-                    className={`object-cover rounded-lg ${
-                      viewMode === 'list' ? 'w-32 h-32' : 'w-full h-48'
-                    }`}
-                  />
+                  {product.images && product.images[0] ? (
+                    <Image
+                      src={product.images[0]}
+                      alt={product.name}
+                      width={viewMode === 'list' ? 128 : 300}
+                      height={viewMode === 'list' ? 128 : 200}
+                      className={`object-cover rounded-lg ${
+                        viewMode === 'list' ? 'w-32 h-32' : 'w-full h-48'
+                      }`}
+                    />
+                  ) : (
+                    <PlaceholderImage
+                      type="product"
+                      className={`rounded-lg ${
+                        viewMode === 'list' ? 'w-32 h-32' : 'w-full h-48'
+                      }`}
+                      size={viewMode === 'list' ? 128 : 200}
+                    />
+                  )}
                   
                   {product.originalPrice && (
                     <Badge className="absolute top-2 left-2 bg-red-500 text-white">
