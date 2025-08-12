@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowRight, Loader2, AlertCircle, TrendingUp, Package, Users } from 'lucide-react';
+import { IconBackground } from '@/components/ui/dynamic-icon';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
@@ -102,25 +102,25 @@ export function CategoriesSection() {
             >
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden transform hover:scale-105">
                 <div className="relative h-56">
-                  <Image
-                    src={'/api/placeholder/400/300'}
-                    alt={category.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  <IconBackground
+                    category={category}
+                    size={80}
+                    className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-orange-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600 group-hover:from-blue-100 group-hover:to-orange-100 dark:group-hover:from-gray-700 dark:group-hover:to-gray-600 transition-all duration-500"
+                    iconClassName="text-blue-600 dark:text-blue-400 group-hover:text-orange-500 group-hover:scale-110 transition-all duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                   
                   {/* Trending Badge */}
                   {index < 3 && (
-                    <div className="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
+                    <div className="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1 shadow-lg">
                       <TrendingUp className="h-3 w-3" />
                       TRENDING
                     </div>
                   )}
                   
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <h3 className="font-bold text-xl mb-2">{category.name}</h3>
-                    <p className="text-sm opacity-90 line-clamp-2">{category.description}</p>
+                  <div className="absolute bottom-4 left-4 text-gray-800 dark:text-white">
+                    <h3 className="font-bold text-xl mb-2 drop-shadow-sm">{category.name}</h3>
+                    <p className="text-sm opacity-90 line-clamp-2 drop-shadow-sm">{category.description}</p>
                   </div>
                 </div>
                 

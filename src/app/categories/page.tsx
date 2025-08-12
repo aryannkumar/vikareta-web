@@ -6,6 +6,7 @@ import { Search, Grid, List, Filter, ArrowRight, TrendingUp, Package, Loader2 } 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { CategoryIcon } from '@/components/ui/dynamic-icon';
 
 interface Category {
   id: string;
@@ -13,6 +14,7 @@ interface Category {
   slug: string;
   description?: string;
   icon?: string;
+  iconName?: string; // Dynamic icon name for Lucide React
   featured: boolean;
   productCount: number;
   isActive: boolean;
@@ -183,8 +185,8 @@ export default function CategoriesPage() {
                   <Card className="card-hover group">
                     <CardContent className="p-6">
                       <div className="flex items-start space-x-4">
-                        <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Package className="h-6 w-6 text-white" />
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-orange-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <CategoryIcon category={category} size={24} className="text-white" />
                         </div>
                         <div className="flex-1">
                           <h3 className="font-bold text-lg group-hover:text-primary transition-colors">
@@ -229,8 +231,8 @@ export default function CategoriesPage() {
                 <Card className="card-hover group h-full">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Package className="h-6 w-6 text-white" />
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-orange-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <CategoryIcon category={category} size={24} className="text-white" />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-start justify-between">
@@ -270,8 +272,8 @@ export default function CategoriesPage() {
                 <Card className="card-hover group">
                   <CardContent className="p-6">
                     <div className="flex items-center space-x-6">
-                      <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Package className="h-8 w-8 text-white" />
+                      <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-orange-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <CategoryIcon category={category} size={32} className="text-white" />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-start justify-between">

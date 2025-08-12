@@ -6,6 +6,7 @@ export interface Category {
   slug: string;
   description: string | null;
   icon: string | null;
+  iconName?: string; // Dynamic icon name for Lucide React
   featured: boolean;
   productCount: number;
   sortOrder: number;

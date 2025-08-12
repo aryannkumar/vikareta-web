@@ -17,6 +17,7 @@ import {
   Building,
   AlertCircle
 } from 'lucide-react';
+import { CategoryIcon } from '@/components/ui/dynamic-icon';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
@@ -171,8 +172,8 @@ export default function CategoryDetailPage() {
         {/* Category Header */}
         <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-8 mb-8">
           <div className="flex items-start gap-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Package className="h-8 w-8 text-white" />
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <CategoryIcon category={categoryData} size={32} className="text-white" />
             </div>
             
             <div className="flex-1">
