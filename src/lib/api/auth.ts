@@ -58,50 +58,50 @@ export interface ChangePasswordData {
 
 export const authApi = {
   async login(credentials: LoginCredentials) {
-    return apiClient.post<AuthResponse>('/api/auth/login', credentials);
+    return apiClient.post<AuthResponse>('/auth/login', credentials);
   },
 
   async register(data: RegisterData) {
-    return apiClient.post<AuthResponse>('/api/auth/register', data);
+    return apiClient.post<AuthResponse>('/auth/register', data);
   },
 
   async logout() {
-    return apiClient.post('/api/auth/logout');
+    return apiClient.post('/auth/logout');
   },
 
   async getCurrentUser() {
-    return apiClient.get<User>('/api/auth/me');
+    return apiClient.get<User>('/auth/me');
   },
 
   async refreshToken() {
-    return apiClient.post<{ token: string; refreshToken: string }>('/api/auth/refresh');
+    return apiClient.post<{ token: string; refreshToken: string }>('/auth/refresh');
   },
 
   async forgotPassword(data: ForgotPasswordData) {
-    return apiClient.post('/api/auth/forgot-password', data);
+    return apiClient.post('/auth/forgot-password', data);
   },
 
   async resetPassword(data: ResetPasswordData) {
-    return apiClient.post('/api/auth/reset-password', data);
+    return apiClient.post('/auth/reset-password', data);
   },
 
   async changePassword(data: ChangePasswordData) {
-    return apiClient.put('/api/auth/change-password', data);
+    return apiClient.put('/auth/change-password', data);
   },
 
   async verifyEmail(token: string) {
-    return apiClient.post('/api/auth/verify-email', { token });
+    return apiClient.post('/auth/verify-email', { token });
   },
 
   async resendVerification() {
-    return apiClient.post('/api/auth/resend-verification');
+    return apiClient.post('/auth/resend-verification');
   },
 
   async updateProfile(data: Partial<User>) {
-    return apiClient.put<User>('/api/auth/profile', data);
+    return apiClient.put<User>('/auth/profile', data);
   },
 
   async deleteAccount() {
-    return apiClient.delete('/api/auth/account');
+    return apiClient.delete('/auth/account');
   }
 };

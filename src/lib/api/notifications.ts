@@ -36,34 +36,34 @@ export const notificationsApi = {
             unreadCount: number;
             page: number;
             totalPages: number;
-        }>('/api/notifications', params);
+        }>('/notifications', params);
     },
 
     async markAsRead(notificationId: string) {
-        return apiClient.patch(`/api/notifications/${notificationId}/read`);
+        return apiClient.patch(`/notifications/${notificationId}/read`);
     },
 
     async markAllAsRead() {
-        return apiClient.patch('/api/notifications/mark-all-read');
+        return apiClient.patch('/notifications/mark-all-read');
     },
 
     async deleteNotification(notificationId: string) {
-        return apiClient.delete(`/api/notifications/${notificationId}`);
+        return apiClient.delete(`/notifications/${notificationId}`);
     },
 
     async getUnreadCount() {
-        return apiClient.get<{ count: number }>('/api/notifications/unread-count');
+        return apiClient.get<{ count: number }>('/notifications/unread-count');
     },
 
     async getPreferences() {
-        return apiClient.get<NotificationPreferences>('/api/notifications/preferences');
+        return apiClient.get<NotificationPreferences>('/notifications/preferences');
     },
 
     async updatePreferences(preferences: Partial<NotificationPreferences>) {
-        return apiClient.put<NotificationPreferences>('/api/notifications/preferences', preferences);
+        return apiClient.put<NotificationPreferences>('/notifications/preferences', preferences);
     },
 
     async testNotification(type: string) {
-        return apiClient.post('/api/notifications/test', { type });
+        return apiClient.post('/notifications/test', { type });
     }
 };
