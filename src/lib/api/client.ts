@@ -1,51 +1,10 @@
+import { CrossDomainCSRFManager } from './csrf-manager';
+
 interface ApiResponse<T = any> {
   success: boolean;
   data: T;
   error?: string;
   message?: string;
-}
-
-class CSRFManager {
-  private static token: string | null = null;
-  private static tokenExpiry: number = 0;
-
-  static async getToken(): Promise<string | null> {
-    // Check if token is still valid (valid for 30 minutes)
-    if (this.token && Date.now() < this.tokenExpiry) {
-      return this.token;
-    }
-
-    try {
-      // Use the correct base URL for CSRF token endpoint
-      const baseUrl = 'https://api.vikareta.com';
-      const response = await fetch(`${baseUrl}/csrf-token`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Origin': window.location.origin,
-          'Accept': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        this.token = data.data.csrfToken;
-        this.tokenExpiry = Date.now() + (30 * 60 * 1000); // 30 minutes
-        return this.token;
-      } else {
-        console.error('CSRF token fetch failed:', response.status, response.statusText);
-      }
-    } catch (error) {
-      console.error('Failed to fetch CSRF token:', error);
-    }
-
-    return null;
-  }
-
-  static clearToken(): void {
-    this.token = null;
-    this.tokenExpiry = 0;
-  }
 }
 
 class ApiClient {
@@ -102,11 +61,33 @@ class ApiClient {
 
     // Add CSRF token for state-changing requests
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method || 'GET')) {
-      const csrfToken = await CSRFManager.getToken();
-      if (csrfToken) {
+      try {
+        const csrfToken = await CrossDomainCSRFManager.getToken();
+        if (csrfToken) {
+          console.log('Adding CSRF token to request:', csrfToken.substring(0, 10) + '...');
+          config.headers = {
+            ...config.headers,
+            'X-CSRF-Token': csrfToken,
+            // Add additional headers for cross-domain auth
+            'X-Cross-Domain-Auth': 'true',
+            'X-Requested-With': 'XMLHttpRequest',
+          };
+        } else {
+          console.warn('No CSRF token available for request to:', endpoint);
+          // For cross-domain auth, add headers even without token
+          config.headers = {
+            ...config.headers,
+            'X-Cross-Domain-Auth': 'true',
+            'X-Requested-With': 'XMLHttpRequest',
+          };
+        }
+      } catch (error) {
+        console.error('Failed to get CSRF token for request:', error);
+        // Add cross-domain headers even on error
         config.headers = {
           ...config.headers,
-          'X-CSRF-Token': csrfToken,
+          'X-Cross-Domain-Auth': 'true',
+          'X-Requested-With': 'XMLHttpRequest',
         };
       }
     }
@@ -123,12 +104,29 @@ class ApiClient {
           const errorData = await response.json().catch(() => ({}));
           const message = errorData.message || '';
           const error = errorData.error || '';
+          const errorCode = errorData.error?.code || '';
+          
           if ((typeof message === 'string' && message.includes('CSRF')) || 
-              (typeof error === 'string' && error.includes('CSRF'))) {
-            console.log('CSRF token expired, clearing and retrying...');
-            CSRFManager.clearToken();
-            // Retry the request once with a fresh CSRF token
-            return this.request<T>(endpoint, options);
+              (typeof error === 'string' && error.includes('CSRF')) ||
+              errorCode === 'CSRF_TOKEN_INVALID') {
+            console.log('CSRF token error detected, clearing and retrying...');
+            console.log('CSRF Error details:', { message, error, errorCode });
+            
+            CrossDomainCSRFManager.clearToken();
+            
+            // For cross-domain requests, try alternative approach
+            const headers = config.headers as Record<string, string>;
+            if (headers && headers['X-Cross-Domain-Auth']) {
+              console.log('Retrying cross-domain request with fresh token...');
+              // Add a retry flag to prevent infinite loops
+              if (!headers['X-CSRF-Retry']) {
+                headers['X-CSRF-Retry'] = 'true';
+                return this.request<T>(endpoint, options);
+              }
+            } else {
+              // Regular retry for same-domain requests
+              return this.request<T>(endpoint, options);
+            }
           }
         }
         
