@@ -54,24 +54,37 @@ export default function LoginPage() {
       
       if (success) {
         // Show success message
-        toast.success('Login Successful!', 'Welcome back!');
+        toast.success('Login Successful!', 'Redirecting to your dashboard...');
         
-        // Redirect to dashboard subdomain
+        // Wait a bit longer to ensure token is properly stored
         setTimeout(() => {
           const dashboardUrl = process.env.NODE_ENV === 'development' 
-            ? 'http://localhost:3001/dashboard' 
-            : 'https://dashboard.vikareta.com/dashboard';
+            ? 'http://localhost:3001' 
+            : process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://dashboard.vikareta.com';
+          
+          console.log('Main Site: Redirecting to dashboard:', dashboardUrl);
           
           // Add auth token as URL parameter for cross-domain auth
           const token = localStorage.getItem('auth_token');
+          console.log('Main Site: Auth token for redirect:', token ? `Found (${token.substring(0, 20)}...)` : 'Not found');
+          
           if (token) {
-            const urlWithAuth = `${dashboardUrl}?token=${encodeURIComponent(token)}`;
-            window.location.href = urlWithAuth;
+            const urlWithAuth = `${dashboardUrl}?token=${encodeURIComponent(token)}&redirect=login&source=main_site`;
+            console.log('Main Site: Redirecting with token to:', urlWithAuth);
+            
+            // Use window.location.replace to avoid back button issues
+            window.location.replace(urlWithAuth);
           } else {
-            // Fallback to dashboard without token
-            window.location.href = dashboardUrl;
+            console.error('Main Site: No auth token found after successful login!');
+            toast.error('Authentication Error', 'Login succeeded but token not found. Please try again.');
+            
+            // Still try to redirect, dashboard will handle the missing token
+            window.location.replace(`${dashboardUrl}?redirect=login&source=main_site&error=no_token`);
           }
-        }, 1000);
+        }, 2000); // Increased timeout to ensure token is stored
+      } else {
+        console.error('Main Site: Login failed - success was false');
+        toast.error('Login Failed', 'Please check your credentials and try again.');
       }
     } catch (error) {
       console.error('Login error:', error);
