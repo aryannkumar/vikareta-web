@@ -36,8 +36,38 @@ export class SSOAuthClient {
 
   constructor() {
     this.baseURL = process.env.NODE_ENV === 'development' 
-      ? 'http://localhost:8000' 
+      ? 'http://localhost:5001' 
       : 'https://api.vikareta.com';
+  }
+
+  /**
+   * Get CSRF token from backend
+   */
+  private async ensureCSRFToken(): Promise<void> {
+    if (typeof window === 'undefined') return;
+    
+    // Check if we already have a token in cookies
+    const existingToken = this.getCSRFToken();
+    if (existingToken) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${this.baseURL}/csrf-token`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        // Token should now be set in cookies
+        console.log('SSO: CSRF token obtained');
+      }
+    } catch (error) {
+      console.warn('SSO: Failed to get CSRF token:', error);
+    }
   }
 
   /**
@@ -110,7 +140,10 @@ export class SSOAuthClient {
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      const response = await this.request<AuthResponse>('/auth/login', {
+      // Ensure we have a CSRF token before making the request
+      await this.ensureCSRFToken();
+      
+      const response = await this.request<AuthResponse>('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify(credentials),
       });
@@ -140,7 +173,7 @@ export class SSOAuthClient {
    */
   async checkSession(): Promise<AuthResponse> {
     try {
-      const response = await this.request<AuthResponse>('/auth/me', {
+      const response = await this.request<AuthResponse>('/api/auth/me', {
         method: 'GET',
       });
 
@@ -168,7 +201,10 @@ export class SSOAuthClient {
    */
   async refreshToken(): Promise<AuthResponse> {
     try {
-      const response = await this.request<AuthResponse>('/auth/refresh', {
+      // Ensure we have a CSRF token before making the request
+      await this.ensureCSRFToken();
+      
+      const response = await this.request<AuthResponse>('/api/auth/refresh', {
         method: 'POST',
       });
 
@@ -196,7 +232,10 @@ export class SSOAuthClient {
    */
   async logout(): Promise<AuthResponse> {
     try {
-      const response = await this.request<AuthResponse>('/auth/logout', {
+      // Ensure we have a CSRF token before making the request
+      await this.ensureCSRFToken();
+      
+      const response = await this.request<AuthResponse>('/api/auth/logout', {
         method: 'POST',
       });
 
@@ -227,7 +266,10 @@ export class SSOAuthClient {
     businessName?: string;
   }): Promise<AuthResponse> {
     try {
-      const response = await this.request<AuthResponse>('/auth/register', {
+      // Ensure we have a CSRF token before making the request
+      await this.ensureCSRFToken();
+      
+      const response = await this.request<AuthResponse>('/api/auth/register', {
         method: 'POST',
         body: JSON.stringify(userData),
       });
