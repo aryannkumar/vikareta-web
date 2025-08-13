@@ -51,12 +51,10 @@ class CSRFManager {
 class ApiClient {
   private baseURL: string;
 
-  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api') {
-    // Ensure baseURL doesn't have double /api and ends with /api
-    if (baseURL.includes('/api/api')) {
-      this.baseURL = baseURL.replace(/\/api\/api$/, '/api');
-    } else if (!baseURL.endsWith('/api')) {
-      this.baseURL = baseURL + '/api';
+  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com') {
+    // Ensure baseURL doesn't end with /api since we'll add it in endpoints
+    if (baseURL.endsWith('/api')) {
+      this.baseURL = baseURL.replace(/\/api$/, '');
     } else {
       this.baseURL = baseURL;
     }
@@ -66,7 +64,9 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    const url = `${this.baseURL}${endpoint}`;
+    // Ensure endpoint starts with /api
+    const normalizedEndpoint = endpoint.startsWith('/api') ? endpoint : `/api${endpoint}`;
+    const url = `${this.baseURL}${normalizedEndpoint}`;
     
     const config: RequestInit = {
       headers: {
