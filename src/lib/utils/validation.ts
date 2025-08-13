@@ -90,7 +90,7 @@ export const searchSchema = z.object({
   maxPrice: z.number().min(0, 'Maximum price cannot be negative').optional(),
   location: z.string().max(100, 'Location is too long').optional(),
   radius: z.number().min(1, 'Radius must be at least 1 km').max(100, 'Radius cannot exceed 100 km').optional(),
-  sortBy: z.enum(['relevance', 'price_asc', 'price_desc', 'newest', 'rating']).optional(),
+  sortBy: z.enum(['createdAt', 'price', 'rating', 'title']).optional(),
 }).refine(data => {
   if (data.minPrice && data.maxPrice) {
     return data.minPrice <= data.maxPrice;

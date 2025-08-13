@@ -98,7 +98,7 @@ export interface OrderFilters {
   minAmount?: number;
   maxAmount?: number;
   search?: string;
-  sortBy?: 'newest' | 'oldest' | 'amount_asc' | 'amount_desc' | 'status';
+  sortBy?: 'createdAt' | 'totalAmount' | 'status';
   page?: number;
   limit?: number;
 }

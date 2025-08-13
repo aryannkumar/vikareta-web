@@ -137,7 +137,7 @@ export interface ProvidersFilters {
   verified?: boolean;
   languages?: string[];
   search?: string;
-  sortBy?: 'relevance' | 'rating' | 'experience' | 'projects' | 'rate-low' | 'rate-high';
+  sortBy?: 'createdAt' | 'rating' | 'experience' | 'projects';
   page?: number;
   limit?: number;
 }

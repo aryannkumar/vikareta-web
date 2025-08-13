@@ -110,7 +110,7 @@ export interface ProductFilters {
   inStock?: boolean;
   rating?: number;
   location?: string;
-  sortBy?: 'price_asc' | 'price_desc' | 'rating' | 'newest' | 'popular';
+  sortBy?: 'price' | 'createdAt' | 'title' | 'stockQuantity';
   page?: number;
   limit?: number;
   search?: string;

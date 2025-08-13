@@ -50,7 +50,7 @@ export interface SearchFilters {
   location?: string;
   rating?: number;
   verified?: boolean;
-  sortBy?: 'relevance' | 'price-low' | 'price-high' | 'rating' | 'newest';
+  sortBy?: 'createdAt' | 'price' | 'rating' | 'title';
   page?: number;
   limit?: number;
 }

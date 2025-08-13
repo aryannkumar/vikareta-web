@@ -51,7 +51,7 @@ export default function ProvidersPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [experienceLevel, setExperienceLevel] = useState('');
-  const [sortBy, setSortBy] = useState<ProvidersFilters['sortBy']>('relevance');
+  const [sortBy, setSortBy] = useState<ProvidersFilters['sortBy']>('createdAt');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   
@@ -79,7 +79,7 @@ export default function ProvidersPage() {
   ];
 
   const sortOptions = [
-    { value: 'relevance', label: 'Relevance' },
+    { value: 'createdAt', label: 'Newest First' },
     { value: 'rating', label: 'Highest Rated' },
     { value: 'experience', label: 'Most Experienced' },
     { value: 'projects', label: 'Most Projects' },

@@ -30,6 +30,7 @@ export interface RegisterData {
   password: string;
   userType: 'buyer' | 'seller';
   businessName?: string;
+  location?: string;
 }
 
 export interface AuthResponse {

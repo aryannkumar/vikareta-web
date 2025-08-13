@@ -40,7 +40,7 @@ function SearchPageContent() {
   const [selectedType, setSelectedType] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-  const [sortBy, setSortBy] = useState<SearchFilters['sortBy']>('relevance');
+  const [sortBy, setSortBy] = useState<SearchFilters['sortBy']>('createdAt');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [totalResults, setTotalResults] = useState(0);
@@ -69,11 +69,10 @@ function SearchPageContent() {
   ];
 
   const sortOptions = [
-    { value: 'relevance', label: 'Relevance' },
-    { value: 'price-low', label: 'Price: Low to High' },
-    { value: 'price-high', label: 'Price: High to Low' },
-    { value: 'rating', label: 'Highest Rated' },
-    { value: 'newest', label: 'Newest First' }
+    { value: 'createdAt', label: 'Newest First' },
+    { value: 'price', label: 'Price' },
+    { value: 'title', label: 'Name A-Z' },
+    { value: 'rating', label: 'Highest Rated' }
   ];
 
 

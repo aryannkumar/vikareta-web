@@ -32,7 +32,7 @@ export default function ServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedServiceType, setSelectedServiceType] = useState('');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-  const [sortBy, setSortBy] = useState<ServicesFilters['sortBy']>('relevance');
+  const [sortBy, setSortBy] = useState<ServicesFilters['sortBy']>('createdAt');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,11 +50,10 @@ export default function ServicesPage() {
   ];
 
   const sortOptions = [
-    { value: 'relevance', label: 'Relevance' },
-    { value: 'price-low', label: 'Price: Low to High' },
-    { value: 'price-high', label: 'Price: High to Low' },
+    { value: 'createdAt', label: 'Newest First' },
+    { value: 'price', label: 'Price' },
+    { value: 'title', label: 'Name A-Z' },
     { value: 'rating', label: 'Highest Rated' },
-    { value: 'newest', label: 'Newest First' }
   ] as const;
 
   useEffect(() => {

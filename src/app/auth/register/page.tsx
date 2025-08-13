@@ -17,6 +17,7 @@ export default function RegisterPage() {
     password: '',
     confirmPassword: '',
     company: '',
+    location: '',
     userType: 'buyer' as 'buyer' | 'seller',
     agreeToTerms: false
   });
@@ -89,7 +90,8 @@ export default function RegisterPage() {
         phone: formData.phone,
         password: formData.password,
         userType: formData.userType as 'buyer' | 'seller',
-        businessName: formData.company
+        businessName: formData.company,
+        location: formData.location
       };
       
       const success = await register(registrationData);
@@ -302,6 +304,25 @@ export default function RegisterPage() {
                 onChange={(e) => handleInputChange('company', e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background"
                 placeholder="Enter your company name"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          {/* Location Field (Optional) */}
+          <div>
+            <label htmlFor="location" className="block text-sm font-medium mb-2">
+              Location (Optional)
+            </label>
+            <div className="relative">
+              <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <input
+                id="location"
+                type="text"
+                value={formData.location}
+                onChange={(e) => handleInputChange('location', e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background"
+                placeholder="Enter your city, state"
                 disabled={loading}
               />
             </div>

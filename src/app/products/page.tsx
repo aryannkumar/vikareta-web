@@ -33,7 +33,7 @@ export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-  const [sortBy, setSortBy] = useState<ProductFilters['sortBy']>('popular');
+  const [sortBy, setSortBy] = useState<ProductFilters['sortBy']>('createdAt');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -49,12 +49,10 @@ export default function ProductsPage() {
   const { addItem } = useCartStore();
 
   const sortOptions = [
-    { value: 'popular', label: 'Most Popular' },
-    { value: 'price_asc', label: 'Price: Low to High' },
-    { value: 'price_desc', label: 'Price: High to Low' },
-    { value: 'rating', label: 'Highest Rated' },
-    { value: 'newest', label: 'Newest First' },
-
+    { value: 'createdAt', label: 'Newest First' },
+    { value: 'price', label: 'Price' },
+    { value: 'title', label: 'Name A-Z' },
+    { value: 'stockQuantity', label: 'Stock Quantity' },
   ] as const;
 
   useEffect(() => {

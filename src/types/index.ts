@@ -252,7 +252,7 @@ export interface SearchFilters {
   verificationTier?: string[];
   isService?: boolean;
   inStock?: boolean;
-  sortBy?: 'relevance' | 'price_asc' | 'price_desc' | 'newest' | 'rating';
+  sortBy?: 'createdAt' | 'price' | 'rating' | 'title';
 }
 
 export interface SearchResult {

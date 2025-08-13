@@ -36,7 +36,7 @@ export function FeaturedProducts() {
       if (!response.success || !response.data.products || response.data.products.length === 0) {
         // Fallback to regular products API
         const productsApi = await import('@/lib/api/products');
-        const fallbackResponse = await productsApi.productsApi.getProducts({ limit: 8, sortBy: 'popular' });
+        const fallbackResponse = await productsApi.productsApi.getProducts({ limit: 8, sortBy: 'createdAt' });
         
         if (fallbackResponse.success && fallbackResponse.data.products) {
           // Transform regular products to featured products format

@@ -112,7 +112,7 @@ export default function MarketplacePage() {
         const [productsResponse, servicesResponse] = await Promise.all([
           productsApi.productsApi.getProducts({ 
             limit: 12, 
-            sortBy: 'popular',
+            sortBy: 'createdAt',
             ...(filters.category && { category: filters.category })
           }),
           servicesApi.servicesApi.getServices({ 

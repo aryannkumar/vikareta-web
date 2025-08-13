@@ -62,7 +62,7 @@ export default function OrdersPage() {
         status: statusFilter as any,
         page: currentPage,
         limit: 10,
-        sortBy: 'newest'
+        sortBy: 'createdAt'
       });
 
       if (response.success) {

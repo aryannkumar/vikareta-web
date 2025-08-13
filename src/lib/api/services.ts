@@ -90,7 +90,7 @@ export interface ServicesFilters {
   experience?: string;
   available?: boolean;
   search?: string;
-  sortBy?: 'relevance' | 'price-low' | 'price-high' | 'rating' | 'newest';
+  sortBy?: 'price' | 'createdAt' | 'title' | 'rating';
   page?: number;
   limit?: number;
 }
