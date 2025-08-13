@@ -16,12 +16,15 @@ class CSRFManager {
     }
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api';
-      // Remove /api suffix if present to avoid double /api/api
-      const baseUrl = apiUrl.replace(/\/api$/, '');
+      // Use the correct base URL for CSRF token endpoint
+      const baseUrl = 'https://api.vikareta.com';
       const response = await fetch(`${baseUrl}/csrf-token`, {
         method: 'GET',
         credentials: 'include',
+        headers: {
+          'Origin': window.location.origin,
+          'Accept': 'application/json',
+        },
       });
 
       if (response.ok) {
@@ -29,6 +32,8 @@ class CSRFManager {
         this.token = data.data.csrfToken;
         this.tokenExpiry = Date.now() + (30 * 60 * 1000); // 30 minutes
         return this.token;
+      } else {
+        console.error('CSRF token fetch failed:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to fetch CSRF token:', error);
@@ -47,8 +52,14 @@ class ApiClient {
   private baseURL: string;
 
   constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api') {
-    // Ensure baseURL doesn't have double /api
-    this.baseURL = baseURL.replace(/\/api\/api$/, '/api');
+    // Ensure baseURL doesn't have double /api and ends with /api
+    if (baseURL.includes('/api/api')) {
+      this.baseURL = baseURL.replace(/\/api\/api$/, '/api');
+    } else if (!baseURL.endsWith('/api')) {
+      this.baseURL = baseURL + '/api';
+    } else {
+      this.baseURL = baseURL;
+    }
   }
 
   private async request<T>(
@@ -94,9 +105,12 @@ class ApiClient {
     }
 
     try {
+      console.log(`Making API request to: ${url}`);
       const response = await fetch(url, config);
       
       if (!response.ok) {
+        console.error(`API request failed: ${response.status} ${response.statusText} for ${url}`);
+        
         // Handle CSRF token errors
         if (response.status === 403) {
           const errorData = await response.json().catch(() => ({}));
@@ -104,6 +118,7 @@ class ApiClient {
           const error = errorData.error || '';
           if ((typeof message === 'string' && message.includes('CSRF')) || 
               (typeof error === 'string' && error.includes('CSRF'))) {
+            console.log('CSRF token expired, clearing and retrying...');
             CSRFManager.clearToken();
             // Retry the request once with a fresh CSRF token
             return this.request<T>(endpoint, options);
@@ -136,13 +151,14 @@ class ApiClient {
       }
 
       const data = await response.json();
+      console.log(`API request successful: ${url}`);
       return {
         success: true,
         data: data.data || data,
         message: data.message,
       };
     } catch (error) {
-      console.error('API request failed:', error);
+      console.error('API request failed with error:', error, 'for URL:', url);
       
       // Return empty array for list endpoints to prevent UI crashes
       const isListEndpoint = endpoint.includes('/products') || 
