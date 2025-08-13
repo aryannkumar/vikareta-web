@@ -64,6 +64,17 @@ export class SSOAuthClient {
       if (response.ok) {
         // Token should now be set in cookies
         console.log('SSO: CSRF token obtained');
+        
+        // Wait a bit for the cookie to be set
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Verify the token is now available
+        const token = this.getCSRFToken();
+        if (!token) {
+          console.warn('SSO: CSRF token not found in cookies after request');
+        } else {
+          console.log('SSO: CSRF token verified in cookies');
+        }
       }
     } catch (error) {
       console.warn('SSO: Failed to get CSRF token:', error);
@@ -109,6 +120,8 @@ export class SSOAuthClient {
     // Add CSRF token for state-changing requests
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method || 'GET')) {
       const csrfToken = this.getCSRFToken();
+      console.log('SSO: CSRF token for request:', csrfToken ? 'Found' : 'Not found');
+      console.log('SSO: All cookies:', document.cookie);
       if (csrfToken) {
         config.headers = {
           ...config.headers,
