@@ -70,7 +70,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (data: RegisterData): Promise<boolean> => {
     try {
-      console.log('useAuth register called with:', data);
       const response = await authApi.register(data);
       if (response.success) {
         localStorage.setItem('auth_token', response.data.token);

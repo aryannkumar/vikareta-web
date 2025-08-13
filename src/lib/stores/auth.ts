@@ -58,7 +58,7 @@ interface AuthState {
   logout: () => void;
   updateUser: (user: Partial<User>) => void;
   refreshAuth: () => Promise<void>;
-  register: (data: RegisterData) => Promise<void>;
+  register: (data: RegisterData) => Promise<boolean>;
   socialLogin: (data: SocialLoginData) => Promise<void>;
   updateProfile: (data: ProfileUpdateData) => Promise<void>;
   clearError: () => void;

@@ -60,7 +60,6 @@ export const authApi = {
   },
 
   async register(data: RegisterData) {
-    console.log('authApi.register called with:', data);
     return apiClient.post<AuthResponse>('/auth/register', data);
   },
 
