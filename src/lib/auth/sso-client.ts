@@ -67,14 +67,6 @@ export class SSOAuthClient {
         
         // Wait a bit for the cookie to be set
         await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Verify the token is now available
-        const token = this.getCSRFToken();
-        if (!token) {
-          console.warn('SSO: CSRF token not found in cookies after request');
-        } else {
-          console.log('SSO: CSRF token verified in cookies');
-        }
       }
     } catch (error) {
       console.warn('SSO: Failed to get CSRF token:', error);
@@ -120,8 +112,6 @@ export class SSOAuthClient {
     // Add CSRF token for state-changing requests
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method || 'GET')) {
       const csrfToken = this.getCSRFToken();
-      console.log('SSO: CSRF token for request:', csrfToken ? 'Found' : 'Not found');
-      console.log('SSO: All cookies:', document.cookie);
       if (csrfToken) {
         config.headers = {
           ...config.headers,
@@ -171,29 +161,6 @@ export class SSOAuthClient {
       }
     } catch (error) {
       console.error('SSO: Login error:', error);
-      
-      // If it's a CSRF error, try to get a fresh token and retry once
-      if (error instanceof Error && error.message.includes('403')) {
-        console.log('SSO: Retrying login with fresh CSRF token...');
-        try {
-          // Clear any existing token and get a fresh one
-          document.cookie = 'XSRF-TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-          await this.ensureCSRFToken();
-          
-          const retryResponse = await this.request<AuthResponse>('/api/auth/login', {
-            method: 'POST',
-            body: JSON.stringify(credentials),
-          });
-          
-          if (retryResponse.success) {
-            console.log('SSO: Login successful on retry');
-            return retryResponse;
-          }
-        } catch (retryError) {
-          console.error('SSO: Retry also failed:', retryError);
-        }
-      }
-      
       return {
         success: false,
         error: {

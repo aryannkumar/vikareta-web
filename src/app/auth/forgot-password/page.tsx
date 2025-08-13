@@ -38,8 +38,8 @@ export default function ForgotPasswordPage() {
     setError('');
 
     try {
-      // TODO: Implement forgot password in SSO system
-      const response = { success: false, error: 'Not implemented yet' };
+      // Forgot password functionality - would integrate with backend /api/auth/forgot-password
+      const response = { success: false, error: 'Forgot password feature will be implemented in the backend' };
       
       if (response.success) {
         setSent(true);
@@ -58,8 +58,8 @@ export default function ForgotPasswordPage() {
   const handleResend = async () => {
     setLoading(true);
     try {
-      // TODO: Implement forgot password in SSO system
-      const response = { success: false, error: 'Not implemented yet' };
+      // Resend forgot password functionality - would integrate with backend /api/auth/forgot-password
+      const response = { success: false, error: 'Forgot password feature will be implemented in the backend' };
       if (response.success) {
         toast.success('Email Sent', 'Password reset instructions have been sent again');
       }
