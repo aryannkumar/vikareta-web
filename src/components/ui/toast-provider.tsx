@@ -88,11 +88,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {children}
       
       {/* Toast Container */}
-      <div className="fixed top-4 right-4 z-50 space-y-2">
+      <div className="fixed bottom-4 right-4 left-4 sm:left-auto z-50 space-y-2">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`max-w-sm w-full border rounded-lg shadow-lg p-4 transition-all duration-300 ${getStyles(toast.type)}`}
+            className={`max-w-sm w-full border rounded-lg shadow-lg p-4 transition-all duration-300 transform animate-in slide-in-from-right ${getStyles(toast.type)}`}
           >
             <div className="flex items-start">
               <div className="flex-shrink-0">

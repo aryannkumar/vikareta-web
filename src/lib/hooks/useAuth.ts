@@ -58,12 +58,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         toast.success('Welcome back!', `Logged in as ${response.data.user.name}`);
         return true;
       } else {
-        toast.error('Login Failed', response.error || 'Invalid credentials');
+        // Extract proper error message from response
+        let errorMessage = 'Invalid credentials';
+        if (response.error) {
+          if (typeof response.error === 'string') {
+            errorMessage = response.error;
+          } else if (typeof response.error === 'object' && response.error !== null && 'message' in response.error) {
+            errorMessage = (response.error as any).message;
+          }
+        }
+
+        // Show user-friendly error messages
+        if (errorMessage.includes('INVALID_CREDENTIALS') || errorMessage.includes('Invalid credentials')) {
+          toast.error('Login Failed', 'Invalid email or password. Please check your credentials and try again.');
+        } else if (errorMessage.includes('USER_NOT_FOUND')) {
+          toast.error('Account Not Found', 'No account found with this email. Please register first.');
+        } else if (errorMessage.includes('ACCOUNT_LOCKED')) {
+          toast.error('Account Locked', 'Your account has been temporarily locked. Please contact support.');
+        } else {
+          toast.error('Login Failed', errorMessage);
+        }
         return false;
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Login Failed', 'An error occurred during login');
+
+      // Handle network or other errors
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch') || error.message.includes('Network error')) {
+          toast.error('Connection Error', 'Please check your internet connection and try again.');
+        } else {
+          toast.error('Login Failed', error.message);
+        }
+      } else {
+        toast.error('Login Failed', 'An unexpected error occurred during login');
+      }
       return false;
     }
   };
@@ -77,12 +106,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         toast.success('Welcome!', `Account created for ${response.data.user.name}`);
         return true;
       } else {
-        toast.error('Registration Failed', response.error || 'Failed to create account');
+        // Extract proper error message from response
+        let errorMessage = 'Failed to create account';
+        if (response.error) {
+          if (typeof response.error === 'string') {
+            errorMessage = response.error;
+          } else if (typeof response.error === 'object' && response.error !== null && 'message' in response.error) {
+            errorMessage = (response.error as any).message;
+          }
+        }
+
+        // Show user-friendly error messages
+        if (errorMessage.includes('USER_EXISTS') || errorMessage.includes('already exists')) {
+          toast.error('Account Already Exists', 'An account with this email or phone number already exists. Please try logging in instead.');
+        } else if (errorMessage.includes('VALIDATION_ERROR')) {
+          toast.error('Invalid Information', 'Please check your information and try again.');
+        } else {
+          toast.error('Registration Failed', errorMessage);
+        }
         return false;
       }
     } catch (error) {
       console.error('Registration error:', error);
-      toast.error('Registration Failed', 'An error occurred during registration');
+
+      // Handle network or other errors
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch') || error.message.includes('Network error')) {
+          toast.error('Connection Error', 'Please check your internet connection and try again.');
+        } else {
+          toast.error('Registration Failed', error.message);
+        }
+      } else {
+        toast.error('Registration Failed', 'An unexpected error occurred during registration');
+      }
       return false;
     }
   };

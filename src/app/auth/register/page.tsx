@@ -120,6 +120,7 @@ export default function RegisterPage() {
       }
     } catch (error) {
       console.error('Registration error:', error);
+      // The error is already handled by the useAuth hook and toast will be shown
     } finally {
       setLoading(false);
     }

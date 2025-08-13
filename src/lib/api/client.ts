@@ -143,10 +143,26 @@ class ApiClient {
         }
         
         const errorData = await response.json().catch(() => ({}));
+        
+        // Extract error message from various possible structures
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        if (errorData.error) {
+          if (typeof errorData.error === 'string') {
+            errorMessage = errorData.error;
+          } else if (errorData.error.message) {
+            errorMessage = errorData.error.message;
+          } else if (errorData.error.code) {
+            // Handle structured errors like { code: 'USER_EXISTS', message: '...' }
+            errorMessage = errorData.error.message || errorData.error.code;
+          }
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+        
         return {
           success: false,
           data: [] as T,
-          error: errorData.message || `HTTP error! status: ${response.status}`,
+          error: errorData.error || errorMessage,
         };
       }
 
