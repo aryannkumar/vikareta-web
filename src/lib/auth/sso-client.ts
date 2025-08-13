@@ -49,10 +49,13 @@ export class SSOAuthClient {
     // Check if we already have a token in cookies
     const existingToken = this.getCSRFToken();
     if (existingToken) {
+      console.log('SSO: Using existing CSRF token');
       return;
     }
 
     try {
+      console.log('SSO: Requesting new CSRF token from:', `${this.baseURL}/csrf-token`);
+      
       const response = await fetch(`${this.baseURL}/csrf-token`, {
         method: 'GET',
         credentials: 'include',
@@ -62,14 +65,28 @@ export class SSOAuthClient {
       });
 
       if (response.ok) {
-        // Token should now be set in cookies
-        console.log('SSO: CSRF token obtained');
+        const data = await response.json();
+        console.log('SSO: CSRF token response:', data);
         
         // Wait a bit for the cookie to be set
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Verify token is now available
+        const token = this.getCSRFToken();
+        console.log('SSO: CSRF token after request:', token ? 'Found' : 'Not found');
+        
+        // If cookie wasn't set but we got token in response, store it manually
+        if (!token && data.data?.csrfToken) {
+          console.log('SSO: Manually setting CSRF token from response');
+          document.cookie = `XSRF-TOKEN=${data.data.csrfToken}; path=/; max-age=3600${
+            process.env.NODE_ENV === 'production' ? '; domain=.vikareta.com; secure; samesite=none' : ''
+          }`;
+        }
+      } else {
+        console.error('SSO: Failed to get CSRF token, status:', response.status);
       }
     } catch (error) {
-      console.warn('SSO: Failed to get CSRF token:', error);
+      console.error('SSO: Failed to get CSRF token:', error);
     }
   }
 
@@ -112,11 +129,17 @@ export class SSOAuthClient {
     // Add CSRF token for state-changing requests
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method || 'GET')) {
       const csrfToken = this.getCSRFToken();
+      console.log('SSO: CSRF token for request:', csrfToken ? 'Found' : 'Not found');
+      console.log('SSO: All cookies:', document.cookie);
+      
       if (csrfToken) {
         config.headers = {
           ...config.headers,
           'X-XSRF-TOKEN': csrfToken,
         };
+        console.log('SSO: Added CSRF header:', csrfToken.substring(0, 20) + '...');
+      } else {
+        console.warn('SSO: No CSRF token available for request');
       }
     }
 
