@@ -82,17 +82,16 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      const success = await register({
-        name: `${formData.firstName} ${formData.lastName}`,
+      const registrationData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
-        confirmPassword: formData.confirmPassword,
-        role: formData.userType,
-        company: formData.company,
-        location: '',
-        acceptTerms: formData.agreeToTerms
-      });
+        userType: formData.userType,
+        businessName: formData.company
+      };
+      const success = await register(registrationData);
       
       if (success) {
         // Show success message

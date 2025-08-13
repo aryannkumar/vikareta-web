@@ -177,17 +177,17 @@ export const providersApi = {
     return providersApi.getProviders({ ...filters, category });
   },
 
-  // Get provider categories
+  // Get provider categories (uses main categories endpoint)
   getCategories: async (): Promise<{ success: boolean; data: string[] }> => {
-    const response = await apiClient.get('/providers/categories');
+    const response = await apiClient.get('/categories');
     return response.data as { success: boolean; data: string[] };
   },
 
-  // Get provider skills
+  // Get provider skills (this endpoint may not exist in backend yet)
   getSkills: async (category?: string): Promise<{ success: boolean; data: string[] }> => {
-    const params = category ? `?category=${category}` : '';
-    const response = await apiClient.get(`/providers/skills${params}`);
-    return response.data as { success: boolean; data: string[] };
+    // This endpoint would need to be implemented in the backend
+    console.log('Provider skills endpoint not implemented in backend yet');
+    return { success: true, data: [] };
   },
 
   // Contact provider

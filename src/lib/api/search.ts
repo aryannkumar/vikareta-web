@@ -129,26 +129,21 @@ export const searchApi = {
     return searchApi.search({ ...filters, query, type: 'provider' });
   },
 
-  // Get trending searches
-  getTrendingSearches: async (): Promise<{ success: boolean; data: string[] }> => {
-    const response = await apiClient.get('/search/trending');
-    return response.data as { success: boolean; data: string[] };
+  // Get popular/trending products
+  getPopularProducts: async (categoryId?: string, limit = 20): Promise<{ success: boolean; data: SearchResult[] }> => {
+    const params = new URLSearchParams();
+    if (categoryId) params.append('categoryId', categoryId);
+    params.append('limit', limit.toString());
+    
+    const response = await apiClient.get(`/search/popular?${params.toString()}`);
+    return response.data as { success: boolean; data: SearchResult[] };
   },
 
-  // Get popular categories
-  getPopularCategories: async (): Promise<{ success: boolean; data: string[] }> => {
-    const response = await apiClient.get('/search/popular-categories');
-    return response.data as { success: boolean; data: string[] };
-  },
-
-  // Save search query (for analytics)
+  // Save search query (for analytics) - Note: This endpoint doesn't exist in backend yet
   saveSearch: async (query: string, resultCount: number): Promise<void> => {
     try {
-      await apiClient.post('/search/analytics', {
-        query,
-        resultCount,
-        timestamp: new Date().toISOString()
-      });
+      // This endpoint would need to be implemented in the backend
+      console.log('Search analytics:', { query, resultCount, timestamp: new Date().toISOString() });
     } catch (error) {
       // Silently fail for analytics
       console.warn('Failed to save search analytics:', error);

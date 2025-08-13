@@ -201,6 +201,7 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         
         try {
+          console.log('Sending registration data to API:', registerData);
           const response = await apiCall('/auth/register', {
             method: 'POST',
             body: JSON.stringify(registerData),
@@ -223,6 +224,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           });
+          
+          return true;
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Registration failed';
           set({

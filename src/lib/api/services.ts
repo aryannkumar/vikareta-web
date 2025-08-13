@@ -132,15 +132,15 @@ export const servicesApi = {
     return response.data as ServicesResponse;
   },
 
-  // Get service categories
+  // Get service categories (uses main categories endpoint)
   getCategories: async (): Promise<{ success: boolean; data: string[] }> => {
-    const response = await apiClient.get('/services/categories');
+    const response = await apiClient.get('/categories');
     return response.data as { success: boolean; data: string[] };
   },
 
   // Get service subcategories
-  getSubcategories: async (category: string): Promise<{ success: boolean; data: string[] }> => {
-    const response = await apiClient.get(`/services/categories/${category}/subcategories`);
+  getSubcategories: async (categoryId: string): Promise<{ success: boolean; data: string[] }> => {
+    const response = await apiClient.get(`/categories/${categoryId}/subcategories`);
     return response.data as { success: boolean; data: string[] };
   },
 

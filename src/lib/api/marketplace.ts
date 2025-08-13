@@ -164,35 +164,22 @@ export const marketplaceApi = {
     };
   },
 
-  // Track item view
+  // Track item view (endpoint not implemented in backend yet)
   trackView: async (itemId: string, itemType: 'product' | 'service' | 'business') => {
-    const response = await apiClient.post('/marketplace/track/view', {
-      itemId,
-      itemType,
-      timestamp: new Date().toISOString()
-    });
-    return response;
+    console.log('Tracking view:', { itemId, itemType, timestamp: new Date().toISOString() });
+    return { success: true, message: 'View tracked (client-side only)' };
   },
 
-  // Track item like
+  // Track item like (endpoint not implemented in backend yet)
   trackLike: async (itemId: string, itemType: 'product' | 'service' | 'business') => {
-    const response = await apiClient.post('/marketplace/track/like', {
-      itemId,
-      itemType,
-      timestamp: new Date().toISOString()
-    });
-    return response;
+    console.log('Tracking like:', { itemId, itemType, timestamp: new Date().toISOString() });
+    return { success: true, message: 'Like tracked (client-side only)' };
   },
 
-  // Track item share
+  // Track item share (endpoint not implemented in backend yet)
   trackShare: async (itemId: string, itemType: 'product' | 'service' | 'business', platform: string) => {
-    const response = await apiClient.post('/marketplace/track/share', {
-      itemId,
-      itemType,
-      platform,
-      timestamp: new Date().toISOString()
-    });
-    return response;
+    console.log('Tracking share:', { itemId, itemType, platform, timestamp: new Date().toISOString() });
+    return { success: true, message: 'Share tracked (client-side only)' };
   },
 
   // Get promotional campaigns
