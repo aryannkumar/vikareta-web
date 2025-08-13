@@ -134,7 +134,12 @@ export const servicesApi = {
   // Get service categories (uses main categories endpoint)
   getCategories: async (): Promise<{ success: boolean; data: string[] }> => {
     const response = await apiClient.get('/categories');
-    return response.data as { success: boolean; data: string[] };
+    if (response.success && Array.isArray(response.data)) {
+      // Extract category names from category objects
+      const categoryNames = response.data.map((category: any) => category.name || category);
+      return { success: true, data: categoryNames };
+    }
+    return { success: false, data: [] };
   },
 
   // Get service subcategories

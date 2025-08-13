@@ -63,36 +63,40 @@ export default function ProfilePage() {
   const loadProfile = async () => {
     setLoading(true);
     try {
-      // In a real app, this would fetch from API
-      // For now, use the auth user data
-      if (user) {
-        const mockProfile: UserProfile = {
-          id: user.id,
-          firstName: user.name.split(' ')[0] || '',
-          lastName: user.name.split(' ').slice(1).join(' ') || '',
-          email: user.email,
-          phone: user.phone || '',
-          avatar: user.avatar,
-          company: user.profile?.company || '',
-          location: user.profile?.location || '',
-          bio: user.profile?.bio || '',
-          website: '',
-          userType: (user.role === 'admin' ? 'seller' : user.role) || 'buyer',
-          verified: user.verified || false,
-          joinedDate: user.createdAt || new Date().toISOString(),
-          stats: {
-            totalOrders: 12,
-            totalSpent: 125000,
-            reviewsGiven: 8,
-            averageRating: 4.5
+      // Import the profile API
+      const { profileApi } = await import('@/lib/api/profile');
+      const response = await profileApi.getProfile();
+      
+      if (response.success && response.data) {
+        const profileData: UserProfile = {
+          id: response.data.id,
+          firstName: response.data.firstName || '',
+          lastName: response.data.lastName || '',
+          email: response.data.email || '',
+          phone: response.data.phone || '',
+          avatar: response.data.avatar,
+          company: response.data.businessName || '',
+          location: response.data.location || '',
+          bio: response.data.bio || '',
+          website: response.data.website || '',
+          userType: response.data.userType === 'seller' ? 'seller' : 'buyer',
+          verified: response.data.isVerified || false,
+          joinedDate: response.data.createdAt || new Date().toISOString(),
+          stats: response.data.stats || {
+            totalOrders: 0,
+            totalSpent: 0,
+            reviewsGiven: 0,
+            averageRating: 0
           }
         };
-        setProfile(mockProfile);
-        setEditData(mockProfile);
+        setProfile(profileData);
+        setEditData(profileData);
+      } else {
+        throw new Error('Failed to load profile data');
       }
     } catch (error) {
       console.error('Error loading profile:', error);
-      toast.error('Error', 'Failed to load profile');
+      toast.error('Error', 'Failed to load profile. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -132,15 +136,51 @@ export default function ProfilePage() {
 
     setSaving(true);
     try {
-      // Update user profile via API
-      // await profileApi.updateProfile(editData);
-      await refreshUser();
-      setProfile(prev => prev ? { ...prev, ...editData } : null);
-      setEditing(false);
-      toast.success('Success', 'Profile updated successfully');
+      // Import the profile API
+      const { profileApi } = await import('@/lib/api/profile');
+      
+      // Prepare update data
+      const updateData = {
+        firstName: editData.firstName,
+        lastName: editData.lastName,
+        phone: editData.phone,
+        businessName: editData.company,
+        location: editData.location,
+        bio: editData.bio,
+        website: editData.website,
+        avatar: editData.avatar,
+      };
+
+      const response = await profileApi.updateProfile(updateData);
+      
+      if (response.success && response.data) {
+        // Update local state with response data
+        const updatedProfile: UserProfile = {
+          ...profile!,
+          firstName: response.data.firstName || '',
+          lastName: response.data.lastName || '',
+          phone: response.data.phone || '',
+          company: response.data.businessName || '',
+          location: response.data.location || '',
+          bio: response.data.bio || '',
+          website: response.data.website || '',
+          avatar: response.data.avatar,
+        };
+        
+        setProfile(updatedProfile);
+        setEditing(false);
+        toast.success('Success', 'Profile updated successfully');
+        
+        // Refresh user data in auth context
+        if (refreshUser) {
+          await refreshUser();
+        }
+      } else {
+        throw new Error('Failed to update profile');
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('Error', 'Failed to update profile');
+      toast.error('Error', 'Failed to update profile. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -175,11 +215,8 @@ export default function ProfilePage() {
     }
 
     try {
-      // In a real app, upload to server
-      const formData = new FormData();
-      formData.append('avatar', file);
-      
-      // Mock upload - in reality, this would be an API call
+      // For now, use base64 encoding for avatar
+      // In production, you would upload to a file storage service
       const reader = new FileReader();
       reader.onload = (e) => {
         const avatarUrl = e.target?.result as string;
