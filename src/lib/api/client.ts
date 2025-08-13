@@ -64,8 +64,15 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    // Ensure endpoint starts with /api
-    const normalizedEndpoint = endpoint.startsWith('/api') ? endpoint : `/api${endpoint}`;
+    // Ensure endpoint starts with /api and has proper slash separation
+    let normalizedEndpoint: string;
+    if (endpoint.startsWith('/api')) {
+      normalizedEndpoint = endpoint;
+    } else {
+      // Add leading slash if missing, then prepend /api
+      const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+      normalizedEndpoint = `/api${cleanEndpoint}`;
+    }
     const url = `${this.baseURL}${normalizedEndpoint}`;
     
     const config: RequestInit = {
