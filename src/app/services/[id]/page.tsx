@@ -191,22 +191,22 @@ export default function ServiceDetailPage() {
   };
 
   useEffect(() => {
-    fetchService();
-  }, [fetchService, params.id]);
+    const fetchService = async () => {
+      setLoading(true);
+      try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setService(mockService);
+      } catch (error) {
+        console.error('Error fetching service:', error);
+        toast.error('Error', 'Failed to load service details');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchService = async () => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setService(mockService);
-    } catch (error) {
-      console.error('Error fetching service:', error);
-      toast.error('Error', 'Failed to load service details');
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchService();
+  }, [params.id]);
 
   const handleContactProvider = () => {
     if (service) {
