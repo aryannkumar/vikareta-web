@@ -131,23 +131,23 @@ export const ordersApi = {
       total: number;
       page: number;
       totalPages: number;
-    }>('/api/orders', filters);
+    }>('/orders', filters);
   },
 
   async getOrder(id: string) {
-    return apiClient.get<Order>(`/api/orders/${id}`);
+    return apiClient.get<Order>(`/orders/${id}`);
   },
 
   async createOrder(data: CreateOrderData) {
-    return apiClient.post<Order>('/api/orders', data);
+    return apiClient.post<Order>('/orders', data);
   },
 
   async updateOrderStatus(id: string, data: UpdateOrderStatusData) {
-    return apiClient.put<Order>(`/api/orders/${id}/status`, data);
+    return apiClient.put<Order>(`/orders/${id}/status`, data);
   },
 
   async cancelOrder(id: string, reason?: string) {
-    return apiClient.post(`/api/orders/${id}/cancel`, { reason });
+    return apiClient.post(`/orders/${id}/cancel`, { reason });
   },
 
   async getMyOrders(filters?: Omit<OrderFilters, 'customerId'>) {
@@ -156,7 +156,7 @@ export const ordersApi = {
       total: number;
       page: number;
       totalPages: number;
-    }>('/api/orders/my', filters);
+    }>('/orders/my', filters);
   },
 
   async getSupplierOrders(filters?: Omit<OrderFilters, 'supplierId'>) {
@@ -165,11 +165,11 @@ export const ordersApi = {
       total: number;
       page: number;
       totalPages: number;
-    }>('/api/orders/supplier', filters);
+    }>('/orders/supplier', filters);
   },
 
   async addOrderNote(id: string, note: string, isInternal: boolean = false) {
-    return apiClient.post(`/api/orders/${id}/notes`, { note, isInternal });
+    return apiClient.post(`/orders/${id}/notes`, { note, isInternal });
   },
 
   async updateTrackingInfo(id: string, data: {
@@ -177,7 +177,7 @@ export const ordersApi = {
     trackingUrl?: string;
     carrier?: string;
   }) {
-    return apiClient.put(`/api/orders/${id}/tracking`, data);
+    return apiClient.put(`/orders/${id}/tracking`, data);
   },
 
   async requestRefund(id: string, data: {
@@ -185,11 +185,11 @@ export const ordersApi = {
     amount?: number;
     items?: string[];
   }) {
-    return apiClient.post(`/api/orders/${id}/refund`, data);
+    return apiClient.post(`/orders/${id}/refund`, data);
   },
 
   async downloadInvoice(id: string) {
-    return apiClient.get<{ url: string }>(`/api/orders/${id}/invoice`);
+    return apiClient.get<{ url: string }>(`/orders/${id}/invoice`);
   },
 
   async getOrderStats(dateFrom?: string, dateTo?: string) {
@@ -199,6 +199,6 @@ export const ordersApi = {
       averageOrderValue: number;
       statusBreakdown: Record<string, number>;
       revenueByMonth: Array<{ month: string; revenue: number }>;
-    }>('/api/orders/stats', { dateFrom, dateTo });
+    }>('/orders/stats', { dateFrom, dateTo });
   }
 };
