@@ -28,7 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useSSOAuth } from '@/lib/auth/use-sso-auth';
 import { useCartStore } from '@/lib/stores/cart';
 import { useWishlistStore } from '@/lib/stores/wishlist';
 import { Badge } from '@/components/ui/badge';
@@ -39,7 +39,7 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const router = useRouter();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useSSOAuth();
   const { totalItems } = useCartStore();
   const { count: wishlistCount, fetchWishlist } = useWishlistStore();
 

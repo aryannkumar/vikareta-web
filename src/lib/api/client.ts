@@ -1,5 +1,3 @@
-import { CrossDomainCSRFManager } from './csrf-manager';
-
 interface ApiResponse<T = any> {
   success: boolean;
   data: T;
@@ -17,6 +15,24 @@ class ApiClient {
     } else {
       this.baseURL = baseURL;
     }
+  }
+
+  /**
+   * Get CSRF token from cookie
+   */
+  private getCSRFToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    
+    const cookies = document.cookie.split(';');
+    const csrfCookie = cookies.find(cookie => 
+      cookie.trim().startsWith('XSRF-TOKEN=')
+    );
+    
+    if (csrfCookie) {
+      return decodeURIComponent(csrfCookie.split('=')[1]);
+    }
+    
+    return null;
   }
 
   private async request<T>(
@@ -50,44 +66,15 @@ class ApiClient {
       };
     }
 
-    // Add auth token if available
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      };
-    }
+    // No need to add auth token - using HttpOnly cookies
 
-    // Add CSRF token for state-changing requests
+    // Add CSRF token for state-changing requests (from cookie)
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method || 'GET')) {
-      try {
-        const csrfToken = await CrossDomainCSRFManager.getToken();
-        if (csrfToken) {
-          console.log('Adding CSRF token to request:', csrfToken.substring(0, 10) + '...');
-          config.headers = {
-            ...config.headers,
-            'X-CSRF-Token': csrfToken,
-            // Add additional headers for cross-domain auth
-            'X-Cross-Domain-Auth': 'true',
-            'X-Requested-With': 'XMLHttpRequest',
-          };
-        } else {
-          console.warn('No CSRF token available for request to:', endpoint);
-          // For cross-domain auth, add headers even without token
-          config.headers = {
-            ...config.headers,
-            'X-Cross-Domain-Auth': 'true',
-            'X-Requested-With': 'XMLHttpRequest',
-          };
-        }
-      } catch (error) {
-        console.error('Failed to get CSRF token for request:', error);
-        // Add cross-domain headers even on error
+      const csrfToken = this.getCSRFToken();
+      if (csrfToken) {
         config.headers = {
           ...config.headers,
-          'X-Cross-Domain-Auth': 'true',
-          'X-Requested-With': 'XMLHttpRequest',
+          'X-XSRF-TOKEN': csrfToken,
         };
       }
     }
@@ -99,35 +86,10 @@ class ApiClient {
       if (!response.ok) {
         console.error(`API request failed: ${response.status} ${response.statusText} for ${url}`);
         
-        // Handle CSRF token errors
-        if (response.status === 403) {
-          const errorData = await response.json().catch(() => ({}));
-          const message = errorData.message || '';
-          const error = errorData.error || '';
-          const errorCode = errorData.error?.code || '';
-          
-          if ((typeof message === 'string' && message.includes('CSRF')) || 
-              (typeof error === 'string' && error.includes('CSRF')) ||
-              errorCode === 'CSRF_TOKEN_INVALID') {
-            console.log('CSRF token error detected, clearing and retrying...');
-            console.log('CSRF Error details:', { message, error, errorCode });
-            
-            CrossDomainCSRFManager.clearToken();
-            
-            // For cross-domain requests, try alternative approach
-            const headers = config.headers as Record<string, string>;
-            if (headers && headers['X-Cross-Domain-Auth']) {
-              console.log('Retrying cross-domain request with fresh token...');
-              // Add a retry flag to prevent infinite loops
-              if (!headers['X-CSRF-Retry']) {
-                headers['X-CSRF-Retry'] = 'true';
-                return this.request<T>(endpoint, options);
-              }
-            } else {
-              // Regular retry for same-domain requests
-              return this.request<T>(endpoint, options);
-            }
-          }
+        // Handle authentication errors
+        if (response.status === 401) {
+          console.log('Authentication required - redirecting to login');
+          // Let the SSO system handle this
         }
         
         // Handle different HTTP status codes

@@ -21,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/lib/stores/cart';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useSSOAuth } from '@/lib/auth/use-sso-auth';
 
 export default function CartPage() {
   const [promoCode, setPromoCode] = useState('');
@@ -29,7 +29,7 @@ export default function CartPage() {
   const [discount, setDiscount] = useState(0);
 
   const toast = useToast();
-  const { user } = useAuth();
+  const { user } = useSSOAuth();
   const { 
     items, 
     totalItems, 

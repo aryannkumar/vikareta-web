@@ -8,13 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useSSOAuth } from '@/lib/auth/use-sso-auth';
 import { useCartStore } from '@/lib/stores/cart';
 import { useWishlistStore } from '@/lib/stores/wishlist';
 
 export default function WishlistPage() {
   const toast = useToast();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useSSOAuth();
   const { addItem } = useCartStore();
   const { 
     items: wishlistItems, 

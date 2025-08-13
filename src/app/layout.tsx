@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/providers/theme-provider';
-import { AuthProvider } from '@/lib/hooks/useAuth';
+import { SSOAuthProvider } from '@/lib/auth/use-sso-auth';
 import { ToastProvider } from '@/components/ui/toast-provider';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
@@ -30,7 +30,7 @@ export default function RootLayout({
           storageKey="vikareta-theme"
         >
           <ToastProvider>
-            <AuthProvider>
+            <SSOAuthProvider>
               <div className="min-h-screen flex flex-col">
                 <Header />
                 <main className="flex-1">
@@ -38,7 +38,7 @@ export default function RootLayout({
                 </main>
                 <Footer />
               </div>
-            </AuthProvider>
+            </SSOAuthProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

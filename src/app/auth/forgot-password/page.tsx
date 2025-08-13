@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Mail, ArrowLeft, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast-provider';
-import { authApi } from '@/lib/api/auth';
+import { ssoAuth } from '@/lib/auth/sso-client';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -38,7 +38,8 @@ export default function ForgotPasswordPage() {
     setError('');
 
     try {
-      const response = await authApi.forgotPassword({ email });
+      // TODO: Implement forgot password in SSO system
+      const response = { success: false, error: 'Not implemented yet' };
       
       if (response.success) {
         setSent(true);
@@ -57,7 +58,8 @@ export default function ForgotPasswordPage() {
   const handleResend = async () => {
     setLoading(true);
     try {
-      const response = await authApi.forgotPassword({ email });
+      // TODO: Implement forgot password in SSO system
+      const response = { success: false, error: 'Not implemented yet' };
       if (response.success) {
         toast.success('Email Sent', 'Password reset instructions have been sent again');
       }

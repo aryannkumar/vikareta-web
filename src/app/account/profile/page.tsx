@@ -21,7 +21,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useSSOAuth } from '@/lib/auth/use-sso-auth';
 
 interface UserProfile {
   id: string;
@@ -54,7 +54,7 @@ export default function ProfilePage() {
   const [editData, setEditData] = useState<Partial<UserProfile>>({});
 
   const toast = useToast();
-  const { user, refreshUser } = useAuth();
+  const { user, refreshSession } = useSSOAuth();
 
   useEffect(() => {
     loadProfile();
@@ -172,8 +172,8 @@ export default function ProfilePage() {
         toast.success('Success', 'Profile updated successfully');
         
         // Refresh user data in auth context
-        if (refreshUser) {
-          await refreshUser();
+        if (refreshSession) {
+          await refreshSession();
         }
       } else {
         throw new Error('Failed to update profile');

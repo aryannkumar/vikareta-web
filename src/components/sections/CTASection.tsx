@@ -4,10 +4,10 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Users, Store, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useSSOAuth } from '@/lib/auth/use-sso-auth';
 
 export function CTASection() {
-    const { isAuthenticated, user } = useAuth();
+    const { isAuthenticated, user } = useSSOAuth();
 
     return (
         <section className="py-24 gradient-orange-blue relative overflow-hidden">

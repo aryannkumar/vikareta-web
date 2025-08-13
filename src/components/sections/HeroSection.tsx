@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search, TrendingUp, Users, Shield, ArrowRight, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useSSOAuth } from '@/lib/auth/use-sso-auth';
 
 export function HeroSection() {
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user } = useSSOAuth();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

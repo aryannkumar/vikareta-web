@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast-provider';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useSSOAuth } from '@/lib/auth/use-sso-auth';
 
 function LoginPageContent() {
   const [formData, setFormData] = useState({
@@ -20,7 +20,7 @@ function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
-  const { login } = useAuth();
+  const { login, isLoading: authLoading } = useSSOAuth();
 
   // Get redirect URL from search params
   const redirectUrl = searchParams.get('redirect');
@@ -58,14 +58,14 @@ function LoginPageContent() {
 
       if (success) {
         // Show success message
-        toast.success('Login Successful!', 'Redirecting to your dashboard...');
+        toast.success('Login Successful!', 'Redirecting...');
 
-        // Wait for token to be properly stored, then redirect
+        // Redirect after successful login
         setTimeout(() => {
           // Use redirect URL if provided, otherwise default to dashboard
           let targetUrl;
           if (redirectUrl) {
-            console.log('Main Site: Using redirect URL from params:', redirectUrl);
+            console.log('SSO Login: Using redirect URL from params:', redirectUrl);
             targetUrl = redirectUrl;
           } else {
             targetUrl = process.env.NODE_ENV === 'development'
@@ -73,37 +73,17 @@ function LoginPageContent() {
               : process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://dashboard.vikareta.com';
           }
 
-          console.log('Main Site: Preparing redirect to:', targetUrl);
-
-          // Get auth token for cross-domain auth
-          const token = localStorage.getItem('auth_token');
-          console.log('Main Site: Auth token for redirect:', token ? `Found (${token.substring(0, 20)}...)` : 'Not found');
-
-          if (token) {
-            // Construct redirect URL with token
-            const separator = targetUrl.includes('?') ? '&' : '?';
-            const urlWithAuth = `${targetUrl}${separator}token=${encodeURIComponent(token)}&redirect=login&source=main_site&timestamp=${Date.now()}`;
-            
-            console.log('Main Site: Final redirect URL:', urlWithAuth.replace(token, '[TOKEN_HIDDEN]'));
-
-            // Use window.location.replace to avoid back button issues
-            window.location.replace(urlWithAuth);
-          } else {
-            console.error('Main Site: No auth token found after successful login!');
-            toast.error('Authentication Error', 'Login succeeded but token not found. Please try again.');
-
-            // Still try to redirect, dashboard will handle the missing token
-            const fallbackUrl = `${targetUrl}${targetUrl.includes('?') ? '&' : '?'}redirect=login&source=main_site&error=no_token&timestamp=${Date.now()}`;
-            console.log('Main Site: Fallback redirect to:', fallbackUrl);
-            window.location.replace(fallbackUrl);
-          }
-        }, 1500); // Reduced timeout but still enough for token storage
+          console.log('SSO Login: Redirecting to:', targetUrl);
+          // No need to pass tokens - using HttpOnly cookies
+          window.location.replace(targetUrl);
+        }, 1000);
       } else {
-        console.error('Main Site: Login failed - success was false');
+        console.error('SSO Login: Login failed');
         toast.error('Login Failed', 'Please check your credentials and try again.');
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('SSO Login error:', error);
+      toast.error('Login Failed', 'An error occurred during login.');
     } finally {
       setLoading(false);
     }

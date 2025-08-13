@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast-provider';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useSSOAuth } from '@/lib/auth/use-sso-auth';
 import { useWishlistStore } from '@/lib/stores/wishlist';
 import { cn } from '@/lib/utils';
 
@@ -29,7 +29,7 @@ export function WishlistButton({
   const [loading, setLoading] = useState(false);
   
   const toast = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useSSOAuth();
   const { 
     addToWishlist, 
     removeItemFromWishlist, 

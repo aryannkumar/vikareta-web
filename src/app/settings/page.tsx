@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
 import { useTheme } from '@/components/theme-provider';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useSSOAuth } from '@/lib/auth/use-sso-auth';
 import { settingsApi } from '@/lib/api/settings';
 
 interface UserSettings {
@@ -76,7 +76,7 @@ export default function SettingsPage() {
 
   const toast = useToast();
   const { theme, setTheme } = useTheme();
-  const { user } = useAuth();
+  const { user } = useSSOAuth();
 
   useEffect(() => {
     loadSettings();

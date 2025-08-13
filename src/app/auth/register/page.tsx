@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, User, Phone, Building, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast-provider';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useSSOAuth } from '@/lib/auth/use-sso-auth';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -29,7 +29,7 @@ export default function RegisterPage() {
 
   const router = useRouter();
   const toast = useToast();
-  const { register } = useAuth();
+  const { register } = useSSOAuth();
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -120,7 +120,7 @@ export default function RegisterPage() {
       }
     } catch (error) {
       console.error('Registration error:', error);
-      // The error is already handled by the useAuth hook and toast will be shown
+      // The error is already handled by the useSSOAuth hook and toast will be shown
     } finally {
       setLoading(false);
     }
