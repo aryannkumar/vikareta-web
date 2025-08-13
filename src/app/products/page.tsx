@@ -24,6 +24,7 @@ import { formatPrice } from '@/lib/utils';
 import { productsApi, type Product, type ProductFilters } from '@/lib/api/products';
 import { categoriesApi } from '@/lib/api/categories';
 import { useCartStore } from '@/lib/stores/cart';
+import { WishlistButton } from '@/components/ui/wishlist-button';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -440,9 +441,12 @@ export default function ProductsPage() {
                       </Badge>
                     )}
                     
-                    <Button className="absolute bottom-2 right-2 bg-white/80 hover:bg-white w-8 h-8 p-0">
-                      <Heart className="h-4 w-4" />
-                    </Button>
+                    <WishlistButton 
+                      itemId={product.id} 
+                      type="product" 
+                      size="sm" 
+                      className="absolute bottom-2 right-2 bg-white/80 hover:bg-white w-8 h-8 p-0"
+                    />
                   </div>
 
                   <div className={viewMode === 'list' ? 'flex-1' : 'p-4'}>

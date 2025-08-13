@@ -9,6 +9,7 @@ interface Toast {
   title: string;
   message?: string;
   duration?: number;
+  startTime?: number;
 }
 
 interface ToastContextType {
@@ -25,16 +26,34 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
+  // Add CSS animation for progress bar
+  React.useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shrink {
+        from { width: 100%; }
+        to { width: 0%; }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      if (document.head.contains(style)) {
+        document.head.removeChild(style);
+      }
+    };
+  }, []);
+
   const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
     const id = Math.random().toString(36).substr(2, 9);
-    const newToast = { ...toast, id };
-    
+    const duration = toast.duration || 5000;
+    const newToast = { ...toast, id, startTime: Date.now(), duration };
+
     setToasts(prev => [...prev, newToast]);
 
     // Auto dismiss after duration
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
-    }, toast.duration || 5000);
+    }, duration);
   }, []);
 
   const success = useCallback((title: string, message?: string, duration?: number) => {
@@ -60,61 +79,93 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const getIcon = (type: Toast['type']) => {
     switch (type) {
       case 'success':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />;
       case 'error':
-        return <AlertCircle className="h-5 w-5 text-red-500" />;
+        return <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />;
       case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+        return <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />;
       case 'info':
-        return <Info className="h-5 w-5 text-blue-500" />;
+        return <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
     }
   };
 
   const getStyles = (type: Toast['type']) => {
     switch (type) {
       case 'success':
-        return 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20';
+        return 'bg-white dark:bg-gray-800 border-l-4 border-l-green-500 shadow-md';
       case 'error':
-        return 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20';
+        return 'bg-white dark:bg-gray-800 border-l-4 border-l-red-500 shadow-md';
       case 'warning':
-        return 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20';
+        return 'bg-white dark:bg-gray-800 border-l-4 border-l-yellow-500 shadow-md';
       case 'info':
-        return 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20';
+        return 'bg-white dark:bg-gray-800 border-l-4 border-l-blue-500 shadow-md';
     }
   };
 
   return (
     <ToastContext.Provider value={{ toasts, success, error, info, warning, dismiss }}>
       {children}
-      
+
       {/* Toast Container */}
-      <div className="fixed bottom-4 right-4 left-4 sm:left-auto z-50 space-y-2">
-        {toasts.map((toast) => (
+      <div className="fixed bottom-4 right-4 z-50 w-full max-w-sm space-y-3 pointer-events-none">
+        {toasts.map((toast, index) => (
           <div
             key={toast.id}
-            className={`max-w-sm w-full border rounded-lg shadow-lg p-4 transition-all duration-300 transform animate-in slide-in-from-right ${getStyles(toast.type)}`}
+            className={`pointer-events-auto transform transition-all duration-300 ease-in-out ${index === toasts.length - 1 ? 'animate-in slide-in-from-right-full' : ''
+              }`}
+            style={{
+              transform: `translateY(-${index * 4}px)`,
+              zIndex: 50 - index,
+            }}
           >
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                {getIcon(toast.type)}
+            <div className={`rounded-lg overflow-hidden ${getStyles(toast.type)}`}>
+              <div className="p-3">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-0.5">
+                    {getIcon(toast.type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                      {toast.title}
+                    </p>
+                    {toast.message && (
+                      <p
+                        className="mt-1 text-xs text-gray-600 dark:text-gray-300 leading-relaxed"
+                        style={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          wordBreak: 'break-word',
+                        }}
+                      >
+                        {toast.message}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => dismiss(toast.id)}
+                    className="flex-shrink-0 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600"
+                    aria-label="Dismiss notification"
+                  >
+                    <X className="h-3.5 w-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" />
+                  </button>
+                </div>
               </div>
-              <div className="ml-3 w-0 flex-1">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {toast.title}
-                </p>
-                {toast.message && (
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {toast.message}
-                  </p>
-                )}
-              </div>
-              <div className="ml-4 flex-shrink-0 flex">
-                <button
-                  onClick={() => dismiss(toast.id)}
-                  className="inline-flex text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+
+              {/* Progress bar */}
+              <div className="h-1 bg-gray-200 dark:bg-gray-700">
+                <div
+                  className={`h-full transition-all ease-linear ${toast.type === 'success' ? 'bg-green-500' :
+                    toast.type === 'error' ? 'bg-red-500' :
+                      toast.type === 'warning' ? 'bg-yellow-500' :
+                        'bg-blue-500'
+                    }`}
+                  style={{
+                    width: '100%',
+                    animation: `shrink ${toast.duration || 5000}ms linear forwards`,
+                  }}
+                />
               </div>
             </div>
           </div>

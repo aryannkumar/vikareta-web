@@ -26,6 +26,7 @@ import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
 import { searchApi, type SearchResult, type SearchFilters } from '@/lib/api/search';
 import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
+import { WishlistButton } from '@/components/ui/wishlist-button';
 
 
 
@@ -502,9 +503,18 @@ function SearchPageContent() {
                     </Badge>
                   </div>
                   
-                  <Button className="absolute top-2 right-2 bg-white/80 hover:bg-white w-8 h-8 p-0">
-                    <Heart className="h-4 w-4" />
-                  </Button>
+                  {(result.type === 'product' || result.type === 'service') ? (
+                    <WishlistButton 
+                      itemId={result.id} 
+                      type={result.type} 
+                      size="sm" 
+                      className="absolute top-2 right-2 bg-white/80 hover:bg-white w-8 h-8 p-0"
+                    />
+                  ) : (
+                    <Button className="absolute top-2 right-2 bg-white/80 hover:bg-white w-8 h-8 p-0">
+                      <Heart className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
 
                 <div className={viewMode === 'list' ? 'flex-1' : 'p-4'}>

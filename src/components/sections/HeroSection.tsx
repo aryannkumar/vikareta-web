@@ -85,11 +85,26 @@ export function HeroSection() {
                   </Button>
                 </Link>
                 {user?.role === 'seller' ? (
-                  <Link href="/dashboard">
-                    <Button variant="outline" size="lg" className="border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all">
-                      Go to Dashboard
-                    </Button>
-                  </Link>
+                  <Button 
+                    variant="outline" 
+                    size="lg" 
+                    className="border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all"
+                    onClick={() => {
+                      const dashboardUrl = process.env.NODE_ENV === 'development' 
+                        ? 'http://localhost:3001/dashboard' 
+                        : 'https://dashboard.vikareta.com/dashboard';
+                      
+                      const token = localStorage.getItem('auth_token');
+                      if (token) {
+                        const urlWithAuth = `${dashboardUrl}?token=${encodeURIComponent(token)}`;
+                        window.location.href = urlWithAuth;
+                      } else {
+                        window.location.href = dashboardUrl;
+                      }
+                    }}
+                  >
+                    Go to Dashboard
+                  </Button>
                 ) : (
                   <Link href="/rfq">
                     <Button variant="outline" size="lg" className="border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all">

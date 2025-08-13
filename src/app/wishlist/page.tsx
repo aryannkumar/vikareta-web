@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Heart, ShoppingCart, Trash2, Package, Star } from 'lucide-react';
@@ -10,113 +10,39 @@ import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useCartStore } from '@/lib/stores/cart';
-
-interface WishlistItem {
-  id: string;
-  type: 'product' | 'service';
-  name: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  provider: string;
-  providerId: string;
-  category: string;
-  rating: number;
-  reviewCount: number;
-  available: boolean;
-  addedAt: string;
-}
+import { useWishlistStore } from '@/lib/stores/wishlist';
 
 export default function WishlistPage() {
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const toast = useToast();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { addItem } = useCartStore();
+  const { 
+    items: wishlistItems, 
+    loading, 
+    error, 
+    fetchWishlist, 
+    removeFromWishlist,
+    clearError 
+  } = useWishlistStore();
 
   useEffect(() => {
-    fetchWishlistItems();
-  }, []);
-
-  const fetchWishlistItems = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // Mock data for now - replace with actual API call
-      const mockItems: WishlistItem[] = [
-        {
-          id: '1',
-          type: 'product',
-          name: 'Industrial Steel Pipes - Grade A',
-          price: 2500,
-          originalPrice: 3000,
-          image: '/api/placeholder/300/200',
-          provider: 'Steel Industries Ltd',
-          providerId: 'provider-1',
-          category: 'Industrial Materials',
-          rating: 4.5,
-          reviewCount: 23,
-          available: true,
-          addedAt: '2024-01-15T10:30:00Z'
-        },
-        {
-          id: '2',
-          type: 'service',
-          name: 'Logistics & Transportation Service',
-          price: 5000,
-          image: '/api/placeholder/300/200',
-          provider: 'FastMove Logistics',
-          providerId: 'provider-2',
-          category: 'Transportation',
-          rating: 4.8,
-          reviewCount: 45,
-          available: true,
-          addedAt: '2024-01-14T15:45:00Z'
-        },
-        {
-          id: '3',
-          type: 'product',
-          name: 'Heavy Duty Bearings Set',
-          price: 1200,
-          originalPrice: 1500,
-          image: '/api/placeholder/300/200',
-          provider: 'Precision Parts Co',
-          providerId: 'provider-3',
-          category: 'Mechanical Parts',
-          rating: 4.2,
-          reviewCount: 18,
-          available: false,
-          addedAt: '2024-01-13T09:20:00Z'
-        }
-      ];
-
-      setWishlistItems(mockItems);
-    } catch (error) {
-      console.error('Error fetching wishlist:', error);
-      setError('Failed to load wishlist items');
-      toast.error('Error', 'Failed to load wishlist items');
-    } finally {
-      setLoading(false);
+    if (isAuthenticated) {
+      fetchWishlist();
     }
-  };
+  }, [isAuthenticated, fetchWishlist]);
 
-  const removeFromWishlist = async (itemId: string) => {
-    try {
-      // API call to remove item
-      setWishlistItems(prev => prev.filter(item => item.id !== itemId));
+  const handleRemoveFromWishlist = async (itemId: string) => {
+    const success = await removeFromWishlist(itemId);
+    if (success) {
       toast.success('Removed', 'Item removed from wishlist');
-    } catch (error) {
-      console.error('Error removing item:', error);
+    } else {
       toast.error('Error', 'Failed to remove item from wishlist');
     }
   };
 
-  const addToCart = (item: WishlistItem) => {
+  const addToCart = (item: typeof wishlistItems[0]) => {
     addItem({
-      id: item.id,
+      id: item.itemId, // Use the actual product/service ID
       name: item.name,
       price: item.price,
       image: item.image,
@@ -127,6 +53,35 @@ export default function WishlistPage() {
     });
     toast.success('Added to Cart', `${item.name} added to cart`);
   };
+
+  // Show login prompt for non-authenticated users
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center py-16">
+            <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-4">Sign in to view your wishlist</h2>
+            <p className="text-muted-foreground mb-8">
+              Save your favorite products and services for later
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Link href="/auth/login">
+                <Button className="btn-primary">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/auth/register">
+                <Button variant="outline">
+                  Create Account
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -153,7 +108,10 @@ export default function WishlistPage() {
             <Package className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-4">Error Loading Wishlist</h2>
             <p className="text-muted-foreground mb-8">{error}</p>
-            <Button onClick={fetchWishlistItems}>
+            <Button onClick={() => {
+              clearError();
+              fetchWishlist();
+            }}>
               Try Again
             </Button>
           </div>
@@ -204,7 +162,7 @@ export default function WishlistPage() {
                       variant="outline"
                       size="sm"
                       className="bg-white/90 hover:bg-white"
-                      onClick={() => removeFromWishlist(item.id)}
+                      onClick={() => handleRemoveFromWishlist(item.id)}
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>
@@ -263,7 +221,7 @@ export default function WishlistPage() {
                       <ShoppingCart className="h-4 w-4 mr-2" />
                       Add to Cart
                     </Button>
-                    <Link href={`/${item.type}s/${item.id}`}>
+                    <Link href={`/${item.type}s/${item.itemId}`}>
                       <Button variant="outline" size="sm">
                         View
                       </Button>

@@ -31,6 +31,7 @@ import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
 import { productsApi, type Product } from '@/lib/api/products';
 import { useCartStore } from '@/lib/stores/cart';
+import { WishlistButton } from '@/components/ui/wishlist-button';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -250,9 +251,13 @@ export default function ProductDetailPage() {
               )}
 
               <div className="absolute bottom-4 right-4 flex gap-2">
-                <Button size="sm" variant="secondary" className="bg-white/80 hover:bg-white">
-                  <Heart className="h-4 w-4" />
-                </Button>
+                <WishlistButton 
+                  itemId={product.id} 
+                  type="product" 
+                  size="sm" 
+                  variant="outline" 
+                  className="bg-white/80 hover:bg-white"
+                />
                 <Button size="sm" variant="secondary" className="bg-white/80 hover:bg-white">
                   <Share2 className="h-4 w-4" />
                 </Button>

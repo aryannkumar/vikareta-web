@@ -56,7 +56,7 @@ export default function LoginPage() {
         // Show success message
         toast.success('Login Successful!', 'Welcome back!');
         
-        // Redirect to dashboard after a short delay
+        // Redirect to dashboard subdomain
         setTimeout(() => {
           const dashboardUrl = process.env.NODE_ENV === 'development' 
             ? 'http://localhost:3001/dashboard' 

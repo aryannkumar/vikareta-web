@@ -22,6 +22,7 @@ import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
 import { servicesApi, type Service, type ServicesFilters } from '@/lib/api/services';
 import { useCartStore } from '@/lib/stores/cart';
+import { WishlistButton } from '@/components/ui/wishlist-button';
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -415,9 +416,12 @@ export default function ServicesPage() {
                       </Badge>
                     )}
 
-                    <Button className="absolute top-2 right-2 bg-white/80 hover:bg-white w-8 h-8 p-0">
-                      <Heart className="h-4 w-4" />
-                    </Button>
+                    <WishlistButton 
+                      itemId={service.id} 
+                      type="service" 
+                      size="sm" 
+                      className="absolute top-2 right-2 bg-white/80 hover:bg-white w-8 h-8 p-0"
+                    />
                   </div>
 
                   <div className={viewMode === 'list' ? 'flex-1' : 'p-4'}>

@@ -70,13 +70,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Show user-friendly error messages
         if (errorMessage.includes('INVALID_CREDENTIALS') || errorMessage.includes('Invalid credentials')) {
-          toast.error('Login Failed', 'Invalid email or password. Please check your credentials and try again.');
+          toast.error('Login Failed', 'Invalid email or password. Please try again.');
         } else if (errorMessage.includes('USER_NOT_FOUND')) {
-          toast.error('Account Not Found', 'No account found with this email. Please register first.');
+          toast.error('Account Not Found', 'No account found with this email.');
         } else if (errorMessage.includes('ACCOUNT_LOCKED')) {
-          toast.error('Account Locked', 'Your account has been temporarily locked. Please contact support.');
+          toast.error('Account Locked', 'Account temporarily locked. Contact support.');
         } else {
-          toast.error('Login Failed', errorMessage);
+          toast.error('Login Failed', errorMessage.length > 60 ? errorMessage.substring(0, 60) + '...' : errorMessage);
         }
         return false;
       }
@@ -118,11 +118,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Show user-friendly error messages
         if (errorMessage.includes('USER_EXISTS') || errorMessage.includes('already exists')) {
-          toast.error('Account Already Exists', 'An account with this email or phone number already exists. Please try logging in instead.');
+          toast.error('Account Already Exists', 'This email or phone is already registered. Try logging in instead.');
         } else if (errorMessage.includes('VALIDATION_ERROR')) {
-          toast.error('Invalid Information', 'Please check your information and try again.');
+          toast.error('Invalid Information', 'Please check your details and try again.');
         } else {
-          toast.error('Registration Failed', errorMessage);
+          toast.error('Registration Failed', errorMessage.length > 60 ? errorMessage.substring(0, 60) + '...' : errorMessage);
         }
         return false;
       }

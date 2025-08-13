@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
+import { WishlistButton } from '@/components/ui/wishlist-button';
 
 interface ServiceDetail {
   id: string;
@@ -191,7 +192,7 @@ export default function ServiceDetailPage() {
 
   useEffect(() => {
     fetchService();
-  }, [params.id]);
+  }, [fetchService, params.id]);
 
   const fetchService = async () => {
     setLoading(true);
@@ -282,9 +283,13 @@ export default function ServiceDetailPage() {
                   </Badge>
                 )}
                 <div className="absolute top-4 right-4 flex gap-2">
-                  <Button size="sm" variant="secondary" className="bg-white/80 hover:bg-white">
-                    <Heart className="h-4 w-4" />
-                  </Button>
+                  <WishlistButton 
+                    itemId={service.id} 
+                    type="service" 
+                    size="sm" 
+                    variant="outline" 
+                    className="bg-white/80 hover:bg-white"
+                  />
                   <Button size="sm" variant="secondary" className="bg-white/80 hover:bg-white">
                     <Share2 className="h-4 w-4" />
                   </Button>

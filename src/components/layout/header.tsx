@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useCartStore } from '@/lib/stores/cart';
+import { useWishlistStore } from '@/lib/stores/wishlist';
 import { Badge } from '@/components/ui/badge';
 import { notificationsApi } from '@/lib/api/notifications';
 
@@ -40,8 +41,9 @@ export function Header() {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
   const { totalItems } = useCartStore();
+  const { count: wishlistCount, fetchWishlist } = useWishlistStore();
 
-  // Fetch unread notifications count
+  // Fetch unread notifications count and wishlist
   useEffect(() => {
     const fetchNotifications = async () => {
       if (isAuthenticated) {
@@ -54,12 +56,21 @@ export function Header() {
       }
     };
 
-    fetchNotifications();
+    const fetchData = async () => {
+      if (isAuthenticated) {
+        await Promise.all([
+          fetchNotifications(),
+          fetchWishlist()
+        ]);
+      }
+    };
+
+    fetchData();
     
     // Poll for new notifications every 30 seconds
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchWishlist]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,6 +168,11 @@ export function Header() {
               <Link href="/wishlist">
                 <Button variant="ghost" size="sm" className="relative p-2 hover:bg-orange-50 dark:hover:bg-orange-900/20">
                   <Heart className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      {wishlistCount > 99 ? '99+' : wishlistCount}
+                    </span>
+                  )}
                 </Button>
               </Link>
             )}
@@ -172,6 +188,31 @@ export function Header() {
                 )}
               </Button>
             </Link>
+
+            {/* Dashboard Button for Sellers */}
+            {isAuthenticated && user?.role === 'seller' && (
+              <Button 
+                size="sm" 
+                variant="outline"
+                className="hidden sm:flex items-center space-x-2 border-orange-500 text-orange-600 hover:bg-orange-50 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-orange-900/20"
+                onClick={() => {
+                  const dashboardUrl = process.env.NODE_ENV === 'development' 
+                    ? 'http://localhost:3001/dashboard' 
+                    : 'https://dashboard.vikareta.com/dashboard';
+                  
+                  const token = localStorage.getItem('auth_token');
+                  if (token) {
+                    const urlWithAuth = `${dashboardUrl}?token=${encodeURIComponent(token)}`;
+                    window.location.href = urlWithAuth;
+                  } else {
+                    window.location.href = dashboardUrl;
+                  }
+                }}
+              >
+                <Store className="h-4 w-4" />
+                <span>Dashboard</span>
+              </Button>
+            )}
 
             {/* User Menu */}
             {isAuthenticated ? (
@@ -227,11 +268,21 @@ export function Header() {
                   {user?.role === 'seller' && (
                     <>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem>
-                        <Link href="/dashboard" className="flex items-center w-full">
-                          <Store className="mr-2 h-4 w-4" />
-                          Supplier Dashboard
-                        </Link>
+                      <DropdownMenuItem onClick={() => {
+                        const dashboardUrl = process.env.NODE_ENV === 'development' 
+                          ? 'http://localhost:3001/dashboard' 
+                          : 'https://dashboard.vikareta.com/dashboard';
+                        
+                        const token = localStorage.getItem('auth_token');
+                        if (token) {
+                          const urlWithAuth = `${dashboardUrl}?token=${encodeURIComponent(token)}`;
+                          window.location.href = urlWithAuth;
+                        } else {
+                          window.location.href = dashboardUrl;
+                        }
+                      }}>
+                        <Store className="mr-2 h-4 w-4" />
+                        Supplier Dashboard
                       </DropdownMenuItem>
                     </>
                   )}
@@ -352,6 +403,28 @@ export function Header() {
               {isAuthenticated && (
                 <>
                   <div className="border-t pt-2 mt-2">
+                    {user?.role === 'seller' && (
+                      <button 
+                        className="w-full px-2 py-2 text-sm font-medium hover:text-orange-500 transition-colors flex items-center text-left"
+                        onClick={() => {
+                          const dashboardUrl = process.env.NODE_ENV === 'development' 
+                            ? 'http://localhost:3001/dashboard' 
+                            : 'https://dashboard.vikareta.com/dashboard';
+                          
+                          const token = localStorage.getItem('auth_token');
+                          if (token) {
+                            const urlWithAuth = `${dashboardUrl}?token=${encodeURIComponent(token)}`;
+                            window.location.href = urlWithAuth;
+                          } else {
+                            window.location.href = dashboardUrl;
+                          }
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <Store className="mr-2 h-4 w-4" />
+                        Supplier Dashboard
+                      </button>
+                    )}
                     <Link 
                       href="/orders" 
                       className="px-2 py-2 text-sm font-medium hover:text-primary transition-colors flex items-center"

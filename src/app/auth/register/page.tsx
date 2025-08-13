@@ -101,7 +101,7 @@ export default function RegisterPage() {
         toast.success('Registration Successful!', 'Your account has been created successfully.');
         setRedirecting(true);
         
-        // Redirect to dashboard after a short delay
+        // Redirect to dashboard subdomain
         setTimeout(() => {
           const dashboardUrl = process.env.NODE_ENV === 'development' 
             ? 'http://localhost:3001/dashboard' 

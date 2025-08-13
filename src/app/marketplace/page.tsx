@@ -32,6 +32,7 @@ import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/lib/stores/cart';
 import { marketplaceApi, type TrendingItem, type NearbyBusiness } from '@/lib/api/marketplace';
 import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
+import { WishlistButton } from '@/components/ui/wishlist-button';
 
 export default function MarketplacePage() {
   const [trendingProducts, setTrendingProducts] = useState<TrendingItem[]>([]);
@@ -298,9 +299,12 @@ export default function MarketplacePage() {
         </div>
 
         {/* Wishlist Button */}
-        <Button className="absolute bottom-3 right-3 bg-white/90 hover:bg-white w-8 h-8 p-0 rounded-full shadow-md">
-          <Heart className="h-4 w-4 text-gray-600" />
-        </Button>
+        <WishlistButton 
+          itemId={item.id} 
+          type={item.type} 
+          size="sm" 
+          className="absolute bottom-3 right-3 bg-white/90 hover:bg-white w-8 h-8 p-0 rounded-full shadow-md"
+        />
       </div>
 
       <div className={viewMode === 'list' ? 'flex-1' : 'p-4'}>
