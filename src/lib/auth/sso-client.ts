@@ -171,6 +171,29 @@ export class SSOAuthClient {
       }
     } catch (error) {
       console.error('SSO: Login error:', error);
+      
+      // If it's a CSRF error, try to get a fresh token and retry once
+      if (error instanceof Error && error.message.includes('403')) {
+        console.log('SSO: Retrying login with fresh CSRF token...');
+        try {
+          // Clear any existing token and get a fresh one
+          document.cookie = 'XSRF-TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+          await this.ensureCSRFToken();
+          
+          const retryResponse = await this.request<AuthResponse>('/api/auth/login', {
+            method: 'POST',
+            body: JSON.stringify(credentials),
+          });
+          
+          if (retryResponse.success) {
+            console.log('SSO: Login successful on retry');
+            return retryResponse;
+          }
+        } catch (retryError) {
+          console.error('SSO: Retry also failed:', retryError);
+        }
+      }
+      
       return {
         success: false,
         error: {
