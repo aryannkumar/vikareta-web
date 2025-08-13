@@ -23,15 +23,13 @@ export interface LoginCredentials {
 }
 
 export interface RegisterData {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   password: string;
-  confirmPassword: string;
-  role: 'buyer' | 'seller';
-  company?: string;
-  location?: string;
-  acceptTerms: boolean;
+  userType: 'buyer' | 'seller';
+  businessName?: string;
 }
 
 export interface AuthResponse {

@@ -201,7 +201,6 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         
         try {
-          console.log('Sending registration data to API:', registerData);
           const response = await apiCall('/auth/register', {
             method: 'POST',
             body: JSON.stringify(registerData),

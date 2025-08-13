@@ -88,9 +88,10 @@ export default function RegisterPage() {
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
-        userType: formData.userType,
+        userType: formData.userType as 'buyer' | 'seller',
         businessName: formData.company
       };
+      
       const success = await register(registrationData);
       
       if (success) {
