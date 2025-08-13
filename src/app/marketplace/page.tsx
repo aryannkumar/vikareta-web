@@ -118,7 +118,8 @@ export default function MarketplacePage() {
           servicesApi.servicesApi.getServices({ 
             limit: 12, 
             sortBy: 'rating',
-            ...(filters.category && { category: filters.category })
+            sortOrder: 'desc'
+            // Note: Removed category filter as it needs categoryId (UUID)
           })
         ]);
 

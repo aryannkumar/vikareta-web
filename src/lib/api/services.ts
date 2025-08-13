@@ -80,17 +80,16 @@ export interface ServiceResponse {
 }
 
 export interface ServicesFilters {
-  category?: string;
-  subcategory?: string;
-  serviceType?: string;
+  categoryId?: string;
+  subcategoryId?: string;
+  providerId?: string;
+  serviceType?: 'one_time' | 'recurring' | 'subscription';
   minPrice?: number;
   maxPrice?: number;
-  location?: string;
-  rating?: number;
-  experience?: string;
-  available?: boolean;
+  location?: 'online' | 'on_site' | 'both';
   search?: string;
   sortBy?: 'price' | 'createdAt' | 'title' | 'rating';
+  sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;
 }
@@ -122,8 +121,8 @@ export const servicesApi = {
   },
 
   // Get services by category
-  getServicesByCategory: async (category: string, filters: Omit<ServicesFilters, 'category'> = {}): Promise<ServicesResponse> => {
-    return servicesApi.getServices({ ...filters, category });
+  getServicesByCategory: async (categoryId: string, filters: Omit<ServicesFilters, 'categoryId'> = {}): Promise<ServicesResponse> => {
+    return servicesApi.getServices({ ...filters, categoryId });
   },
 
   // Get services by provider

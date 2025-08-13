@@ -29,7 +29,7 @@ export default function HomePage() {
       setHasProducts(productsResponse.success && productsResponse.data.length > 0);
 
       // Check if we have services
-      const servicesResponse = await servicesApi.getServices({ limit: 4 });
+      const servicesResponse = await servicesApi.getServices({ limit: 4, sortOrder: 'desc' });
       setHasServices(servicesResponse.success && servicesResponse.data.services.length > 0);
 
       // Check if we have categories

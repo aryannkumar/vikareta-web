@@ -84,9 +84,11 @@ export default function ServicesPage() {
         page: currentPage,
         limit: 12,
         sortBy,
+        sortOrder: 'desc',
         ...(searchQuery && { search: searchQuery }),
-        ...(selectedCategory && selectedCategory !== 'All Categories' && { category: selectedCategory }),
-        ...(selectedServiceType && { serviceType: selectedServiceType as any }),
+        // Note: We would need categoryId (UUID) instead of category name
+        // For now, removing category filter until we implement category name to ID mapping
+        ...(selectedServiceType && { serviceType: selectedServiceType as 'one_time' | 'recurring' | 'subscription' }),
         ...(priceRange.min && { minPrice: parseInt(priceRange.min) }),
         ...(priceRange.max && { maxPrice: parseInt(priceRange.max) })
       };
