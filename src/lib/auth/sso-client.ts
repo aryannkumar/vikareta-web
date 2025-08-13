@@ -149,6 +149,7 @@ export class SSOAuthClient {
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.error('SSO: Request failed with response:', errorData);
         throw new Error(errorData.message || `HTTP ${response.status}`);
       }
 
