@@ -60,7 +60,7 @@ function LoginPageContent() {
         // Show success message
         toast.success('Login Successful!', 'Redirecting to your dashboard...');
 
-        // Wait a bit longer to ensure token is properly stored
+        // Wait for token to be properly stored, then redirect
         setTimeout(() => {
           // Use redirect URL if provided, otherwise default to dashboard
           let targetUrl;
@@ -73,17 +73,18 @@ function LoginPageContent() {
               : process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://dashboard.vikareta.com';
           }
 
-          console.log('Main Site: Redirecting to:', targetUrl);
+          console.log('Main Site: Preparing redirect to:', targetUrl);
 
-          // Add auth token as URL parameter for cross-domain auth
+          // Get auth token for cross-domain auth
           const token = localStorage.getItem('auth_token');
           console.log('Main Site: Auth token for redirect:', token ? `Found (${token.substring(0, 20)}...)` : 'Not found');
 
           if (token) {
-            // Check if target URL already has parameters
+            // Construct redirect URL with token
             const separator = targetUrl.includes('?') ? '&' : '?';
-            const urlWithAuth = `${targetUrl}${separator}token=${encodeURIComponent(token)}&redirect=login&source=main_site`;
-            console.log('Main Site: Redirecting with token to:', urlWithAuth);
+            const urlWithAuth = `${targetUrl}${separator}token=${encodeURIComponent(token)}&redirect=login&source=main_site&timestamp=${Date.now()}`;
+            
+            console.log('Main Site: Final redirect URL:', urlWithAuth.replace(token, '[TOKEN_HIDDEN]'));
 
             // Use window.location.replace to avoid back button issues
             window.location.replace(urlWithAuth);
@@ -92,9 +93,11 @@ function LoginPageContent() {
             toast.error('Authentication Error', 'Login succeeded but token not found. Please try again.');
 
             // Still try to redirect, dashboard will handle the missing token
-            window.location.replace(`${targetUrl}${targetUrl.includes('?') ? '&' : '?'}redirect=login&source=main_site&error=no_token`);
+            const fallbackUrl = `${targetUrl}${targetUrl.includes('?') ? '&' : '?'}redirect=login&source=main_site&error=no_token&timestamp=${Date.now()}`;
+            console.log('Main Site: Fallback redirect to:', fallbackUrl);
+            window.location.replace(fallbackUrl);
           }
-        }, 2000); // Increased timeout to ensure token is stored
+        }, 1500); // Reduced timeout but still enough for token storage
       } else {
         console.error('Main Site: Login failed - success was false');
         toast.error('Login Failed', 'Please check your credentials and try again.');
