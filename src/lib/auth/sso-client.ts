@@ -283,30 +283,24 @@ export class SSOAuthClient {
    * Get current user profile (returns User object or null)
    */
   async getCurrentUser(): Promise<User | null> {
-    // First check localStorage for cached user
-    const storedUser = this.getStoredUser();
-    const accessToken = this.getAccessToken();
-    
-    if (storedUser && accessToken) {
-      // Verify token is still valid by making a quick API call
-      try {
-        const response = await this.request<AuthResponse>('/api/auth/me', {
-          method: 'GET',
-        });
-        
-        if (response.success && response.user) {
-          // Update stored user data
-          this.setUser(response.user);
-          return response.user;
-        }
-      } catch (error) {
-        // Token might be expired, clear storage
-        this.clearTokens();
-        return null;
+    try {
+      // Always try to get current user from API (handles both localStorage and cookie auth)
+      const response = await this.request<AuthResponse>('/api/auth/me', {
+        method: 'GET',
+      });
+      
+      if (response.success && response.user) {
+        // Store user data in localStorage for future use
+        this.setUser(response.user);
+        return response.user;
       }
+      
+      return null;
+    } catch (error) {
+      // If API call fails, clear any stored tokens and return null
+      this.clearTokens();
+      return null;
     }
-    
-    return null;
   }
 
   /**

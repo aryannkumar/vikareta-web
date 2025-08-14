@@ -14,27 +14,42 @@ export default function DashboardPage() {
   const checkAuthAndRedirect = async () => {
     try {
       const ssoClient = new SSOAuthClient();
+      console.log('Dashboard: Checking authentication...');
+      
       const user = await ssoClient.getCurrentUser();
+      console.log('Dashboard: User result:', user ? 'User found' : 'No user');
       
       if (user) {
-        // User is authenticated, redirect to dashboard
+        // User is authenticated, redirect to dashboard with token
+        console.log('Dashboard: User authenticated, redirecting to dashboard');
         setRedirecting(true);
+        
+        // Get the access token to pass to dashboard
+        const accessToken = localStorage.getItem('vikareta_access_token');
+        
         const dashboardUrl = process.env.NODE_ENV === 'production' 
           ? 'https://dashboard.vikareta.com' 
           : 'https://dashboard.vikareta.com';
         
+        // Add token as URL parameter for cross-domain authentication
+        const redirectUrl = accessToken 
+          ? `${dashboardUrl}?token=${encodeURIComponent(accessToken)}&redirect=main`
+          : dashboardUrl;
+        
         // Add a small delay to show the redirect message
         setTimeout(() => {
-          window.location.href = dashboardUrl;
+          window.location.href = redirectUrl;
         }, 1000);
       } else {
         // User not authenticated, redirect to login
+        console.log('Dashboard: No user found, redirecting to login');
         setTimeout(() => {
           window.location.href = '/auth/login';
         }, 1000);
       }
     } catch (error) {
       // If there's an error (like 401), redirect to login
+      console.error('Dashboard: Authentication error:', error);
       setTimeout(() => {
         window.location.href = '/auth/login';
       }, 1000);
