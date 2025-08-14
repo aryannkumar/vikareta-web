@@ -25,7 +25,15 @@ export default function DashboardPage() {
         setRedirecting(true);
         
         // Get the access token to pass to dashboard
-        const accessToken = localStorage.getItem('vikareta_access_token');
+        let accessToken = ssoClient.getCurrentAccessToken();
+        
+        // Fallback to localStorage if SSO client doesn't have it
+        if (!accessToken) {
+          accessToken = localStorage.getItem('vikareta_access_token');
+        }
+        
+        console.log('Dashboard: Access token available:', !!accessToken);
+        console.log('Dashboard: Token source:', accessToken ? 'Found' : 'Not found');
         
         const dashboardUrl = process.env.NODE_ENV === 'production' 
           ? 'https://dashboard.vikareta.com' 

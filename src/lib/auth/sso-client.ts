@@ -427,6 +427,22 @@ export class SSOAuthClient {
       };
     }
   }
+
+  /**
+   * Get current access token (public method)
+   */
+  public getCurrentAccessToken(): string | null {
+    return this.getAccessToken();
+  }
+
+  /**
+   * Check if user is currently authenticated
+   */
+  public isAuthenticated(): boolean {
+    const token = this.getAccessToken();
+    const user = this.getStoredUser();
+    return !!(token && user);
+  }
 }
 
 // Export singleton instance
