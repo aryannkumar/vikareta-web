@@ -24,6 +24,8 @@ export interface LoginCredentials {
 export interface AuthResponse {
   success: boolean;
   user?: User;
+  accessToken?: string;
+  refreshToken?: string;
   error?: {
     code: string;
     message: string;
@@ -33,11 +35,71 @@ export interface AuthResponse {
 export class SSOAuthClient {
   private baseURL: string;
   private csrfToken: string | null = null;
+  private readonly ACCESS_TOKEN_KEY = 'vikareta_access_token';
+  private readonly REFRESH_TOKEN_KEY = 'vikareta_refresh_token';
+  private readonly USER_KEY = 'vikareta_user';
 
   constructor() {
     this.baseURL = process.env.NODE_ENV === 'development' 
       ? 'http://localhost:5001' 
       : 'https://api.vikareta.com';
+  }
+
+  /**
+   * LocalStorage helpers for token management
+   */
+  private setAccessToken(token: string): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(this.ACCESS_TOKEN_KEY, token);
+    }
+  }
+
+  private getAccessToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+    }
+    return null;
+  }
+
+  private setRefreshToken(token: string): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(this.REFRESH_TOKEN_KEY, token);
+    }
+  }
+
+  private getRefreshToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+    }
+    return null;
+  }
+
+  private setUser(user: User): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+    }
+  }
+
+  private getStoredUser(): User | null {
+    if (typeof window !== 'undefined') {
+      const userData = localStorage.getItem(this.USER_KEY);
+      if (userData) {
+        try {
+          return JSON.parse(userData);
+        } catch {
+          return null;
+        }
+      }
+    }
+    return null;
+  }
+
+  private clearTokens(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(this.ACCESS_TOKEN_KEY);
+      localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+      localStorage.removeItem(this.USER_KEY);
+    }
   }
 
   /**
@@ -99,7 +161,7 @@ export class SSOAuthClient {
   }
 
   /**
-   * Make authenticated API request
+   * Make authenticated API request with localStorage tokens
    */
   private async request<T>(
     endpoint: string, 
@@ -108,13 +170,22 @@ export class SSOAuthClient {
     const url = `${this.baseURL}${endpoint}`;
     
     const config: RequestInit = {
-      credentials: 'include', // CRITICAL: Include cookies
+      credentials: 'include', // Still include for CSRF cookies
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
       ...options,
     };
+
+    // Add access token from localStorage
+    const accessToken = this.getAccessToken();
+    if (accessToken) {
+      config.headers = {
+        ...config.headers,
+        'Authorization': `Bearer ${accessToken}`,
+      };
+    }
 
     // Add CSRF token for state-changing requests
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method || 'GET')) {
@@ -132,6 +203,15 @@ export class SSOAuthClient {
       const response = await fetch(url, config);
       
       if (!response.ok) {
+        // If 401, try to refresh token
+        if (response.status === 401 && accessToken) {
+          const refreshed = await this.tryRefreshToken();
+          if (refreshed) {
+            // Retry the original request with new token
+            return this.request(endpoint, options);
+          }
+        }
+        
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `HTTP ${response.status}`);
       }
@@ -144,7 +224,26 @@ export class SSOAuthClient {
   }
 
   /**
-   * Login with username/password
+   * Try to refresh access token using refresh token
+   */
+  private async tryRefreshToken(): Promise<boolean> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      this.clearTokens();
+      return false;
+    }
+
+    try {
+      const response = await this.refreshToken();
+      return response.success;
+    } catch {
+      this.clearTokens();
+      return false;
+    }
+  }
+
+  /**
+   * Login with username/password and store tokens in localStorage
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
@@ -155,6 +254,18 @@ export class SSOAuthClient {
         method: 'POST',
         body: JSON.stringify(credentials),
       });
+
+      // Store tokens and user data in localStorage
+      if (response.success && response.user) {
+        // Extract tokens from response (backend should return them)
+        if (response.accessToken) {
+          this.setAccessToken(response.accessToken);
+        }
+        if (response.refreshToken) {
+          this.setRefreshToken(response.refreshToken);
+        }
+        this.setUser(response.user);
+      }
 
       return response;
     } catch (error) {
@@ -172,16 +283,30 @@ export class SSOAuthClient {
    * Get current user profile (returns User object or null)
    */
   async getCurrentUser(): Promise<User | null> {
-    try {
-      const response = await this.request<AuthResponse>('/api/auth/me', {
-        method: 'GET',
-      });
-
-      return response.success && response.user ? response.user : null;
-    } catch (error) {
-      // 401 is expected when not logged in
-      return null;
+    // First check localStorage for cached user
+    const storedUser = this.getStoredUser();
+    const accessToken = this.getAccessToken();
+    
+    if (storedUser && accessToken) {
+      // Verify token is still valid by making a quick API call
+      try {
+        const response = await this.request<AuthResponse>('/api/auth/me', {
+          method: 'GET',
+        });
+        
+        if (response.success && response.user) {
+          // Update stored user data
+          this.setUser(response.user);
+          return response.user;
+        }
+      } catch (error) {
+        // Token might be expired, clear storage
+        this.clearTokens();
+        return null;
+      }
     }
+    
+    return null;
   }
 
   /**
@@ -245,6 +370,9 @@ export class SSOAuthClient {
    */
   async logout(): Promise<AuthResponse> {
     try {
+      // Clear localStorage first
+      this.clearTokens();
+      
       // Ensure we have a CSRF token before making the request
       await this.ensureCSRFToken();
       
@@ -253,12 +381,12 @@ export class SSOAuthClient {
       });
 
       console.log('SSO: Logout completed');
-      // Cookies are automatically cleared by the server
       return response;
     } catch (error) {
+      // Even if API call fails, we've cleared local tokens
       console.error('SSO: Logout error:', error);
       return {
-        success: false,
+        success: true, // Consider it successful since we cleared local data
         error: {
           code: 'LOGOUT_ERROR',
           message: error instanceof Error ? error.message : 'Logout failed'
