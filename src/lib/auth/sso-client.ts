@@ -169,7 +169,23 @@ export class SSOAuthClient {
   }
 
   /**
-   * Check current session and get user profile
+   * Get current user profile (returns User object or null)
+   */
+  async getCurrentUser(): Promise<User | null> {
+    try {
+      const response = await this.request<AuthResponse>('/api/auth/me', {
+        method: 'GET',
+      });
+
+      return response.success && response.user ? response.user : null;
+    } catch (error) {
+      // 401 is expected when not logged in
+      return null;
+    }
+  }
+
+  /**
+   * Check current session and get user profile (returns full AuthResponse)
    */
   async checkSession(): Promise<AuthResponse> {
     try {
@@ -178,14 +194,11 @@ export class SSOAuthClient {
       });
 
       if (response.success) {
-        console.log('SSO: Session valid');
         return response;
       } else {
-        console.log('SSO: Session invalid');
         return response;
       }
     } catch (error) {
-      console.error('SSO: Session check error:', error);
       return {
         success: false,
         error: {

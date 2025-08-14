@@ -1,26 +1,78 @@
 'use client';
 
-import { useEffect } from 'react';
-import { Metadata } from 'next';
+import { useEffect, useState } from 'react';
+import { SSOAuthClient } from '@/lib/auth/sso-client';
 
-// Note: metadata export doesn't work with 'use client', so we'll handle this differently
 export default function DashboardPage() {
+  const [loading, setLoading] = useState(true);
+  const [redirecting, setRedirecting] = useState(false);
+
   useEffect(() => {
-    // Redirect to the local dashboard service
-    window.location.href = 'http://localhost:3002';
+    checkAuthAndRedirect();
   }, []);
+
+  const checkAuthAndRedirect = async () => {
+    try {
+      const ssoClient = new SSOAuthClient();
+      const user = await ssoClient.getCurrentUser();
+      
+      if (user) {
+        // User is authenticated, redirect to dashboard
+        setRedirecting(true);
+        const dashboardUrl = process.env.NODE_ENV === 'production' 
+          ? 'https://dashboard.vikareta.com' 
+          : 'https://dashboard.vikareta.com';
+        
+        // Add a small delay to show the redirect message
+        setTimeout(() => {
+          window.location.href = dashboardUrl;
+        }, 1000);
+      } else {
+        // User not authenticated, redirect to login
+        setTimeout(() => {
+          window.location.href = '/auth/login';
+        }, 1000);
+      }
+    } catch (error) {
+      // If there's an error (like 401), redirect to login
+      setTimeout(() => {
+        window.location.href = '/auth/login';
+      }, 1000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto text-center">
+          <h1 className="text-3xl font-bold mb-4">Loading...</h1>
+          <p className="text-gray-600">Checking authentication status...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto text-center">
-        <h1 className="text-3xl font-bold mb-4">Redirecting to Dashboard...</h1>
+        <h1 className="text-3xl font-bold mb-4">
+          {redirecting ? 'Redirecting to Dashboard...' : 'Redirecting to Login...'}
+        </h1>
         <p className="text-gray-600 mb-6">
-          You are being redirected to the Vikareta Dashboard.
+          {redirecting 
+            ? 'You are being redirected to the Vikareta Dashboard.'
+            : 'Please log in to access the dashboard.'
+          }
         </p>
         <p className="text-sm text-gray-500">
           If you are not redirected automatically, 
           <a 
-            href="http://localhost:3002" 
+            href={redirecting 
+              ? (process.env.NODE_ENV === 'production' ? 'https://dashboard.vikareta.com' : 'http://localhost:3002')
+              : '/auth/login'
+            }
             className="text-blue-600 hover:underline ml-1"
           >
             click here
