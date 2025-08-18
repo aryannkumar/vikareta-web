@@ -72,7 +72,9 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
         'Content-Type': 'application/json',
         ...options.headers,
       },
-      ...options,
+  // Default to sending credentials (cookies) so cookie-based auth/refresh works cross-origin
+  credentials: (options as any).credentials ?? 'include',
+  ...options,
     });
 
     let data;
@@ -171,13 +173,16 @@ export const useAuthStore = create<AuthState>()(
 
       refreshAuth: async () => {
         const { refreshToken } = get();
-        if (!refreshToken) return;
 
         try {
-          const response = await apiCall('/auth/refresh', {
-            method: 'POST',
-            body: JSON.stringify({ refreshToken }),
-          });
+          // If we have a stored refresh token use it in the body (backward compat).
+          // Otherwise attempt cookie-based refresh (credentials included by default in apiCall).
+          const response = refreshToken
+            ? await apiCall('/auth/refresh', {
+                method: 'POST',
+                body: JSON.stringify({ refreshToken }),
+              })
+            : await apiCall('/auth/refresh', { method: 'POST' });
 
           const { token: newToken, refreshToken: newRefreshToken } = response.data;
           
