@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SSO Relay</title>
+    <script>
+      // sso-relay.html
+      // This page is intended to be the final redirect target after OAuth provider
+      // redirects back to the frontend. It posts a message to the opener window
+      // (the page that opened the popup) and then closes itself.
+
+      (function () {
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const state = params.get('state') || null;
+          const success = !params.get('error');
+
+          // Determine the allowed origin for security. Default to current origin.
+          // If your opener uses a different host, replace allowedOrigin accordingly.
+          const allowedOrigin = window.location.origin;
+
+          const message = {
+            type: 'SSO_COMPLETE',
+            success: success,
+            state: state,
+            timestamp: Date.now(),
+          };
+
+          if (window.opener && !window.opener.closed) {
+            // Send message to opener and close
+            window.opener.postMessage(message, allowedOrigin);
+          }
+
+          // Try to give a short UX for users who land here directly
+          document.addEventListener('DOMContentLoaded', () => {
+            const el = document.getElementById('status');
+            if (el) el.textContent = success ? 'Authentication successful — you may close this window.' : 'Authentication failed — you may close this window.';
+          });
+
+          // Close the window after a short delay
+          setTimeout(() => {
+            try { window.close(); } catch (e) { /* ignore */ }
+          }, 700);
+        } catch (err) {
+          // silence errors
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div style="font-family: system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial; padding: 24px;">
+      <h2 id="status">Completing authentication...</h2>
+      <p>If this page does not close automatically, you may close it manually and return to the application.</p>
+    </div>
+  </body>
+</html>
