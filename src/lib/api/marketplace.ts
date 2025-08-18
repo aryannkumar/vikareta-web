@@ -154,12 +154,17 @@ export const marketplaceApi = {
     // Heuristic: only include seller/provider businesses
     const isSellerEntity = (b: any) => {
       if (!b) return false;
+      // explicit flags
+      if (b.type === 'business' || b.type === 'seller') return true;
+      if (b.userType === 'seller') return true;
       if (b.sellerId) return true;
       if (b.isSeller === true) return true;
-      if (b.role === 'seller' || b.type === 'seller') return true;
-      if (b.provider && (b.provider.isSeller === true || b.provider.role === 'seller' || b.provider.id)) return true;
-      // fallback: if provider exists, treat as seller
+      if (b.role === 'seller') return true;
+      // seller embedded on product/service
       if (b.provider && b.provider.id) return true;
+      if (b.seller && b.seller.id) return true;
+      // fallback: typical user/business shape from backend
+      if (b.businessName || b.firstName || b.lastName) return true;
       return false;
     };
 
@@ -195,11 +200,14 @@ export const marketplaceApi = {
 
     const isSellerEntity = (b: any) => {
       if (!b) return false;
+      if (b.type === 'business' || b.type === 'seller') return true;
+      if (b.userType === 'seller') return true;
       if (b.sellerId) return true;
       if (b.isSeller === true) return true;
-      if (b.role === 'seller' || b.type === 'seller') return true;
-      if (b.provider && (b.provider.isSeller === true || b.provider.role === 'seller' || b.provider.id)) return true;
+      if (b.role === 'seller') return true;
       if (b.provider && b.provider.id) return true;
+      if (b.seller && b.seller.id) return true;
+      if (b.businessName || b.firstName || b.lastName) return true;
       return false;
     };
 
@@ -235,11 +243,14 @@ export const marketplaceApi = {
 
     const isSellerEntity = (b: any) => {
       if (!b) return false;
+      if (b.type === 'business' || b.type === 'seller') return true;
+      if (b.userType === 'seller') return true;
       if (b.sellerId) return true;
       if (b.isSeller === true) return true;
-      if (b.role === 'seller' || b.type === 'seller') return true;
-      if (b.provider && (b.provider.isSeller === true || b.provider.role === 'seller' || b.provider.id)) return true;
+      if (b.role === 'seller') return true;
       if (b.provider && b.provider.id) return true;
+      if (b.seller && b.seller.id) return true;
+      if (b.businessName || b.firstName || b.lastName) return true;
       return false;
     };
 
@@ -347,11 +358,14 @@ export const marketplaceApi = {
     if (filters?.type === 'businesses') {
       const isSellerEntity = (b: any) => {
         if (!b) return false;
+        if (b.type === 'business' || b.type === 'seller') return true;
+        if (b.userType === 'seller') return true;
         if (b.sellerId) return true;
         if (b.isSeller === true) return true;
-        if (b.role === 'seller' || b.type === 'seller') return true;
-        if (b.provider && (b.provider.isSeller === true || b.provider.role === 'seller' || b.provider.id)) return true;
+        if (b.role === 'seller') return true;
         if (b.provider && b.provider.id) return true;
+        if (b.seller && b.seller.id) return true;
+        if (b.businessName || b.firstName || b.lastName) return true;
         return false;
       };
       arr = (arr || []).filter(isSellerEntity);
