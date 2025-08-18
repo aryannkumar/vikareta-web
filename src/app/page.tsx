@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Search, ArrowRight, Package, Settings, Sparkles, Building2 } from 'lucide-react';
 import { CategoriesSection } from '@/components/sections/CategoriesSection';
 import { FeaturedProducts } from '@/components/sections/FeaturedProducts';
 import { FeaturedServices } from '@/components/sections/FeaturedServices';
@@ -11,6 +12,7 @@ import { CTASection } from '@/components/sections/CTASection';
 import { productsApi } from '@/lib/api/products';
 import { servicesApi } from '@/lib/api/services';
 import { apiClient } from '@/lib/api/client';
+import { searchApi } from '@/lib/api/search';
 import { RevealSection, FloatingElement } from '@/components/Animated';
 
 // Premium page animations
@@ -65,6 +67,14 @@ interface HomePageData {
   error: string | null;
 }
 
+// Search interface
+interface SearchState {
+  query: string;
+  type: 'products' | 'services' | 'businesses';
+  isSearching: boolean;
+  suggestions: string[];
+}
+
 export default function HomePage() {
   const [data, setData] = useState<HomePageData>({
     categories: [],
@@ -80,9 +90,62 @@ export default function HomePage() {
     error: null
   });
 
+  const [search, setSearch] = useState<SearchState>({
+    query: '',
+    type: 'products',
+    isSearching: false,
+    suggestions: []
+  });
+
   useEffect(() => {
     loadHomePageData();
   }, []);
+
+  const handleSearch = async () => {
+    if (!search.query.trim()) return;
+    
+    setSearch(prev => ({ ...prev, isSearching: true, suggestions: [] }));
+    
+    try {
+      // Use centralized search that leverages Elasticsearch
+      const searchType = search.type === 'businesses' ? 'provider' : search.type.slice(0, -1) as 'product' | 'service';
+      
+      // Redirect to unified search page with filters
+      const searchParams = new URLSearchParams({
+        q: search.query,
+        type: searchType,
+        page: '1'
+      });
+      
+      window.location.href = `/search?${searchParams.toString()}`;
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearch(prev => ({ ...prev, isSearching: false, suggestions: [] }));
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  // Load search suggestions as user types
+  const loadSuggestions = async (query: string) => {
+    if (query.length < 2) {
+      setSearch(prev => ({ ...prev, suggestions: [] }));
+      return;
+    }
+
+    try {
+      const response = await searchApi.getSuggestions(query, 5);
+      if (response.success) {
+        setSearch(prev => ({ ...prev, suggestions: response.data.suggestions }));
+      }
+    } catch (error) {
+      console.error('Failed to load suggestions:', error);
+    }
+  };
 
   const loadHomePageData = async () => {
     try {
@@ -196,20 +259,20 @@ export default function HomePage() {
                   transition={{ delay: 0.4 }}
                 >
                   {[
-                    { label: 'Categories', icon: '📂' },
-                    { label: 'Products', icon: '📦' },
-                    { label: 'Services', icon: '⚙️' },
-                    { label: 'Suppliers', icon: '🏢' }
+                    { label: 'Categories', icon: '📂', bgColor: 'bg-purple-50 dark:bg-purple-900/30', progressColor: 'from-purple-500 to-purple-600' },
+                    { label: 'Products', icon: '📦', bgColor: 'bg-blue-50 dark:bg-blue-900/30', progressColor: 'from-blue-500 to-cyan-500' },
+                    { label: 'Services', icon: '⚙️', bgColor: 'bg-emerald-50 dark:bg-emerald-900/30', progressColor: 'from-emerald-500 to-green-500' },
+                    { label: 'Suppliers', icon: '🏢', bgColor: 'bg-orange-50 dark:bg-orange-900/30', progressColor: 'from-orange-500 to-red-500' }
                   ].map((item, index) => (
                     <motion.div
                       key={item.label}
-                      className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg"
+                      className={`${item.bgColor} rounded-xl p-4 shadow-lg border border-gray-100 dark:border-gray-700`}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.5 + index * 0.1 }}
                     >
                       <div className="text-2xl mb-2">{item.icon}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">{item.label}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">{item.label}</div>
                       <motion.div 
                         className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2"
                         initial={{ opacity: 0 }}
@@ -217,7 +280,7 @@ export default function HomePage() {
                         transition={{ delay: 0.6 + index * 0.1 }}
                       >
                         <motion.div
-                          className="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full"
+                          className={`bg-gradient-to-r ${item.progressColor} h-2 rounded-full`}
                           initial={{ width: "0%" }}
                           animate={{ width: "100%" }}
                           transition={{ duration: 2, delay: 0.7 + index * 0.2, ease: "easeInOut" }}
@@ -245,10 +308,51 @@ export default function HomePage() {
       <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-blue-500/5 pointer-events-none" />
       
-      {/* Floating Decorative Elements */}
+      {/* Enhanced Floating Decorative Elements with Animations */}
       <FloatingElement className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-br from-orange-400/20 to-orange-600/20 rounded-full blur-xl" delay={0} />
       <FloatingElement className="absolute top-40 right-20 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full blur-xl" delay={2} />
       <FloatingElement className="absolute bottom-40 left-20 w-24 h-24 bg-gradient-to-br from-orange-500/20 to-pink-500/20 rounded-full blur-xl" delay={4} />
+      
+      {/* Additional Moving Elements */}
+      <motion.div
+        className="absolute top-1/4 right-1/4 w-4 h-4 bg-purple-400/30 rounded-full"
+        animate={{
+          x: [0, 30, 0],
+          y: [0, -20, 0],
+          scale: [1, 1.2, 1],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div
+        className="absolute bottom-1/3 left-1/3 w-6 h-6 bg-emerald-400/20 rounded-full"
+        animate={{
+          x: [0, -25, 0],
+          y: [0, 15, 0],
+          rotate: [0, 180, 360],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div
+        className="absolute top-2/3 right-1/3 w-3 h-3 bg-cyan-400/40 rounded-full"
+        animate={{
+          x: [0, 20, 0],
+          y: [0, -30, 0],
+          opacity: [0.4, 0.8, 0.4],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
       
       {/* Error Banner */}
       {data.error && (
@@ -276,8 +380,24 @@ export default function HomePage() {
                   transition={{ duration: 0.6 }}
                   className="inline-flex items-center gap-2 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-4 py-2 rounded-full text-sm font-medium mb-6"
                 >
-                  <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
-                  Live B2B Marketplace
+                  <motion.span 
+                    className="w-2 h-2 bg-orange-500 rounded-full"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    Live B2B Marketplace
+                  </motion.span>
+                  <motion.div
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                  </motion.div>
                 </motion.div>
                 
                 <motion.h1 
@@ -286,7 +406,15 @@ export default function HomePage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  Premium B2B
+                  <motion.span
+                    animate={{ 
+                      backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+                    }}
+                    transition={{ duration: 5, repeat: Infinity }}
+                    className="bg-gradient-to-r from-gray-900 via-orange-600 to-gray-900 bg-[length:200%_auto] bg-clip-text text-transparent dark:from-white dark:via-orange-400 dark:to-white"
+                  >
+                    Premium B2B
+                  </motion.span>
                   <span className="block bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent">
                     Marketplace
                   </span>
@@ -301,6 +429,148 @@ export default function HomePage() {
                   Connect with verified suppliers, discover premium products, and scale your business with India's most trusted B2B platform.
                 </motion.p>
 
+                {/* Enhanced Search Bar */}
+                <motion.div 
+                  className="max-w-4xl mx-auto mb-12"
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-2 shadow-2xl border border-gray-200 dark:border-gray-700">
+                    <div className="flex flex-col lg:flex-row gap-2">
+                      {/* Search Type Toggle */}
+                      <div className="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
+                        <button
+                          onClick={() => setSearch(prev => ({ ...prev, type: 'products' }))}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                            search.type === 'products'
+                              ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-md'
+                              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400'
+                          }`}
+                        >
+                          <Package className="w-4 h-4" />
+                          Products
+                        </button>
+                        <button
+                          onClick={() => setSearch(prev => ({ ...prev, type: 'services' }))}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                            search.type === 'services'
+                              ? 'bg-white dark:bg-gray-600 text-emerald-600 dark:text-emerald-400 shadow-md'
+                              : 'text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400'
+                          }`}
+                        >
+                          <Settings className="w-4 h-4" />
+                          Services
+                        </button>
+                        <button
+                          onClick={() => setSearch(prev => ({ ...prev, type: 'businesses' }))}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                            search.type === 'businesses'
+                              ? 'bg-white dark:bg-gray-600 text-purple-600 dark:text-purple-400 shadow-md'
+                              : 'text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400'
+                          }`}
+                        >
+                          <Building2 className="w-4 h-4" />
+                          Businesses
+                        </button>
+                      </div>
+
+                      {/* Search Input */}
+                      <div className="flex-1 relative">
+                        <input
+                          type="text"
+                          value={search.query}
+                          onChange={(e) => {
+                            setSearch(prev => ({ ...prev, query: e.target.value }));
+                            loadSuggestions(e.target.value);
+                          }}
+                          onKeyPress={handleKeyPress}
+                          placeholder={`Search for ${
+                            search.type === 'products' 
+                              ? 'products like "industrial machinery, electronics..."' 
+                              : search.type === 'services'
+                              ? 'services like "logistics, manufacturing..."'
+                              : 'businesses like "suppliers, manufacturers..."'
+                          }`}
+                          className="w-full px-6 py-4 text-lg rounded-xl border-0 focus:ring-4 focus:ring-orange-500/25 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                        />
+                        <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        
+                        {/* Live Search Suggestions */}
+                        {search.suggestions.length > 0 && search.query.length > 1 && (
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 max-h-60 overflow-y-auto">
+                            {search.suggestions.map((suggestion, index) => (
+                              <button
+                                key={index}
+                                onClick={() => setSearch(prev => ({ ...prev, query: suggestion, suggestions: [] }))}
+                                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
+                              >
+                                <Search className="w-4 h-4 text-gray-400" />
+                                <span className="text-gray-900 dark:text-white">{suggestion}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Search Button */}
+                      <motion.button
+                        onClick={handleSearch}
+                        disabled={!search.query.trim() || search.isSearching}
+                        whileHover={{ scale: search.query.trim() ? 1.05 : 1 }}
+                        whileTap={{ scale: search.query.trim() ? 0.95 : 1 }}
+                        className={`flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
+                          search.query.trim()
+                            ? search.type === 'products'
+                              ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl'
+                              : 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl'
+                            : 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        {search.isSearching ? (
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                          />
+                        ) : (
+                          <>
+                            <Search className="w-5 h-5" />
+                            Search
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
+                      </motion.button>
+                    </div>
+                  </div>
+                  
+                  {/* Search Suggestions */}
+                  <motion.div 
+                    className="flex flex-wrap justify-center gap-2 mt-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Popular searches:</span>
+                    {[
+                      { term: 'Industrial Machinery', type: 'products' },
+                      { term: 'Electronics', type: 'products' },
+                      { term: 'Logistics Services', type: 'services' },
+                      { term: 'Manufacturing', type: 'services' }
+                    ].map((suggestion) => (
+                      <motion.button
+                        key={suggestion.term}
+                        onClick={() => setSearch({ query: suggestion.term, type: suggestion.type as 'products' | 'services', isSearching: false, suggestions: [] })}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-orange-100 dark:hover:bg-orange-900/30 hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-200"
+                      >
+                        {suggestion.term}
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                </motion.div>
+
                 {/* Real-time Stats Dashboard */}
                 <motion.div 
                   className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
@@ -313,38 +583,80 @@ export default function HomePage() {
                       label: 'Active Products', 
                       value: data.stats.totalProducts.toLocaleString(),
                       icon: '📦',
-                      color: 'from-blue-500 to-blue-600'
+                      color: 'from-blue-500 to-cyan-500',
+                      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+                      iconColor: 'text-blue-600'
                     },
                     { 
                       label: 'Verified Suppliers', 
                       value: data.stats.totalSuppliers.toLocaleString(),
                       icon: '🏢',
-                      color: 'from-green-500 to-green-600'
+                      color: 'from-emerald-500 to-green-500',
+                      bgColor: 'bg-emerald-50 dark:bg-emerald-900/20',
+                      iconColor: 'text-emerald-600'
                     },
                     { 
                       label: 'Categories', 
                       value: data.stats.totalCategories.toString(),
                       icon: '📂',
-                      color: 'from-purple-500 to-purple-600'
+                      color: 'from-purple-500 to-violet-500',
+                      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+                      iconColor: 'text-purple-600'
                     },
                     { 
                       label: 'Successful Deals', 
                       value: data.stats.successfulDeals.toLocaleString(),
                       icon: '🤝',
-                      color: 'from-orange-500 to-orange-600'
+                      color: 'from-orange-500 to-red-500',
+                      bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+                      iconColor: 'text-orange-600'
                     }
-                  ].map((stat, _index) => (
+                  ].map((stat, index) => (
                     <motion.div
                       key={stat.label}
-                      className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
+                      className={`${stat.bgColor} rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 relative overflow-hidden`}
                       variants={featureVariants}
                       whileHover={{ scale: 1.05, y: -5 }}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 + index * 0.1 }}
                     >
-                      <div className="text-3xl mb-3">{stat.icon}</div>
-                      <div className={`text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-1`}>
+                      {/* Background Animation */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"
+                        animate={{
+                          opacity: [0.1, 0.3, 0.1],
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          delay: index * 0.5
+                        }}
+                      />
+                      
+                      <motion.div 
+                        className="text-4xl mb-4 relative z-10"
+                        animate={{
+                          scale: [1, 1.1, 1],
+                          rotate: [0, 5, -5, 0],
+                        }}
+                        transition={{
+                          duration: 4,
+                          repeat: Infinity,
+                          delay: index * 0.3
+                        }}
+                      >
+                        {stat.icon}
+                      </motion.div>
+                      <motion.div 
+                        className={`text-2xl lg:text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-1 relative z-10`}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.7 + index * 0.1, type: "spring", stiffness: 200 }}
+                      >
                         {stat.value}
-                      </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">{stat.label}</div>
+                      </motion.div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400 font-medium relative z-10">{stat.label}</div>
                     </motion.div>
                   ))}
                 </motion.div>
@@ -478,15 +790,15 @@ export default function HomePage() {
                       transition={{ delay: 0.5 }}
                     >
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                        <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
                         Weekly Market Reports
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                        <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
                         Exclusive Product Launches
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                        <span className="w-2 h-2 bg-violet-400 rounded-full animate-pulse"></span>
                         Business Networking Events
                       </div>
                     </motion.div>
@@ -521,12 +833,18 @@ export default function HomePage() {
               whileInView={{ opacity: 0.6 }}
               transition={{ duration: 0.8 }}
             >
-              {[1, 2, 3, 4, 5].map((item) => (
-                <div key={item} className="text-center">
-                  <div className="w-20 h-20 mx-auto bg-gray-200 dark:bg-gray-700 rounded-xl flex items-center justify-center text-2xl font-bold text-gray-400">
-                    B{item}
+              {[
+                { name: 'TechCorp', color: 'bg-blue-500', icon: '💻' },
+                { name: 'GreenEnergy', color: 'bg-emerald-500', icon: '🌱' },
+                { name: 'ManufacturingPro', color: 'bg-purple-500', icon: '⚙️' },
+                { name: 'LogiTrans', color: 'bg-orange-500', icon: '🚛' },
+                { name: 'BuildMasters', color: 'bg-cyan-500', icon: '🏗️' }
+              ].map((company, _index) => (
+                <div key={company.name} className="text-center">
+                  <div className={`w-20 h-20 mx-auto ${company.color} rounded-xl flex items-center justify-center text-2xl text-white shadow-lg`}>
+                    {company.icon}
                   </div>
-                  <div className="mt-2 text-sm text-gray-500">Business {item}</div>
+                  <div className="mt-2 text-sm text-gray-500 font-medium">{company.name}</div>
                 </div>
               ))}
             </motion.div>
