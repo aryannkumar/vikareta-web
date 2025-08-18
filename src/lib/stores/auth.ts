@@ -67,10 +67,14 @@ interface AuthState {
 
 const apiCall = async (endpoint: string, options: RequestInit = {}) => {
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  // Attach CSRF token (if stored) to match backend CSRF middleware expectations
+  const csrfToken = typeof window !== 'undefined' ? localStorage.getItem('csrf_token') : null;
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers,
+    ...(csrfToken ? { 'X-XSRF-TOKEN': csrfToken } : {}),
+    ...options.headers,
       },
   // Default to sending credentials (cookies) so cookie-based auth/refresh works cross-origin
   credentials: (options as any).credentials ?? 'include',
