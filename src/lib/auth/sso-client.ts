@@ -38,6 +38,8 @@ export class SSOAuthClient {
   private readonly ACCESS_TOKEN_KEY = 'vikareta_access_token';
   private readonly REFRESH_TOKEN_KEY = 'vikareta_refresh_token';
   private readonly USER_KEY = 'vikareta_user';
+  // Prevent multiple simultaneous refresh attempts
+  private refreshingPromise: Promise<boolean> | null = null;
 
   constructor() {
     this.baseURL = process.env.NODE_ENV === 'development' 
@@ -205,6 +207,14 @@ export class SSOAuthClient {
       if (!response.ok) {
         // If 401, try to refresh token
         if (response.status === 401 && accessToken) {
+          // Avoid trying to refresh when we are already calling the refresh endpoint
+          if (endpoint.includes('/auth/refresh')) {
+            // Clear tokens to avoid retry loops
+            this.clearTokens();
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `HTTP ${response.status}`);
+          }
+
           const refreshed = await this.tryRefreshToken();
           if (refreshed) {
             // Retry the original request with new token
@@ -233,12 +243,69 @@ export class SSOAuthClient {
       return false;
     }
 
+    // If a refresh is already in progress, wait for it instead of issuing another
+    if (this.refreshingPromise) {
+      try {
+        return await this.refreshingPromise;
+      } catch {
+        return false;
+      }
+    }
+
+    // Create a lock for the refresh flow
+    this.refreshingPromise = (async () => {
+      try {
+        const response = await this.refreshTokenDirect();
+        return response.success === true;
+      } catch {
+        return false;
+      } finally {
+        // Clear the lock after completion
+        this.refreshingPromise = null;
+      }
+    })();
+
     try {
-      const response = await this.refreshToken();
-      return response.success;
-    } catch {
+      return await this.refreshingPromise;
+    } finally {
+      this.refreshingPromise = null;
+    }
+  }
+
+  /**
+   * Directly call the refresh endpoint using fetch to avoid the request() auto-refresh recursion.
+   */
+  private async refreshTokenDirect(): Promise<AuthResponse> {
+    try {
+      // Ensure CSRF token is present
+      await this.ensureCSRFToken();
+
+      const csrfToken = this.getCSRFToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (csrfToken) headers['X-XSRF-TOKEN'] = csrfToken;
+
+      const res = await fetch(`${this.baseURL}/api/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+        headers,
+      });
+
+      const data = await res.json().catch(() => ({ success: false }));
+
+      if (res.ok && data && data.success) {
+        // Update stored tokens and user if returned
+        if (data.accessToken) this.setAccessToken(data.accessToken);
+        if (data.refreshToken) this.setRefreshToken(data.refreshToken);
+        if (data.user) this.setUser(data.user);
+        return data;
+      }
+
+      // If refresh failed, clear any stored tokens
       this.clearTokens();
-      return false;
+      return { success: false, error: data.error } as AuthResponse;
+    } catch (error) {
+      this.clearTokens();
+      return { success: false, error: { code: 'REFRESH_ERROR', message: (error as Error).message } } as AuthResponse;
     }
   }
 
@@ -307,6 +374,18 @@ export class SSOAuthClient {
    * Check current session and get user profile (returns full AuthResponse)
    */
   async checkSession(): Promise<AuthResponse> {
+    // Short-circuit if we have no tokens or cookies that indicate a logged-in user.
+    const hasLocalAccess = !!this.getAccessToken();
+    const hasLocalRefresh = !!this.getRefreshToken();
+    const hasCookieToken = typeof document !== 'undefined' && (document.cookie.includes('refresh_token') || document.cookie.includes('access_token'));
+
+    if (!hasLocalAccess && !hasLocalRefresh && !hasCookieToken) {
+      return {
+        success: false,
+        error: { code: 'NO_TOKENS', message: 'No authentication tokens present' }
+      };
+    }
+
     try {
       const response = await this.request<AuthResponse>('/api/auth/me', {
         method: 'GET',
@@ -333,12 +412,8 @@ export class SSOAuthClient {
    */
   async refreshToken(): Promise<AuthResponse> {
     try {
-      // Ensure we have a CSRF token before making the request
-      await this.ensureCSRFToken();
-      
-      const response = await this.request<AuthResponse>('/api/auth/refresh', {
-        method: 'POST',
-      });
+      // Keep the public refreshToken() method but delegate to direct fetch flow
+      const response = await this.refreshTokenDirect();
 
       if (response.success) {
         console.log('SSO: Token refreshed successfully');

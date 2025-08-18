@@ -143,9 +143,17 @@ export function SSOAuthProvider({ children }: AuthProviderProps) {
         setError(null);
     };
 
-    // Check session on mount
+    // Check session on mount only if tokens/cookies exist
     useEffect(() => {
-        checkSession();
+        const hasLocalAccess = typeof window !== 'undefined' && !!localStorage.getItem('vikareta_access_token');
+        const hasLocalRefresh = typeof window !== 'undefined' && !!localStorage.getItem('vikareta_refresh_token');
+        const hasCookieToken = typeof document !== 'undefined' && (document.cookie.includes('refresh_token') || document.cookie.includes('access_token'));
+
+        if (hasLocalAccess || hasLocalRefresh || hasCookieToken) {
+            checkSession();
+        } else {
+            setIsLoading(false);
+        }
     }, []);
 
     // Set up periodic session check (every 5 minutes)
