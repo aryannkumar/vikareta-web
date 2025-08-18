@@ -36,17 +36,16 @@ export default function BusinessesPage() {
         else if (Array.isArray(payload?.data)) source = payload.data;
         else if (Array.isArray(payload?.items)) source = payload.items;
 
-        const loaded = (source || []).filter((b) => {
-          // Use business-level verified flag if present, or fall back to nested provider
-          return (b as any).isVerified || (b as any).provider?.verified || false;
-        });
-        setBusinesses(loaded);
+        // Show all businesses by default (not verified-only)
+        const loaded = source || [];
+        setBusinesses(loaded as NearbyBusiness[]);
+
         // apply query filter immediately
         if (query.trim() === '') {
-          setFiltered(loaded);
+          setFiltered(loaded as NearbyBusiness[]);
         } else {
           const q = query.toLowerCase();
-          setFiltered(loaded.filter(b => (b.name || '').toLowerCase().includes(q) || (b.category || '').toLowerCase().includes(q) || (b.address || '').toLowerCase().includes(q)));
+          setFiltered((loaded as NearbyBusiness[]).filter(b => (b.name || '').toLowerCase().includes(q) || (b.category || '').toLowerCase().includes(q) || (b.address || '').toLowerCase().includes(q)));
         }
       } else {
         setError((res as any).error || 'Failed to load businesses');
@@ -113,7 +112,7 @@ export default function BusinessesPage() {
                               else if (Array.isArray(payload?.data)) src = payload.data;
                               else if (Array.isArray(payload?.items)) src = payload.items;
 
-                              setFiltered((src || []).filter((b) => (b as any).isVerified || (b as any).provider?.verified || false));
+                              setFiltered(src || []);
                             } else {
                               setFiltered([]);
                             }
