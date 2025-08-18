@@ -16,18 +16,34 @@ export default async function BusinessProfilePage(props: any) {
     servicesApi.getServices({ businessId: id, limit: 8 } as any)
   ]);
 
-  if (!businessRes || !businessRes.success || !businessRes.data) {
+  // If direct fetch failed, try a fallback by scanning nearby businesses
+  let business = businessRes && businessRes.success && businessRes.data ? businessRes.data : null;
+  if (!business) {
+    try {
+      const nearby = await marketplaceApi.getNearbyBusinesses();
+      if (nearby && nearby.success && Array.isArray(nearby.data)) {
+        business = nearby.data.find((b: any) => String(b.id) === String(id)) || null;
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  if (!business) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8 text-center">
+        <div className="container mx-auto px-4 py-12 text-center">
           <div className="text-2xl font-semibold">Business not found</div>
           <p className="text-gray-600 mt-2">We couldn't find this business. It may have been removed or its details are unavailable.</p>
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <a href="/businesses" className="px-4 py-2 bg-orange-600 text-white rounded-lg">Back to directory</a>
+            <button onClick={async () => { await marketplaceApi.getPopularBusinesses(); }} className="px-4 py-2 border rounded-lg">Retry lookup</button>
+          </div>
         </div>
       </div>
     );
   }
 
-  const business = businessRes.data as any;
   const products = productsRes && productsRes.success ? (productsRes.data?.products || productsRes.data || []) : [];
   const services = servicesRes && servicesRes.success ? (servicesRes.data?.services || servicesRes.data || []) : [];
 

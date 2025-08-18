@@ -59,96 +59,94 @@ export default function BusinessesPage() {
   };
 
   useEffect(() => {
-  loadBusinesses(activeTab);
+    loadBusinesses(activeTab);
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Business Directory</h1>
-          <p className="text-gray-600 dark:text-gray-300">Verified businesses (Email Level Verified)</p>
+    <div className="min-h-screen bg-gradient-to-b from-white to-orange-50 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 py-10">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Business Directory</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Discover verified suppliers, manufacturers and service providers across India.</p>
+            <div className="mt-3 flex items-center gap-3">
+              <span className="inline-flex items-center bg-white dark:bg-gray-900 px-3 py-1 rounded-full border border-gray-200">
+                <strong className="mr-2">{businesses.length}</strong> listed
+              </span>
+              <button onClick={() => loadBusinesses(activeTab)} className="text-sm text-orange-600">Retry</button>
+            </div>
+          </div>
+
+          <div className="w-full md:w-1/2 lg:w-1/3">
+            <div className="flex items-center gap-2 bg-white dark:bg-gray-900 p-2 rounded-lg border border-gray-100 dark:border-gray-700">
+              <input
+                placeholder="Search businesses, categories, locations..."
+                value={query}
+                className="flex-1 px-3 py-2 bg-transparent outline-none"
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setQuery(v);
+                  if (debounceTimeout) window.clearTimeout(debounceTimeout);
+                  const t = window.setTimeout(async () => {
+                    const q = v.trim();
+                    if (q.length >= 2) {
+                      try {
+                        const searchRes = await marketplaceApi.searchMarketplace(q, { type: 'businesses' });
+                        if ((searchRes as any).success) {
+                          const payload = (searchRes as any).data;
+                          let src: any[] = [];
+                          if (Array.isArray(payload)) src = payload;
+                          else if (Array.isArray(payload?.businesses)) src = payload.businesses;
+                          else if (Array.isArray(payload?.data)) src = payload.data;
+                          else if (Array.isArray(payload?.items)) src = payload.items;
+
+                          setFiltered(src || []);
+                        } else {
+                          setFiltered([]);
+                        }
+                      } catch (e) {
+                        console.error(e);
+                        setFiltered([]);
+                      }
+                    } else if (q === '') {
+                      setFiltered(businesses);
+                    } else {
+                      const qq = q.toLowerCase();
+                      setFiltered(businesses.filter(b => (b.name || '').toLowerCase().includes(qq) || (b.category || '').toLowerCase().includes(qq) || (b.address || '').toLowerCase().includes(qq)));
+                    }
+                  }, 300);
+                  setDebounceTimeout(t as unknown as number);
+                }}
+              />
+              <div className="flex items-center gap-2 px-2">
+                <button onClick={() => { setActiveTab('nearby'); loadBusinesses('nearby'); }} className={`px-3 py-1 rounded ${activeTab === 'nearby' ? 'bg-orange-600 text-white' : 'bg-transparent'}`}>Nearby</button>
+                <button onClick={() => { setActiveTab('popular'); loadBusinesses('popular'); }} className={`px-3 py-1 rounded ${activeTab === 'popular' ? 'bg-orange-600 text-white' : 'bg-transparent'}`}>Popular</button>
+                <button onClick={() => { setActiveTab('featured'); loadBusinesses('featured'); }} className={`px-3 py-1 rounded ${activeTab === 'featured' ? 'bg-orange-600 text-white' : 'bg-transparent'}`}>Featured</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <LoadingSkeleton type="card" count={6} />
           </div>
-        ) : (
-          <div>
-            <div className="mb-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Businesses</h2>
-                <div className="flex items-center gap-3">
-                  <div className="text-sm text-gray-500">{businesses.length} listed</div>
-                  <button className="text-sm text-blue-600 dark:text-blue-300" onClick={() => loadBusinesses(activeTab)}>Retry</button>
-                </div>
-              </div>
-
-              <div className="mt-3 flex items-center gap-2">
-                <button onClick={() => { setActiveTab('nearby'); loadBusinesses('nearby'); }} className={`px-3 py-1 rounded ${activeTab === 'nearby' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800'}`}>Nearby</button>
-                <button onClick={() => { setActiveTab('popular'); loadBusinesses('popular'); }} className={`px-3 py-1 rounded ${activeTab === 'popular' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800'}`}>Popular</button>
-                <button onClick={() => { setActiveTab('featured'); loadBusinesses('featured'); }} className={`px-3 py-1 rounded ${activeTab === 'featured' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800'}`}>Featured</button>
-                <div className="ml-auto">
-                  <input
-                    placeholder="Search businesses"
-                    value={query}
-                    className="px-3 py-2 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-700"
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      setQuery(v);
-                      if (debounceTimeout) window.clearTimeout(debounceTimeout);
-                      const t = window.setTimeout(async () => {
-                        const q = v.trim();
-                        if (q.length >= 2) {
-                          // server-side search for businesses
-                          try {
-                            const searchRes = await marketplaceApi.searchMarketplace(q, { type: 'businesses' });
-                            if ((searchRes as any).success) {
-                              const payload = (searchRes as any).data;
-                              let src: any[] = [];
-                              if (Array.isArray(payload)) src = payload;
-                              else if (Array.isArray(payload?.businesses)) src = payload.businesses;
-                              else if (Array.isArray(payload?.data)) src = payload.data;
-                              else if (Array.isArray(payload?.items)) src = payload.items;
-
-                              setFiltered(src || []);
-                            } else {
-                              setFiltered([]);
-                            }
-                          } catch (e) {
-                            console.error(e);
-                            setFiltered([]);
-                          }
-                        } else if (q === '') {
-                          setFiltered(businesses);
-                        } else {
-                          const qq = q.toLowerCase();
-                          setFiltered(businesses.filter(b => (b.name || '').toLowerCase().includes(qq) || (b.category || '').toLowerCase().includes(qq) || (b.address || '').toLowerCase().includes(qq)));
-                        }
-                      }, 300);
-                      setDebounceTimeout(t as unknown as number);
-                    }}
-                  />
-                </div>
-              </div>
-
-              {error ? (
-                <div className="text-sm text-red-600 mt-3">{error}</div>
-              ) : null}
+        ) : error ? (
+          <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">{error}</div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12">
+            <h3 className="text-xl font-semibold">No businesses found</h3>
+            <p className="text-gray-600 mt-2">Try adjusting your filters or broaden the search terms.</p>
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <button onClick={() => { setQuery(''); setFiltered(businesses); }} className="px-4 py-2 bg-orange-600 text-white rounded-lg">Show all {businesses.length}</button>
+              <button onClick={() => { setActiveTab('popular'); loadBusinesses('popular'); }} className="px-4 py-2 border rounded-lg">Try popular</button>
             </div>
-
-            {filtered.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600 dark:text-gray-400">No businesses found.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filtered.map((b) => (
-                  <BusinessCard key={b.id} business={b} />
-                ))}
-              </div>
-            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((b) => (
+              <BusinessCard key={b.id || JSON.stringify(b)} business={b} />
+            ))}
           </div>
         )}
       </div>

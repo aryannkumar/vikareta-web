@@ -151,9 +151,23 @@ export const marketplaceApi = {
     else if (Array.isArray(payload?.data)) arr = payload.data;
     else if (Array.isArray(payload?.items)) arr = payload.items;
 
+    // Heuristic: only include seller/provider businesses
+    const isSellerEntity = (b: any) => {
+      if (!b) return false;
+      if (b.sellerId) return true;
+      if (b.isSeller === true) return true;
+      if (b.role === 'seller' || b.type === 'seller') return true;
+      if (b.provider && (b.provider.isSeller === true || b.provider.role === 'seller' || b.provider.id)) return true;
+      // fallback: if provider exists, treat as seller
+      if (b.provider && b.provider.id) return true;
+      return false;
+    };
+
+    const filtered = (arr || []).filter(isSellerEntity);
+
     return {
       success: true,
-      data: arr || []
+      data: filtered
     };
   },
 
@@ -179,9 +193,21 @@ export const marketplaceApi = {
     else if (Array.isArray(payload?.data)) arr = payload.data;
     else if (Array.isArray(payload?.items)) arr = payload.items;
 
+    const isSellerEntity = (b: any) => {
+      if (!b) return false;
+      if (b.sellerId) return true;
+      if (b.isSeller === true) return true;
+      if (b.role === 'seller' || b.type === 'seller') return true;
+      if (b.provider && (b.provider.isSeller === true || b.provider.role === 'seller' || b.provider.id)) return true;
+      if (b.provider && b.provider.id) return true;
+      return false;
+    };
+
+    const filtered = (arr || []).filter(isSellerEntity);
+
     return {
       success: true,
-      data: arr || []
+      data: filtered
     };
   },
 
@@ -207,9 +233,21 @@ export const marketplaceApi = {
     else if (Array.isArray(payload?.data)) arr = payload.data;
     else if (Array.isArray(payload?.items)) arr = payload.items;
 
+    const isSellerEntity = (b: any) => {
+      if (!b) return false;
+      if (b.sellerId) return true;
+      if (b.isSeller === true) return true;
+      if (b.role === 'seller' || b.type === 'seller') return true;
+      if (b.provider && (b.provider.isSeller === true || b.provider.role === 'seller' || b.provider.id)) return true;
+      if (b.provider && b.provider.id) return true;
+      return false;
+    };
+
+    const filtered = (arr || []).filter(isSellerEntity);
+
     return {
       success: true,
-      data: arr || []
+      data: filtered
     };
   },
 
@@ -293,20 +331,32 @@ export const marketplaceApi = {
 
     const payload = response.data as any;
     // search may return { products: [], services: [], businesses: [] } or direct array
-    if (Array.isArray(payload)) {
-      return { success: true, data: payload };
+    let arr: any[] = [];
+    if (Array.isArray(payload)) arr = payload;
+    else if (filters?.type && Array.isArray(payload?.[filters.type])) arr = payload[filters.type];
+    else {
+      for (const key of ['data', 'items', 'results', 'products', 'services', 'businesses']) {
+        if (Array.isArray(payload?.[key])) {
+          arr = payload[key];
+          break;
+        }
+      }
     }
 
-    if (filters?.type) {
-      const maybe = payload?.[filters.type];
-      if (Array.isArray(maybe)) return { success: true, data: maybe };
+    // if searching businesses, filter to seller entities only
+    if (filters?.type === 'businesses') {
+      const isSellerEntity = (b: any) => {
+        if (!b) return false;
+        if (b.sellerId) return true;
+        if (b.isSeller === true) return true;
+        if (b.role === 'seller' || b.type === 'seller') return true;
+        if (b.provider && (b.provider.isSeller === true || b.provider.role === 'seller' || b.provider.id)) return true;
+        if (b.provider && b.provider.id) return true;
+        return false;
+      };
+      arr = (arr || []).filter(isSellerEntity);
     }
 
-    // fallback check common fields
-    for (const key of ['data', 'items', 'results', 'products', 'services', 'businesses']) {
-      if (Array.isArray(payload?.[key])) return { success: true, data: payload[key] };
-    }
-
-    return { success: true, data: [] };
+    return { success: true, data: arr || [] };
   }
 };
