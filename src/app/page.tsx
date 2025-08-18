@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { Search, ArrowRight, Package, Settings, Sparkles, Building2, Store } from 'lucide-react';
 import { CategoriesSection } from '@/components/sections/CategoriesSection';
 import { TestimonialsSection } from '@/components/sections/TestimonialsSection';
@@ -73,6 +74,8 @@ interface SearchState {
 }
 
 export default function HomePage() {
+  const router = useRouter();
+  
   const [data, setData] = useState<HomePageData>({
     categories: [],
     featuredProducts: [],
@@ -709,6 +712,7 @@ export default function HomePage() {
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     className="btn-primary text-lg px-8 py-4"
+                    onClick={() => router.push('/products')}
                   >
                     Explore Products
                   </motion.button>
@@ -716,6 +720,7 @@ export default function HomePage() {
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     className="btn-outline text-lg px-8 py-4"
+                    onClick={() => router.push('/auth/register?type=supplier')}
                   >
                     Join as Supplier
                   </motion.button>
@@ -833,6 +838,7 @@ export default function HomePage() {
               className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => router.push('/products')}
             >
               Browse All Products
             </motion.button>
@@ -940,6 +946,7 @@ export default function HomePage() {
               className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => router.push('/services')}
             >
               Browse All Services
             </motion.button>
@@ -1138,48 +1145,6 @@ export default function HomePage() {
                 </div>
               </motion.div>
             </div>
-          </div>
-        </section>
-      </RevealSection>
-
-      {/* Trust Indicators Section */}
-      <RevealSection direction="up">
-        <section className="py-16 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
-          <div className="container mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              className="text-center mb-12"
-            >
-              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                Trusted by Leading Businesses
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                Join thousands of verified suppliers and buyers who trust Vikareta for their B2B needs.
-              </p>
-            </motion.div>
-
-            <motion.div 
-              className="grid grid-cols-2 lg:grid-cols-5 gap-8 items-center opacity-60"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 0.6 }}
-              transition={{ duration: 0.8 }}
-            >
-              {[
-                { name: 'TechCorp', color: 'bg-blue-500', icon: '💻' },
-                { name: 'GreenEnergy', color: 'bg-emerald-500', icon: '🌱' },
-                { name: 'ManufacturingPro', color: 'bg-purple-500', icon: '⚙️' },
-                { name: 'LogiTrans', color: 'bg-orange-500', icon: '🚛' },
-                { name: 'BuildMasters', color: 'bg-cyan-500', icon: '🏗️' }
-              ].map((company, _index) => (
-                <div key={company.name} className="text-center">
-                  <div className={`w-20 h-20 mx-auto ${company.color} rounded-xl flex items-center justify-center text-2xl text-white shadow-lg`}>
-                    {company.icon}
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500 font-medium">{company.name}</div>
-                </div>
-              ))}
-            </motion.div>
           </div>
         </section>
       </RevealSection>
