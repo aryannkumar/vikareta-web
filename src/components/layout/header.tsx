@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Logo from '@/components/ui/logo';
 import { useRouter } from 'next/navigation';
 import { 
   Search, 
@@ -20,7 +21,6 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -99,13 +99,7 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
-            <Image
-              src="/img/logo.png"
-              alt="Vikareta Logo"
-              width={40}
-              height={40}
-              className="h-10 w-10 object-contain"
-            />
+            <Logo className="h-10 w-10" />
             <span className="text-2xl font-bold text-gradient-orange-blue">Vikareta</span>
           </Link>
 
@@ -137,8 +131,8 @@ export function Header() {
             <Link href="/services" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">
               Services
             </Link>
-            <Link href="/providers" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">
-              Suppliers
+            <Link href="/businesses" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">
+              Businesses
             </Link>
             <Link href="/rfq" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">
               RFQ
@@ -147,8 +141,7 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center space-x-2">
-            {/* Theme Toggle */}
-            <ThemeToggle />
+            {/* Theme Toggle removed per request */}
 
             {/* Notifications */}
             {isAuthenticated && (
@@ -398,11 +391,11 @@ export function Header() {
                 Services
               </Link>
               <Link 
-                href="/providers" 
+                href="/businesses" 
                 className="px-4 py-3 text-base font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Suppliers
+                Businesses
               </Link>
               <Link 
                 href="/rfq" 

@@ -147,10 +147,12 @@
   }
   
   .text-gradient-orange-blue {
-    background: linear-gradient(135deg, hsl(var(--orange-500)) 0%, hsl(var(--orange-700)) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  background: linear-gradient(135deg, hsl(var(--orange-500)) 0%, hsl(var(--orange-600)) 50%, hsl(var(--blue-500)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* Fallback for older browsers */
+  color: hsl(var(--orange-600));
   }
 
   .text-gradient {
@@ -224,6 +226,49 @@
   .hover\:border-orange-500:hover {
     border-color: hsl(var(--orange-500));
   }
+}
+
+/* Logo hover animation */
+.logo-hover {
+  transition: transform 220ms ease, filter 220ms ease;
+}
+.logo-hover:hover {
+  transform: translateY(-4px) scale(1.03);
+  filter: drop-shadow(0 6px 18px rgba(59,130,246,0.14)) drop-shadow(0 2px 6px rgba(249,115,22,0.08));
+}
+
+/* Animated gradient background for category cards */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-shift {
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+}
+
+/* Speed up and intensify on parent group hover */
+.group:hover .gradient-shift {
+  animation-duration: 4s;
+  filter: saturate(1.06) contrast(1.03);
+}
+
+/* Icon pulse subtle animation */
+@keyframes iconPulse {
+  0% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+  50% { transform: translateY(-2px) scale(1.06); filter: drop-shadow(0 10px 18px rgba(59,130,246,0.12)); }
+  100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+}
+
+.icon-pulse {
+  transform-origin: center;
+  animation: iconPulse 6s ease-in-out infinite;
+}
+
+.group:hover .icon-pulse {
+  animation-duration: 2.5s;
 }
 
 /* Custom scrollbar */

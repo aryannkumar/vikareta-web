@@ -17,6 +17,7 @@ import {
   Award
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Logo from '@/components/ui/logo';
 import { useTheme } from '@/components/providers/theme-provider';
 
 export function Footer() {
@@ -76,9 +77,7 @@ export function Footer() {
           {/* Company Info */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">V</span>
-              </div>
+              <Logo className="h-8 w-8 rounded-lg logo-hover" />
               <span className="text-xl font-bold text-gradient">Vikareta</span>
             </div>
             <p className="text-sm text-muted-foreground max-w-md">

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuthStore } from '@/lib/stores/auth';
 import { useCartStore } from '@/lib/stores/cart';
 import { 
@@ -59,7 +58,6 @@ export function MobileNav({ isOpen, onToggle }: MobileNavProps) {
               <div className="flex items-center justify-between p-6 border-b border-gray-200/50 dark:border-gray-700/50">
                 <h2 className="text-xl font-bold text-gradient-primary">Menu</h2>
                 <div className="flex items-center gap-2">
-                  <ThemeToggle />
                   <Button variant="ghost" size="sm" onClick={onToggle}>
                     <X className="w-5 h-5" />
                   </Button>
