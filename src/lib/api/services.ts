@@ -98,21 +98,73 @@ export const servicesApi = {
   // Get all services with filters
   getServices: async (filters: ServicesFilters = {}): Promise<ServicesResponse> => {
     const searchParams = new URLSearchParams();
-    
+
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         searchParams.append(key, value.toString());
       }
     });
 
-    const response = await apiClient.get(`/services?${searchParams.toString()}`);
-    return response.data as ServicesResponse;
+    const response = await apiClient.get<any>(`/services?${searchParams.toString()}`);
+
+    // Normalize various possible response shapes from backend
+    // Possible shapes:
+    // 1) { services: [...], total, page, limit, hasMore }
+    // 2) [ ... ] (array of services)
+    // 3) { data: { services: [...] } }
+    const raw = response as any;
+
+    let services: Service[] = [];
+    let total = 0;
+    let page = (filters.page as number) || 1;
+    let limit = (filters.limit as number) || 12;
+    let hasMore = false;
+
+    if (raw && raw.data) {
+      const d = raw.data;
+      if (Array.isArray(d)) {
+        services = d;
+        total = d.length;
+      } else if (Array.isArray(d.services)) {
+        services = d.services;
+        total = d.total || services.length;
+        page = d.page || page;
+        limit = d.limit || limit;
+        hasMore = Boolean(d.hasMore);
+      } else if (Array.isArray(d.data)) {
+        services = d.data;
+        total = services.length;
+      }
+    } else if (raw && Array.isArray(raw)) {
+      services = raw;
+      total = raw.length;
+    } else if (raw && raw.services && Array.isArray(raw.services)) {
+      services = raw.services;
+      total = raw.total || services.length;
+      page = raw.page || page;
+      limit = raw.limit || limit;
+      hasMore = Boolean(raw.hasMore);
+    }
+
+    return {
+      success: response.success,
+      data: {
+        services,
+        total,
+        page,
+        limit,
+        hasMore,
+      },
+    } as ServicesResponse;
   },
 
   // Get service by ID
   getService: async (id: string): Promise<ServiceResponse> => {
-    const response = await apiClient.get(`/services/${id}`);
-    return response.data as ServiceResponse;
+    const response = await apiClient.get<Service>(`/services/${id}`);
+    return {
+      success: response.success,
+      data: response.data as Service,
+    } as ServiceResponse;
   },
 
   // Search services
@@ -127,16 +179,19 @@ export const servicesApi = {
 
   // Get services by provider
   getServicesByProvider: async (providerId: string): Promise<ServicesResponse> => {
-    const response = await apiClient.get(`/providers/${providerId}/services`);
-    return response.data as ServicesResponse;
+    const response = await apiClient.get<{ services: Service[]; total: number; page: number; limit: number; hasMore: boolean }>(`/providers/${providerId}/services`);
+    return {
+      success: response.success,
+      data: response.data as any,
+    } as ServicesResponse;
   },
 
   // Get service categories (uses main categories endpoint)
   getCategories: async (): Promise<{ success: boolean; data: string[] }> => {
     const response = await apiClient.get('/categories');
-    if (response.success && Array.isArray(response.data)) {
-      // Extract category names from category objects
-      const categoryNames = response.data.map((category: any) => category.name || category);
+    const raw: any = response as any;
+    if (raw.success && Array.isArray(raw.data)) {
+      const categoryNames = raw.data.map((category: any) => category.name || category);
       return { success: true, data: categoryNames };
     }
     return { success: false, data: [] };
@@ -145,7 +200,11 @@ export const servicesApi = {
   // Get service subcategories
   getSubcategories: async (categoryId: string): Promise<{ success: boolean; data: string[] }> => {
     const response = await apiClient.get(`/categories/${categoryId}/subcategories`);
-    return response.data as { success: boolean; data: string[] };
+    const raw: any = response as any;
+    return {
+      success: raw.success,
+      data: Array.isArray(raw.data) ? raw.data : (raw.data?.data || []),
+    } as { success: boolean; data: string[] };
   },
 
   // Add service review
@@ -154,7 +213,10 @@ export const servicesApi = {
     comment: string;
   }): Promise<{ success: boolean; data: ServiceReview }> => {
     const response = await apiClient.post(`/services/${serviceId}/reviews`, review);
-    return response.data as { success: boolean; data: ServiceReview };
+    return {
+      success: response.success,
+      data: response.data as ServiceReview,
+    } as { success: boolean; data: ServiceReview };
   },
 
   // Get service reviews
@@ -168,7 +230,10 @@ export const servicesApi = {
     };
   }> => {
     const response = await apiClient.get(`/services/${serviceId}/reviews?page=${page}&limit=${limit}`);
-    return response.data as any;
+    return {
+      success: response.success,
+      data: response.data as any,
+    } as any;
   },
 
   // Contact service provider
@@ -182,7 +247,10 @@ export const servicesApi = {
     };
   }): Promise<{ success: boolean; data: { messageId: string } }> => {
     const response = await apiClient.post(`/services/${serviceId}/contact`, message);
-    return response.data as any;
+    return {
+      success: response.success,
+      data: response.data as any,
+    };
   },
 
   // Request service quote
@@ -199,6 +267,9 @@ export const servicesApi = {
     };
   }): Promise<{ success: boolean; data: { quoteId: string } }> => {
     const response = await apiClient.post(`/services/${serviceId}/quote`, requirements);
-    return response.data as any;
+    return {
+      success: response.success,
+      data: response.data as any,
+    };
   }
 };
