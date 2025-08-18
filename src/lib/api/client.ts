@@ -164,9 +164,15 @@ class ApiClient {
     if (params) {
       const url = new URL(`${this.baseURL}${endpoint}`);
       Object.keys(params).forEach(key => {
-        if (params[key] !== undefined && params[key] !== null) {
-          url.searchParams.append(key, String(params[key]));
-        }
+        const value = params[key];
+        // Skip undefined or null
+        if (value === undefined || value === null) return;
+        // Skip empty strings
+        if (typeof value === 'string' && value.trim() === '') return;
+        // Skip empty arrays
+        if (Array.isArray(value) && value.length === 0) return;
+
+        url.searchParams.append(key, String(value));
       });
       finalEndpoint = url.pathname.replace(new URL(this.baseURL).pathname, '') + url.search;
     }

@@ -58,12 +58,17 @@ export default function OrdersPage() {
     setError(null);
     
     try {
-      const response = await ordersApi.getMyOrders({
-        status: statusFilter as any,
+      const filters: Record<string, any> = {
         page: currentPage,
         limit: 10,
         sortBy: 'createdAt'
-      });
+      };
+
+      if (statusFilter && statusFilter.trim() !== '') {
+        filters.status = statusFilter;
+      }
+
+      const response = await ordersApi.getMyOrders(filters);
 
       if (response.success) {
         setOrders(response.data.orders);

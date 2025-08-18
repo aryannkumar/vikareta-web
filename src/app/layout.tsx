@@ -14,8 +14,9 @@ export const metadata: Metadata = {
   description: 'Connect, Trade, and Grow with Vikareta - Your trusted B2B marketplace',
   keywords: 'B2B, marketplace, wholesale, suppliers, buyers, trade',
   authors: [{ name: 'Vikareta Team' }],
-  viewport: 'width=device-width, initial-scale=1',
 };
+
+export const viewport = 'width=device-width, initial-scale=1';
 
 export default function RootLayout({
   children,
