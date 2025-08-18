@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { SSOAuthClient, User } from '@/lib/auth/sso-client';
+import { syncSSOToSubdomains, handlePostLoginRedirect } from '@/lib/utils/cross-domain-auth';
 
 interface UseAuthReturn {
   user: User | null;
@@ -45,10 +46,23 @@ export function useAuth(): UseAuthReturn {
       setLoading(true);
       setError(null);
 
+      // Store where the user started the login flow so we can return them
+      if (typeof window !== 'undefined') {
+        try { localStorage.setItem('auth_return_url', window.location.href); } catch {}
+      }
+
       const result = await ssoClient.login({ email, password });
       
       if (result.success && result.user) {
         setUser(result.user);
+
+  // Best-effort: request SSO tokens from backend and silently sync them
+  // to configured subdomains so the user can navigate cross-domain
+  // without an additional login. Non-blocking for user-visible login.
+  try { syncSSOToSubdomains(); } catch {}
+
+        // Redirect back to where user started (if any)
+        try { handlePostLoginRedirect(); } catch {}
         return true;
       } else {
         setError(result.error?.message || 'Login failed');

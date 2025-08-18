@@ -1,27 +1,20 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+// NOTE:
+// Previously this middleware automatically redirected requests to `/dashboard` on
+// the main site to the `dashboard.` subdomain. That behavior forced users to be
+// moved to the dashboard subdomain immediately when visiting dashboard paths.
+//
+// Per the requested behaviour, we should NOT auto-redirect users. Instead we
+// rely on explicit navigation and a secure SSO sync to enable cross-domain
+// sign-in. Keep a minimal middleware that passes through requests.
 
-  // Redirect dashboard routes to dashboard subdomain
-  if (pathname.startsWith('/dashboard')) {
-    const dashboardUrl = new URL(request.url);
-    dashboardUrl.hostname = `dashboard.${dashboardUrl.hostname}`;
-    
-    // In development, you might want to use a different port
-    if (process.env.NODE_ENV === 'development') {
-      dashboardUrl.port = '3001'; // Assuming dashboard runs on port 3001
-    }
-    
-    return NextResponse.redirect(dashboardUrl);
-  }
-
+export function middleware(_request: NextRequest) {
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    '/dashboard/:path*',
-  ],
+  // Keep no matcher here or restrict to explicit needs. Removing the
+  // `/dashboard` matcher prevents accidental interception of dashboard routes.
 };

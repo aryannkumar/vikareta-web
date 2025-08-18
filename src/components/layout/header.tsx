@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useSSOAuth } from '@/lib/auth/use-sso-auth';
+import { syncSSOToSubdomains } from '@/lib/utils/cross-domain-auth';
 import { useCartStore } from '@/lib/stores/cart';
 import { useWishlistStore } from '@/lib/stores/wishlist';
 import { Badge } from '@/components/ui/badge';
@@ -195,17 +196,25 @@ export function Header() {
                 size="sm" 
                 variant="outline"
                 className="hidden sm:flex items-center space-x-2 border-orange-500 text-orange-600 hover:bg-orange-50 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-orange-900/20"
-                onClick={() => {
-                  const dashboardUrl = process.env.NODE_ENV === 'development' 
-                    ? 'http://localhost:3001/dashboard' 
-                    : 'https://dashboard.vikareta.com/dashboard';
-                  
-                  const token = localStorage.getItem('auth_token');
-                  if (token) {
-                    const urlWithAuth = `${dashboardUrl}?token=${encodeURIComponent(token)}`;
-                    window.location.href = urlWithAuth;
-                  } else {
+                onClick={async () => {
+                  try {
+                    // Persist return url so user can come back
+                    try { localStorage.setItem('auth_return_url', window.location.href); } catch {}
+
+                    // Trigger SSO sync to dashboard host(s)
+                    const targets = [process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'];
+                    await syncSSOToSubdomains(targets);
+
+                    // After sync redirect user to dashboard (top-level)
+                    const dashboardUrl = process.env.NODE_ENV === 'development' 
+                      ? 'http://localhost:3001' 
+                      : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
                     window.location.href = dashboardUrl;
+                  } catch (err) {
+                    console.error('Failed to open dashboard via SSO:', err);
+                    // fallback to direct link
+                    const fallback = process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
+                    window.location.href = fallback;
                   }
                 }}
               >
@@ -265,27 +274,29 @@ export function Header() {
                       My RFQs
                     </Link>
                   </DropdownMenuItem>
-                  {user?.role === 'seller' && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => {
-                        const dashboardUrl = process.env.NODE_ENV === 'development' 
-                          ? 'http://localhost:3001/dashboard' 
-                          : 'https://dashboard.vikareta.com/dashboard';
-                        
-                        const token = localStorage.getItem('auth_token');
-                        if (token) {
-                          const urlWithAuth = `${dashboardUrl}?token=${encodeURIComponent(token)}`;
-                          window.location.href = urlWithAuth;
-                        } else {
-                          window.location.href = dashboardUrl;
-                        }
-                      }}>
-                        <Store className="mr-2 h-4 w-4" />
-                        Supplier Dashboard
-                      </DropdownMenuItem>
-                    </>
-                  )}
+                      {user?.role === 'seller' && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={async () => {
+                            try {
+                              try { localStorage.setItem('auth_return_url', window.location.href); } catch {}
+                              const targets = [process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'];
+                              await syncSSOToSubdomains(targets);
+                              const dashboardUrl = process.env.NODE_ENV === 'development' 
+                                ? 'http://localhost:3001' 
+                                : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
+                              window.location.href = dashboardUrl;
+                            } catch (err) {
+                              console.error('Failed to open dashboard via SSO:', err);
+                              const fallback = process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
+                              window.location.href = fallback;
+                            }
+                          }}>
+                            <Store className="mr-2 h-4 w-4" />
+                            Supplier Dashboard
+                          </DropdownMenuItem>
+                        </>
+                      )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <Link href="/notifications" className="flex items-center w-full">
