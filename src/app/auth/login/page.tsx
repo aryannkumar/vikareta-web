@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast-provider';
 import { useSSOAuth } from '@/lib/auth/use-sso-auth';
+import { getPostLoginRedirectUrl, syncSSOToSubdomains, hasDashboardAccess } from '@/lib/utils/cross-domain-auth';
 
 function LoginPageContent() {
   const [formData, setFormData] = useState({
@@ -17,10 +18,9 @@ function LoginPageContent() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
-  const { login, isLoading: authLoading } = useSSOAuth();
+  const { login, user } = useSSOAuth();
 
   // Get redirect URL from search params
   const redirectUrl = searchParams.get('redirect');
@@ -51,26 +51,53 @@ function LoginPageContent() {
 
     setLoading(true);
     try {
-      const success = await login({
+  const success = await login({
         email: formData.email,
         password: formData.password
-      });
+  });
 
-      if (success) {
+  if (success) {
         // Show success message
         toast.success('Login Successful!', 'Redirecting...');
 
         // Redirect after successful login
         setTimeout(() => {
-          // Use redirect URL if provided, otherwise default to dashboard
-          let targetUrl;
+          // Determine target: priority -> explicit redirect param -> stored return URL -> role-based helper -> fallback '/'
+          let targetUrl: string | null = null;
+
           if (redirectUrl) {
             console.log('SSO Login: Using redirect URL from params:', redirectUrl);
             targetUrl = redirectUrl;
-          } else {
-            targetUrl = process.env.NODE_ENV === 'development'
-              ? 'http://localhost:3001'
-              : process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://dashboard.vikareta.com';
+          }
+
+          // Respect previously stored return URL if present
+          try {
+            const stored = localStorage.getItem('auth_return_url');
+            if (!targetUrl && stored) {
+              targetUrl = stored;
+              localStorage.removeItem('auth_return_url');
+              console.log('SSO Login: Using stored auth_return_url:', targetUrl);
+            }
+          } catch {
+            // ignore localStorage errors
+          }
+
+          // Use role-aware helper if we have user info
+          if (!targetUrl && user) {
+            targetUrl = getPostLoginRedirectUrl(user);
+            console.log('SSO Login: Using role-based redirect:', targetUrl);
+          }
+
+          if (!targetUrl) targetUrl = '/';
+
+          // Only sync SSO to dashboard/admin subdomains for users who have dashboard access
+          try {
+            if (user && hasDashboardAccess(user)) {
+              // fire-and-forget SSO sync; it will set cookies on subdomains
+              syncSSOToSubdomains();
+            }
+          } catch (err) {
+            console.warn('SSO Login: Failed to sync SSO to subdomains', err);
           }
 
           console.log('SSO Login: Redirecting to:', targetUrl);
