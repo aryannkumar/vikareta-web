@@ -2,16 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
 @layer base {
   :root {
-    /* Orange Theme - Light Mode */
+    /* Premium Orange Theme - Light Mode */
     --background: 0 0% 100%;
     --foreground: 20 14.3% 4.1%;
     --card: 0 0% 100%;
     --card-foreground: 20 14.3% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 20 14.3% 4.1%;
-    --primary: 24.6 95% 53.1%; /* Orange Primary */
+    --primary: 24.6 95% 53.1%; /* Premium Orange Primary */
     --primary-foreground: 60 9.1% 97.8%;
     --secondary: 60 4.8% 95.9%;
     --secondary-foreground: 24 9.8% 10%;
@@ -26,7 +30,7 @@
     --ring: 24.6 95% 53.1%;
     --radius: 0.75rem;
     
-    /* Custom Orange Variables */
+    /* Premium Color Palette */
     --orange-50: 33 100% 96%;
     --orange-100: 34 100% 92%;
     --orange-200: 32 98% 83%;
@@ -39,7 +43,7 @@
     --orange-900: 15 75% 28%;
     --orange-950: 9 80% 17%;
     
-    /* Complementary Blue Variables */
+    /* Complementary Colors */
     --blue-50: 214 100% 97%;
     --blue-100: 214 95% 93%;
     --blue-200: 213 97% 87%;
@@ -51,17 +55,48 @@
     --blue-800: 226 71% 40%;
     --blue-900: 224 64% 33%;
     --blue-950: 226 55% 21%;
+    
+    /* Premium Neutral Grays */
+    --gray-50: 210 40% 98%;
+    --gray-100: 210 40% 96%;
+    --gray-200: 214 32% 91%;
+    --gray-300: 213 27% 84%;
+    --gray-400: 215 20% 65%;
+    --gray-500: 215 16% 47%;
+    --gray-600: 215 19% 35%;
+    --gray-700: 215 25% 27%;
+    --gray-800: 217 33% 17%;
+    --gray-900: 222 84% 5%;
+    --gray-950: 229 84% 5%;
+    
+    /* Typography Scale */
+    --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-family-secondary: 'Lexend', 'Inter', sans-serif;
+    --font-family-display: 'Poppins', 'Inter', sans-serif;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+    
+    /* Orange-specific shadows */
+    --shadow-orange: 0 10px 15px -3px rgb(249 115 22 / 0.1), 0 4px 6px -4px rgb(249 115 22 / 0.1);
+    --shadow-orange-lg: 0 20px 25px -5px rgb(249 115 22 / 0.1), 0 8px 10px -6px rgb(249 115 22 / 0.1);
   }
 
   .dark {
-    /* Orange Theme - Dark Mode */
+    /* Premium Orange Theme - Dark Mode */
     --background: 20 14.3% 4.1%;
     --foreground: 60 9.1% 97.8%;
     --card: 20 14.3% 4.1%;
     --card-foreground: 60 9.1% 97.8%;
     --popover: 20 14.3% 4.1%;
     --popover-foreground: 60 9.1% 97.8%;
-    --primary: 20.5 90.2% 48.2%; /* Orange Primary for dark */
+    --primary: 20.5 90.2% 48.2%;
     --primary-foreground: 60 9.1% 97.8%;
     --secondary: 12 6.5% 15.1%;
     --secondary-foreground: 60 9.1% 97.8%;
@@ -74,32 +109,6 @@
     --border: 12 6.5% 15.1%;
     --input: 12 6.5% 15.1%;
     --ring: 20.5 90.2% 48.2%;
-    
-    /* Custom Orange Variables for Dark Mode */
-    --orange-50: 9 80% 17%;
-    --orange-100: 15 75% 28%;
-    --orange-200: 15 79.1% 33.7%;
-    --orange-300: 17.5 88.2% 40.6%;
-    --orange-400: 20.5 90.2% 48.2%;
-    --orange-500: 24.6 95% 53.1%;
-    --orange-600: 27 96% 61%;
-    --orange-700: 31 97% 72%;
-    --orange-800: 32 98% 83%;
-    --orange-900: 34 100% 92%;
-    --orange-950: 33 100% 96%;
-    
-    /* Complementary Blue Variables for Dark Mode */
-    --blue-50: 226 55% 21%;
-    --blue-100: 224 64% 33%;
-    --blue-200: 226 71% 40%;
-    --blue-300: 224 76% 48%;
-    --blue-400: 221 83% 53%;
-    --blue-500: 217 91% 60%;
-    --blue-600: 213 94% 68%;
-    --blue-700: 212 96% 78%;
-    --blue-800: 213 97% 87%;
-    --blue-900: 214 95% 93%;
-    --blue-950: 214 100% 97%;
   }
 }
 
@@ -107,124 +116,234 @@
   * {
     @apply border-border;
   }
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-inter antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-variation-settings: normal;
+  }
+  
+  /* Premium Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-lexend font-semibold tracking-tight;
+  }
+  
+  h1 {
+    @apply text-4xl lg:text-5xl xl:text-6xl leading-tight;
+  }
+  
+  h2 {
+    @apply text-3xl lg:text-4xl leading-tight;
+  }
+  
+  h3 {
+    @apply text-2xl lg:text-3xl leading-snug;
+  }
+  
+  h4 {
+    @apply text-xl lg:text-2xl leading-snug;
+  }
+  
+  h5 {
+    @apply text-lg lg:text-xl leading-normal;
+  }
+  
+  h6 {
+    @apply text-base lg:text-lg leading-normal;
+  }
+  
+  p {
+    @apply leading-relaxed text-gray-600 dark:text-gray-300;
+  }
+  
+  .text-display {
+    @apply font-poppins font-bold;
+  }
+  
+  .font-inter {
+    font-family: var(--font-family-primary);
+  }
+  
+  .font-lexend {
+    font-family: var(--font-family-secondary);
+  }
+  
+  .font-poppins {
+    font-family: var(--font-family-display);
   }
 }
 
 @layer components {
+  /* Premium Button Styles */
   .btn-primary {
-    @apply bg-orange-500 text-white hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200 shadow-lg hover:shadow-xl;
+    @apply bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:ring-4 focus:ring-orange-500/25 focus:outline-none;
   }
   
   .btn-secondary {
-    @apply bg-orange-600 text-white hover:bg-orange-700 focus:ring-2 focus:ring-orange-600 focus:ring-offset-2 transition-all duration-200 shadow-lg hover:shadow-xl;
+    @apply bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:ring-4 focus:ring-blue-500/25 focus:outline-none;
   }
   
   .btn-outline {
-    @apply border-2 border-orange-500 text-orange-500 bg-white hover:bg-orange-500 hover:text-white dark:bg-gray-900 dark:hover:bg-orange-500 transition-all duration-200;
-  }
-  
-  .btn-outline-orange {
-    @apply border-2 border-orange-500 text-orange-500 bg-white hover:bg-orange-500 hover:text-white dark:bg-gray-900 dark:hover:bg-orange-500 transition-all duration-200;
+    @apply border-2 border-orange-500 text-orange-600 bg-white hover:bg-orange-500 hover:text-white dark:bg-gray-900 dark:text-orange-400 dark:hover:bg-orange-500 dark:hover:text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:shadow-lg focus:ring-4 focus:ring-orange-500/25 focus:outline-none;
   }
   
   .btn-ghost {
-    @apply hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-900/20 dark:hover:text-orange-400 transition-all duration-200;
+    @apply hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-900/20 dark:hover:text-orange-400 font-medium px-4 py-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-orange-500/25 focus:outline-none;
   }
   
-  .btn-destructive {
-    @apply bg-red-500 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200;
+  .btn-icon {
+    @apply p-3 rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-600 transition-all duration-300 group;
   }
 
-  /* Orange Gradient Utilities */
-  .gradient-orange-blue {
+  /* Premium Card Styles */
+  .card-premium {
+    @apply bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 dark:border-gray-700 transition-all duration-300 overflow-hidden;
+  }
+  
+  .card-hover {
+    @apply transform hover:-translate-y-2 hover:shadow-2xl transition-all duration-300;
+  }
+  
+  .card-glass {
+    @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-xl;
+  }
+
+  /* Gradient Utilities */
+  .gradient-orange {
     background: linear-gradient(135deg, hsl(var(--orange-500)) 0%, hsl(var(--orange-600)) 100%);
   }
   
-  .gradient-blue-orange {
-    background: linear-gradient(135deg, hsl(var(--orange-400)) 0%, hsl(var(--orange-600)) 100%);
+  .gradient-orange-blue {
+    background: linear-gradient(135deg, hsl(var(--orange-500)) 0%, hsl(var(--blue-500)) 100%);
   }
   
-  .text-gradient-orange-blue {
-  background: linear-gradient(135deg, hsl(var(--orange-500)) 0%, hsl(var(--orange-600)) 50%, hsl(var(--blue-500)) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  /* Fallback for older browsers */
-  color: hsl(var(--orange-600));
+  .gradient-mesh {
+    background: linear-gradient(135deg, hsl(var(--orange-500)/0.1) 0%, hsl(var(--blue-500)/0.1) 100%);
   }
-
+  
   .text-gradient {
     background: linear-gradient(135deg, hsl(var(--orange-500)) 0%, hsl(var(--orange-700)) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    color: hsl(var(--orange-600)); /* fallback */
+  }
+  
+  .text-gradient-orange-blue {
+    background: linear-gradient(135deg, hsl(var(--orange-500)) 0%, hsl(var(--orange-600)) 50%, hsl(var(--blue-500)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: hsl(var(--orange-600)); /* fallback */
   }
 
-  /* Custom Orange Color Classes */
-  .bg-orange-50 {
-    background-color: hsl(var(--orange-50));
+  /* Background Patterns */
+  .bg-grid-pattern {
+    background-image: 
+      linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
   }
   
-  .bg-orange-100 {
-    background-color: hsl(var(--orange-100));
-  }
-  
-  .bg-orange-500 {
-    background-color: hsl(var(--orange-500));
-  }
-  
-  .bg-orange-600 {
-    background-color: hsl(var(--orange-600));
-  }
-  
-  .bg-orange-700 {
-    background-color: hsl(var(--orange-700));
-  }
-  
-  .text-orange-500 {
-    color: hsl(var(--orange-500));
-  }
-  
-  .text-orange-600 {
-    color: hsl(var(--orange-600));
-  }
-  
-  .text-orange-700 {
-    color: hsl(var(--orange-700));
-  }
-  
-  .border-orange-500 {
-    border-color: hsl(var(--orange-500));
-  }
-  
-  .border-orange-600 {
-    border-color: hsl(var(--orange-600));
+  .bg-dot-pattern {
+    background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
+    background-size: 15px 15px;
   }
 
-  .hover\:bg-orange-50:hover {
-    background-color: hsl(var(--orange-50));
+  /* Animation Classes */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
   
-  .hover\:bg-orange-500:hover {
-    background-color: hsl(var(--orange-500));
+  .animate-pulse-slow {
+    animation: pulse 4s ease-in-out infinite;
   }
   
-  .hover\:bg-orange-600:hover {
-    background-color: hsl(var(--orange-600));
+  .animate-gradient {
+    animation: gradientShift 8s ease infinite;
+    background-size: 200% 200%;
   }
 
-  .hover\:text-orange-500:hover {
-    color: hsl(var(--orange-500));
+  /* Focus Styles */
+  .focus-visible-orange {
+    @apply focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-500/25;
   }
-  
-  .hover\:text-orange-600:hover {
-    color: hsl(var(--orange-600));
-  }
+}
 
-  .hover\:border-orange-500:hover {
-    border-color: hsl(var(--orange-500));
+/* Premium Animations */
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+@keyframes gradientShift {
+  0% { 
+    background-position: 0% 50%; 
+  }
+  50% { 
+    background-position: 100% 50%; 
+  }
+  100% { 
+    background-position: 0% 50%; 
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
   }
 }
 
@@ -232,34 +351,36 @@
 .logo-hover {
   transition: transform 220ms ease, filter 220ms ease;
 }
+
 .logo-hover:hover {
   transform: translateY(-4px) scale(1.03);
-  filter: drop-shadow(0 6px 18px rgba(59,130,246,0.14)) drop-shadow(0 2px 6px rgba(249,115,22,0.08));
+  filter: drop-shadow(0 6px 18px rgba(249,115,22,0.14)) drop-shadow(0 2px 6px rgba(59,130,246,0.08));
 }
 
-/* Animated gradient background for category cards */
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+/* Premium card hover effects */
+.card-hover-premium {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.gradient-shift {
-  background-size: 200% 200%;
-  animation: gradientShift 8s ease infinite;
+.card-hover-premium:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
-/* Speed up and intensify on parent group hover */
-.group:hover .gradient-shift {
-  animation-duration: 4s;
-  filter: saturate(1.06) contrast(1.03);
-}
-
-/* Icon pulse subtle animation */
+/* Icon animations */
 @keyframes iconPulse {
-  0% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
-  50% { transform: translateY(-2px) scale(1.06); filter: drop-shadow(0 10px 18px rgba(59,130,246,0.12)); }
-  100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+  0% { 
+    transform: translateY(0) scale(1); 
+    filter: drop-shadow(0 0 0 rgba(0,0,0,0)); 
+  }
+  50% { 
+    transform: translateY(-2px) scale(1.06); 
+    filter: drop-shadow(0 10px 18px rgba(249,115,22,0.12)); 
+  }
+  100% { 
+    transform: translateY(0) scale(1); 
+    filter: drop-shadow(0 0 0 rgba(0,0,0,0)); 
+  }
 }
 
 .icon-pulse {
@@ -271,82 +392,126 @@
   animation-duration: 2.5s;
 }
 
-/* Custom scrollbar */
+/* Speed up and intensify on parent group hover */
+.group:hover .animate-gradient {
+  animation-duration: 4s;
+  filter: saturate(1.06) contrast(1.03);
+}
+
+/* Custom scrollbar styles */
+.scrollbar-orange::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-orange::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+.scrollbar-orange::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, hsl(var(--orange-500)), hsl(var(--orange-600)));
+  border-radius: 4px;
+}
+
+.scrollbar-orange::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, hsl(var(--orange-600)), hsl(var(--orange-700)));
+}
+
+/* Global scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
   background: hsl(var(--muted));
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground));
+  background: hsl(var(--orange-500));
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--foreground));
+  background: hsl(var(--orange-600));
 }
 
-/* Line clamp utilities */
-.line-clamp-1 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
+/* Selection styles */
+::selection {
+  background-color: hsl(var(--orange-200));
+  color: hsl(var(--orange-900));
 }
 
-.line-clamp-2 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+::-moz-selection {
+  background-color: hsl(var(--orange-200));
+  color: hsl(var(--orange-900));
 }
 
-.line-clamp-3 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+/* Focus styles for accessibility */
+.focus-visible-premium {
+  outline: none;
+  box-shadow: 0 0 0 3px hsl(var(--orange-500) / 0.3);
+  border-color: hsl(var(--orange-500));
 }
 
-/* Animation utilities */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+/* Utility classes for common patterns */
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}
+
+.container-fluid {
+  width: 100%;
+  max-width: none;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  
+  .print-break-before {
+    page-break-before: always;
+  }
+  
+  .print-break-after {
+    page-break-after: always;
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .btn-primary {
+    border: 2px solid currentColor;
+  }
+  
+  .btn-outline {
+    border-width: 3px;
+  }
 }
 
-/* Focus styles */
-.focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
-}
-
-/* Loading skeleton */
-.skeleton {
-  @apply animate-pulse bg-muted rounded;
-}
-
-/* Card hover effects */
-.card-hover {
-  @apply transition-all duration-200 hover:shadow-md hover:-translate-y-1;
-}
-
-/* Gradient backgrounds */
-.gradient-primary {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
-}
-
-.gradient-secondary {
-  background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(var(--muted)) 100%);
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, 
+  *::before, 
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .animate-float,
+  .animate-pulse-slow,
+  .animate-gradient,
+  .icon-pulse {
+    animation: none !important;
+  }
 }

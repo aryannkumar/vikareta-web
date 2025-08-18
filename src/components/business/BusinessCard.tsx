@@ -4,109 +4,253 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { MapPin, Star } from 'lucide-react';
+import { MapPin, Star, ArrowRight, Phone, Mail, Award, TrendingUp, Users, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { fadeInUp, cardHover } from '@/lib/motion';
 
 interface BusinessCardProps {
   business: any;
 }
 
+const cardVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 30,
+    scale: 0.95 
+  },
+  show: { 
+    opacity: 1, 
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut"
+    }
+  },
+  hover: {
+    y: -8,
+    scale: 1.02,
+    transition: {
+      duration: 0.3,
+      ease: "easeOut"
+    }
+  },
+  tap: {
+    scale: 0.98,
+    transition: {
+      duration: 0.1
+    }
+  }
+};
+
 export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
   const router = useRouter();
-  const tags = [] as string[];
-  if (business?.category) tags.push(business.category);
-  if (business?.tags && Array.isArray(business.tags)) {
-    for (const t of business.tags) {
-      if (tags.length >= 5) break;
-      if (!tags.includes(t)) tags.push(t);
-    }
+  
+  // Extract business data with fallbacks
+  const businessData = {
+    id: business?.id,
+    name: business?.businessName || `${business?.firstName || ''} ${business?.lastName || ''}`.trim() || business?.name || 'Business',
+    description: business?.description || business?.about || `Professional ${business?.verificationTier || 'business'} services`,
+    location: business?.address || business?.location || business?.provider?.location || 'Location not specified',
+    rating: business?.rating || 4.5,
+    reviewCount: business?.reviewCount || business?.completedOrders || 0,
+    productCount: business?.productCount ?? business?.totalProducts ?? business?._count?.products ?? 0,
+    serviceCount: business?.serviceCount ?? business?.products?.filter?.((p: any) => p.isService)?.length ?? 0,
+    isVerified: business?.isVerified || business?.verificationTier === 'premium',
+    verificationTier: business?.verificationTier || 'basic',
+    logo: business?.logo || business?.avatar,
+    coverImage: business?.coverImage || business?.bannerImage,
+    category: business?.category || business?.verificationTier || 'General',
+    phone: business?.phone || business?.contactPhone,
+    email: business?.email || business?.contactEmail,
+    completedOrders: business?.completedOrders || business?._count?.sellerOrders || 0
+  };
+
+  // Generate category tags
+  const tags = [];
+  if (businessData.category && businessData.category !== 'General') tags.push(businessData.category);
+  if (businessData.verificationTier && businessData.verificationTier !== 'basic') {
+    tags.push(businessData.verificationTier.charAt(0).toUpperCase() + businessData.verificationTier.slice(1));
   }
 
-  // prefer subcategories for tags
-  if (business?.subcategories && Array.isArray(business.subcategories)) {
-    for (const t of business.subcategories) {
-      if (tags.length >= 5) break;
-      if (!tags.includes(t)) tags.push(t);
-    }
-  }
-
-  const location = business?.address || business?.location || business?.provider?.location || '';
-  const name = business?.businessName || `${business?.firstName || ''} ${business?.lastName || ''}`.trim() || (business?.name) || (business?.id ? `Listing ${String(business.id).slice(0, 6)}` : 'Untitled Listing');
-  const productCount = business?.productCount ?? business?.totalProducts ?? business?._count?.products ?? business?.products?.length ?? 0;
-  const serviceCount = business?.serviceCount ?? business?.serviceCount ?? business?.products?.filter?.((p: any) => p.isService).length ?? 0;
+  const handleCardClick = () => {
+    router.push(`/businesses/${businessData.id}`);
+  };
 
   return (
     <motion.article
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.12 }}
-      variants={fadeInUp}
-      {...cardHover}
-      onClick={() => router.push(`/businesses/${business?.id}`)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/businesses/${business?.id}`); }}
-      className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+      whileHover="hover"
+      whileTap="tap"
+      viewport={{ once: true, amount: 0.1 }}
+      variants={cardVariants}
+      onClick={handleCardClick}
+      className="group relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-gray-700 cursor-pointer"
     >
-      <div className="relative h-40 w-full bg-gradient-to-br from-orange-50 to-white dark:from-orange-900/20 dark:to-transparent">
-        {business?.coverImage ? (
-          <Image src={business.coverImage} alt={name} fill className="object-cover" />
+      {/* Cover Image / Gradient Background */}
+      <div className="relative h-48 w-full overflow-hidden">
+        {businessData.coverImage ? (
+          <Image 
+            src={businessData.coverImage} 
+            alt={businessData.name} 
+            fill 
+            className="object-cover group-hover:scale-105 transition-transform duration-500" 
+          />
         ) : (
-          <div className="h-40 w-full flex items-center justify-center text-gray-500">
-            <svg width="84" height="84" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-orange-400">
-              <rect width="24" height="24" rx="4" fill="#FFEFD5" />
-              <path d="M6 14l3-4 2 3 3-5 4 7H6z" fill="#FDBA74" />
-            </svg>
+          <div className="h-full w-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 relative overflow-hidden">
+            {/* Animated background pattern */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-white/20 text-6xl font-bold">
+                {businessData.name.charAt(0)}
+              </div>
+            </div>
           </div>
         )}
-
-        <div className="absolute top-3 left-3 bg-white/90 dark:bg-black/60 rounded-full px-3 py-1 flex items-center gap-2">
-          <div className="text-xs font-medium text-orange-600 dark:text-orange-300">{business?.category || business?.verificationTier || 'General'}</div>
+        
+        {/* Overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+        
+        {/* Top badges */}
+        <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+          {businessData.isVerified && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+            >
+              <Award className="w-3 h-3" />
+              Verified
+            </motion.div>
+          )}
+          {businessData.verificationTier === 'premium' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+              className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold"
+            >
+              Premium
+            </motion.div>
+          )}
         </div>
-
-        <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/60 rounded-full px-3 py-1 flex items-center gap-2 text-sm">
-          <Star className="h-3 w-3 text-yellow-400" />
-          <span className="font-medium">{(business?.rating || 0).toFixed(1)}</span>
+        
+        {/* Rating badge */}
+        <div className="absolute top-4 right-4 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1">
+          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">
+            {businessData.rating.toFixed(1)}
+          </span>
         </div>
       </div>
 
-      <div className="p-4 flex-1 flex flex-col">
-        <div className="flex items-start gap-3">
-          <div className="h-12 w-12 rounded-md bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden text-xl font-semibold text-gray-700">
-            {business?.logo ? (
-              <Image src={business.logo} alt={name} width={48} height={48} className="object-cover" />
-            ) : (
-              <span>{(name || 'U').charAt(0)}</span>
-            )}
-          </div>
-
-          <div className="flex-1">
-            <div className="font-semibold text-lg text-gray-900 dark:text-white">{name}</div>
-            <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
-              <MapPin className="h-3 w-3" />
-              <span className="truncate max-w-[220px]">{location || 'Unknown location'}</span>
+      {/* Business Logo */}
+      <div className="absolute -mt-8 left-6 z-10">
+        <div className="w-16 h-16 rounded-xl bg-white dark:bg-gray-800 shadow-lg border-4 border-white dark:border-gray-800 overflow-hidden">
+          {businessData.logo ? (
+            <Image 
+              src={businessData.logo} 
+              alt={businessData.name} 
+              width={64} 
+              height={64} 
+              className="w-full h-full object-cover" 
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-xl">
+              {businessData.name.charAt(0)}
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="pt-12 p-6">
+        {/* Business name and location */}
+        <div className="mb-4">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-orange-600 transition-colors duration-300">
+            {businessData.name}
+          </h3>
+          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+            <MapPin className="w-4 h-4 flex-shrink-0" />
+            <span className="text-sm truncate">{businessData.location}</span>
           </div>
         </div>
 
-  <p className="text-sm text-gray-600 dark:text-gray-400 mt-3 line-clamp-3 flex-1">{business?.description || (business?.about) || `${productCount} products • ${serviceCount} services` || 'No description available.'}</p>
+        {/* Description */}
+        <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 line-clamp-2 leading-relaxed">
+          {businessData.description}
+        </p>
 
-        <div className="mt-4 flex items-center justify-between">
-          <div className="flex flex-wrap gap-2">
-            {tags.slice(0, 5).map((tag) => (
-              <span key={tag} className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-full">
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-1">
+              <Package className="w-4 h-4 text-orange-500" />
+            </div>
+            <div className="text-lg font-bold text-gray-900 dark:text-white">
+              {businessData.productCount}
+            </div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">Products</div>
+          </div>
+          <div className="text-center border-x border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-center mb-1">
+              <TrendingUp className="w-4 h-4 text-orange-500" />
+            </div>
+            <div className="text-lg font-bold text-gray-900 dark:text-white">
+              {businessData.serviceCount}
+            </div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">Services</div>
+          </div>
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-1">
+              <Users className="w-4 h-4 text-orange-500" />
+            </div>
+            <div className="text-lg font-bold text-gray-900 dark:text-white">
+              {businessData.completedOrders}
+            </div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">Orders</div>
+          </div>
+        </div>
+
+        {/* Tags */}
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {tags.slice(0, 2).map((tag, index) => (
+              <span
+                key={index}
+                className="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 px-3 py-1 rounded-full text-xs font-medium"
+              >
                 {tag}
               </span>
             ))}
           </div>
+        )}
 
-          <div className="flex items-center gap-2">
-            <Link href={`/businesses/${business?.id}`} onClick={(e) => e.stopPropagation()} className="inline-flex items-center gap-2 bg-orange-600 text-white py-2 px-3 rounded-lg hover:bg-orange-700 transition">View</Link>
-            <button className="bg-transparent border border-gray-200 dark:border-gray-700 py-2 px-3 rounded-lg text-sm" onClick={(e) => { e.stopPropagation(); if (business?.phone) window.location.href = `tel:${business.phone}`; else if (business?.contactEmail) window.location.href = `mailto:${business.contactEmail}`; else window.alert('Contact details not available'); }}>
-              Contact
-            </button>
-          </div>
+        {/* Action buttons */}
+        <div className="flex gap-3">
+          <Link
+            href={`/businesses/${businessData.id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-2.5 px-4 rounded-lg font-semibold text-center transition-all duration-300 flex items-center justify-center gap-2 group/btn"
+          >
+            View Profile
+            <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
+          </Link>
+          
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (businessData.phone) {
+                window.location.href = `tel:${businessData.phone}`;
+              } else if (businessData.email) {
+                window.location.href = `mailto:${businessData.email}`;
+              }
+            }}
+            className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-2 border-orange-500 text-orange-600 dark:text-orange-400 p-2.5 rounded-lg transition-all duration-300 hover:scale-105"
+          >
+            {businessData.phone ? <Phone className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
+          </button>
         </div>
       </div>
     </motion.article>

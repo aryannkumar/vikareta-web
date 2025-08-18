@@ -133,47 +133,52 @@ export const marketplaceApi = {
 
   // Get nearby businesses
   getNearbyBusinesses: async (filters?: MarketplaceFilters): Promise<NearbyBusinessesResponse> => {
-    const searchParams = new URLSearchParams();
-    
-    if (filters?.location) searchParams.append('location', filters.location);
-    if (filters?.category) searchParams.append('category', filters.category);
-    if (filters?.radius) searchParams.append('radius', filters.radius.toString());
-    if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy);
+    try {
+      const searchParams = new URLSearchParams();
+      
+      if (filters?.location) searchParams.append('location', filters.location);
+      if (filters?.category) searchParams.append('category', filters.category);
+      if (filters?.radius) searchParams.append('radius', filters.radius.toString());
+      if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy);
 
-  const response = await apiClient.get(`/marketplace/businesses?${searchParams.toString()}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch nearby businesses');
+      const response = await apiClient.get(`/marketplace/businesses?${searchParams.toString()}`);
+      if (!response.success) {
+        return { success: false, data: [] };
+      }
+      const payload = response.data as any;
+      let arr: NearbyBusiness[] = [];
+      if (Array.isArray(payload)) arr = payload;
+      else if (Array.isArray(payload?.businesses)) arr = payload.businesses;
+      else if (Array.isArray(payload?.data)) arr = payload.data;
+      else if (Array.isArray(payload?.items)) arr = payload.items;
+
+      // Heuristic: only include seller/provider businesses
+      const isSellerEntity = (b: any) => {
+        if (!b) return false;
+        // explicit flags
+        if (b.type === 'business' || b.type === 'seller') return true;
+        if (b.userType === 'seller') return true;
+        if (b.sellerId) return true;
+        if (b.isSeller === true) return true;
+        if (b.role === 'seller') return true;
+        // seller embedded on product/service
+        if (b.provider && b.provider.id) return true;
+        if (b.seller && b.seller.id) return true;
+        // fallback: typical user/business shape from backend
+        if (b.businessName || b.firstName || b.lastName) return true;
+        return false;
+      };
+
+      const filtered = (arr || []).filter(isSellerEntity);
+
+      return {
+        success: true,
+        data: filtered
+      };
+    } catch (error) {
+      console.error('getNearbyBusinesses failed', error);
+      return { success: false, data: [] };
     }
-    const payload = response.data as any;
-    let arr: NearbyBusiness[] = [];
-    if (Array.isArray(payload)) arr = payload;
-    else if (Array.isArray(payload?.businesses)) arr = payload.businesses;
-    else if (Array.isArray(payload?.data)) arr = payload.data;
-    else if (Array.isArray(payload?.items)) arr = payload.items;
-
-    // Heuristic: only include seller/provider businesses
-    const isSellerEntity = (b: any) => {
-      if (!b) return false;
-      // explicit flags
-      if (b.type === 'business' || b.type === 'seller') return true;
-      if (b.userType === 'seller') return true;
-      if (b.sellerId) return true;
-      if (b.isSeller === true) return true;
-      if (b.role === 'seller') return true;
-      // seller embedded on product/service
-      if (b.provider && b.provider.id) return true;
-      if (b.seller && b.seller.id) return true;
-      // fallback: typical user/business shape from backend
-      if (b.businessName || b.firstName || b.lastName) return true;
-      return false;
-    };
-
-    const filtered = (arr || []).filter(isSellerEntity);
-
-    return {
-      success: true,
-      data: filtered
-    };
   },
 
   // Get featured businesses
@@ -279,17 +284,23 @@ export const marketplaceApi = {
   // Get a single business by id
   getBusinessById: async (id: string): Promise<{ success: boolean; data: any | null }> => {
     if (!id) return { success: false, data: null };
-    const response = await apiClient.get(`/marketplace/businesses/${encodeURIComponent(id)}`);
-    if (!response.success) {
+    
+    try {
+      const response = await apiClient.get(`/marketplace/businesses/${encodeURIComponent(id)}`);
+      if (!response.success) {
+        return { success: false, data: null };
+      }
+
+      const payload = response.data as any;
+      // backend may return { data: { business: {...} } } or { business: {...} } or direct object
+      if (payload == null) return { success: true, data: null };
+      if (payload.business) return { success: true, data: payload.business };
+      if (payload.data && (payload.data.business || payload.data.provider)) return { success: true, data: payload.data.business || payload.data };
+      return { success: true, data: payload };
+    } catch (error) {
+      console.error('getBusinessById failed for id', id, error);
       return { success: false, data: null };
     }
-
-    const payload = response.data as any;
-    // backend may return { data: { business: {...} } } or { business: {...} } or direct object
-    if (payload == null) return { success: true, data: null };
-    if (payload.business) return { success: true, data: payload.business };
-    if (payload.data && (payload.data.business || payload.data.provider)) return { success: true, data: payload.data.business || payload.data };
-    return { success: true, data: payload };
   },
 
   // Track item view (endpoint not implemented in backend yet)

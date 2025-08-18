@@ -1,27 +1,88 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 
-export function Logo({ className = 'h-10 w-10' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Vikareta">
+interface LogoProps {
+  className?: string;
+  showText?: boolean;
+  priority?: boolean;
+}
+
+export function Logo({ className = 'h-10 w-10', showText = false, priority = false }: LogoProps) {
+  const [imageError, setImageError] = useState(false);
+
+  // Fallback SVG logo with premium design
+  const FallbackLogo = () => (
+    <svg 
+      className={className} 
+      viewBox="0 0 96 96" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg" 
+      role="img" 
+      aria-label="Vikareta"
+    >
       <defs>
-        <linearGradient id="l1" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="primaryGradient" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#FB923C" />
           <stop offset="50%" stopColor="#F97316" />
-          <stop offset="100%" stopColor="#3B82F6" />
+          <stop offset="100%" stopColor="#EA580C" />
         </linearGradient>
-        <linearGradient id="l2" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#34D399" />
-          <stop offset="100%" stopColor="#06B6D4" />
+        <linearGradient id="accentGradient" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#3B82F6" />
+          <stop offset="100%" stopColor="#1D4ED8" />
         </linearGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge> 
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
-      <rect width="96" height="96" rx="20" fill="url(#l1)" opacity="0.12" />
-      <g transform="translate(18 18)">
-        <circle cx="30" cy="18" r="18" fill="url(#l1)" />
-        <rect x="12" y="36" width="36" height="12" rx="3" fill="url(#l2)" />
-        <path d="M8 10 L14 24 L22 8 L30 24 L36 10" stroke="#fff" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" fill="none" opacity={0.95} />
+      {/* Background circle with gradient */}
+      <circle cx="48" cy="48" r="44" fill="url(#primaryGradient)" opacity="0.1" />
+      
+      {/* Main logo shape - Modern V */}
+      <g transform="translate(24 20)">
+        {/* V shape with gradient */}
+        <path 
+          d="M8 12 L20 44 L24 44 L36 12 L32 12 L22 38 L12 12 Z" 
+          fill="url(#primaryGradient)" 
+          filter="url(#glow)"
+        />
+        
+        {/* Accent dot */}
+        <circle cx="38" cy="15" r="3" fill="url(#accentGradient)" />
+        
+        {/* Underline accent */}
+        <rect x="8" y="48" width="28" height="3" rx="1.5" fill="url(#accentGradient)" opacity="0.7" />
       </g>
     </svg>
+  );
+
+  return (
+    <div className={`flex items-center gap-2 ${showText ? 'space-x-3' : ''}`}>
+      {!imageError ? (
+        <Image
+          src="/img/logo.png"
+          alt="Vikareta Logo"
+          width={40}
+          height={40}
+          className={`${className} object-contain logo-hover`}
+          priority={priority}
+          onError={() => setImageError(true)}
+          onLoad={() => setImageError(false)}
+        />
+      ) : (
+        <FallbackLogo />
+      )}
+      
+      {showText && (
+        <span className="text-2xl font-bold text-gradient-orange-blue font-lexend">
+          Vikareta
+        </span>
+      )}
+    </div>
   );
 }
 
