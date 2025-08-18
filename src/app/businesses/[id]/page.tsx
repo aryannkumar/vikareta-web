@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { marketplaceApi, type NearbyBusiness } from '@/lib/api/marketplace';
+import { marketplaceApi } from '@/lib/api/marketplace';
 import { productsApi } from '@/lib/api/products';
 import { servicesApi } from '@/lib/api/services';
 import { MapPin, Phone, Globe, Star } from 'lucide-react';
@@ -9,18 +9,14 @@ import { Badge } from '@/components/ui/badge';
 export default async function BusinessProfilePage(props: any) {
   const id = props?.params?.id as string;
 
-  // Fetch businesses list and try to find the matching business by id
-  const [businessesRes, productsRes, servicesRes] = await Promise.all([
-    marketplaceApi.getNearbyBusinesses(),
-    productsApi.getProducts({ supplierId: id, limit: 6 } as any),
-    servicesApi.getServices({ businessId: id, limit: 6 } as any)
+  // Fetch the business directly by id
+  const [businessRes, productsRes, servicesRes] = await Promise.all([
+    marketplaceApi.getBusinessById(id),
+    productsApi.getProducts({ supplierId: id, limit: 8 } as any),
+    servicesApi.getServices({ businessId: id, limit: 8 } as any)
   ]);
 
-  const found = businessesRes && businessesRes.success && Array.isArray(businessesRes.data)
-    ? (businessesRes.data as NearbyBusiness[]).find(b => b.id === id)
-    : null;
-
-  if (!found) {
+  if (!businessRes || !businessRes.success || !businessRes.data) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 text-center">
@@ -31,11 +27,11 @@ export default async function BusinessProfilePage(props: any) {
     );
   }
 
-  const business = found as any as NearbyBusiness;
-  const products = productsRes && productsRes.success ? (productsRes.data?.products || []) : [];
-  const services = servicesRes && servicesRes.success ? (servicesRes.data?.services || []) : [];
+  const business = businessRes.data as any;
+  const products = productsRes && productsRes.success ? (productsRes.data?.products || productsRes.data || []) : [];
+  const services = servicesRes && servicesRes.success ? (servicesRes.data?.services || servicesRes.data || []) : [];
 
-  const address = (business as any).address || (business as any).location || (business as any).provider?.location || '';
+  const address = business.address || business.location || business.provider?.location || '';
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -45,16 +41,24 @@ export default async function BusinessProfilePage(props: any) {
             {business.coverImage ? (
               <Image src={business.coverImage} alt={business.name} fill className="object-cover" />
             ) : (
-              <div className="h-64 w-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">No cover image</div>
+              <div className="h-64 w-full bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 flex items-center justify-center"> 
+                <div className="text-2xl font-semibold text-orange-600 dark:text-orange-300">{business.name}</div>
+              </div>
             )}
 
-            <div className="absolute -bottom-10 left-8 flex items-center gap-4">
-              <div className="h-28 w-28 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-2xl font-bold">{(business.name || 'B').charAt(0)}</div>
+            <div className="absolute -bottom-12 left-8 flex items-center gap-4">
+              <div className="h-28 w-28 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-2xl font-bold overflow-hidden">
+                {business.logo ? (
+                  <Image src={business.logo} alt={business.name} width={112} height={112} className="object-cover" />
+                ) : (
+                  <div className="text-3xl">{(business.name || 'B').charAt(0)}</div>
+                )}
+              </div>
 
               <div className="ml-2">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{business.name}</h1>
                 <div className="flex items-center gap-2 mt-1">
-                  {(business as any).isVerified || business.provider?.verified ? (
+                  {business.isVerified || business.provider?.verified ? (
                     <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30">Verified</Badge>
                   ) : null}
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 gap-2">
@@ -66,12 +70,12 @@ export default async function BusinessProfilePage(props: any) {
             </div>
           </div>
 
-          <div className="p-6 mt-10">
+          <div className="p-6 mt-16">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <div className="mb-6">
                   <h2 className="text-xl font-semibold mb-2">About</h2>
-                  <p className="text-gray-700 dark:text-gray-300">{business.description}</p>
+                  <p className="text-gray-700 dark:text-gray-300">{business.description || 'No description available.'}</p>
                 </div>
 
                 <div className="mb-6">
@@ -121,22 +125,28 @@ export default async function BusinessProfilePage(props: any) {
               <aside className="space-y-6">
                 <div className="bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
                   <h4 className="font-semibold mb-2">Contact</h4>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">Contact details are not available for this listing.</div>
-                  <div className="mt-3">
-                    <button disabled className="btn-disabled w-full py-2">Contact Business</button>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">{business.contactEmail || 'Contact details are not available for this listing.'}</div>
+                  <div className="mt-3 flex flex-col gap-2">
+                    {business.phone ? (
+                      <a href={`tel:${business.phone}`} className="w-full inline-flex items-center justify-center bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition"><Phone className="mr-2" />Call</a>
+                    ) : null}
+                    {business.website ? (
+                      <a href={business.website} target="_blank" rel="noreferrer" className="w-full inline-flex items-center justify-center bg-transparent border border-gray-200 dark:border-gray-700 py-2 px-3 rounded-lg text-sm"><Globe className="mr-2" />Visit Website</a>
+                    ) : null}
+                    <button disabled={!business.contactEmail} onClick={() => { if (business.contactEmail) window.location.href = `mailto:${business.contactEmail}`; }} className="w-full py-2 bg-transparent border border-gray-200 dark:border-gray-700 rounded-lg">Email</button>
                   </div>
                 </div>
 
                 <div className="bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
                   <h4 className="font-semibold mb-2">Stats</h4>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">Rating: <span className="font-semibold">{(business as any).rating || 0}</span> <Star className="h-4 w-4 inline-block text-yellow-400" /></div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">Employees: <span className="font-semibold">{(business as any).employeeCount || 0}</span></div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">Products: <span className="font-semibold">{(business as any).productsCount || 0}</span></div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Rating: <span className="font-semibold">{business.rating || 0}</span> <Star className="h-4 w-4 inline-block text-yellow-400" /></div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Employees: <span className="font-semibold">{business.employeeCount || 0}</span></div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Products: <span className="font-semibold">{business.productsCount || 0}</span></div>
                 </div>
 
                 <div className="bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
                   <h4 className="font-semibold mb-2">Certifications</h4>
-                  <p className="text-gray-600 dark:text-gray-400">No certifications listed.</p>
+                  <p className="text-gray-600 dark:text-gray-400">{(business.certifications && business.certifications.length) ? business.certifications.join(', ') : 'No certifications listed.'}</p>
                 </div>
               </aside>
             </div>

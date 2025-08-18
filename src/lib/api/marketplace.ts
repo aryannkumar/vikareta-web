@@ -227,6 +227,22 @@ export const marketplaceApi = {
     };
   },
 
+  // Get a single business by id
+  getBusinessById: async (id: string): Promise<{ success: boolean; data: any | null }> => {
+    if (!id) return { success: false, data: null };
+    const response = await apiClient.get(`/marketplace/businesses/${encodeURIComponent(id)}`);
+    if (!response.success) {
+      return { success: false, data: null };
+    }
+
+    const payload = response.data as any;
+    // backend may return { data: { business: {...} } } or { business: {...} } or direct object
+    if (payload == null) return { success: true, data: null };
+    if (payload.business) return { success: true, data: payload.business };
+    if (payload.data && (payload.data.business || payload.data.provider)) return { success: true, data: payload.data.business || payload.data };
+    return { success: true, data: payload };
+  },
+
   // Track item view (endpoint not implemented in backend yet)
   trackView: async (itemId: string, itemType: 'product' | 'service' | 'business') => {
     console.log('Tracking view:', { itemId, itemType, timestamp: new Date().toISOString() });

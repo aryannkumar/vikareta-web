@@ -1,8 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, CheckCircle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { MapPin, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { fadeInUp, cardHover } from '@/lib/motion';
 
@@ -46,6 +45,16 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
           <div className="h-44 w-full flex items-center justify-center text-gray-500">No image</div>
         )}
 
+        <div className="absolute top-3 left-3 bg-orange-50 dark:bg-orange-900/60 rounded-full px-3 py-1 flex items-center gap-2">
+          <div className="text-xs font-medium text-orange-600 dark:text-orange-300">{business.category || 'General'}</div>
+        </div>
+
+        <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/60 rounded-full px-3 py-1 flex items-center gap-2 text-sm">
+          <Star className="h-3 w-3 text-yellow-400" />
+          <span className="font-medium">{(business.rating || 0).toFixed(1)}</span>
+          <span className="text-gray-500">· {business.reviewCount || 0}</span>
+        </div>
+
         <div className="absolute bottom-3 left-3 bg-white/90 dark:bg-black/60 rounded-full px-3 py-1 flex items-center gap-2">
           {business.logo ? (
             <Image src={business.logo} alt={business.name} width={40} height={40} className="rounded-full object-cover" />
@@ -65,21 +74,9 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
       </div>
 
       <div className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            {business.isVerified || business.provider?.verified ? (
-              <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-xs font-medium flex items-center gap-1">
-                <CheckCircle className="h-3 w-3" />
-                Verified
-              </Badge>
-            ) : null}
-          </div>
-          <div className="text-sm text-gray-500">{business.reviewCount || 0} reviews</div>
-        </div>
-
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-3">{business.description || 'No description available.'}</p>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mb-4">
           {tags.slice(0, 5).map((tag) => (
             <span key={tag} className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-full">
               {tag}
@@ -88,15 +85,13 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
         </div>
 
         <div className="mt-4 flex gap-2">
-          <Link href={`/businesses/${business.id}`}>
-            <a className="flex-1 inline-flex items-center justify-center bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition">View</a>
-          </Link>
-          <button className="bg-transparent border border-gray-200 dark:border-gray-700 py-2 px-3 rounded-lg text-sm" onClick={() => { window.alert('Contact flow'); }}>
+          <Link href={`/businesses/${business.id}`} className="flex-1 inline-flex items-center justify-center bg-orange-600 text-white py-2 px-3 rounded-lg hover:bg-orange-700 transition">View</Link>
+          <button className="bg-transparent border border-gray-200 dark:border-gray-700 py-2 px-3 rounded-lg text-sm" onClick={() => { if (business.phone) window.location.href = `tel:${business.phone}`; else window.alert('Contact flow'); }}>
             Contact
           </button>
         </div>
       </div>
-  </motion.article>
+    </motion.article>
   );
 };
 
