@@ -210,7 +210,7 @@ export default function ServiceDetailPage() {
 
   const handleContactProvider = () => {
     if (service) {
-      toast.info('Contact Provider', `Redirecting to contact ${service.provider.name}`);
+  toast.info('Contact Business', `Redirecting to contact ${service.provider.name}`);
     }
   };
 
@@ -444,7 +444,7 @@ export default function ServiceDetailPage() {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-8">
-              {/* Provider Info */}
+              {/* Business Info */}
               <div className="bg-card rounded-lg border p-6 mb-6">
                 <div className="flex items-center gap-4 mb-4">
                   <Image
@@ -455,7 +455,7 @@ export default function ServiceDetailPage() {
                     className="w-15 h-15 rounded-full object-cover"
                   />
                   <div>
-                    <Link href={`/providers/${service.provider.id}`}>
+                    <Link href={`/businesses/${service.provider.id}`}>
                       <h3 className="font-semibold hover:text-primary">
                         {service.provider.name}
                         {service.provider.verified && (
@@ -541,7 +541,7 @@ export default function ServiceDetailPage() {
                     onClick={handleContactProvider}
                   >
                     <MessageCircle className="h-4 w-4 mr-2" />
-                    Contact Provider
+                    Contact Business
                   </Button>
                 </div>
               </div>

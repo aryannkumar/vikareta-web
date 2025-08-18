@@ -224,7 +224,7 @@ export default function MarketplacePage() {
   };
 
   const handleContactProvider = (item: TrendingItem | NearbyBusiness) => {
-    toast.info('Contact Provider', `Redirecting to contact ${item.provider?.name || item.name}`);
+    toast.info('Contact Business', `Redirecting to contact ${item.provider?.name || item.name}`);
   };
 
   const getPromotionIcon = (promotionType: string) => {
@@ -361,7 +361,7 @@ export default function MarketplacePage() {
 
         <div className="mb-4">
           <Link
-            href={`/providers/${item.provider.id}`}
+            href={`/businesses/${item.provider.id}`}
             className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
           >
             {item.provider.name}
@@ -462,7 +462,7 @@ export default function MarketplacePage() {
           </div>
         </div>
 
-        <Link href={`/providers/${business.id}`}>
+  <Link href={`/businesses/${business.id}`}>
           <h3 className="font-bold text-xl mb-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
             {business.name}
           </h3>
@@ -525,7 +525,7 @@ export default function MarketplacePage() {
             <MessageCircle className="h-4 w-4 mr-2" />
             Contact Business
           </Button>
-          <Link href={`/providers/${business.id}`}>
+          <Link href={`/businesses/${business.id}`}>
             <Button variant="outline" className="px-4 py-2 border-2 border-gray-300 hover:border-orange-500 hover:text-orange-600 transition-colors">
               View Profile
             </Button>
@@ -743,9 +743,9 @@ export default function MarketplacePage() {
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
                   We're working on adding more businesses in your area
                 </p>
-                <Link href="/providers">
+                <Link href="/businesses">
                   <Button className="btn-primary">
-                    Browse All Suppliers
+                    Browse All Businesses
                   </Button>
                 </Link>
               </div>

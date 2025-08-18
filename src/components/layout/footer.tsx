@@ -165,7 +165,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/providers" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/businesses" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Find Suppliers
                 </Link>
               </li>

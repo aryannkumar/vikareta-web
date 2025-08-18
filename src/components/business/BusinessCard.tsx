@@ -39,17 +39,17 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
 
         <div className="absolute bottom-3 left-3 bg-white/90 dark:bg-black/60 rounded-full px-3 py-1 flex items-center gap-2">
           {business.logo ? (
-            <Image src={business.logo} alt={business.name} width={32} height={32} className="rounded-full object-cover" />
+            <Image src={business.logo} alt={business.name} width={40} height={40} className="rounded-full object-cover" />
           ) : (
-            <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm font-bold text-gray-600">{(business.name || 'B').charAt(0)}</div>
+            <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm font-bold text-gray-600">{(business.name || 'B').charAt(0)}</div>
           )}
           <div className="flex flex-col">
-            <Link href={`/providers/${business.id}`} className="font-semibold text-sm text-gray-900 dark:text-white hover:underline">
-              {business.name}
+            <Link href={`/businesses/${business.id}`} className="font-semibold text-sm text-gray-900 dark:text-white hover:underline">
+              {business.name || 'Untitled Business'}
             </Link>
             <div className="text-xs text-gray-600 dark:text-gray-300 flex items-center gap-1">
               <MapPin className="h-3 w-3" />
-              <span className="truncate max-w-[180px]">{location}</span>
+              <span className="truncate max-w-[180px]">{location || 'Unknown location'}</span>
             </div>
           </div>
         </div>
@@ -68,7 +68,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
           <div className="text-sm text-gray-500">{business.reviewCount || 0} reviews</div>
         </div>
 
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-3">{business.description}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-3">{business.description || 'No description available.'}</p>
 
         <div className="flex flex-wrap gap-2">
           {tags.slice(0, 5).map((tag) => (
@@ -79,10 +79,10 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
         </div>
 
         <div className="mt-4 flex gap-2">
-          <Link href={`/providers/${business.id}`}>
-            <button className="flex-1 btn-primary py-2 px-3 rounded-lg">View Profile</button>
+          <Link href={`/businesses/${business.id}`}>
+            <a className="flex-1 inline-flex items-center justify-center bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition">View</a>
           </Link>
-          <button className="btn-secondary py-2 px-3 rounded-lg" onClick={() => { window.alert('Contact flow'); }}>
+          <button className="bg-transparent border border-gray-200 dark:border-gray-700 py-2 px-3 rounded-lg text-sm" onClick={() => { window.alert('Contact flow'); }}>
             Contact
           </button>
         </div>

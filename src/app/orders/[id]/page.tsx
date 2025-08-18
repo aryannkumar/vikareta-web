@@ -299,7 +299,7 @@ export default function OrderDetailPage() {
           <div className="space-y-6">
             {/* Provider Info */}
             <div className="bg-card rounded-lg border p-6">
-              <h3 className="text-lg font-semibold mb-4">Provider</h3>
+              <h3 className="text-lg font-semibold mb-4">Business</h3>
               <div className="flex items-start gap-3 mb-4">
                 <Image
                   src="/api/placeholder/48/48"
@@ -310,7 +310,7 @@ export default function OrderDetailPage() {
                 />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <Link href={`/providers/${order.supplierId}`}>
+                    <Link href={`/businesses/${order.supplierId}`}>
                       <h4 className="font-medium hover:text-primary">{order.supplierName}</h4>
                     </Link>
                     {/* Verified badge - would need to be added to Order interface */}
@@ -335,7 +335,7 @@ export default function OrderDetailPage() {
 
               <Button className="w-full mt-4" variant="outline">
                 <MessageCircle className="h-4 w-4 mr-2" />
-                Contact Provider
+                Contact Business
               </Button>
             </div>
 

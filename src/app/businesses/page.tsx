@@ -10,31 +10,50 @@ export default function BusinessesPage() {
   const [businesses, setBusinesses] = useState<NearbyBusiness[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'nearby' | 'popular' | 'featured'>('nearby');
+  const [query, setQuery] = useState('');
+  const [filtered, setFiltered] = useState<NearbyBusiness[]>([]);
+  const [debounceTimeout, setDebounceTimeout] = useState<number | null>(null);
+
+  const loadBusinesses = async (tab: typeof activeTab = activeTab) => {
+    try {
+      setLoading(true);
+      setError(null);
+      let res;
+      if (tab === 'nearby') {
+        res = await marketplaceApi.getNearbyBusinesses();
+      } else if (tab === 'popular') {
+        res = await marketplaceApi.getPopularBusinesses();
+      } else {
+        res = await marketplaceApi.getFeaturedBusinesses();
+      }
+
+      if ((res as any).success) {
+        const loaded = (res.data || []).filter((b) => {
+          // Use business-level verified flag if present, or fall back to nested provider
+          return (b as any).isVerified || (b as any).provider?.verified || false;
+        });
+        setBusinesses(loaded);
+        // apply query filter immediately
+        if (query.trim() === '') {
+          setFiltered(loaded);
+        } else {
+          const q = query.toLowerCase();
+          setFiltered(loaded.filter(b => (b.name || '').toLowerCase().includes(q) || (b.category || '').toLowerCase().includes(q) || (b.address || '').toLowerCase().includes(q)));
+        }
+      } else {
+        setError((res as any).error || 'Failed to load businesses');
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : 'Failed to load businesses');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetch = async () => {
-      try {
-        setLoading(true);
-        const res = await marketplaceApi.getNearbyBusinesses();
-        if (res.success) {
-          // Filter to only show email-level verified businesses
-          const filtered = (res.data || []).filter((b) => {
-            // Accept businesses with provider.verified or isVerified flag
-            return (b.provider && b.provider.verified) || (b as any).isVerified || false;
-          });
-          setBusinesses(filtered);
-        } else {
-          setError('Failed to load businesses');
-        }
-      } catch (err) {
-        console.error(err);
-        setError('Failed to load businesses');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetch();
+  loadBusinesses(activeTab);
   }, []);
 
   return (
@@ -49,22 +68,71 @@ export default function BusinessesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <LoadingSkeleton type="card" count={6} />
           </div>
-        ) : error ? (
-          <div className="text-center text-red-600">{error}</div>
         ) : (
           <div>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Businesses</h2>
-              <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">{businesses.length} listed</Badge>
+            <div className="mb-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Businesses</h2>
+                <div className="flex items-center gap-3">
+                  <div className="text-sm text-gray-500">{businesses.length} listed</div>
+                  <button className="text-sm text-blue-600 dark:text-blue-300" onClick={() => loadBusinesses(activeTab)}>Retry</button>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center gap-2">
+                <button onClick={() => { setActiveTab('nearby'); loadBusinesses('nearby'); }} className={`px-3 py-1 rounded ${activeTab === 'nearby' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800'}`}>Nearby</button>
+                <button onClick={() => { setActiveTab('popular'); loadBusinesses('popular'); }} className={`px-3 py-1 rounded ${activeTab === 'popular' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800'}`}>Popular</button>
+                <button onClick={() => { setActiveTab('featured'); loadBusinesses('featured'); }} className={`px-3 py-1 rounded ${activeTab === 'featured' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800'}`}>Featured</button>
+                <div className="ml-auto">
+                  <input
+                    placeholder="Search businesses"
+                    value={query}
+                    className="px-3 py-2 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-700"
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setQuery(v);
+                      if (debounceTimeout) window.clearTimeout(debounceTimeout);
+                      const t = window.setTimeout(async () => {
+                        const q = v.trim();
+                        if (q.length >= 2) {
+                          // server-side search for businesses
+                          try {
+                            const searchRes = await marketplaceApi.searchMarketplace(q, { type: 'businesses' });
+                            if ((searchRes as any).success) {
+                              const loaded = (searchRes.data?.businesses || []) as NearbyBusiness[];
+                              setFiltered(loaded.filter((b) => (b as any).isVerified || (b as any).provider?.verified || false));
+                            } else {
+                              setFiltered([]);
+                            }
+                          } catch (e) {
+                            console.error(e);
+                            setFiltered([]);
+                          }
+                        } else if (q === '') {
+                          setFiltered(businesses);
+                        } else {
+                          const qq = q.toLowerCase();
+                          setFiltered(businesses.filter(b => (b.name || '').toLowerCase().includes(qq) || (b.category || '').toLowerCase().includes(qq) || (b.address || '').toLowerCase().includes(qq)));
+                        }
+                      }, 300);
+                      setDebounceTimeout(t as unknown as number);
+                    }}
+                  />
+                </div>
+              </div>
+
+              {error ? (
+                <div className="text-sm text-red-600 mt-3">{error}</div>
+              ) : null}
             </div>
 
-            {businesses.length === 0 ? (
+            {filtered.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-600 dark:text-gray-400">No verified businesses found in your area.</p>
+                <p className="text-gray-600 dark:text-gray-400">No businesses found.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {businesses.map((b) => (
+                {filtered.map((b) => (
                   <BusinessCard key={b.id} business={b} />
                 ))}
               </div>

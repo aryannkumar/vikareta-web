@@ -338,10 +338,10 @@ export default function OrdersPage() {
                         </Button>
                       </Link>
 
-                      <Link href={`/providers/${order.supplierId}`}>
+                      <Link href={`/businesses/${order.supplierId}`}>
                         <Button variant="outline" size="sm">
                           <MessageCircle className="h-4 w-4 mr-2" />
-                          Contact Provider
+                          Contact Business
                         </Button>
                       </Link>
 

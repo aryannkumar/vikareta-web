@@ -54,7 +54,7 @@ function SearchPageContent() {
     { value: '', label: 'All Results' },
     { value: 'product', label: 'Products' },
     { value: 'service', label: 'Services' },
-    { value: 'provider', label: 'Providers' }
+  { value: 'provider', label: 'Businesses' }
   ];
 
   const categories = [
@@ -243,7 +243,7 @@ function SearchPageContent() {
       case 'service':
         return `/services/${result.id}`;
       case 'provider':
-        return `/providers/${result.id}`;
+  return `/businesses/${result.id}`;
       default:
         return '#';
     }
@@ -259,7 +259,7 @@ function SearchPageContent() {
             {query && <span className="text-muted-foreground"> for "{query}"</span>}
           </h1>
           <p className="text-muted-foreground">
-            Find products, services, and providers that match your needs
+            Find products, services, and businesses that match your needs
           </p>
         </div>
 
@@ -271,7 +271,7 @@ function SearchPageContent() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <input
                 type="text"
-                placeholder="Search products, services, providers..."
+                placeholder="Search products, services, businesses..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-background"
@@ -563,7 +563,7 @@ function SearchPageContent() {
                   {result.provider && (
                     <div className="mb-3">
                       <Link
-                        href={`/providers/${result.provider.id}`}
+                        href={`/businesses/${result.provider.id}`}
                         className="text-xs text-primary hover:underline font-medium"
                       >
                         {result.provider.name}

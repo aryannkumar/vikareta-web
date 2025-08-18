@@ -135,7 +135,7 @@ export default function ServicesPage() {
 
   const handleContactProvider = (service: Service) => {
     // In a real app, this would open a contact modal or redirect to contact page
-    toast.info('Contact Provider', `Redirecting to contact ${service.provider.name}`);
+    toast.info('Contact Business', `Redirecting to contact ${service.provider.name}`);
   };
 
   const getServiceTypeColor = (serviceType: string) => {
@@ -183,7 +183,7 @@ export default function ServicesPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">All Services</h1>
           <p className="text-muted-foreground">
-            Find professional services from verified providers across India
+            Find professional services from verified businesses across India
           </p>
         </div>
 
@@ -193,9 +193,9 @@ export default function ServicesPage() {
           <form onSubmit={handleSearch} className="mb-6">
             <div className="relative max-w-2xl">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <input
+                <input
                 type="text"
-                placeholder="Search services, providers, skills..."
+                placeholder="Search services, businesses, skills..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background"
@@ -316,7 +316,7 @@ export default function ServicesPage() {
               <h3 className="font-semibold mb-4">Advanced Filters</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Provider Location</label>
+                  <label className="block text-sm font-medium mb-2">Business Location</label>
                   <select className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background">
                     <option value="">All Locations</option>
                     <option value="mumbai">Mumbai</option>
@@ -480,21 +480,21 @@ export default function ServicesPage() {
 
                     <div className="mb-3">
                       <Link
-                        href={`/providers/${service.provider.id}`}
+                        href={`/businesses/${service.provider.id}`}
                         className="text-xs text-primary hover:underline font-medium"
                       >
-                        {service.provider.name}
+                {service.provider.name.replace('Provider', 'Business')}
                         {service.provider.verified && (
                           <span className="ml-1 text-green-600">✓</span>
                         )}
                       </Link>
                       <div className="flex items-center gap-2 mt-1">
                         <p className="text-xs text-muted-foreground">
-                          {service.provider.location}
+                  {service.provider.location.replace('Provider', 'Business')}
                         </p>
                         <span className="text-xs text-muted-foreground">•</span>
                         <p className="text-xs text-muted-foreground">
-                          {service.provider.experience}
+                  {service.provider.experience.replace('Provider', 'Business')}
                         </p>
                       </div>
                     </div>

@@ -55,6 +55,7 @@ export interface MarketplaceFilters {
   maxPrice?: number;
   radius?: number;
   sortBy?: 'trending' | 'rating' | 'distance' | 'price';
+  type?: 'all' | 'businesses' | 'products' | 'services';
 }
 
 export interface TrendingResponse {
@@ -139,11 +140,55 @@ export const marketplaceApi = {
     if (filters?.radius) searchParams.append('radius', filters.radius.toString());
     if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy);
 
-    const response = await apiClient.get(`/marketplace/nearby/businesses?${searchParams.toString()}`);
+  const response = await apiClient.get(`/marketplace/businesses?${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch nearby businesses');
     }
     
+    return {
+      success: true,
+      data: (response.data as NearbyBusiness[]) || []
+    };
+  },
+
+  // Get featured businesses
+  getFeaturedBusinesses: async (filters?: MarketplaceFilters): Promise<NearbyBusinessesResponse> => {
+    const searchParams = new URLSearchParams();
+    if (filters?.location) searchParams.append('location', filters.location);
+    if (filters?.category) searchParams.append('category', filters.category);
+    if (filters?.radius) searchParams.append('radius', filters.radius.toString());
+    if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy);
+
+    // request only businesses
+    searchParams.append('type', 'businesses');
+
+    const response = await apiClient.get(`/marketplace/featured?${searchParams.toString()}`);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch featured businesses');
+    }
+
+    return {
+      success: true,
+      data: (response.data as NearbyBusiness[]) || []
+    };
+  },
+
+  // Get popular businesses
+  getPopularBusinesses: async (filters?: MarketplaceFilters): Promise<NearbyBusinessesResponse> => {
+    const searchParams = new URLSearchParams();
+    if (filters?.location) searchParams.append('location', filters.location);
+    if (filters?.category) searchParams.append('category', filters.category);
+    if (filters?.radius) searchParams.append('radius', filters.radius.toString());
+    if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy);
+
+    // request only businesses
+    searchParams.append('type', 'businesses');
+
+    const response = await apiClient.get(`/marketplace/popular?${searchParams.toString()}`);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch popular businesses');
+    }
+
     return {
       success: true,
       data: (response.data as NearbyBusiness[]) || []

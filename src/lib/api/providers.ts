@@ -142,144 +142,32 @@ export interface ProvidersFilters {
   limit?: number;
 }
 
+// Providers API has been deprecated/removed on the backend.
+// Keep a shim to avoid accidental 404 requests from the frontend — callers should be migrated
+// to marketplace/businesses endpoints or removed.
 export const providersApi = {
-  // Get all providers with filters
-  getProviders: async (filters: ProvidersFilters = {}): Promise<ProvidersResponse> => {
-    const searchParams = new URLSearchParams();
-    
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        if (Array.isArray(value)) {
-          value.forEach(v => searchParams.append(key, v));
-        } else {
-          searchParams.append(key, value.toString());
-        }
-      }
-    });
+  _deprecatedWarning: () => console.warn('providersApi is deprecated. Use marketplaceApi or businesses endpoints instead.'),
 
-    const response = await apiClient.get(`/providers?${searchParams.toString()}`);
-    return response.data as ProvidersResponse;
+  getProviders: async (): Promise<ProvidersResponse> => {
+    providersApi._deprecatedWarning();
+    return { success: false, data: { providers: [], total: 0, page: 1, limit: 0, hasMore: false } } as any;
   },
 
-  // Get provider by ID
   getProvider: async (id: string): Promise<ProviderResponse> => {
-    const response = await apiClient.get(`/providers/${id}`);
-    return response.data as ProviderResponse;
+    providersApi._deprecatedWarning();
+    return { success: false, data: null as any } as any;
   },
 
-  // Search providers
-  searchProviders: async (query: string, filters: Omit<ProvidersFilters, 'search'> = {}): Promise<ProvidersResponse> => {
-    return providersApi.getProviders({ ...filters, search: query });
-  },
-
-  // Get providers by category
-  getProvidersByCategory: async (category: string, filters: Omit<ProvidersFilters, 'category'> = {}): Promise<ProvidersResponse> => {
-    return providersApi.getProviders({ ...filters, category });
-  },
-
-  // Get provider categories (uses main categories endpoint)
-  getCategories: async (): Promise<{ success: boolean; data: string[] }> => {
-    const response = await apiClient.get('/categories');
-    return response.data as { success: boolean; data: string[] };
-  },
-
-  // Get provider skills (this endpoint may not exist in backend yet)
-  getSkills: async (category?: string): Promise<{ success: boolean; data: string[] }> => {
-    // This endpoint would need to be implemented in the backend
-    console.log('Provider skills endpoint not implemented in backend yet');
-    return { success: true, data: [] };
-  },
-
-  // Contact provider
-  contactProvider: async (providerId: string, message: {
-    subject: string;
-    message: string;
-    projectType?: string;
-    budget?: number;
-    timeline?: string;
-    contactInfo: {
-      name: string;
-      email: string;
-      phone?: string;
-      company?: string;
-    };
-  }): Promise<{ success: boolean; data: { messageId: string } }> => {
-    const response = await apiClient.post(`/providers/${providerId}/contact`, message);
-    return response.data as any;
-  },
-
-  // Hire provider
-  hireProvider: async (providerId: string, project: {
-    title: string;
-    description: string;
-    serviceId?: string;
-    budget: number;
-    timeline: string;
-    requirements: string[];
-    milestones?: {
-      title: string;
-      description: string;
-      amount: number;
-      dueDate: string;
-    }[];
-  }): Promise<{ success: boolean; data: { projectId: string } }> => {
-    const response = await apiClient.post(`/providers/${providerId}/hire`, project);
-    return response.data as any;
-  },
-
-  // Add provider review
-  addReview: async (providerId: string, review: {
-    rating: number;
-    comment: string;
-    projectType: string;
-  }): Promise<{ success: boolean; data: ProviderReview }> => {
-    const response = await apiClient.post(`/providers/${providerId}/reviews`, review);
-    return response.data as { success: boolean; data: ProviderReview };
-  },
-
-  // Get provider reviews
-  getReviews: async (providerId: string, page = 1, limit = 10): Promise<{
-    success: boolean;
-    data: {
-      reviews: ProviderReview[];
-      total: number;
-      averageRating: number;
-      ratingDistribution: Record<number, number>;
-    };
-  }> => {
-    const response = await apiClient.get(`/providers/${providerId}/reviews?page=${page}&limit=${limit}`);
-    return response.data as any;
-  },
-
-  // Get provider availability
-  getAvailability: async (providerId: string): Promise<{
-    success: boolean;
-    data: {
-      available: boolean;
-      nextAvailableDate?: string;
-      workingHours: Record<string, { start: string; end: string; available: boolean }>;
-      timezone: string;
-    };
-  }> => {
-    const response = await apiClient.get(`/providers/${providerId}/availability`);
-    return response.data as any;
-  },
-
-  // Get provider portfolio
-  getPortfolio: async (providerId: string): Promise<{
-    success: boolean;
-    data: PortfolioItem[];
-  }> => {
-    const response = await apiClient.get(`/providers/${providerId}/portfolio`);
-    return response.data as any;
-  },
-
-  // Get similar providers
-  getSimilarProviders: async (providerId: string, limit = 5): Promise<{
-    success: boolean;
-    data: Provider[];
-  }> => {
-    const response = await apiClient.get(`/providers/${providerId}/similar?limit=${limit}`);
-    return response.data as any;
-  }
+  // The rest of the methods are kept as no-op stubs to avoid runtime errors
+  searchProviders: async () => { providersApi._deprecatedWarning(); return { success: false, data: { providers: [], total: 0, page: 1, limit: 0, hasMore: false } } as any; },
+  getProvidersByCategory: async () => { providersApi._deprecatedWarning(); return { success: false, data: { providers: [], total: 0, page: 1, limit: 0, hasMore: false } } as any; },
+  getCategories: async () => { providersApi._deprecatedWarning(); return { success: false, data: [] } as any; },
+  getSkills: async () => { providersApi._deprecatedWarning(); return { success: false, data: [] } as any; },
+  contactProvider: async () => { providersApi._deprecatedWarning(); return { success: false, data: null } as any; },
+  hireProvider: async () => { providersApi._deprecatedWarning(); return { success: false, data: null } as any; },
+  addReview: async () => { providersApi._deprecatedWarning(); return { success: false, data: null } as any; },
+  getReviews: async () => { providersApi._deprecatedWarning(); return { success: false, data: { reviews: [], total: 0, averageRating: 0, ratingDistribution: {} } } as any; },
+  getAvailability: async () => { providersApi._deprecatedWarning(); return { success: false, data: null } as any; },
+  getPortfolio: async () => { providersApi._deprecatedWarning(); return { success: false, data: [] } as any; },
+  getSimilarProviders: async () => { providersApi._deprecatedWarning(); return { success: false, data: [] } as any; },
 };

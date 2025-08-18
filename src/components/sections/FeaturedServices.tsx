@@ -53,7 +53,7 @@ export function FeaturedServices() {
 
   const handleContactProvider = (service: FeaturedService) => {
     // In production, this would open a contact modal or redirect to messaging
-    toast.info('Contact Provider', `Redirecting to contact ${service.provider.name}`);
+    toast.info('Contact Business', `Redirecting to contact ${service.provider.name}`);
   };
 
   const getPromotionIcon = (promotionType: string) => {
@@ -98,7 +98,7 @@ export function FeaturedServices() {
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-4">Featured Services</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Discover top-quality services promoted by verified providers
+              Discover top-quality services promoted by verified businesses
             </p>
           </div>
           
@@ -118,7 +118,7 @@ export function FeaturedServices() {
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-4">Featured Services</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Discover top-quality services promoted by verified providers
+              Discover top-quality services promoted by verified businesses
             </p>
           </div>
           
@@ -141,7 +141,7 @@ export function FeaturedServices() {
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-4">Featured Services</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Discover top-quality services promoted by verified providers
+              Discover top-quality services promoted by verified businesses
             </p>
           </div>
           
@@ -163,8 +163,8 @@ export function FeaturedServices() {
           <h2 className="text-3xl font-bold mb-4">
             <span className="text-gradient">Featured Services</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Discover top-quality services promoted by verified providers across India
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+            Discover top-quality services promoted by verified businesses across India
           </p>
         </div>
 
@@ -266,11 +266,11 @@ export function FeaturedServices() {
 
                 <div className="mb-3">
                   <Link
-                    href={`/providers/${service.provider.id}`}
-                    className="text-xs text-primary hover:underline font-medium"
-                  >
-                    {service.provider.name}
-                  </Link>
+                      href={`/businesses/${service.provider.id}`}
+                      className="text-xs text-primary hover:underline font-medium"
+                    >
+                      {service.provider.name}
+                    </Link>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-xs text-muted-foreground">
                       {service.provider.location}
