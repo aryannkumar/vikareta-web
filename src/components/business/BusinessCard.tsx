@@ -1,6 +1,9 @@
+"use client";
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { MapPin, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { fadeInUp, cardHover } from '@/lib/motion';
@@ -10,6 +13,7 @@ interface BusinessCardProps {
 }
 
 export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
+  const router = useRouter();
   const tags = [] as string[];
   if (business?.category) tags.push(business.category);
   if (business?.tags && Array.isArray(business.tags)) {
@@ -28,7 +32,9 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
   }
 
   const location = business?.address || business?.location || business?.provider?.location || '';
-  const name = business?.name || (business?.id ? `Listing ${String(business.id).slice(0, 6)}` : 'Untitled Listing');
+  const name = business?.businessName || `${business?.firstName || ''} ${business?.lastName || ''}`.trim() || (business?.name) || (business?.id ? `Listing ${String(business.id).slice(0, 6)}` : 'Untitled Listing');
+  const productCount = business?.productCount ?? business?.totalProducts ?? business?._count?.products ?? business?.products?.length ?? 0;
+  const serviceCount = business?.serviceCount ?? business?.serviceCount ?? business?.products?.filter?.((p: any) => p.isService).length ?? 0;
 
   return (
     <motion.article
@@ -37,7 +43,11 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
       viewport={{ once: true, amount: 0.12 }}
       variants={fadeInUp}
       {...cardHover}
-      className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col"
+      onClick={() => router.push(`/businesses/${business?.id}`)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/businesses/${business?.id}`); }}
+      className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
     >
       <div className="relative h-40 w-full bg-gradient-to-br from-orange-50 to-white dark:from-orange-900/20 dark:to-transparent">
         {business?.coverImage ? (
@@ -52,7 +62,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
         )}
 
         <div className="absolute top-3 left-3 bg-white/90 dark:bg-black/60 rounded-full px-3 py-1 flex items-center gap-2">
-          <div className="text-xs font-medium text-orange-600 dark:text-orange-300">{business?.category || 'General'}</div>
+          <div className="text-xs font-medium text-orange-600 dark:text-orange-300">{business?.category || business?.verificationTier || 'General'}</div>
         </div>
 
         <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/60 rounded-full px-3 py-1 flex items-center gap-2 text-sm">
@@ -67,14 +77,12 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
             {business?.logo ? (
               <Image src={business.logo} alt={name} width={48} height={48} className="object-cover" />
             ) : (
-              <span>{name.charAt(0)}</span>
+              <span>{(name || 'U').charAt(0)}</span>
             )}
           </div>
 
           <div className="flex-1">
-            <Link href={`/businesses/${business?.id}`} className="font-semibold text-lg text-gray-900 dark:text-white hover:underline">
-              {name}
-            </Link>
+            <div className="font-semibold text-lg text-gray-900 dark:text-white">{name}</div>
             <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
               <MapPin className="h-3 w-3" />
               <span className="truncate max-w-[220px]">{location || 'Unknown location'}</span>
@@ -82,7 +90,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
           </div>
         </div>
 
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-3 line-clamp-3 flex-1">{business?.description || 'No description available.'}</p>
+  <p className="text-sm text-gray-600 dark:text-gray-400 mt-3 line-clamp-3 flex-1">{business?.description || (business?.about) || `${productCount} products • ${serviceCount} services` || 'No description available.'}</p>
 
         <div className="mt-4 flex items-center justify-between">
           <div className="flex flex-wrap gap-2">
@@ -94,8 +102,8 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Link href={`/businesses/${business?.id}`} className="inline-flex items-center gap-2 bg-orange-600 text-white py-2 px-3 rounded-lg hover:bg-orange-700 transition">View</Link>
-            <button className="bg-transparent border border-gray-200 dark:border-gray-700 py-2 px-3 rounded-lg text-sm" onClick={() => { if (business?.phone) window.location.href = `tel:${business.phone}`; else window.alert('Contact flow'); }}>
+            <Link href={`/businesses/${business?.id}`} onClick={(e) => e.stopPropagation()} className="inline-flex items-center gap-2 bg-orange-600 text-white py-2 px-3 rounded-lg hover:bg-orange-700 transition">View</Link>
+            <button className="bg-transparent border border-gray-200 dark:border-gray-700 py-2 px-3 rounded-lg text-sm" onClick={(e) => { e.stopPropagation(); if (business?.phone) window.location.href = `tel:${business.phone}`; else if (business?.contactEmail) window.location.href = `mailto:${business.contactEmail}`; else window.alert('Contact details not available'); }}>
               Contact
             </button>
           </div>

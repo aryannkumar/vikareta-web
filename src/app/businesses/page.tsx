@@ -69,11 +69,10 @@ export default function BusinessesPage() {
           <div>
             <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">Business Directory</h1>
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Discover verified suppliers, manufacturers and service providers across India.</p>
-            <div className="mt-3 flex items-center gap-3">
+            <div className="mt-3">
               <span className="inline-flex items-center bg-white dark:bg-gray-900 px-3 py-1 rounded-full border border-gray-200">
-                <strong className="mr-2">{businesses.length}</strong> listed
+                <strong className="mr-2">{businesses.length}</strong> suppliers
               </span>
-              <button onClick={() => loadBusinesses(activeTab)} className="text-sm text-orange-600">Retry</button>
             </div>
           </div>
 
@@ -138,7 +137,7 @@ export default function BusinessesPage() {
             <h3 className="text-xl font-semibold">No businesses found</h3>
             <p className="text-gray-600 mt-2">Try adjusting your filters or broaden the search terms.</p>
             <div className="mt-6 flex items-center justify-center gap-3">
-              <button onClick={() => { setQuery(''); setFiltered(businesses); }} className="px-4 py-2 bg-orange-600 text-white rounded-lg">Show all {businesses.length}</button>
+              <button onClick={() => { setQuery(''); setFiltered(businesses); }} className="px-4 py-2 bg-orange-600 text-white rounded-lg">Show all suppliers</button>
               <button onClick={() => { setActiveTab('popular'); loadBusinesses('popular'); }} className="px-4 py-2 border rounded-lg">Try popular</button>
             </div>
           </div>

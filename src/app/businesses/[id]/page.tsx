@@ -1,32 +1,39 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { marketplaceApi } from '@/lib/api/marketplace';
-import { productsApi } from '@/lib/api/products';
-import { servicesApi } from '@/lib/api/services';
 import { MapPin, Phone, Globe, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import BusinessProducts from '@/components/business/BusinessProducts';
+import BusinessServices from '@/components/business/BusinessServices';
 
 export default async function BusinessProfilePage(props: any) {
   const id = props?.params?.id as string;
 
-  // Fetch the business directly by id
-  const [businessRes, productsRes, servicesRes] = await Promise.all([
-    marketplaceApi.getBusinessById(id),
-    productsApi.getProducts({ supplierId: id, limit: 8 } as any),
-    servicesApi.getServices({ businessId: id, limit: 8 } as any)
-  ]);
-
-  // If direct fetch failed, try a fallback by scanning nearby businesses
-  let business = businessRes && businessRes.success && businessRes.data ? businessRes.data : null;
-  if (!business) {
-    try {
-      const nearby = await marketplaceApi.getNearbyBusinesses();
-      if (nearby && nearby.success && Array.isArray(nearby.data)) {
-        business = nearby.data.find((b: any) => String(b.id) === String(id)) || null;
-      }
-    } catch {
-      // ignore
+  let business = null;
+  try {
+    // Fetch the business directly by id
+    const businessRes = await marketplaceApi.getBusinessById(id);
+    if (businessRes && businessRes.success && businessRes.data) {
+      business = businessRes.data;
     }
+
+    // If direct fetch failed, try a fallback by scanning nearby businesses
+    if (!business) {
+      try {
+        const nearby = await marketplaceApi.getNearbyBusinesses();
+        if (nearby && nearby.success) {
+          // normalize to array
+          const payload = nearby.data as any;
+          const list = Array.isArray(payload) ? payload : (payload?.businesses || payload?.data || payload?.items || []);
+          business = list.find((b: any) => String(b.id) === String(id)) || null;
+        }
+      } catch (fallbackErr) {
+        console.error('Fallback nearby lookup failed for business id', id, fallbackErr);
+      }
+    }
+  } catch (err) {
+    console.error('Failed to fetch business for id', id, err);
+    business = null;
   }
 
   if (!business) {
@@ -36,16 +43,14 @@ export default async function BusinessProfilePage(props: any) {
           <div className="text-2xl font-semibold">Business not found</div>
           <p className="text-gray-600 mt-2">We couldn't find this business. It may have been removed or its details are unavailable.</p>
           <div className="mt-6 flex items-center justify-center gap-3">
-            <a href="/businesses" className="px-4 py-2 bg-orange-600 text-white rounded-lg">Back to directory</a>
-            <button onClick={async () => { await marketplaceApi.getPopularBusinesses(); }} className="px-4 py-2 border rounded-lg">Retry lookup</button>
+            <Link href="/businesses" className="px-4 py-2 bg-orange-600 text-white rounded-lg">Back to directory</Link>
           </div>
         </div>
       </div>
     );
   }
 
-  const products = productsRes && productsRes.success ? (productsRes.data?.products || productsRes.data || []) : [];
-  const services = servicesRes && servicesRes.success ? (servicesRes.data?.services || servicesRes.data || []) : [];
+  // Products and services are loaded client-side in separate components
 
   const address = business.address || business.location || business.provider?.location || '';
 
@@ -96,40 +101,12 @@ export default async function BusinessProfilePage(props: any) {
 
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold mb-3">Products</h3>
-                  {products.length === 0 ? (
-                    <p className="text-gray-600 dark:text-gray-400">No products listed.</p>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {products.map((p: any) => (
-                        <Link key={p.id} href={`/products/${p.id}`} className="flex items-center gap-3 bg-white dark:bg-gray-900 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
-                          <img src={p.images?.[0] || '/img/placeholder-product.jpg'} alt={p.name} className="w-20 h-20 object-cover rounded-md" />
-                          <div>
-                            <div className="font-semibold">{p.name}</div>
-                            <div className="text-sm text-gray-500">{p.price ? `₹${p.price}` : 'Price on request'}</div>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
+                  <BusinessProducts supplierId={String(business.id)} />
                 </div>
 
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold mb-3">Services</h3>
-                  {services.length === 0 ? (
-                    <p className="text-gray-600 dark:text-gray-400">No services listed.</p>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {services.map((s: any) => (
-                        <Link key={s.id} href={`/services/${s.id}`} className="flex items-center gap-3 bg-white dark:bg-gray-900 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
-                          <img src={s.images?.[0] || '/img/placeholder-service.jpg'} alt={s.name} className="w-20 h-20 object-cover rounded-md" />
-                          <div>
-                            <div className="font-semibold">{s.name}</div>
-                            <div className="text-sm text-gray-500">{s.basePrice ? `₹${s.basePrice}` : 'Price on request'}</div>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
+                  <BusinessServices businessId={String(business.id)} />
                 </div>
 
                 <div>
