@@ -11,6 +11,8 @@ import { useCartStore } from '@/lib/stores/cart';
 import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
 import { featuredProductsApi, type FeaturedProduct } from '@/lib/api/featuredProducts';
+import { motion } from 'framer-motion';
+import { fadeInUp, cardHover } from '@/lib/motion';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
 
@@ -201,8 +203,13 @@ export function FeaturedProducts() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <div
+            <motion.article
               key={product.id}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.12 }}
+              variants={fadeInUp}
+              {...cardHover}
               className="bg-card rounded-lg border shadow-sm hover:shadow-md transition-all duration-200 card-hover"
             >
               <div className="relative">
@@ -331,7 +338,7 @@ export function FeaturedProducts() {
                   </Link>
                 </div>
               </div>
-            </div>
+            </motion.article>
           ))}
         </div>
 

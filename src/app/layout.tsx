@@ -6,6 +6,7 @@ import { SSOAuthProvider } from '@/lib/auth/use-sso-auth';
 import { ToastProvider } from '@/components/ui/toast-provider';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import Entrance from '@/components/Animated';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -39,7 +40,9 @@ export default function RootLayout({
               <div className="min-h-screen flex flex-col">
                 <Header />
                 <main className="flex-1">
-                  {children}
+                  <Entrance>
+                    {children}
+                  </Entrance>
                 </main>
                 <Footer />
               </div>

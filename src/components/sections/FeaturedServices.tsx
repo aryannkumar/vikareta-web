@@ -20,6 +20,8 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
 import { featuredServicesApi, type FeaturedService } from '@/lib/api/featuredServices';
+import { motion } from 'framer-motion';
+import { fadeInUp, cardHover } from '@/lib/motion';
 
 export function FeaturedServices() {
   const [services, setServices] = useState<FeaturedService[]>([]);
@@ -170,8 +172,13 @@ export function FeaturedServices() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((service) => (
-            <div
+            <motion.article
               key={service.id}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.12 }}
+              variants={fadeInUp}
+              {...cardHover}
               className="bg-card rounded-lg border shadow-sm hover:shadow-md transition-all duration-200 card-hover"
             >
               <div className="relative">
@@ -307,7 +314,7 @@ export function FeaturedServices() {
                   </Link>
                 </div>
               </div>
-            </div>
+            </motion.article>
           ))}
         </div>
 

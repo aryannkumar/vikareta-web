@@ -29,7 +29,14 @@ export default function BusinessesPage() {
       }
 
       if ((res as any).success) {
-        const loaded = (res.data || []).filter((b) => {
+        const payload = (res as any).data;
+        let source: any[] = [];
+        if (Array.isArray(payload)) source = payload;
+        else if (Array.isArray(payload?.businesses)) source = payload.businesses;
+        else if (Array.isArray(payload?.data)) source = payload.data;
+        else if (Array.isArray(payload?.items)) source = payload.items;
+
+        const loaded = (source || []).filter((b) => {
           // Use business-level verified flag if present, or fall back to nested provider
           return (b as any).isVerified || (b as any).provider?.verified || false;
         });
@@ -99,8 +106,14 @@ export default function BusinessesPage() {
                           try {
                             const searchRes = await marketplaceApi.searchMarketplace(q, { type: 'businesses' });
                             if ((searchRes as any).success) {
-                              const loaded = (searchRes.data?.businesses || []) as NearbyBusiness[];
-                              setFiltered(loaded.filter((b) => (b as any).isVerified || (b as any).provider?.verified || false));
+                              const payload = (searchRes as any).data;
+                              let src: any[] = [];
+                              if (Array.isArray(payload)) src = payload;
+                              else if (Array.isArray(payload?.businesses)) src = payload.businesses;
+                              else if (Array.isArray(payload?.data)) src = payload.data;
+                              else if (Array.isArray(payload?.items)) src = payload.items;
+
+                              setFiltered((src || []).filter((b) => (b as any).isVerified || (b as any).provider?.verified || false));
                             } else {
                               setFiltered([]);
                             }

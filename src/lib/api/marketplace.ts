@@ -144,10 +144,16 @@ export const marketplaceApi = {
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch nearby businesses');
     }
-    
+    const payload = response.data as any;
+    let arr: NearbyBusiness[] = [];
+    if (Array.isArray(payload)) arr = payload;
+    else if (Array.isArray(payload?.businesses)) arr = payload.businesses;
+    else if (Array.isArray(payload?.data)) arr = payload.data;
+    else if (Array.isArray(payload?.items)) arr = payload.items;
+
     return {
       success: true,
-      data: (response.data as NearbyBusiness[]) || []
+      data: arr || []
     };
   },
 
@@ -166,10 +172,16 @@ export const marketplaceApi = {
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch featured businesses');
     }
+    const payload = response.data as any;
+    let arr: NearbyBusiness[] = [];
+    if (Array.isArray(payload)) arr = payload;
+    else if (Array.isArray(payload?.businesses)) arr = payload.businesses;
+    else if (Array.isArray(payload?.data)) arr = payload.data;
+    else if (Array.isArray(payload?.items)) arr = payload.items;
 
     return {
       success: true,
-      data: (response.data as NearbyBusiness[]) || []
+      data: arr || []
     };
   },
 
@@ -188,10 +200,16 @@ export const marketplaceApi = {
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch popular businesses');
     }
+    const payload = response.data as any;
+    let arr: NearbyBusiness[] = [];
+    if (Array.isArray(payload)) arr = payload;
+    else if (Array.isArray(payload?.businesses)) arr = payload.businesses;
+    else if (Array.isArray(payload?.data)) arr = payload.data;
+    else if (Array.isArray(payload?.items)) arr = payload.items;
 
     return {
       success: true,
-      data: (response.data as NearbyBusiness[]) || []
+      data: arr || []
     };
   },
 
@@ -256,15 +274,23 @@ export const marketplaceApi = {
     if (!response.success) {
       throw new Error(response.error || 'Failed to search marketplace');
     }
-    
-    return {
-      success: true,
-      data: (response.data as any) || {
-        products: [],
-        services: [],
-        businesses: [],
-        total: 0
-      }
-    };
+
+    const payload = response.data as any;
+    // search may return { products: [], services: [], businesses: [] } or direct array
+    if (Array.isArray(payload)) {
+      return { success: true, data: payload };
+    }
+
+    if (filters?.type) {
+      const maybe = payload?.[filters.type];
+      if (Array.isArray(maybe)) return { success: true, data: maybe };
+    }
+
+    // fallback check common fields
+    for (const key of ['data', 'items', 'results', 'products', 'services', 'businesses']) {
+      if (Array.isArray(payload?.[key])) return { success: true, data: payload[key] };
+    }
+
+    return { success: true, data: [] };
   }
 };

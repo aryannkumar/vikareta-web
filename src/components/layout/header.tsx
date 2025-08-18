@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { AnimatedLink } from '@/components/Animated';
 import Image from 'next/image';
 import Logo from '@/components/ui/logo';
+import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { 
   Search, 
@@ -99,8 +101,10 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
-            <Logo className="h-10 w-10" />
-            <span className="text-2xl font-bold text-gradient-orange-blue">Vikareta</span>
+            <motion.div whileHover={{ scale: 1.06, y: -3 }} transition={{ type: 'spring', stiffness: 300 }}>
+              <Logo className="h-10 w-10" />
+            </motion.div>
+            <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.12 }} className="text-2xl font-bold text-gradient-orange-blue">Vikareta</motion.span>
           </Link>
 
           {/* Search Bar - Desktop */}
@@ -119,24 +123,12 @@ export function Header() {
 
           {/* Navigation - Desktop */}
           <nav className="hidden lg:flex items-center space-x-8">
-            <Link href="/marketplace" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">
-              Marketplace
-            </Link>
-            <Link href="/categories" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">
-              Categories
-            </Link>
-            <Link href="/products" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">
-              Products
-            </Link>
-            <Link href="/services" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">
-              Services
-            </Link>
-            <Link href="/businesses" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">
-              Businesses
-            </Link>
-            <Link href="/rfq" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">
-              RFQ
-            </Link>
+            <AnimatedLink href="/marketplace" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">Marketplace</AnimatedLink>
+            <AnimatedLink href="/categories" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">Categories</AnimatedLink>
+            <AnimatedLink href="/products" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">Products</AnimatedLink>
+            <AnimatedLink href="/services" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">Services</AnimatedLink>
+            <AnimatedLink href="/businesses" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">Businesses</AnimatedLink>
+            <AnimatedLink href="/rfq" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200">RFQ</AnimatedLink>
           </nav>
 
           {/* Actions */}

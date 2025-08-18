@@ -3,6 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
+import { fadeInUp, cardHover } from '@/lib/motion';
 
 interface BusinessCardProps {
   business: any;
@@ -29,7 +31,14 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
   const location = business.address || business.location || business.provider?.location || '';
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+    <motion.article
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.12 }}
+      variants={fadeInUp}
+      {...cardHover}
+      className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+    >
       <div className="relative h-44 w-full bg-gray-100 dark:bg-gray-700">
         {business.coverImage ? (
           <Image src={business.coverImage} alt={business.name} fill className="object-cover" />
@@ -87,7 +96,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
           </button>
         </div>
       </div>
-    </div>
+  </motion.article>
   );
 };
 
