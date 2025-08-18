@@ -29,7 +29,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useSSOAuth } from '@/lib/auth/use-sso-auth';
-import { syncSSOToSubdomains } from '@/lib/utils/cross-domain-auth';
+import { syncSSOToSubdomains, hasDashboardAccess } from '@/lib/utils/cross-domain-auth';
 import { useCartStore } from '@/lib/stores/cart';
 import { useWishlistStore } from '@/lib/stores/wishlist';
 import { Badge } from '@/components/ui/badge';
@@ -190,8 +190,8 @@ export function Header() {
               </Button>
             </Link>
 
-            {/* Dashboard Button for Sellers */}
-            {isAuthenticated && user?.role === 'seller' && (
+            {/* Dashboard Button for Sellers/Admin (role-based) */}
+            {isAuthenticated && ((user && hasDashboardAccess(user)) || (user?.role === 'admin' && process.env.NEXT_PUBLIC_ADMIN_STANDALONE !== 'true')) && (
               <Button 
                 size="sm" 
                 variant="outline"
@@ -274,7 +274,7 @@ export function Header() {
                       My RFQs
                     </Link>
                   </DropdownMenuItem>
-                      {user?.role === 'seller' && (
+                      { ((user && hasDashboardAccess(user)) || (user?.role === 'admin' && process.env.NEXT_PUBLIC_ADMIN_STANDALONE !== 'true')) && (
                         <>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={async () => {
@@ -414,7 +414,7 @@ export function Header() {
               {isAuthenticated && (
                 <>
                   <div className="border-t pt-2 mt-2">
-                    {user?.role === 'seller' && (
+                    { ((user && hasDashboardAccess(user)) || (user?.role === 'admin' && process.env.NEXT_PUBLIC_ADMIN_STANDALONE !== 'true')) && (
                       <button 
                         className="w-full px-2 py-2 text-sm font-medium hover:text-orange-500 transition-colors flex items-center text-left"
                         onClick={() => {
