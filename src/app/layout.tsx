@@ -79,6 +79,12 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
         
+        {/* Cashfree SDK */}
+        <Script
+          src="https://sdk.cashfree.com/js/v3/cashfree.js"
+          strategy="beforeInteractive"
+        />
+        
         <ThemeProvider
           defaultTheme="system"
           storageKey="vikareta-theme"

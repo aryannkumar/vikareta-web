@@ -27,6 +27,23 @@ declare global {
     Razorpay: any;
     Stripe: any;
     PayPal: any;
+    Cashfree: (config: { mode: 'production' | 'sandbox' }) => {
+      checkout: (options: {
+        paymentSessionId: string;
+        redirectTarget?: '_self' | '_blank';
+      }) => Promise<{
+        error?: {
+          message: string;
+          code: string;
+        };
+        redirect?: boolean;
+        paymentDetails?: {
+          paymentMessage: string;
+          paymentStatus: string;
+          transactionId: string;
+        };
+      }>;
+    };
   }
 }
 
@@ -93,6 +110,9 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
       switch (selectedGateway.slug) {
         case 'razorpay':
           await processRazorpayPayment(paymentRequest);
+          break;
+        case 'cashfree':
+          await processCashfreePayment(paymentRequest);
           break;
         case 'stripe':
           await processStripePayment(paymentRequest);
@@ -166,6 +186,49 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
     razorpay.open();
   };
 
+  const processCashfreePayment = async (request: PaymentRequest) => {
+    try {
+      // Create Cashfree order through backend
+      const orderResponse = await paymentService.createCashfreeOrder({
+        orderId: request.orderId,
+        amount: request.amount,
+        currency: request.currency,
+        customerDetails: {
+          customerId: order.userId,
+          customerName: request.metadata?.customerName || order.user?.name || '',
+          customerEmail: request.metadata?.customerEmail || order.user?.email,
+          customerPhone: order.user?.phone
+        }
+      });
+
+      if (orderResponse.success && orderResponse.paymentSessionId) {
+        // Use Cashfree SDK for checkout
+        const cashfree = window.Cashfree({
+          mode: process.env.NEXT_PUBLIC_CASHFREE_ENVIRONMENT === 'production' ? 'production' : 'sandbox'
+        });
+
+        const checkoutOptions = {
+          paymentSessionId: orderResponse.paymentSessionId,
+          redirectTarget: '_self' as const
+        };
+
+        const result = await cashfree.checkout(checkoutOptions);
+        
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
+
+        if (result.paymentDetails) {
+          onSuccess(result.paymentDetails.transactionId);
+        }
+      } else {
+        throw new Error(orderResponse.error || 'Failed to create Cashfree order');
+      }
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Cashfree payment failed');
+    }
+  };
+
   const processStripePayment = async (_request: PaymentRequest) => {
     // Implement Stripe payment processing
     const gateway = gateways.find(g => g.slug === 'stripe');
@@ -198,6 +261,7 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
   const getGatewayIcon = (slug: string) => {
     switch (slug) {
       case 'razorpay':
+      case 'cashfree':
       case 'stripe':
       case 'paypal':
         return <CreditCard className="w-6 h-6" />;

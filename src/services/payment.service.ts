@@ -134,6 +134,44 @@ export class PaymentService {
     }
   }
 
+  async createCashfreeOrder(request: {
+    orderId: string;
+    amount: number;
+    currency: string;
+    customerDetails: {
+      customerId: string;
+      customerName: string;
+      customerEmail?: string;
+      customerPhone?: string;
+    };
+  }): Promise<PaymentResponse & { paymentSessionId?: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/payments/cashfree/create-order`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Cashfree order creation failed');
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error('Cashfree order creation error:', error);
+      return {
+        success: false,
+        orderId: request.orderId,
+        amount: request.amount,
+        currency: request.currency,
+        status: 'failed',
+        error: error instanceof Error ? error.message : 'Cashfree order creation failed'
+      };
+    }
+  }
+
   async verifyPayment(gateway: string, verificationData: Record<string, any>): Promise<PaymentResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/payments/${gateway}/verify`, {
