@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Star, ChevronLeft, ChevronRight, Quote, Award, Building2, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Testimonial {
@@ -106,118 +107,203 @@ export function TestimonialsSection() {
   };
 
   return (
-    <section className="py-16 bg-white dark:bg-gray-900">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            What Our Users Say
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Hear from businesses that have grown with Vikareta
-          </p>
+    <section className="py-20 bg-gradient-to-br from-orange-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="container mx-auto px-6">
+        <div className="text-center mb-16">
+          <motion.h2 
+            className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            Success Stories
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            Hear from enterprise leaders who have transformed their procurement with our platform
+          </motion.p>
         </div>
 
-        <div className="relative max-w-4xl mx-auto">
-          {/* Main Testimonial */}
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 md:p-12 relative overflow-hidden">
-            <Quote className="absolute top-6 right-6 h-12 w-12 text-blue-100 dark:text-gray-700" />
-            
-            <div className="relative z-10">
-              <div className="flex items-center mb-6">
-                {renderStars(testimonials[currentIndex].rating)}
-              </div>
-              
-              <blockquote className="text-lg md:text-xl text-gray-700 dark:text-gray-300 mb-8 leading-relaxed">
-                "{testimonials[currentIndex].content}"
-              </blockquote>
-              
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
-                  {testimonials[currentIndex].name.charAt(0)}
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">
-                    {testimonials[currentIndex].name}
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {testimonials[currentIndex].role}, {testimonials[currentIndex].company}
-                  </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-500">
-                    {testimonials[currentIndex].location}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <div className="flex items-center justify-between mt-8">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={prevTestimonial}
-              className="flex items-center space-x-2"
+        <div className="relative max-w-5xl mx-auto">
+          {/* Main Testimonial with enhanced animations */}
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={currentIndex}
+              className="bg-white/80 dark:bg-gray-800/80 rounded-3xl p-8 md:p-12 relative overflow-hidden backdrop-blur-md border border-orange-200/50 dark:border-orange-800/50 shadow-2xl"
+              initial={{ opacity: 0, x: 100, scale: 0.95 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -100, scale: 0.95 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
             >
-              <ChevronLeft className="h-4 w-4" />
-              <span>Previous</span>
-            </Button>
+              {/* Decorative elements */}
+              <motion.div
+                className="absolute top-6 right-6 w-20 h-20 bg-gradient-to-br from-orange-500/20 to-amber-500/20 rounded-full blur-xl"
+                animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
+                transition={{ duration: 8, repeat: Infinity }}
+              />
+              <Quote className="absolute top-6 right-6 h-12 w-12 text-orange-200 dark:text-orange-800 z-10" />
+              
+              <div className="relative z-10">
+                {/* Enhanced star rating */}
+                <motion.div 
+                  className="flex items-center mb-6"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                >
+                  {renderStars(testimonials[currentIndex].rating)}
+                  <span className="ml-2 text-sm font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
+                    {testimonials[currentIndex].rating}.0/5.0
+                  </span>
+                </motion.div>
+                
+                <motion.blockquote 
+                  className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-8 leading-relaxed font-medium"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                >
+                  "{testimonials[currentIndex].content}"
+                </motion.blockquote>
+                
+                <motion.div 
+                  className="flex items-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.6 }}
+                >
+                  <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl mr-4 shadow-lg">
+                    {testimonials[currentIndex].name.charAt(0)}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-bold text-xl text-gray-900 dark:text-white">
+                      {testimonials[currentIndex].name}
+                    </div>
+                    <div className="text-orange-600 dark:text-orange-400 font-semibold">
+                      {testimonials[currentIndex].role}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Building2 className="h-4 w-4 text-gray-500" />
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {testimonials[currentIndex].company} • {testimonials[currentIndex].location}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="hidden md:flex items-center gap-2 bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full">
+                    <Award className="h-4 w-4 text-green-600" />
+                    <span className="text-green-600 dark:text-green-400 text-sm font-semibold">Verified Business</span>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
 
-            {/* Dots Indicator */}
-            <div className="flex space-x-2">
+          {/* Enhanced Navigation */}
+          <div className="flex items-center justify-between mt-8">
+            <motion.button
+              onClick={prevTestimonial}
+              className="group flex items-center space-x-2 bg-white dark:bg-gray-800 border border-orange-200 dark:border-orange-800 rounded-xl px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+              whileHover={{ scale: 1.05, x: -2 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ChevronLeft className="h-5 w-5 text-orange-600 group-hover:text-orange-700" />
+              <span className="font-semibold text-gray-700 dark:text-gray-300 group-hover:text-orange-600">Previous</span>
+            </motion.button>
+
+            {/* Animated dots indicator */}
+            <div className="flex space-x-3">
               {testimonials.map((_, index) => (
-                <button
+                <motion.button
                   key={index}
                   onClick={() => goToTestimonial(index)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
                     index === currentIndex
-                      ? 'bg-blue-600'
-                      : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+                      ? 'bg-orange-600 scale-125'
+                      : 'bg-orange-200 hover:bg-orange-400 dark:bg-orange-800 dark:hover:bg-orange-600'
                   }`}
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
                 />
               ))}
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
+            <motion.button
               onClick={nextTestimonial}
-              className="flex items-center space-x-2"
+              className="group flex items-center space-x-2 bg-white dark:bg-gray-800 border border-orange-200 dark:border-orange-800 rounded-xl px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+              whileHover={{ scale: 1.05, x: 2 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <span>Next</span>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+              <span className="font-semibold text-gray-700 dark:text-gray-300 group-hover:text-orange-600">Next</span>
+              <ChevronRight className="h-5 w-5 text-orange-600 group-hover:text-orange-700" />
+            </motion.button>
           </div>
         </div>
 
-        {/* Additional Testimonials Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mt-16">
+        {/* Enhanced testimonials grid with stagger animation */}
+        <motion.div 
+          className="grid md:grid-cols-3 gap-8 mt-20"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
           {testimonials.slice(0, 3).map((testimonial, index) => (
-            <div
+            <motion.div
               key={testimonial.id}
-              className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border border-orange-100 dark:border-orange-800/50"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              whileHover={{ y: -8, scale: 1.02 }}
             >
               <div className="flex items-center mb-4">
                 {renderStars(testimonial.rating)}
               </div>
-              <p className="text-gray-700 dark:text-gray-300 mb-4 text-sm leading-relaxed">
-                "{testimonial.content.substring(0, 120)}..."
+              <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed line-clamp-4">
+                "{testimonial.content.substring(0, 150)}..."
               </p>
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center text-white font-bold text-sm mr-3">
                   {testimonial.name.charAt(0)}
                 </div>
                 <div>
-                  <div className="font-medium text-gray-900 dark:text-white text-sm">
+                  <div className="font-semibold text-gray-900 dark:text-white group-hover:text-orange-600 transition-colors">
                     {testimonial.name}
                   </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
-                    {testimonial.company}
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {testimonial.role} • {testimonial.company}
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
+
+        {/* Trust indicators */}
+        <motion.div 
+          className="text-center mt-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+        >
+          <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-2">
+              <Star className="h-5 w-5 text-yellow-500" />
+              <span className="font-semibold">4.9/5 Average Rating</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-green-500" />
+              <span className="font-semibold">5000+ Happy Businesses</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Award className="h-5 w-5 text-blue-500" />
+              <span className="font-semibold">ISO 27001 Certified</span>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

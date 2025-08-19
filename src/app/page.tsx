@@ -3,7 +3,28 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, ShieldCheck, FileCheck2, Boxes, LineChart, Package, Store } from 'lucide-react';
+import { 
+  ArrowRight, 
+  ShieldCheck, 
+  FileCheck2, 
+  Boxes, 
+  Package, 
+  Store,
+  CheckCircle,
+  Users,
+  Globe,
+  TrendingUp,
+  Zap,
+  Clock,
+  Award,
+  Target,
+  BarChart3,
+  Search,
+  MessageCircle,
+  Settings,
+  Play,
+  Star
+} from 'lucide-react';
 import { CategoriesSection } from '@/components/sections/CategoriesSection';
 import { TestimonialsSection } from '@/components/sections/TestimonialsSection';
 import { CTASection } from '@/components/sections/CTASection';
@@ -150,32 +171,61 @@ export default function HomePage() {
 
   return (
     <div className="relative">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-28 pb-20 lg:pt-36 lg:pb-28">
-        {/* Warm orange gradient background with parallax blobs */}
+      {/* Hero Section - Premium B2B Procurement */}
+      <section className="relative overflow-hidden pt-28 pb-20 lg:pt-36 lg:pb-28 bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 dark:from-gray-900 dark:via-orange-900/10 dark:to-gray-900">
+        {/* Animated Background Elements */}
         <div className="absolute inset-0 -z-10">
           <motion.div
             className="absolute -top-24 -left-16 w-96 h-96 bg-gradient-to-br from-orange-400/30 via-amber-400/20 to-orange-600/30 rounded-full blur-3xl"
-            animate={{ x: [0, 30, -20, 0], y: [0, 10, -15, 0], scale: [1, 1.05, 0.98, 1] }}
-            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+            animate={{ 
+              x: [0, 30, -20, 0], 
+              y: [0, 10, -15, 0], 
+              scale: [1, 1.05, 0.98, 1],
+              rotate: [0, 90, 180, 270, 360]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
           />
           <motion.div
             className="absolute -bottom-20 -right-10 w-[34rem] h-[34rem] bg-gradient-to-tr from-rose-300/20 via-orange-400/20 to-amber-500/30 rounded-full blur-3xl"
-            animate={{ x: [0, -20, 25, 0], y: [0, -15, 10, 0], rotate: [0, 120, 240, 360] }}
-            transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
+            animate={{ 
+              x: [0, -20, 25, 0], 
+              y: [0, -15, 10, 0], 
+              rotate: [360, 240, 120, 0],
+              scale: [1, 1.1, 0.9, 1]
+            }}
+            transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
           />
+          
+          {/* Supply Chain Flow Animation */}
+          <div className="absolute top-1/2 left-1/4 transform -translate-y-1/2">
+            <motion.div 
+              className="flex items-center space-x-6 opacity-10"
+              animate={{ x: [0, 100, 0] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <div className="w-8 h-8 bg-orange-500 rounded-full" />
+              <div className="w-12 h-1 bg-orange-500" />
+              <div className="w-8 h-8 bg-amber-500 rounded-full" />
+              <div className="w-12 h-1 bg-amber-500" />
+              <div className="w-8 h-8 bg-orange-600 rounded-full" />
+            </motion.div>
+          </div>
         </div>
 
         <div className="container mx-auto px-6 relative">
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, ease: 'easeOut' }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-orange-700 border border-orange-200 shadow-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-700 border border-orange-200 shadow-sm mb-6"
               >
-                <span className="inline-flex h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+                <motion.span 
+                  className="inline-flex h-2 w-2 rounded-full bg-orange-500"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
                 Enterprise Procurement, Simplified
               </motion.div>
 
@@ -183,74 +233,135 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.8, ease: 'easeOut' }}
-                className="mt-6 text-5xl md:text-6xl font-extrabold tracking-tight leading-tight text-gray-900 dark:text-white"
+                className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight text-gray-900 dark:text-white mb-6"
               >
-                Procure smarter with
-                <span className="block bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 bg-clip-text text-transparent">
-                  trusted suppliers at scale
-                </span>
+                Procure 
+                <motion.span 
+                  className="block bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 bg-clip-text text-transparent"
+                  animate={{ backgroundPosition: ['0%', '100%', '0%'] }}
+                  transition={{ duration: 5, repeat: Infinity }}
+                >
+                  smarter & faster
+                </motion.span>
+                with trusted suppliers
               </motion.h1>
 
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.6 }}
-                className="mt-6 text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl"
+                className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mb-8 leading-relaxed"
               >
-                Modern B2B procurement platform that unifies sourcing, RFQs, supplier management, and compliance—built for speed, transparency, and savings.
+                Modern B2B procurement platform that unifies sourcing, RFQs, supplier management, and compliance—built for speed, transparency, and enterprise-scale savings.
               </motion.p>
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
-                className="mt-8 flex flex-col sm:flex-row gap-4"
+                className="flex flex-col sm:flex-row gap-4 mb-8"
               >
-                <AnimatedButton size="lg" onClick={() => router.push('/rfq')} className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700">
-                  Get Started – Post RFQ
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </AnimatedButton>
-                <AnimatedButton size="lg" variant="outline" onClick={() => router.push('/contact')} className="border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white dark:text-orange-400 dark:border-orange-400">
-                  Talk to Sales
-                </AnimatedButton>
+                <motion.button
+                  onClick={() => router.push('/rfq')}
+                  className="group bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-lg"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Play className="mr-2 h-5 w-5" />
+                  Start Procurement Journey
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </motion.button>
+                
+                <motion.button
+                  onClick={() => router.push('/contact')}
+                  className="group border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center text-lg dark:text-orange-400 dark:border-orange-400"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <MessageCircle className="mr-2 h-5 w-5" />
+                  Talk to Procurement Expert
+                </motion.button>
               </motion.div>
 
               <motion.ul
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35, duration: 0.6 }}
-                className="mt-8 grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300"
+                className="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300"
               >
-                <li className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-orange-600" /> Verified Suppliers</li>
-                <li className="flex items-center gap-2"><FileCheck2 className="h-4 w-4 text-orange-600" /> Contract-ready</li>
-                <li className="flex items-center gap-2"><Boxes className="h-4 w-4 text-orange-600" /> Product + Services</li>
-                <li className="flex items-center gap-2"><LineChart className="h-4 w-4 text-orange-600" /> Analytics</li>
+                <motion.li 
+                  className="flex items-center gap-2"
+                  whileHover={{ x: 4 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ShieldCheck className="h-4 w-4 text-orange-600" /> 
+                  <span>Verified Enterprise Suppliers</span>
+                </motion.li>
+                <motion.li 
+                  className="flex items-center gap-2"
+                  whileHover={{ x: 4 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <FileCheck2 className="h-4 w-4 text-orange-600" /> 
+                  <span>Contract & Compliance Ready</span>
+                </motion.li>
+                <motion.li 
+                  className="flex items-center gap-2"
+                  whileHover={{ x: 4 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Boxes className="h-4 w-4 text-orange-600" /> 
+                  <span>Products + Services Unified</span>
+                </motion.li>
+                <motion.li 
+                  className="flex items-center gap-2"
+                  whileHover={{ x: 4 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <BarChart3 className="h-4 w-4 text-orange-600" /> 
+                  <span>Advanced Procurement Analytics</span>
+                </motion.li>
               </motion.ul>
             </div>
 
-            {/* Motion visual on right */}
+            {/* Animated Business Dashboard Visual */}
             <div className="relative">
-              <div className="relative z-10 rounded-3xl p-6 bg-white/70 dark:bg-gray-800/60 border border-orange-200/40 dark:border-orange-900/30 shadow-2xl backdrop-blur-md">
-                <motion.div className="grid grid-cols-2 gap-4">
-                  {["Sourcing", "RFQs", "Approvals", "Vendors", "Orders", "Invoices"].map((label, i) => (
+              <div className="relative z-10 rounded-3xl p-8 bg-white/80 dark:bg-gray-800/80 border border-orange-200/40 dark:border-orange-900/30 shadow-2xl backdrop-blur-md">
+                <motion.div 
+                  className="grid grid-cols-2 gap-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.8 }}
+                >
+                  {[
+                    { label: "RFQ Management", progress: 85, icon: Search, color: "from-orange-500 to-amber-500" },
+                    { label: "Supplier Network", progress: 92, icon: Users, color: "from-amber-500 to-orange-600" },
+                    { label: "Order Processing", progress: 78, icon: Package, color: "from-orange-600 to-amber-600" },
+                    { label: "Compliance Track", progress: 95, icon: Award, color: "from-amber-600 to-orange-500" },
+                    { label: "Cost Analytics", progress: 88, icon: TrendingUp, color: "from-orange-500 to-amber-400" },
+                    { label: "Quality Control", progress: 91, icon: Target, color: "from-amber-400 to-orange-500" }
+                  ].map((item, i) => (
                     <motion.div
-                      key={label}
+                      key={item.label}
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: 0.1 * i, duration: 0.5 }}
-                      className="rounded-2xl p-4 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/10 border border-orange-200/60 dark:border-orange-800/40 shadow-sm hover:shadow-md transition-all"
+                      className="rounded-2xl p-4 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/10 border border-orange-200/60 dark:border-orange-800/40 shadow-sm hover:shadow-md transition-all group cursor-pointer"
+                      whileHover={{ scale: 1.02, y: -2 }}
                     >
-                      <div className="text-sm font-semibold text-orange-700 dark:text-orange-300">{label}</div>
-                      <motion.div
-                        className="mt-3 h-2 w-full bg-orange-100/70 dark:bg-orange-900/40 rounded-full overflow-hidden"
-                      >
+                      <div className="flex items-center justify-between mb-3">
+                        <item.icon className="h-5 w-5 text-orange-600 group-hover:scale-110 transition-transform" />
+                        <span className="text-xs font-bold text-orange-700 dark:text-orange-300">{item.progress}%</span>
+                      </div>
+                      <div className="text-sm font-semibold text-orange-700 dark:text-orange-300 mb-3">{item.label}</div>
+                      <motion.div className="h-2 w-full bg-orange-100/70 dark:bg-orange-900/40 rounded-full overflow-hidden">
                         <motion.div
-                          className="h-2 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"
-                          initial={{ width: '10%' }}
-                          whileInView={{ width: '90%' }}
+                          className={`h-2 bg-gradient-to-r ${item.color} rounded-full`}
+                          initial={{ width: '0%' }}
+                          whileInView={{ width: `${item.progress}%` }}
                           viewport={{ once: true }}
-                          transition={{ duration: 1.2, ease: 'easeInOut' }}
+                          transition={{ duration: 1.5, ease: 'easeInOut', delay: 0.2 * i }}
                         />
                       </motion.div>
                     </motion.div>
@@ -258,243 +369,478 @@ export default function HomePage() {
                 </motion.div>
               </div>
 
-              {/* floating accents */}
-              <FloatingElement className="absolute -top-6 -left-6 w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500/30 to-amber-500/30 blur-md" />
-              <FloatingElement className="absolute -bottom-6 -right-8 w-20 h-20 rounded-full bg-gradient-to-br from-amber-400/30 to-orange-600/30 blur-xl" delay={1.8} />
+              {/* Floating business metrics */}
+              <FloatingElement className="absolute -top-8 -left-8 w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500/40 to-amber-500/40 blur-sm" />
+              <FloatingElement className="absolute -bottom-8 -right-8 w-24 h-24 rounded-full bg-gradient-to-br from-amber-400/30 to-orange-600/30 blur-lg" delay={1.5} />
+              
+              {/* Success metrics overlay */}
+              <motion.div 
+                className="absolute -top-4 -right-4 bg-white dark:bg-gray-800 rounded-xl p-3 shadow-lg border border-orange-200 dark:border-orange-800"
+                animate={{ y: [-5, 5, -5] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-green-500" />
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">30% Cost Savings</span>
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
+      {/* How It Works - Step-by-step Process Flow */}
+      <RevealSection direction="up">
+        <section className="py-20 bg-white dark:bg-gray-900">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16">
+              <motion.h2 
+                className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                How Procurement Works
+              </motion.h2>
+              <motion.p 
+                className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                Simple, streamlined process from requirement to delivery—designed for enterprise efficiency
+              </motion.p>
+            </div>
+
+            <div className="grid md:grid-cols-4 gap-8">
+              {[
+                {
+                  step: "01",
+                  title: "Post Requirements",
+                  description: "Create detailed RFQs with specifications, quantities, and delivery requirements",
+                  icon: Search,
+                  color: "from-orange-500 to-amber-500"
+                },
+                {
+                  step: "02", 
+                  title: "Receive Quotes",
+                  description: "Get competitive quotes from verified suppliers within 24-48 hours",
+                  icon: MessageCircle,
+                  color: "from-amber-500 to-orange-600"
+                },
+                {
+                  step: "03",
+                  title: "Compare & Select",
+                  description: "Evaluate suppliers based on price, quality, compliance, and delivery terms",
+                  icon: CheckCircle,
+                  color: "from-orange-600 to-amber-600"
+                },
+                {
+                  step: "04",
+                  title: "Manage Orders",
+                  description: "Track orders, manage payments, and ensure compliance with enterprise standards",
+                  icon: Settings,
+                  color: "from-amber-600 to-orange-500"
+                }
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  className="relative group"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  whileHover={{ y: -8 }}
+                >
+                  <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-orange-200/50 dark:border-orange-800/50 h-full">
+                    <div className="relative mb-6">
+                      <div className={`w-16 h-16 bg-gradient-to-r ${item.color} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                        <item.icon className="h-8 w-8 text-white" />
+                      </div>
+                      <div className="absolute -top-2 -right-2 bg-white dark:bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center shadow-lg border-2 border-orange-200 dark:border-orange-800">
+                        <span className="text-sm font-bold text-orange-600">{item.step}</span>
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{item.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{item.description}</p>
+                    
+                    {/* Connection line to next step */}
+                    {index < 3 && (
+                      <motion.div 
+                        className="hidden md:block absolute top-1/2 -right-4 w-8 h-1 bg-gradient-to-r from-orange-300 to-amber-300"
+                        initial={{ scaleX: 0 }}
+                        whileInView={{ scaleX: 1 }}
+                        transition={{ duration: 0.8, delay: index * 0.2 + 0.5 }}
+                      />
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div 
+              className="text-center mt-12"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <motion.button
+                onClick={() => router.push('/rfq')}
+                className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Get Started with Your First RFQ
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </motion.button>
+            </motion.div>
+          </div>
+        </section>
+      </RevealSection>
+
+      {/* Enhanced Categories Section */}
       <RevealSection direction="up">
         <CategoriesSection />
       </RevealSection>
 
-      {/* Featured Products Section */}
+      {/* Featured Products Section - Premium Enterprise Focus */}
       <RevealSection direction="left">
-        <section className="container mx-auto px-4 py-16">
-          <div className="text-center mb-12">
+        <section className="container mx-auto px-6 py-20">
+          <div className="text-center mb-16">
             <motion.h2 
-              className="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent"
+              className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              Featured Products
+              Enterprise Products
             </motion.h2>
             <motion.p 
-              className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto"
+              className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              Discover top-quality products promoted by verified suppliers
+              Premium products from verified suppliers, perfect for enterprise procurement needs
             </motion.p>
           </div>
 
           {data.loading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg animate-pulse">
-                  <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
+                <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg animate-pulse">
+                  <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 rounded-xl mb-4"></div>
                   <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
                   <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
                 </div>
               ))}
             </div>
           ) : data.featuredProducts.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {data.featuredProducts.slice(0, 4).map((product: any, index: number) => (
                 <motion.div
                   key={product.id || index}
-                  className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
+                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 overflow-hidden"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  whileHover={{ scale: 1.02, y: -5 }}
+                  whileHover={{ y: -12, scale: 1.02 }}
                 >
-                  <div className="relative overflow-hidden rounded-lg mb-4">
-                    <img 
+                  <div className="relative overflow-hidden rounded-xl mb-4">
+                    <motion.img 
                       src={product.images?.[0] || product.image || '/api/placeholder/300/200'} 
                       alt={product.name || 'Product'}
-                      className="w-full h-48 object-cover hover:scale-110 transition-transform duration-300"
+                      className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                      whileHover={{ scale: 1.1 }}
                     />
                     {product.discount && (
-                      <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-lg text-sm font-semibold">
+                      <motion.div 
+                        className="absolute top-3 right-3 bg-orange-500 text-white px-3 py-1 rounded-lg text-sm font-semibold shadow-lg"
+                        initial={{ scale: 0, rotate: 45 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ delay: index * 0.1 + 0.5, type: 'spring', stiffness: 500 }}
+                      >
                         -{product.discount}%
-                      </div>
+                      </motion.div>
                     )}
+                    <div className="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                      Enterprise Ready
+                    </div>
                   </div>
-                  <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white line-clamp-2">
-                    {product.name || 'Premium Product'}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
-                    {product.description || product.shortDescription || 'High-quality product from verified supplier'}
-                  </p>
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="flex flex-col">
-                      <span className="text-2xl font-bold text-orange-600">
-                        ₹{(product.price || 999).toLocaleString()}
-                      </span>
-                      {product.originalPrice && (
-                        <span className="text-sm text-gray-500 line-through">
-                          ₹{product.originalPrice.toLocaleString()}
+                  
+                  <div className="space-y-3">
+                    <h3 className="font-bold text-lg text-gray-900 dark:text-white line-clamp-2 group-hover:text-orange-600 transition-colors">
+                      {product.name || 'Premium Enterprise Product'}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 leading-relaxed">
+                      {product.description || product.shortDescription || 'High-quality product from verified enterprise supplier'}
+                    </p>
+                    
+                    <div className="flex justify-between items-center">
+                      <div className="flex flex-col">
+                        <span className="text-2xl font-bold text-orange-600">
+                          ₹{(product.price || 999).toLocaleString()}
                         </span>
-                      )}
+                        {product.originalPrice && (
+                          <span className="text-sm text-gray-500 line-through">
+                            ₹{product.originalPrice.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-lg">
+                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                        <span className="text-sm font-semibold text-yellow-600">
+                          {product.rating || product.reviews?.average || 4.5}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-yellow-500">★</span>
-                      <span className="text-sm font-medium">{product.rating || product.reviews?.average || 4.5}</span>
+                    
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
+                      <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                        {product.supplier?.name || product.brand || 'Verified Supplier'}
+                      </span>
+                      <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2 py-1 rounded-full font-semibold">
+                        {product.inStock ? 'In Stock' : 'Available'}
+                      </span>
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {product.supplier?.name || product.brand || 'Verified Supplier'}
-                    </span>
-                    <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2 py-1 rounded-full">
-                      {product.inStock ? 'In Stock' : 'Available'}
-                    </span>
                   </div>
                 </motion.div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
-                Featured products will appear here soon
+            <div className="text-center py-16">
+              <Package className="h-20 w-20 text-gray-300 mx-auto mb-6" />
+              <p className="text-gray-500 dark:text-gray-400 text-xl">
+                Enterprise products will appear here soon
               </p>
             </div>
           )}
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-12">
             <motion.button
-              className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
+              className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-10 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-lg group"
+              whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push('/products')}
             >
-              Browse All Products
+              Explore All Enterprise Products
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </div>
         </section>
       </RevealSection>
 
-      {/* Featured Services Section */}
+      {/* Featured Services Section - B2B Focus */}
       <RevealSection direction="right">
-        <section className="container mx-auto px-4 py-16 bg-gray-50 dark:bg-gray-900/50">
-          <div className="text-center mb-12">
+        <section className="container mx-auto px-6 py-20 bg-gradient-to-br from-gray-50 to-orange-50 dark:from-gray-900 dark:to-gray-800">
+          <div className="text-center mb-16">
             <motion.h2 
-              className="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent"
+              className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              Featured Services
+              Professional Services
             </motion.h2>
             <motion.p 
-              className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto"
+              className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              Discover top-quality services promoted by verified businesses
+              Expert services from certified providers for your business operations and growth
             </motion.p>
           </div>
 
           {data.loading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg animate-pulse">
-                  <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
+                <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg animate-pulse">
+                  <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 rounded-xl mb-4"></div>
                   <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
                   <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
                 </div>
               ))}
             </div>
           ) : data.featuredServices.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {data.featuredServices.slice(0, 3).map((service: any, index: number) => (
                 <motion.div
                   key={service.id || index}
-                  className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
+                  className="group bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  whileHover={{ scale: 1.02, y: -5 }}
+                  whileHover={{ y: -12, scale: 1.02 }}
                 >
-                  <div className="relative overflow-hidden rounded-lg mb-4">
-                    <img 
+                  <div className="relative overflow-hidden rounded-xl mb-6">
+                    <motion.img 
                       src={service.images?.[0] || service.image || '/api/placeholder/300/200'} 
                       alt={service.name || 'Service'}
-                      className="w-full h-48 object-cover hover:scale-110 transition-transform duration-300"
+                      className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    <div className="absolute top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded-lg text-sm font-semibold">
-                      {service.serviceType || service.category || 'Service'}
+                    <div className="absolute top-3 left-3 bg-orange-500 text-white px-3 py-1 rounded-lg text-sm font-semibold shadow-lg">
+                      {service.serviceType || service.category || 'Professional Service'}
+                    </div>
+                    <div className="absolute top-3 right-3 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                      Certified
                     </div>
                   </div>
-                  <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white line-clamp-2">
-                    {service.name || 'Professional Service'}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
-                    {service.description || 'High-quality service from verified provider'}
-                  </p>
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="flex flex-col">
-                      <span className="text-2xl font-bold text-orange-600">
-                        ₹{(service.basePrice || service.price || 2999).toLocaleString()}
-                      </span>
-                      {service.originalPrice && (
-                        <span className="text-sm text-gray-500 line-through">
-                          ₹{service.originalPrice.toLocaleString()}
+                  
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-xl text-gray-900 dark:text-white line-clamp-2 group-hover:text-orange-600 transition-colors">
+                      {service.name || 'Professional Enterprise Service'}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">
+                      {service.description || 'High-quality professional service from certified provider'}
+                    </p>
+                    
+                    <div className="flex justify-between items-center">
+                      <div className="flex flex-col">
+                        <span className="text-2xl font-bold text-orange-600">
+                          ₹{(service.basePrice || service.price || 2999).toLocaleString()}
                         </span>
-                      )}
+                        <span className="text-sm text-gray-500">Starting from</span>
+                      </div>
+                      <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-lg">
+                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                        <span className="text-sm font-semibold text-yellow-600">{service.rating || 4.7}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-yellow-500">★</span>
-                      <span className="text-sm font-medium">{service.rating || 4.7}</span>
+                    
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                      <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                        {service.provider?.name || 'Certified Provider'}
+                      </span>
+                      <span className="text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 px-3 py-1 rounded-full font-semibold">
+                        {service.deliveryTime || 'Available'}
+                      </span>
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {service.provider?.name || 'Verified Provider'}
-                    </span>
-                    <span className="text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 px-2 py-1 rounded-full">
-                      {service.deliveryTime || 'Available'}
-                    </span>
                   </div>
                 </motion.div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <Store className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
-                Featured services will appear here soon
+            <div className="text-center py-16">
+              <Store className="h-20 w-20 text-gray-300 mx-auto mb-6" />
+              <p className="text-gray-500 dark:text-gray-400 text-xl">
+                Professional services will appear here soon
               </p>
             </div>
           )}
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-12">
             <motion.button
-              className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
+              className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-10 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-lg group"
+              whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push('/services')}
             >
-              Browse All Services
+              Explore All Professional Services
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </div>
         </section>
       </RevealSection>
 
-      {/* Testimonials */}
+      {/* Key Features Section */}
+      <RevealSection direction="up">
+        <section className="py-20 bg-white dark:bg-gray-900">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16">
+              <motion.h2 
+                className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                Why Choose Our Platform
+              </motion.h2>
+              <motion.p 
+                className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                Built specifically for enterprise procurement teams who need efficiency, compliance, and results
+              </motion.p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: ShieldCheck,
+                  title: "Verified Suppliers",
+                  description: "All suppliers undergo rigorous verification including business licenses, quality certifications, and financial background checks.",
+                  gradient: "from-green-500 to-emerald-600"
+                },
+                {
+                  icon: Zap,
+                  title: "Lightning Fast RFQs",
+                  description: "Get competitive quotes in 24-48 hours instead of weeks. Our AI matches you with the right suppliers instantly.",
+                  gradient: "from-blue-500 to-indigo-600"
+                },
+                {
+                  icon: Globe,
+                  title: "Pan-India Network",
+                  description: "Access suppliers from across India with local presence and nationwide delivery capabilities for any scale requirement.",
+                  gradient: "from-purple-500 to-pink-600"
+                },
+                {
+                  icon: Award,
+                  title: "Quality Assurance",
+                  description: "Built-in quality control processes, supplier ratings, and compliance tracking ensure you get exactly what you ordered.",
+                  gradient: "from-orange-500 to-red-600"
+                },
+                {
+                  icon: Clock,
+                  title: "Time Saving",
+                  description: "Automate your procurement workflow and reduce sourcing time by 70% with our intelligent matching and communication tools.",
+                  gradient: "from-teal-500 to-cyan-600"
+                },
+                {
+                  icon: BarChart3,
+                  title: "Cost Optimization",
+                  description: "Advanced analytics and price comparison tools help you achieve 15-30% cost savings on your procurement spend.",
+                  gradient: "from-amber-500 to-orange-600"
+                }
+              ].map((feature, index) => (
+                <motion.div
+                  key={index}
+                  className="group"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  whileHover={{ y: -8 }}
+                >
+                  <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-gray-600 h-full">
+                    <motion.div 
+                      className={`w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
+                      whileHover={{ rotate: 5 }}
+                    >
+                      <feature.icon className="h-8 w-8 text-white" />
+                    </motion.div>
+                    
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-orange-600 transition-colors">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </RevealSection>
+
+      {/* Premium Testimonials */}
       <RevealSection direction="up">
         <TestimonialsSection />
       </RevealSection>
 
-      {/* CTA Section */}
+      {/* Enhanced CTA Section */}
       <RevealSection direction="up">
         <CTASection />
       </RevealSection>
