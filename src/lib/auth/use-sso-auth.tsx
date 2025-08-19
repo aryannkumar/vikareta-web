@@ -143,17 +143,13 @@ export function SSOAuthProvider({ children }: AuthProviderProps) {
         setError(null);
     };
 
-    // Check session on mount only if tokens/cookies exist
+    // Always check session on mount.
+    // Rationale: HttpOnly cookies (used by SSO) are not visible to JS via document.cookie,
+    // so attempting to detect them client-side is unreliable and can prevent session hydration
+    // after social OAuth redirects. A lightweight GET to /api/auth/me will either return the
+    // current user (when cookies/tokens are valid) or 401 quickly.
     useEffect(() => {
-        const hasLocalAccess = typeof window !== 'undefined' && !!localStorage.getItem('vikareta_access_token');
-        const hasLocalRefresh = typeof window !== 'undefined' && !!localStorage.getItem('vikareta_refresh_token');
-        const hasCookieToken = typeof document !== 'undefined' && (document.cookie.includes('refresh_token') || document.cookie.includes('access_token'));
-
-        if (hasLocalAccess || hasLocalRefresh || hasCookieToken) {
-            checkSession();
-        } else {
-            setIsLoading(false);
-        }
+        checkSession();
     }, []);
 
     // Set up periodic session check (every 5 minutes)
