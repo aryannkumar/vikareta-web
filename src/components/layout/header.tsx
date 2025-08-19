@@ -231,6 +231,7 @@ export function Header() {
           <motion.nav variants={itemVariants} className="hidden lg:flex items-center space-x-1">
             {[
               { href: '/marketplace', label: 'Marketplace', icon: Globe },
+              { href: '/procurement', label: 'Procurement', icon: FileText },
               { href: '/categories', label: 'Categories', icon: Package },
               { href: '/products', label: 'Products', icon: Star },
               { href: '/services', label: 'Services', icon: TrendingUp },
@@ -244,7 +245,7 @@ export function Header() {
               >
                 <Link 
                   href={item.href}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all duration-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 group"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 rounded-xl transition-all duration-300 hover:bg-orange-50 dark:hover:bg-orange-900/20 group"
                 >
                   <item.icon className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
                   <span>{item.label}</span>
@@ -516,6 +517,7 @@ export function Header() {
               <nav className="space-y-2">
                 {[
                   { href: '/marketplace', label: 'Marketplace', icon: Globe, color: 'orange' },
+                  { href: '/procurement', label: 'Procurement', icon: FileText, color: 'orange' },
                   { href: '/categories', label: 'Categories', icon: Package, color: 'blue' },
                   { href: '/products', label: 'Products', icon: Star, color: 'purple' },
                   { href: '/services', label: 'Services', icon: TrendingUp, color: 'green' },
@@ -529,7 +531,7 @@ export function Header() {
                   >
                     <Link 
                       href={item.href}
-                      className="flex items-center space-x-3 px-4 py-4 text-base font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300"
+                      className="flex items-center space-x-3 px-4 py-4 text-base font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-xl transition-all duration-300"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <item.icon className="w-5 h-5" />
