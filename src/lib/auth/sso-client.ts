@@ -374,18 +374,6 @@ export class SSOAuthClient {
    * Check current session and get user profile (returns full AuthResponse)
    */
   async checkSession(): Promise<AuthResponse> {
-    // Short-circuit if we have no tokens or cookies that indicate a logged-in user.
-    const hasLocalAccess = !!this.getAccessToken();
-    const hasLocalRefresh = !!this.getRefreshToken();
-    const hasCookieToken = typeof document !== 'undefined' && (document.cookie.includes('refresh_token') || document.cookie.includes('access_token'));
-
-    if (!hasLocalAccess && !hasLocalRefresh && !hasCookieToken) {
-      return {
-        success: false,
-        error: { code: 'NO_TOKENS', message: 'No authentication tokens present' }
-      };
-    }
-
     try {
       const response = await this.request<AuthResponse>('/api/auth/me', {
         method: 'GET',

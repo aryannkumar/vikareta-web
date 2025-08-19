@@ -27,9 +27,44 @@
             timestamp: Date.now(),
           };
 
+          // Helper: persist tokens by calling backend /auth/me (returns tokens in body)
+          const persistTokens = async () => {
+            try {
+              const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+              const backend = isLocal ? 'http://localhost:5001' : 'https://api.vikareta.com';
+              const res = await fetch(`${backend}/api/auth/me`, { credentials: 'include' });
+              const data = await res.json().catch(() => null);
+              if (data && data.success && data.user) {
+                if (data.accessToken) localStorage.setItem('vikareta_access_token', data.accessToken);
+                if (data.refreshToken) localStorage.setItem('vikareta_refresh_token', data.refreshToken);
+                try { localStorage.setItem('vikareta_user', JSON.stringify(data.user)); } catch {}
+              }
+            } catch (e) {
+              // ignore token persist errors; cookies are still set HttpOnly
+            }
+          };
+
+          // Determine post-auth redirect target
+          const getReturnUrl = () => {
+            try {
+              const stored = localStorage.getItem('auth_return_url');
+              if (stored) return stored;
+            } catch {}
+            return '/';
+          };
+
           if (window.opener && !window.opener.closed) {
-            // Send message to opener and close
+            // Popup flow: notify opener and close
             window.opener.postMessage(message, allowedOrigin);
+            setTimeout(() => { try { window.close(); } catch (e) {} }, 200);
+          } else {
+            // Full-page redirect flow: persist tokens then navigate back
+            (async () => {
+              await persistTokens();
+              const target = getReturnUrl();
+              try { localStorage.removeItem('auth_return_url'); } catch {}
+              window.location.replace(target);
+            })();
           }
 
           // Try to give a short UX for users who land here directly
@@ -38,10 +73,10 @@
             if (el) el.textContent = success ? 'Authentication successful — you may close this window.' : 'Authentication failed — you may close this window.';
           });
 
-          // Close the window after a short delay
-          setTimeout(() => {
-            try { window.close(); } catch (e) { /* ignore */ }
-          }, 700);
+          // If still here and opener exists, attempt to close as a fallback
+          if (window.opener && !window.opener.closed) {
+            setTimeout(() => { try { window.close(); } catch (e) {} }, 700);
+          }
         } catch (err) {
           // silence errors
         }
