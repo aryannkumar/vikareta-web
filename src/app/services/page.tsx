@@ -2,567 +2,561 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { motion } from 'framer-motion';
 import {
   Search,
   Grid,
   List,
   Star,
-  MessageCircle,
-  Heart,
-  SlidersHorizontal,
-  ChevronDown,
   Clock,
-  AlertCircle,
-  Loader2
+  Loader2,
+  Award,
+  Settings,
+  Users,
+  CheckCircle,
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui/toast-provider';
-import { formatPrice } from '@/lib/utils';
-import { servicesApi, type Service, type ServicesFilters } from '@/lib/api/services';
-import { useCartStore } from '@/lib/stores/cart';
-import { WishlistButton } from '@/components/ui/wishlist-button';
+import { Card, CardContent } from '@/components/ui/card';
+
+// Simple types for Services
+interface Service {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  currency: string;
+  rating: number;
+  reviewCount: number;
+  supplier: {
+    id: string;
+    name: string;
+    logo?: string;
+    verified: boolean;
+    rating: number;
+  };
+  category: string;
+  deliveryTime: string;
+  featured: boolean;
+  image?: string;
+}
+
+// Enhanced animated hero section for Services
+const ServicesHero = () => {
+  return (
+    <motion.section 
+      className="relative bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+    >
+      {/* Animated background elements */}
+      <div className="absolute inset-0">
+        <motion.div
+          className="absolute top-20 left-10 w-20 h-20 bg-orange-200 rounded-full opacity-30"
+          animate={{ y: [0, -20, 0], rotate: [0, 180, 360] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-40 right-20 w-16 h-16 bg-amber-200 rounded-full opacity-20"
+          animate={{ y: [0, 20, 0], rotate: [0, -180, -360] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-20 left-1/3 w-12 h-12 bg-orange-300 rounded-full opacity-25"
+          animate={{ x: [0, 30, 0], scale: [1, 1.2, 1] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center">
+          <motion.h1 
+            className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-6"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+          >
+            Business Services
+          </motion.h1>
+          
+          <motion.p 
+            className="text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+          >
+            Connect with professional service providers offering expertise across industries. 
+            From consulting to technical services, find the right partner for your business needs.
+          </motion.p>
+
+          {/* Service stats */}
+          <motion.div 
+            className="flex flex-wrap justify-center gap-8 mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+          >
+            {[
+              { icon: Settings, label: 'Service Categories', value: '150+', color: 'from-blue-500 to-cyan-500' },
+              { icon: Users, label: 'Service Providers', value: '5K+', color: 'from-orange-500 to-amber-500' },
+              { icon: CheckCircle, label: 'Completed Projects', value: '50K+', color: 'from-green-500 to-emerald-500' },
+              { icon: Award, label: 'Success Rate', value: '96%', color: 'from-purple-500 to-pink-500' }
+            ].map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                className="flex flex-col items-center"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8 + index * 0.1, duration: 0.5 }}
+              >
+                <div className={`w-16 h-16 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mb-3 shadow-lg`}>
+                  <stat.icon className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                <div className="text-sm text-gray-600">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    </motion.section>
+  );
+};
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
+  const [filteredServices, setFilteredServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [categories, setCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedServiceType, setSelectedServiceType] = useState('');
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-  const [sortBy, setSortBy] = useState<ServicesFilters['sortBy']>('createdAt');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showFilters, setShowFilters] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
 
-  const toast = useToast();
-  const { addItem } = useCartStore();
-
-  const serviceTypes = [
-    { value: '', label: 'All Types' },
-    { value: 'one-time', label: 'One-time' },
-    { value: 'monthly', label: 'Monthly' },
-    { value: 'project-based', label: 'Project-based' }
-  ];
-
-  const sortOptions = [
-    { value: 'createdAt', label: 'Newest First' },
-    { value: 'price', label: 'Price' },
-    { value: 'title', label: 'Name A-Z' },
-    { value: 'rating', label: 'Highest Rated' },
-  ] as const;
-
+  // Mock data
   useEffect(() => {
-    loadCategories();
+    const mockServices: Service[] = [
+      {
+        id: '1',
+        title: 'IT Consulting & Implementation',
+        description: 'Complete IT consulting services including system design, implementation, and ongoing support for enterprise solutions.',
+        price: 150,
+        currency: 'USD',
+        rating: 4.8,
+        reviewCount: 124,
+        supplier: {
+          id: 'sup-1',
+          name: 'TechSolutions Pro',
+          verified: true,
+          rating: 4.7
+        },
+        category: 'Technology',
+        deliveryTime: '2-4 weeks',
+        featured: true,
+        image: '/images/services/it-consulting.jpg'
+      },
+      {
+        id: '2',
+        title: 'Digital Marketing Strategy',
+        description: 'Comprehensive digital marketing strategies including SEO, social media, content marketing, and PPC campaigns.',
+        price: 200,
+        currency: 'USD',
+        rating: 4.9,
+        reviewCount: 89,
+        supplier: {
+          id: 'sup-2',
+          name: 'Growth Marketing Agency',
+          verified: true,
+          rating: 4.8
+        },
+        category: 'Marketing',
+        deliveryTime: '1-2 weeks',
+        featured: true,
+        image: '/images/services/digital-marketing.jpg'
+      },
+      {
+        id: '3',
+        title: 'Financial Consulting',
+        description: 'Expert financial consulting services including business planning, investment strategy, and financial analysis.',
+        price: 180,
+        currency: 'USD',
+        rating: 4.7,
+        reviewCount: 156,
+        supplier: {
+          id: 'sup-3',
+          name: 'Financial Experts Ltd',
+          verified: true,
+          rating: 4.6
+        },
+        category: 'Finance',
+        deliveryTime: '1-3 weeks',
+        featured: false,
+        image: '/images/services/financial-consulting.jpg'
+      },
+      {
+        id: '4',
+        title: 'Legal Advisory Services',
+        description: 'Professional legal advisory services covering corporate law, contracts, compliance, and legal documentation.',
+        price: 250,
+        currency: 'USD',
+        rating: 4.6,
+        reviewCount: 78,
+        supplier: {
+          id: 'sup-4',
+          name: 'Legal Partners Group',
+          verified: true,
+          rating: 4.5
+        },
+        category: 'Legal',
+        deliveryTime: '3-5 days',
+        featured: false,
+        image: '/images/services/legal-advisory.jpg'
+      }
+    ];
+
+    setTimeout(() => {
+      setServices(mockServices);
+      setFilteredServices(mockServices);
+      setLoading(false);
+    }, 800);
   }, []);
 
+  // Filter and sort services
   useEffect(() => {
-    fetchServices();
-  }, [searchQuery, selectedCategory, selectedServiceType, priceRange, sortBy, currentPage]);
+    let filtered = services;
 
-  const loadCategories = async () => {
-    try {
-      const response = await servicesApi.getCategories();
-      if (response.success) {
-        setCategories(['All Categories', ...response.data]);
-      }
-    } catch (error) {
-      console.error('Error loading categories:', error);
+    if (searchQuery) {
+      filtered = filtered.filter(service =>
+        service.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        service.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        service.category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
-  };
 
-  const fetchServices = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const filters: ServicesFilters = {
-        page: currentPage,
-        limit: 12,
-        sortBy,
-        sortOrder: 'desc',
-        ...(searchQuery && { search: searchQuery }),
-        // Note: We would need categoryId (UUID) instead of category name
-        // For now, removing category filter until we implement category name to ID mapping
-        ...(selectedServiceType && { serviceType: selectedServiceType as 'one_time' | 'recurring' | 'subscription' }),
-        ...(priceRange.min && { minPrice: parseInt(priceRange.min) }),
-        ...(priceRange.max && { maxPrice: parseInt(priceRange.max) })
-      };
-
-      const response = await servicesApi.getServices(filters);
-
-      if (response.success) {
-        setServices(response.data.services);
-        setTotalPages(Math.ceil(response.data.total / 12));
-        setHasMore(response.data.hasMore);
-      } else {
-        setError('Failed to load services');
-      }
-    } catch (error) {
-      console.error('Error fetching services:', error);
-      setError('Failed to load services. Please try again.');
-    } finally {
-      setLoading(false);
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(service => service.category === selectedCategory);
     }
-  };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setCurrentPage(1);
-    fetchServices();
-  };
-
-  const handleAddToCart = (service: Service) => {
-    addItem({
-      id: service.id,
-      type: 'service',
-      name: service.name,
-      price: service.basePrice,
-      originalPrice: service.originalPrice,
-      image: service.images[0] || '/placeholder-service.jpg',
-      provider: service.provider,
-      category: service.category,
-      inStock: service.available
-    });
-
-    toast.success('Added to Cart', `${service.name} has been added to your cart`);
-  };
-
-  const handleContactProvider = (service: Service) => {
-    // In a real app, this would open a contact modal or redirect to contact page
-    toast.info('Contact Business', `Redirecting to contact ${service.provider.name}`);
-  };
-
-  const getServiceTypeColor = (serviceType: string) => {
-    switch (serviceType) {
-      case 'one-time':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300';
-      case 'monthly':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300';
-      case 'project-based':
-  return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300';
+    // Sort services
+    switch (sortBy) {
+      case 'featured':
+        filtered = filtered.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+        break;
+      case 'price-low':
+        filtered = filtered.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-high':
+        filtered = filtered.sort((a, b) => b.price - a.price);
+        break;
+      case 'rating':
+        filtered = filtered.sort((a, b) => b.rating - a.rating);
+        break;
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-300';
+        break;
     }
-  };
 
-  const clearFilters = () => {
-    setSearchQuery('');
-    setSelectedCategory('');
-    setSelectedServiceType('');
-    setPriceRange({ min: '', max: '' });
-    setCurrentPage(1);
-  };
+    setFilteredServices(filtered);
+  }, [services, searchQuery, selectedCategory, sortBy]);
 
-  if (error) {
+  const categories = ['all', 'Technology', 'Marketing', 'Finance', 'Legal'];
+  const sortOptions = [
+    { value: 'featured', label: 'Featured First' },
+    { value: 'price-low', label: 'Price: Low to High' },
+    { value: 'price-high', label: 'Price: High to Low' },
+    { value: 'rating', label: 'Highest Rated' }
+  ];
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-4">Error Loading Services</h2>
-            <p className="text-muted-foreground mb-8">{error}</p>
-            <Button onClick={fetchServices}>
-              Try Again
-            </Button>
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-orange-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading services...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-4">All Services</h1>
-          <p className="text-muted-foreground">
-            Find professional services from verified businesses across India
-          </p>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="mb-8">
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="mb-6">
-            <div className="relative max-w-2xl">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <input
+    <div className="min-h-screen bg-white">
+      <ServicesHero />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Enhanced Search and Filter Controls */}
+        <motion.div 
+          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            {/* Search Bar */}
+            <div className="relative flex-1 max-w-lg">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
                 type="text"
-                placeholder="Search services, businesses, skills..."
+                placeholder="Search services..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background"
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
               />
-              <Button type="submit" className="absolute right-2 top-2 bottom-2 btn-primary">
-                Search
-              </Button>
-            </div>
-          </form>
-
-          {/* Filter Bar */}
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-            <div className="flex flex-wrap gap-4 items-center">
-              {/* Category Filter */}
-              <div className="relative">
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="appearance-none bg-background border rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  {categories.map((category) => (
-                    <option key={category} value={category === 'All Categories' ? '' : category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-              </div>
-
-              {/* Service Type Filter */}
-              <div className="relative">
-                <select
-                  value={selectedServiceType}
-                  onChange={(e) => setSelectedServiceType(e.target.value)}
-                  className="appearance-none bg-background border rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  {serviceTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-              </div>
-
-              {/* Price Range */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  placeholder="Min Price"
-                  value={priceRange.min}
-                  onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
-                  className="w-24 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-                />
-                <span className="text-muted-foreground">to</span>
-                <input
-                  type="number"
-                  placeholder="Max Price"
-                  value={priceRange.max}
-                  onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
-                  className="w-24 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-                />
-              </div>
-
-              {/* Advanced Filters Toggle */}
-              <Button
-                variant="outline"
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2"
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-                Filters
-              </Button>
             </div>
 
+            {/* Filter Controls */}
             <div className="flex items-center gap-4">
-              {/* Sort */}
-              <div className="relative">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as ServicesFilters['sortBy'])}
-                  className="appearance-none bg-background border rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  {sortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-              </div>
+              {/* Category Filter */}
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              >
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category === 'all' ? 'All Categories' : category}
+                  </option>
+                ))}
+              </select>
 
-              {/* View Mode */}
-              <div className="flex border rounded-lg">
+              {/* Sort */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              >
+                {sortOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
+              {/* View Mode Toggle */}
+              <div className="flex border border-gray-200 rounded-lg overflow-hidden">
                 <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  variant={viewMode === 'grid' ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode('grid')}
-                  className="rounded-r-none"
+                  className={viewMode === 'grid' 
+                    ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white" 
+                    : "hover:bg-gray-50"
+                  }
                 >
-                  <Grid className="h-4 w-4" />
+                  <Grid className="w-4 h-4" />
                 </Button>
                 <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  variant={viewMode === 'list' ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode('list')}
-                  className="rounded-l-none"
+                  className={viewMode === 'list' 
+                    ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white" 
+                    : "hover:bg-gray-50"
+                  }
                 >
-                  <List className="h-4 w-4" />
+                  <List className="w-4 h-4" />
                 </Button>
               </div>
             </div>
           </div>
 
-          {/* Advanced Filters */}
-          {showFilters && (
-            <div className="mt-6 p-6 border rounded-lg bg-muted/30">
-              <h3 className="font-semibold mb-4">Advanced Filters</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Business Location</label>
-                  <select className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background">
-                    <option value="">All Locations</option>
-                    <option value="mumbai">Mumbai</option>
-                    <option value="delhi">Delhi</option>
-                    <option value="bangalore">Bangalore</option>
-                    <option value="chennai">Chennai</option>
-                    <option value="kolkata">Kolkata</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Minimum Rating</label>
-                  <select className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background">
-                    <option value="">Any Rating</option>
-                    <option value="4.5">4.5+ Stars</option>
-                    <option value="4">4+ Stars</option>
-                    <option value="3">3+ Stars</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Experience Level</label>
-                  <select className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background">
-                    <option value="">Any Experience</option>
-                    <option value="5+">5+ Years</option>
-                    <option value="3+">3+ Years</option>
-                    <option value="1+">1+ Years</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Results */}
-        <div className="mb-6 flex items-center justify-between">
-          <p className="text-muted-foreground">
-            {loading ? 'Loading...' : `Showing ${services.length} services`}
-          </p>
-
-          {(searchQuery || selectedCategory || selectedServiceType || priceRange.min || priceRange.max) && (
-            <Button variant="outline" onClick={clearFilters}>
-              Clear Filters
-            </Button>
-          )}
-        </div>
+          {/* Results Summary */}
+          <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
+            <span>
+              Showing {filteredServices.length} of {services.length} services
+            </span>
+            {(searchQuery || selectedCategory !== 'all') && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory('all');
+                }}
+                className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+              >
+                Clear Filters
+              </Button>
+            )}
+          </div>
+        </motion.div>
 
         {/* Services Grid/List */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="bg-muted rounded-lg h-48 mb-4"></div>
-                <div className="bg-muted rounded h-4 mb-2"></div>
-                <div className="bg-muted rounded h-4 w-2/3"></div>
-              </div>
+        {viewMode === 'grid' ? (
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ staggerChildren: 0.1 }}
+          >
+            {filteredServices.map((service, index) => (
+              <motion.div
+                key={service.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
+              >
+                <Link href={`/services/${service.id}`}>
+                  <Card className="group h-full bg-white shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden">
+                    <CardContent className="p-6">
+                      {/* Service Header */}
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="font-bold text-lg text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2 mb-2">
+                            {service.title}
+                          </h3>
+                          {service.featured && (
+                            <Badge className="bg-gradient-to-r from-orange-600 to-amber-600 text-white border-0 mb-2">
+                              Featured
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Service Description */}
+                      <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed mb-4">
+                        {service.description}
+                      </p>
+
+                      {/* Service Details */}
+                      <div className="space-y-3">
+                        {/* Rating and Reviews */}
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center">
+                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                            <span className="text-sm font-medium text-gray-900 ml-1">
+                              {service.rating}
+                            </span>
+                          </div>
+                          <span className="text-sm text-gray-500">
+                            ({service.reviewCount} reviews)
+                          </span>
+                        </div>
+
+                        {/* Supplier */}
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-gradient-to-r from-orange-600 to-amber-600 rounded-full flex items-center justify-center">
+                            <Users className="w-3 h-3 text-white" />
+                          </div>
+                          <span className="text-sm text-gray-600">{service.supplier.name}</span>
+                          {service.supplier.verified && (
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                          )}
+                        </div>
+
+                        {/* Price and Delivery */}
+                        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                          <div className="text-lg font-bold text-gray-900">
+                            ${service.price}/{service.currency === 'USD' ? 'hour' : 'project'}
+                          </div>
+                          <div className="flex items-center text-sm text-gray-500">
+                            <Clock className="w-4 h-4 mr-1" />
+                            {service.deliveryTime}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </motion.div>
             ))}
-          </div>
-        ) : services.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="h-12 w-12 text-muted-foreground" />
+          </motion.div>
+        ) : (
+          <motion.div 
+            className="space-y-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ staggerChildren: 0.05 }}
+          >
+            {filteredServices.map((service, index) => (
+              <motion.div
+                key={service.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <Link href={`/services/${service.id}`}>
+                  <Card className="group bg-white shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-center space-x-6">
+                        <div className="w-16 h-16 bg-gradient-to-r from-orange-600 to-amber-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Settings className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors">
+                                {service.title}
+                              </h3>
+                              <p className="text-gray-600 mt-1 leading-relaxed line-clamp-2">
+                                {service.description}
+                              </p>
+                            </div>
+                            {service.featured && (
+                              <Badge className="bg-gradient-to-r from-orange-600 to-amber-600 text-white border-0">
+                                Featured
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between mt-4">
+                            <div className="flex items-center space-x-4">
+                              <div className="flex items-center">
+                                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                <span className="text-sm font-medium text-gray-900 ml-1">
+                                  {service.rating}
+                                </span>
+                                <span className="text-sm text-gray-500 ml-1">
+                                  ({service.reviewCount})
+                                </span>
+                              </div>
+                              <Badge variant="outline" className="text-orange-600 border-orange-600">
+                                {service.category}
+                              </Badge>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-lg font-bold text-gray-900">
+                                ${service.price}/{service.currency === 'USD' ? 'hour' : 'project'}
+                              </div>
+                              <div className="text-sm text-gray-500">{service.deliveryTime}</div>
+                            </div>
+                          </div>
+                        </div>
+                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
+        {/* No Results */}
+        {filteredServices.length === 0 && (
+          <motion.div 
+            className="text-center py-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="h-12 w-12 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">No services found</h3>
-            <p className="text-muted-foreground mb-4">
+            <h3 className="text-xl font-semibold mb-2 text-gray-900">No services found</h3>
+            <p className="text-gray-600 mb-4">
               Try adjusting your search terms or filters
             </p>
-            <Button onClick={clearFilters}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('all');
+              }}
+              className="hover:bg-orange-50 hover:border-orange-300"
+            >
               Clear Filters
             </Button>
-          </div>
-        ) : (
-          <>
-            <div className={viewMode === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'
-              : 'space-y-4'
-            }>
-              {services.map((service) => (
-                <div
-                  key={service.id}
-                  className={`bg-card rounded-lg border shadow-sm hover:shadow-md transition-all duration-200 ${viewMode === 'list' ? 'flex items-center p-6 gap-6' : 'card-hover'
-                    }`}
-                >
-                  <div className={`relative ${viewMode === 'list' ? 'w-32 h-32 flex-shrink-0' : ''}`}>
-                    <Image
-                      src={service.images[0] || '/placeholder-service.jpg'}
-                      alt={service.name}
-                      width={viewMode === 'list' ? 128 : 300}
-                      height={viewMode === 'list' ? 128 : 200}
-                      className={`object-cover rounded-lg ${viewMode === 'list' ? 'w-32 h-32' : 'w-full h-48'
-                        }`}
-                    />
-
-                    {service.originalPrice && (
-                      <Badge className="absolute top-2 left-2 bg-red-500 text-white">
-                        {Math.round(((service.originalPrice - service.basePrice) / service.originalPrice) * 100)}% OFF
-                      </Badge>
-                    )}
-
-                    <WishlistButton 
-                      itemId={service.id} 
-                      type="service" 
-                      size="sm" 
-                      className="absolute top-2 right-2 bg-white/80 hover:bg-white w-8 h-8 p-0"
-                    />
-                  </div>
-
-                  <div className={viewMode === 'list' ? 'flex-1' : 'p-4'}>
-                    <div className="mb-2 flex items-center justify-between">
-                      <Badge className="text-xs bg-secondary text-secondary-foreground">
-                        {service.category}
-                      </Badge>
-                      <div className={`px-2 py-1 rounded-full text-xs font-medium ${getServiceTypeColor(service.serviceType)}`}>
-                        {service.serviceType.replace('-', ' ')}
-                      </div>
-                    </div>
-
-                    <Link href={`/services/${service.id}`}>
-                      <h3 className="font-semibold text-sm mb-2 hover:text-primary transition-colors line-clamp-2">
-                        {service.name}
-                      </h3>
-                    </Link>
-
-                    <div className="flex items-center gap-1 mb-2">
-                      <div className="flex items-center">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-3 w-3 ${i < Math.floor(service.rating)
-                              ? 'text-yellow-400 fill-current'
-                              : 'text-gray-300'
-                              }`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        ({service.reviewCount})
-                      </span>
-                    </div>
-
-                    <div className="mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Starting at</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-lg text-primary">
-                          {formatPrice(service.basePrice)}
-                        </span>
-                        {service.originalPrice && (
-                          <span className="text-sm text-muted-foreground line-through">
-                            {formatPrice(service.originalPrice)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      <span>Delivery: {service.deliveryTime}</span>
-                    </div>
-
-                    <div className="mb-3">
-                      <Link
-                        href={`/businesses/${service.provider.id}`}
-                        className="text-xs text-primary hover:underline font-medium"
-                      >
-                {service.provider.name.replace('Provider', 'Business')}
-                        {service.provider.verified && (
-                          <span className="ml-1 text-green-600">✓</span>
-                        )}
-                      </Link>
-                      <div className="flex items-center gap-2 mt-1">
-                        <p className="text-xs text-muted-foreground">
-                  {service.provider.location.replace('Provider', 'Business')}
-                        </p>
-                        <span className="text-xs text-muted-foreground">•</span>
-                        <p className="text-xs text-muted-foreground">
-                  {service.provider.experience.replace('Provider', 'Business')}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button
-                        className="flex-1 btn-primary text-sm px-3 py-2"
-                        onClick={() => handleAddToCart(service)}
-                        disabled={!service.available}
-                      >
-                        {service.available ? 'Add to Cart' : 'Unavailable'}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="text-sm px-3 py-2"
-                        onClick={() => handleContactProvider(service)}
-                      >
-                        <MessageCircle className="h-4 w-4" />
-                      </Button>
-                      <Link href={`/services/${service.id}`}>
-                        <Button variant="outline" className="text-sm px-3 py-2">
-                          View
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-8">
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1 || loading}
-                >
-                  Previous
-                </Button>
-
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const page = i + 1;
-                    return (
-                      <Button
-                        key={page}
-                        variant={currentPage === page ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setCurrentPage(page)}
-                        disabled={loading}
-                      >
-                        {page}
-                      </Button>
-                    );
-                  })}
-                </div>
-
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages || loading}
-                >
-                  Next
-                </Button>
-              </div>
-            )}
-          </>
+          </motion.div>
         )}
       </div>
     </div>
