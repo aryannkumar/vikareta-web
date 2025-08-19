@@ -203,33 +203,34 @@ export class SSOAuthClient {
 
     try {
       const response = await fetch(url, config);
-      
-      if (!response.ok) {
-        // If 401, try to refresh token
-        if (response.status === 401 && accessToken) {
-          // Avoid trying to refresh when we are already calling the refresh endpoint
-          if (endpoint.includes('/auth/refresh')) {
-            // Clear tokens to avoid retry loops
-            this.clearTokens();
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `HTTP ${response.status}`);
-          }
 
-          const refreshed = await this.tryRefreshToken();
-          if (refreshed) {
-            // Retry the original request with new token
-            return this.request(endpoint, options);
+      if (!response.ok) {
+        const is401 = response.status === 401;
+        const isRefreshCall = endpoint.includes('/auth/refresh');
+
+        if (is401) {
+          // If unauthorized, attempt refresh regardless of local access token presence,
+          // as cookies may still hold a valid refresh token.
+          if (!isRefreshCall) {
+            const refreshed = await this.tryRefreshToken();
+            if (refreshed) {
+              // Retry the original request with new token
+              return this.request(endpoint, options);
+            }
+          } else {
+            // On 401 from refresh endpoint itself, clear any local tokens
+            this.clearTokens();
           }
         }
-        
+
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `HTTP ${response.status}`);
       }
 
       return await response.json();
-    } catch (error) {
-      console.error(`SSO: Request failed to ${endpoint}:`, error);
-      throw error;
+    } catch (_error) {
+      console.error(`SSO: Request failed to ${endpoint}:`, _error);
+      throw _error;
     }
   }
 
@@ -237,11 +238,8 @@ export class SSOAuthClient {
    * Try to refresh access token using refresh token
    */
   private async tryRefreshToken(): Promise<boolean> {
-    const refreshToken = this.getRefreshToken();
-    if (!refreshToken) {
-      this.clearTokens();
-      return false;
-    }
+  // Try server-side refresh regardless of presence of local refresh token,
+  // since HttpOnly cookies may hold a valid refresh token.
 
     // If a refresh is already in progress, wait for it instead of issuing another
     if (this.refreshingPromise) {
@@ -255,9 +253,9 @@ export class SSOAuthClient {
     // Create a lock for the refresh flow
     this.refreshingPromise = (async () => {
       try {
-        const response = await this.refreshTokenDirect();
-        return response.success === true;
-      } catch {
+  const response = await this.refreshTokenDirect();
+  return response.success === true;
+  } catch {
         return false;
       } finally {
         // Clear the lock after completion

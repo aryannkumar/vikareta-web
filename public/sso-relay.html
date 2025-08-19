@@ -32,7 +32,12 @@
             try {
               const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
               const backend = isLocal ? 'http://localhost:5001' : 'https://api.vikareta.com';
-              const res = await fetch(`${backend}/api/auth/me`, { credentials: 'include' });
+              let res = await fetch(`${backend}/api/auth/me`, { credentials: 'include' });
+              if (res.status === 401) {
+                // Try a refresh using refresh cookie, then retry /me
+                await fetch(`${backend}/api/auth/refresh`, { method: 'POST', credentials: 'include' });
+                res = await fetch(`${backend}/api/auth/me`, { credentials: 'include' });
+              }
               const data = await res.json().catch(() => null);
               if (data && data.success && data.user) {
                 if (data.accessToken) localStorage.setItem('vikareta_access_token', data.accessToken);
