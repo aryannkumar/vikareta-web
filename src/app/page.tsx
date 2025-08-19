@@ -405,117 +405,199 @@ export default function HomePage() {
         </motion.div>
       )}
 
-      {/* Enhanced Hero Section with Real-time Stats */}
+      {/* Premium Hero Section with Professional Moving Animations */}
       <RevealSection>
-        <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32">
-          <div className="container mx-auto px-6">
+        <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 -z-10">
+            <motion.div
+              className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-orange-400/20 to-red-400/20 rounded-full blur-3xl"
+              animate={{
+                x: [0, 30, -30, 0],
+                y: [0, -20, 20, 0],
+                scale: [1, 1.1, 0.9, 1],
+              }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+            <motion.div
+              className="absolute top-40 right-20 w-96 h-96 bg-gradient-to-bl from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"
+              animate={{
+                x: [0, -40, 40, 0],
+                y: [0, 30, -30, 0],
+                scale: [1, 0.8, 1.2, 1],
+              }}
+              transition={{
+                duration: 25,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 2
+              }}
+            />
+            <motion.div
+              className="absolute bottom-20 left-1/2 w-64 h-64 bg-gradient-to-tr from-emerald-400/20 to-cyan-400/20 rounded-full blur-3xl"
+              animate={{
+                x: [0, 20, -20, 0],
+                y: [0, -25, 25, 0],
+                rotate: [0, 180, 360],
+              }}
+              transition={{
+                duration: 30,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 5
+              }}
+            />
+          </div>
+
+          <div className="container mx-auto px-6 relative">
             <div className="max-w-6xl mx-auto">
               <motion.div
                 variants={sectionVariants}
                 className="text-center mb-16"
               >
+                {/* Premium Badge with Sophisticated Animation */}
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6 }}
-                  className="inline-flex items-center gap-2 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-4 py-2 rounded-full text-sm font-medium mb-6"
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300 px-6 py-3 rounded-full text-sm font-semibold mb-8 shadow-lg backdrop-blur-sm"
                 >
-                  <motion.span 
-                    className="w-2 h-2 bg-orange-500 rounded-full"
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
+                  <motion.div
+                    className="relative"
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                   >
-                    Live B2B Marketplace
+                    <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                    <motion.div
+                      className="absolute inset-0 w-2 h-2 bg-orange-400 rounded-full"
+                      animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  </motion.div>
+                  <motion.span
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5, duration: 0.6 }}
+                  >
+                    Enterprise-Grade B2B Platform
                   </motion.span>
                   <motion.div
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    animate={{ 
+                      rotate: [0, 360],
+                      scale: [1, 1.1, 1]
+                    }}
+                    transition={{ 
+                      rotate: { duration: 4, repeat: Infinity, ease: "linear" },
+                      scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                    }}
                   >
                     <Sparkles className="w-4 h-4" />
                   </motion.div>
                 </motion.div>
                 
+                {/* Professional Premium Heading */}
                 <motion.h1 
-                  className="text-5xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 font-lexend"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <motion.span
-                    animate={{ 
-                      backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
-                    }}
-                    transition={{ duration: 5, repeat: Infinity }}
-                    className="bg-gradient-to-r from-gray-900 via-orange-600 to-gray-900 bg-[length:200%_auto] bg-clip-text text-transparent dark:from-white dark:via-orange-400 dark:to-white"
-                  >
-                    Premium B2B
-                  </motion.span>
-                  <span className="block bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent">
-                    Marketplace
-                  </span>
-                </motion.h1>
-                
-                <motion.p 
-                  className="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  Connect with verified suppliers, discover premium products, and scale your business with India's most trusted B2B platform.
-                </motion.p>
-
-                {/* Enhanced Search Bar */}
-                <motion.div 
-                  className="max-w-4xl mx-auto mb-12"
+                  className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-8 leading-tight tracking-tight"
                   initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
+                  transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
                 >
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-2 shadow-2xl border border-gray-200 dark:border-gray-700">
-                    <div className="flex flex-col lg:flex-row gap-2">
-                      {/* Search Type Toggle */}
-                      <div className="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
-                        <button
+                  <motion.div className="relative overflow-hidden">
+                    <motion.span
+                      animate={{ 
+                        backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                      }}
+                      transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                      className="bg-gradient-to-r from-gray-900 via-orange-600 via-red-600 to-gray-900 bg-[length:300%_auto] bg-clip-text text-transparent dark:from-white dark:via-orange-400 dark:via-red-400 dark:to-white font-extrabold"
+                    >
+                      Professional B2B
+                    </motion.span>
+                  </motion.div>
+                  <motion.span 
+                    className="block mt-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6, duration: 0.8 }}
+                  >
+                    <span className="bg-gradient-to-r from-orange-600 via-red-600 to-orange-700 bg-clip-text text-transparent font-extrabold">
+                      Commerce Platform
+                    </span>
+                  </motion.span>
+                </motion.h1>
+                
+                {/* Professional Description */}
+                <motion.p 
+                  className="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed font-medium"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.8 }}
+                >
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8, duration: 1 }}
+                  >
+                    Streamline procurement processes, connect with enterprise-grade suppliers, and accelerate business growth through our comprehensive B2B ecosystem.
+                  </motion.span>
+                </motion.p>
+
+                {/* Enhanced Professional Search Bar */}
+                <motion.div 
+                  className="max-w-5xl mx-auto mb-16"
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7, duration: 0.8 }}
+                >
+                  <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl p-3 shadow-2xl border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-500">
+                    <div className="flex flex-col lg:flex-row gap-3">
+                      {/* Professional Search Type Toggle */}
+                      <div className="flex bg-gray-50 dark:bg-gray-700/50 rounded-xl p-1.5 backdrop-blur-sm">
+                        <motion.button
                           onClick={() => setSearch(prev => ({ ...prev, type: 'products' }))}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${
                             search.type === 'products'
-                              ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-md'
-                              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400'
+                              ? 'bg-white dark:bg-gray-600 text-orange-600 dark:text-orange-400 shadow-lg'
+                              : 'text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400'
                           }`}
                         >
                           <Package className="w-4 h-4" />
                           Products
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
                           onClick={() => setSearch(prev => ({ ...prev, type: 'services' }))}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${
                             search.type === 'services'
-                              ? 'bg-white dark:bg-gray-600 text-emerald-600 dark:text-emerald-400 shadow-md'
-                              : 'text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400'
+                              ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-lg'
+                              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400'
                           }`}
                         >
                           <Settings className="w-4 h-4" />
                           Services
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
                           onClick={() => setSearch(prev => ({ ...prev, type: 'businesses' }))}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${
                             search.type === 'businesses'
-                              ? 'bg-white dark:bg-gray-600 text-purple-600 dark:text-purple-400 shadow-md'
+                              ? 'bg-white dark:bg-gray-600 text-purple-600 dark:text-purple-400 shadow-lg'
                               : 'text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400'
                           }`}
                         >
                           <Building2 className="w-4 h-4" />
                           Businesses
-                        </button>
+                        </motion.button>
                       </div>
 
-                      {/* Search Input */}
+                      {/* Professional Search Input */}
                       <div className="flex-1 relative">
                         <input
                           type="text"
@@ -527,44 +609,47 @@ export default function HomePage() {
                           onKeyPress={handleKeyPress}
                           placeholder={`Search for ${
                             search.type === 'products' 
-                              ? 'products like "industrial machinery, electronics..."' 
+                              ? 'industrial machinery, electronics, materials...' 
                               : search.type === 'services'
-                              ? 'services like "logistics, manufacturing..."'
-                              : 'businesses like "suppliers, manufacturers..."'
+                              ? 'logistics, manufacturing, consulting...'
+                              : 'verified suppliers, manufacturers, distributors...'
                           }`}
-                          className="w-full px-6 py-4 text-lg rounded-xl border-0 focus:ring-4 focus:ring-orange-500/25 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                          className="w-full px-6 py-4 text-lg rounded-xl border-0 focus:ring-2 focus:ring-orange-500/50 focus:outline-none bg-gray-50/80 dark:bg-gray-700/80 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 backdrop-blur-sm transition-all duration-300"
                         />
-                        <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <Search className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         
                         {/* Live Search Suggestions */}
                         {search.suggestions.length > 0 && search.query.length > 1 && (
-                          <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 max-h-60 overflow-y-auto">
+                          <motion.div 
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="absolute top-full left-0 right-0 mt-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 z-50 max-h-60 overflow-y-auto"
+                          >
                             {search.suggestions.map((suggestion, index) => (
-                              <button
+                              <motion.button
                                 key={index}
                                 onClick={() => setSearch(prev => ({ ...prev, query: suggestion, suggestions: [] }))}
-                                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
+                                whileHover={{ backgroundColor: "rgba(249, 250, 251, 0.8)" }}
+                                className="w-full px-5 py-3 text-left hover:bg-gray-50/80 dark:hover:bg-gray-700/80 flex items-center gap-3 transition-all duration-200 first:rounded-t-xl last:rounded-b-xl"
                               >
                                 <Search className="w-4 h-4 text-gray-400" />
-                                <span className="text-gray-900 dark:text-white">{suggestion}</span>
-                              </button>
+                                <span className="text-gray-900 dark:text-white font-medium">{suggestion}</span>
+                              </motion.button>
                             ))}
-                          </div>
+                          </motion.div>
                         )}
                       </div>
 
-                      {/* Search Button */}
+                      {/* Premium Search Button */}
                       <motion.button
                         onClick={handleSearch}
                         disabled={!search.query.trim() || search.isSearching}
                         whileHover={{ scale: search.query.trim() ? 1.05 : 1 }}
                         whileTap={{ scale: search.query.trim() ? 0.95 : 1 }}
-                        className={`flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
+                        className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 shadow-lg ${
                           search.query.trim()
-                            ? search.type === 'products'
-                              ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl'
-                              : 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl'
-                            : 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                            ? 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white shadow-orange-500/25 hover:shadow-xl hover:shadow-orange-500/30'
+                            : 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed shadow-none'
                         }`}
                       >
                         {search.isSearching ? (
@@ -577,17 +662,17 @@ export default function HomePage() {
                           <>
                             <Search className="w-5 h-5" />
                             Search
-                            <ArrowRight className="w-4 h-4" />
+                            <ArrowRight className="w-5 h-5" />
                           </>
                         )}
                       </motion.button>
                     </div>
                   </div>
                   
-                  {/* Search Suggestions */}
+                  {/* Professional Search Suggestions */}
                   <motion.div 
-                    className="flex flex-wrap justify-center gap-2 mt-4"
-                    initial={{ opacity: 0 }}
+                    className="flex flex-wrap justify-center gap-3 mt-6"
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.6 }}
                   >
@@ -701,28 +786,51 @@ export default function HomePage() {
                   ))}
                 </motion.div>
 
-                {/* Enhanced CTA Buttons */}
+                {/* Professional CTA Buttons */}
                 <motion.div 
-                  className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-                  initial={{ opacity: 0, y: 30 }}
+                  className="flex flex-col sm:flex-row gap-5 justify-center items-center mt-8"
+                  initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
+                  transition={{ delay: 0.9, duration: 0.8 }}
                 >
                   <motion.button
-                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileHover={{ scale: 1.05, y: -3 }}
                     whileTap={{ scale: 0.95 }}
-                    className="btn-primary text-lg px-8 py-4"
+                    className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-bold text-lg px-12 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 border-0 backdrop-blur-sm"
                     onClick={() => router.push('/products')}
                   >
-                    Explore Products
+                    <motion.span
+                      animate={{ x: [0, 2, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      Explore Products
+                    </motion.span>
                   </motion.button>
                   <motion.button
-                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileHover={{ scale: 1.05, y: -3 }}
                     whileTap={{ scale: 0.95 }}
-                    className="btn-outline text-lg px-8 py-4"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-lg px-12 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 border-0 backdrop-blur-sm"
+                    onClick={() => router.push('/services')}
+                  >
+                    <motion.span
+                      animate={{ x: [0, -2, 0] }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      Explore Services
+                    </motion.span>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05, y: -3 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white border-2 border-gray-300 dark:border-gray-600 hover:border-orange-500 dark:hover:border-orange-500 hover:bg-white dark:hover:bg-gray-800 font-bold text-lg px-12 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 backdrop-blur-sm"
                     onClick={() => router.push('/auth/register?type=supplier')}
                   >
-                    Join as Supplier
+                    <motion.span
+                      animate={{ scale: [1, 1.02, 1] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      Join as Supplier
+                    </motion.span>
                   </motion.button>
                 </motion.div>
               </motion.div>
