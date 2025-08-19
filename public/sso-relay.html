@@ -32,10 +32,25 @@
             try {
               const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
               const backend = isLocal ? 'http://localhost:5001' : 'https://api.vikareta.com';
+              
               let res = await fetch(`${backend}/api/auth/me`, { credentials: 'include' });
               if (res.status === 401) {
                 // Try a refresh using refresh cookie, then retry /me
-                await fetch(`${backend}/api/auth/refresh`, { method: 'POST', credentials: 'include' });
+                // First get CSRF token for the refresh request
+                try {
+                  await fetch(`${backend}/csrf-token`, { credentials: 'include' });
+                } catch (e) {
+                  // CSRF fetch failed, try refresh without CSRF header
+                }
+                
+                // Try refresh with credentials
+                await fetch(`${backend}/api/auth/refresh`, { 
+                  method: 'POST', 
+                  credentials: 'include',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  }
+                });
                 res = await fetch(`${backend}/api/auth/me`, { credentials: 'include' });
               }
               const data = await res.json().catch(() => null);
