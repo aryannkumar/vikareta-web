@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef, useState } from 'react';
+import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
 import { fadeInUp, staggerContainer, floatSlow } from '@/lib/motion';
 import HeroParticles from '@/components/hero/HeroParticles';
 import Link from 'next/link';
@@ -15,6 +15,26 @@ export function HeroSection() {
   const router = useRouter();
   const { isAuthenticated, user } = useSSOAuth();
 
+  const prefersReducedMotion = useReducedMotion();
+
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const xSmall = useSpring(useTransform(mx, [-0.5, 0.5], [-15, 15]), { stiffness: 80, damping: 20, mass: 0.2 });
+  const ySmall = useSpring(useTransform(my, [-0.5, 0.5], [-15, 15]), { stiffness: 80, damping: 20, mass: 0.2 });
+  const xLarge = useSpring(useTransform(mx, [-0.5, 0.5], [-30, 30]), { stiffness: 70, damping: 18, mass: 0.25 });
+  const yLarge = useSpring(useTransform(my, [-0.5, 0.5], [-30, 30]), { stiffness: 70, damping: 18, mass: 0.25 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (prefersReducedMotion) return;
+    const rect = sectionRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    mx.set(px);
+    my.set(py);
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -27,7 +47,11 @@ export function HeroSection() {
   ];
 
   return (
-      <section className="relative bg-gradient-to-br from-white via-blue-50 to-orange-50 dark:from-gray-900 dark:via-blue-900/10 dark:to-orange-900/10 py-24 overflow-hidden">
+      <section
+        ref={sectionRef}
+        onMouseMove={handleMouseMove}
+        className="relative bg-gradient-to-br from-white via-blue-50 to-orange-50 dark:from-gray-900 dark:via-blue-900/10 dark:to-orange-900/10 py-24 overflow-hidden"
+      >
         {/* Particle / Gradient Background */}
         <HeroParticles className="mix-blend-screen opacity-60" />
 
@@ -41,24 +65,62 @@ export function HeroSection() {
           />
         </div>
 
+        {/* Animated Gradient Blobs (Parallax) */}
+        {!prefersReducedMotion && (
+          <>
+            <motion.div
+              aria-hidden
+              style={{ x: xLarge, y: yLarge }}
+              className="absolute -top-10 -left-10 w-72 h-72 bg-gradient-to-br from-orange-300/30 to-orange-500/20 dark:from-orange-500/15 dark:to-red-500/10 rounded-full blur-3xl"
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+            />
+            <motion.div
+              aria-hidden
+              style={{ x: xSmall, y: ySmall }}
+              className="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-tr from-blue-300/30 to-purple-400/20 dark:from-blue-500/15 dark:to-purple-600/10 rounded-full blur-3xl translate-x-12 translate-y-12"
+              animate={{ rotate: [360, 0] }}
+              transition={{ duration: 70, repeat: Infinity, ease: 'linear' }}
+            />
+          </>
+        )}
+
         {/* Floating Elements */}
-        <motion.div
-          variants={floatSlow}
-          animate="animate"
-          className="absolute top-20 left-10 w-20 h-20 bg-blue-500/10 rounded-full blur-xl"
-        />
-        <motion.div
-          variants={floatSlow}
-          animate="animate"
-          style={{ animationDelay: '0.6s' }}
-          className="absolute bottom-20 right-10 w-32 h-32 bg-orange-500/10 rounded-full blur-xl"
-        />
-        <motion.div
-          variants={floatSlow}
-          animate="animate"
-          style={{ animationDelay: '1.2s' }}
-          className="absolute top-1/2 left-1/4 w-16 h-16 bg-blue-500/5 rounded-full blur-lg"
-        />
+        {!prefersReducedMotion && (
+          <>
+            <motion.div
+              variants={floatSlow}
+              animate="animate"
+              className="absolute top-20 left-10 w-20 h-20 bg-blue-500/10 rounded-full blur-xl"
+            />
+            <motion.div
+              variants={floatSlow}
+              animate="animate"
+              style={{ animationDelay: '0.6s' }}
+              className="absolute bottom-20 right-10 w-32 h-32 bg-orange-500/10 rounded-full blur-xl"
+            />
+            <motion.div
+              variants={floatSlow}
+              animate="animate"
+              style={{ animationDelay: '1.2s' }}
+              className="absolute top-1/2 left-1/4 w-16 h-16 bg-blue-500/5 rounded-full blur-lg"
+            />
+          </>
+        )}
+
+        {/* Micro moving accents near heading */}
+        {!prefersReducedMotion && (
+          <div className="pointer-events-none absolute inset-x-0 top-28 flex justify-center gap-6">
+            {[0, 1, 2].map((i) => (
+              <motion.span
+                key={i}
+                className="w-2 h-2 rounded-full bg-orange-400/70"
+                animate={{ y: [0, -6, 0], opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 2 + i * 0.4, repeat: Infinity, ease: 'easeInOut', delay: i * 0.2 }}
+              />
+            ))}
+          </div>
+        )}
 
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
@@ -71,7 +133,13 @@ export function HeroSection() {
             <motion.div className="mb-12" variants={fadeInUp}>
               <motion.h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight" variants={fadeInUp}>
                 India's Leading{' '}
-                <span className="text-gradient-orange-blue">B2B Marketplace</span>
+                <motion.span
+                  className="text-gradient-orange-blue inline-block"
+                  animate={prefersReducedMotion ? undefined : { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+                  transition={prefersReducedMotion ? undefined : { duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  B2B Marketplace
+                </motion.span>
               </motion.h1>
 
               <motion.p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed" variants={fadeInUp}>
@@ -152,12 +220,23 @@ export function HeroSection() {
                   placeholder="Search for products, suppliers, or categories..."
                   className="w-full pl-16 pr-36 py-6 text-lg border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 bg-white dark:bg-gray-800 shadow-xl transition-all duration-300 placeholder-gray-500 dark:placeholder-gray-400"
                 />
-                <Button
-                  type="submit"
-                  className="absolute right-3 top-3 bottom-3 btn-primary px-8 rounded-xl font-bold shadow-lg hover:shadow-xl"
-                >
-                  Search
-                </Button>
+                <motion.div className="absolute right-3 top-3 bottom-3 rounded-xl overflow-hidden">
+                  {!prefersReducedMotion && (
+                    <motion.div
+                      aria-hidden
+                      className="absolute inset-0 bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 opacity-80"
+                      animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+                      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                      style={{ backgroundSize: "200% 200%" }}
+                    />
+                  )}
+                  <Button
+                    type="submit"
+                    className="relative btn-primary px-8 h-full rounded-xl font-bold shadow-lg hover:shadow-xl"
+                  >
+                    Search
+                  </Button>
+                </motion.div>
               </form>
 
               {/* Popular Searches */}
@@ -207,12 +286,12 @@ export function HeroSection() {
 
             {/* Video/Demo Section */}
             <div className="mt-20">
-              <button className="group flex items-center justify-center mx-auto bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800 rounded-2xl px-8 py-4 shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 dark:border-gray-600">
+              <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="group flex items-center justify-center mx-auto bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800 rounded-2xl px-8 py-4 shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 dark:border-gray-600">
                 <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
                   <Play className="h-6 w-6 text-white ml-1" />
                 </div>
                 <span className="text-gray-700 dark:text-gray-300 font-semibold text-lg">Watch How It Works</span>
-              </button>
+              </motion.button>
             </div>
           </motion.div>
         </div>

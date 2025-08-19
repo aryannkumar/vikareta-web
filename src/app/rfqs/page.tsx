@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   Package,
   Calendar,
@@ -26,6 +26,7 @@ type PublicRFQ = {
 };
 
 export default function PublicRFQsPage() {
+  const prefersReducedMotion = useReducedMotion();
   const [rfqs, setRfqs] = useState<PublicRFQ[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,8 +89,22 @@ export default function PublicRFQsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white dark:from-gray-950 dark:to-gray-900">
       {/* Hero */}
-      <section className="relative border-b">
+      <section className="relative border-b overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-400 via-transparent to-transparent" />
+        {!prefersReducedMotion && (
+          <>
+            <motion.div
+              className="absolute -top-10 -left-10 w-72 h-72 bg-gradient-to-br from-orange-300/30 to-orange-500/20 rounded-full blur-3xl"
+              animate={{ x: [0, 25, -20, 0], y: [0, -15, 20, 0], rotate: [0, 120, 240, 360] }}
+              transition={{ duration: 30, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.div
+              className="absolute -bottom-16 -right-12 w-80 h-80 bg-gradient-to-tr from-blue-300/30 to-purple-400/20 rounded-full blur-3xl"
+              animate={{ x: [0, -30, 20, 0], y: [0, 20, -15, 0], rotate: [360, 240, 120, 0] }}
+              transition={{ duration: 36, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
+            />
+          </>
+        )}
         <div className="container mx-auto px-6 py-12">
           <div className="flex flex-col items-center text-center gap-4">
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 border border-orange-200/50">
