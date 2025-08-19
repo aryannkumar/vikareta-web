@@ -59,6 +59,9 @@ export default function RFQPage() {
   const [submitted, setSubmitted] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [subcategories, setSubcategories] = useState<any[]>([]);
+  const [recentRfqs, setRecentRfqs] = useState<Array<{ id: string; title: string; quantity: number | null; budgetMin: number | null; budgetMax: number | null; createdAt: string }>>([]);
+  const [recentLoading, setRecentLoading] = useState(true);
+  const [recentError, setRecentError] = useState<string | null>(null);
 
   // Load categories on component mount
   useEffect(() => {
@@ -92,6 +95,21 @@ export default function RFQPage() {
     };
     loadSubs();
   }, [formData.category]);
+
+  // Fetch top 5 recent RFQs for guests
+  useEffect(() => {
+    (async () => {
+      try {
+        setRecentLoading(true);
+        const rfqs = await rfqService.getPublicRecentRfqs(5);
+        setRecentRfqs(rfqs);
+      } catch (e: any) {
+        setRecentError(e?.message || 'Failed to load recent RFQs');
+      } finally {
+        setRecentLoading(false);
+      }
+    })();
+  }, []);
 
   const units = ['pieces', 'kg', 'tons', 'meters', 'liters', 'boxes', 'sets'];
 
@@ -186,41 +204,24 @@ export default function RFQPage() {
       const budgetMax = parseFloat(formData.budget.replace(/[^0-9.-]+/g, ''));
       const baseDesc = `${formData.description}\n\nContact Information:\nName: ${formData.contactInfo.name}\nEmail: ${formData.contactInfo.email}\nPhone: ${formData.contactInfo.phone}${formData.contactInfo.company ? `\nCompany: ${formData.contactInfo.company}` : ''}`;
 
-      if (formData.rfqType === 'service') {
-        const serviceData = {
-          title: formData.title,
-          description: baseDesc,
-          categoryId: formData.category,
-          subcategoryId: formData.subcategory || undefined,
-          serviceType: 'one_time' as const,
-          budgetMax,
-          preferredLocation: 'both' as const,
-          preferredTimeline: formData.timeline,
-          urgency: 'medium' as const,
-          attachments: attachmentUrls,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        };
-        const result = await rfqService.createServiceRfq(serviceData);
-        setSubmitted(true);
-        console.log('Service RFQ created successfully:', result);
-      } else {
-        const productData = {
-          title: formData.title,
-          description: baseDesc,
-          categoryId: formData.category,
-          subcategoryId: formData.subcategory || undefined,
-          quantity: parseInt(formData.quantity),
-          budgetMax,
-          deliveryTimeline: formData.timeline,
-          deliveryLocation: formData.location,
-          specifications: formData.specifications.filter(Boolean),
-          attachments: attachmentUrls,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        };
-        const result = await rfqService.createProductRfq(productData);
-        setSubmitted(true);
-        console.log('Product RFQ created successfully:', result);
-      }
+      const common = {
+        title: formData.title,
+        description: baseDesc,
+        categoryId: formData.category,
+        subcategoryId: formData.subcategory || undefined,
+        budgetMax,
+        deliveryTimeline: formData.timeline,
+        deliveryLocation: formData.rfqType === 'product' ? formData.location : undefined,
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      } as const;
+
+      const createPayload = formData.rfqType === 'product'
+        ? { ...common, quantity: parseInt(formData.quantity) }
+        : { ...common };
+
+      const result = await rfqService.createRfq(createPayload as any);
+      setSubmitted(true);
+      console.log('RFQ created successfully:', result);
     } catch (error) {
       console.error('Error submitting RFQ:', error);
       setErrors({ submit: error instanceof Error ? error.message : 'Failed to submit RFQ' });
@@ -321,8 +322,43 @@ export default function RFQPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Request for Quotation (RFQ)</h1>
-          
+          <h1 className="text-3xl font-bold mb-2">Request for Quotation (RFQ)</h1>
+          <p className="text-sm text-muted-foreground mb-8">Top 5 recent RFQs are visible to everyone. Sign in to view full details and create your own RFQ.</p>
+
+          {/* Recent RFQs (Public) */}
+          <div className="bg-card rounded-lg border p-6 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Recent RFQs (Public)</h2>
+              <span className="text-xs text-muted-foreground">Showing title, qty, and budget only</span>
+            </div>
+            {recentLoading ? (
+              <div className="text-sm text-muted-foreground">Loading recent RFQs...</div>
+            ) : recentError ? (
+              <div className="text-sm text-red-600">{recentError}</div>
+            ) : recentRfqs.length === 0 ? (
+              <div className="text-sm text-muted-foreground">No RFQs available yet.</div>
+            ) : (
+              <ul className="divide-y">
+                {recentRfqs.map((r) => (
+                  <li key={r.id} className="py-3 flex items-center justify-between">
+                    <div>
+                      <div className="font-medium">{r.title}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {r.quantity !== null ? `Qty: ${r.quantity}` : 'Service RFQ'}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm">
+                        {r.budgetMin || r.budgetMax ? `Budget: ${r.budgetMin ? `₹${r.budgetMin}` : ''}${r.budgetMin && r.budgetMax ? ' - ' : ''}${r.budgetMax ? `₹${r.budgetMax}` : ''}` : 'Budget: N/A'}
+                      </div>
+                      <div className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString()}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           {/* Tab Navigation */}
           <div className="flex space-x-1 mb-8 bg-muted p-1 rounded-lg">
             <button 
