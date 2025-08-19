@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Lexend, Poppins } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { SSOAuthProvider } from '@/lib/auth/use-sso-auth';
@@ -72,6 +73,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${lexend.variable} ${poppins.variable}`}>
       <body className={`${inter.className} bg-gradient-to-br from-gray-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-900 dark:text-white antialiased font-inter selection:bg-orange-200 selection:text-orange-900 dark:selection:bg-orange-800 dark:selection:text-orange-100`}>
+        {/* Google Identity Services */}
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="beforeInteractive"
+        />
+        
         <ThemeProvider
           defaultTheme="system"
           storageKey="vikareta-theme"

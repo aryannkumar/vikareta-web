@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast-provider';
@@ -15,6 +15,13 @@ declare global {
   interface Window {
     google?: {
       accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: any) => void;
+          }) => void;
+          prompt: () => void;
+        };
         oauth2: {
           initTokenClient: (config: {
             client_id: string;
@@ -49,83 +56,43 @@ function LoginPageContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const searchParams = useSearchParams();
+  
   const toast = useToast();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const redirectUrl = searchParams?.get('redirect');
   const { login, user } = useSSOAuth();
-  const { socialLogin } = useAuthStore();
-
-  // Get redirect URL from search params
-  const redirectUrl = searchParams.get('redirect');
 
   // Google OAuth configuration
-  const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1073421967516-ot2tc7dckqj2fvj1m8nt89gqkv5l5eoo.apps.googleusercontent.com';
-
   const handleGoogleLogin = async () => {
+    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    
+    // Check if Google OAuth is properly configured
+    if (!googleClientId || googleClientId === 'your-google-client-id') {
+      toast.error('Configuration Error', 'Google OAuth is not configured. Please contact support.');
+      return;
+    }
+
     try {
       setLoading(true);
       
-      // Check if Google Client ID is properly configured
-      if (GOOGLE_CLIENT_ID === 'your-google-client-id') {
-        toast.error('Configuration Error', 'Google OAuth is not properly configured. Please contact support.');
-        return;
+      // Use the backend OAuth flow instead of GSI
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api';
+      const redirectUrl = `${apiUrl}/auth/google`;
+      
+      // Store current location for redirect after auth
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth_return_url', window.location.pathname + window.location.search);
       }
       
-      // Initialize Google OAuth
-      if (typeof window !== 'undefined' && window.google?.accounts?.oauth2) {
-        window.google.accounts.oauth2.initTokenClient({
-          client_id: GOOGLE_CLIENT_ID,
-          scope: 'email profile',
-          callback: async (response: any) => {
-            if (response.access_token) {
-              try {
-                await socialLogin({
-                  provider: 'google',
-                  token: response.access_token
-                });
-                
-                toast.success('Login Successful!', 'Redirecting...');
-                
-                setTimeout(() => {
-                  const targetUrl = redirectUrl || (user ? getPostLoginRedirectUrl(user) : '/') || '/';
-                  
-                  // Sync SSO if user has dashboard access
-                  if (user && hasDashboardAccess(user)) {
-                    syncSSOToSubdomains();
-                  }
-                  
-                  window.location.replace(targetUrl);
-                }, 1000);
-              } catch (error) {
-                console.error('Google login failed:', error);
-                toast.error('Login Failed', 'Google authentication failed. Please try again.');
-              }
-            }
-          }
-        }).requestAccessToken();
-      } else {
-        // Load Google OAuth library if not available
-        const script = document.createElement('script');
-        script.src = 'https://accounts.google.com/gsi/client';
-        script.async = true;
-        script.defer = true;
-        script.onload = () => {
-          setTimeout(() => handleGoogleLogin(), 500);
-        };
-        script.onerror = () => {
-          toast.error('Login Failed', 'Failed to load Google authentication library. Please try again.');
-        };
-        document.head.appendChild(script);
-      }
+      // Redirect to backend OAuth endpoint
+      window.location.href = redirectUrl;
     } catch (error) {
-      console.error('Google OAuth initialization failed:', error);
-      toast.error('Login Failed', 'Failed to initialize Google login. Please try again.');
-    } finally {
+      console.error('Google OAuth error:', error);
+      toast.error('Error', 'Failed to initialize Google sign-in');
       setLoading(false);
     }
-  };
-
-  const handleFacebookLogin = async () => {
+  };  const handleFacebookLogin = async () => {
     try {
       setLoading(true);
       
