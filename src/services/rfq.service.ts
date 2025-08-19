@@ -540,6 +540,173 @@ export class RFQService {
     }
   }
 
+  // Quote management methods
+  async submitQuote(rfqId: string, quoteData: any): Promise<any> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/rfqs/${rfqId}/quotes`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(quoteData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to submit quote');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error submitting quote:', error);
+      throw error;
+    }
+  }
+
+  async updateQuoteStatus(quoteId: string, status: string, notes?: string): Promise<any> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/quotes/${quoteId}/status`, {
+        method: 'PATCH',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ status, notes }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to update quote status');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error updating quote status:', error);
+      throw error;
+    }
+  }
+
+  async acceptQuote(quoteId: string): Promise<any> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/quotes/${quoteId}/accept`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        // backend expects no body; only quoteId in path
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to accept quote');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error accepting quote:', error);
+      throw error;
+    }
+  }
+
+  async rejectQuote(quoteId: string, reason?: string): Promise<any> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/quotes/${quoteId}/reject`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ reason }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to reject quote');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error rejecting quote:', error);
+      throw error;
+    }
+  }
+
+  async negotiateQuote(quoteId: string, negotiationData: {
+    counterPrice?: number;
+    message: string;
+    requestedChanges?: string[];
+  }): Promise<any> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/quotes/${quoteId}/negotiate`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(negotiationData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to send negotiation');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error negotiating quote:', error);
+      throw error;
+    }
+  }
+
+  async getRfqWithResponses(rfqId: string): Promise<RfqWithResponses> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/rfqs/${rfqId}/with-responses`, {
+        headers: this.getHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to fetch RFQ with responses');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching RFQ with responses:', error);
+      throw error;
+    }
+  }
+
+  async getCategories(): Promise<any[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/categories`, {
+        headers: this.getHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to fetch categories');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      throw error;
+    }
+  }
+
+  async getSubcategories(categoryId: string): Promise<any[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/categories/${categoryId}/subcategories`, {
+        headers: this.getHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to fetch subcategories');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      throw error;
+    }
+  }
+
   // Legacy methods for backward compatibility
   async submitRFQ(rfqData: Omit<RFQRequest, 'id' | 'status' | 'createdAt' | 'responses'>): Promise<{ success: boolean; rfqId?: string; error?: string }> {
     try {
@@ -648,14 +815,27 @@ export class RFQService {
     }
   }
 
-  async submitSupplierResponse(_rfqId: string, _response: Omit<RFQResponse, 'id' | 'createdAt'>): Promise<{ success: boolean; responseId?: string; error?: string }> {
+  async submitSupplierResponse(rfqId: string, response: Omit<RFQResponse, 'id' | 'createdAt'>): Promise<{ success: boolean; responseId?: string; error?: string }> {
     try {
-      // This would need to integrate with the quotes system
-      // For now, return a placeholder implementation
-      console.warn('submitSupplierResponse: Implementation pending - integrate with quotes system');
+      const quoteData = {
+        totalPrice: response.quotedPrice,
+        currency: 'INR',
+        message: response.terms,
+        validUntil: new Date(response.validUntil),
+        items: [{
+          name: 'Product',
+          quantity: 1,
+          unitPrice: response.quotedPrice,
+          description: response.terms
+        }],
+        estimatedDelivery: response.deliveryTime,
+        paymentTerms: response.terms
+      };
+
+      const result = await this.submitQuote(rfqId, quoteData);
       return {
-        success: false,
-        error: 'Implementation pending - integrate with quotes system',
+        success: true,
+        responseId: result.id,
       };
     } catch (error) {
       console.error('Error submitting supplier response:', error);
@@ -666,14 +846,27 @@ export class RFQService {
     }
   }
 
-  async getSupplierResponses(_rfqId: string): Promise<{ success: boolean; responses?: RFQResponse[]; error?: string }> {
+  async getSupplierResponses(rfqId: string): Promise<{ success: boolean; responses?: RFQResponse[]; error?: string }> {
     try {
-      // This would need to integrate with the quotes system
-      // For now, return a placeholder implementation
-      console.warn('getSupplierResponses: Implementation pending - integrate with quotes system');
+      const rfqWithResponses = await this.getRfqWithResponses(rfqId);
+      
+      // Convert platform responses to legacy format
+      const legacyResponses: RFQResponse[] = rfqWithResponses.responses.platform.map(quote => ({
+        id: quote.id,
+        supplierId: quote.sellerId,
+        supplierName: quote.seller.name,
+        quotedPrice: quote.totalPrice,
+        deliveryTime: quote.estimatedDelivery || '',
+        terms: quote.message || '',
+        validUntil: quote.validUntil?.toISOString() || '',
+        status: quote.status as any,
+        createdAt: quote.submittedAt.toISOString(),
+        attachments: quote.attachments || []
+      }));
+
       return {
-        success: false,
-        error: 'Implementation pending - integrate with quotes system',
+        success: true,
+        responses: legacyResponses,
       };
     } catch (error) {
       console.error('Error fetching supplier responses:', error);

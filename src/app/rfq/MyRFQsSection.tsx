@@ -2,161 +2,346 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  Eye,
-  MessageSquare,
-  Users,
-  TrendingUp,
-  Clock,
-  Filter,
-  Search,
-  ChevronDown,
-  ExternalLink,
-  Star,
-  Package,
-  Calendar,
-  DollarSign,
-  CheckCircle,
-  AlertCircle,
-  Loader2
-} from 'lucide-react';
+import { Eye, MessageSquare, TrendingUp, Search, ChevronDown, ExternalLink, Star, Package, Calendar, DollarSign, CheckCircle, Loader2, Check, X, MessageCircle, ShoppingCart } from 'lucide-react';
+import { rfqService, QuoteResponse, RfqWithResponses } from '../../services/rfq.service';
+import { orderService, CreateOrderFromQuoteData } from '../../services/order.service';
 
-// Mock data for demonstration
-const mockRfqs = [
-  {
-    id: 'rfq-001',
-    title: 'Industrial Pumps Required',
-    description: 'Need high-quality industrial pumps for water treatment facility',
-    category: { name: 'Machinery & Equipment' },
-    status: 'active',
-    createdAt: new Date('2024-01-15'),
-    expiresAt: new Date('2024-02-15'),
-    budgetMax: 150000,
-    quantity: 5,
-    rfqType: 'product' as const,
-    responses: {
-      platform: [
-        {
-          id: 'quote-001',
-          seller: {
-            name: 'Rajesh Kumar',
-            businessName: 'Kumar Industries',
-            isVerified: true,
-            averageRating: 4.8,
-            totalReviews: 124
-          },
-          totalPrice: 125000,
-          currency: 'INR',
-          status: 'pending' as const,
-          submittedAt: new Date('2024-01-16'),
-          items: [
-            { name: 'Industrial Pump Model A', quantity: 5, unitPrice: 25000 }
-          ],
-          message: 'High-quality pumps with 2-year warranty included.'
-        },
-        {
-          id: 'quote-002',
-          seller: {
-            name: 'Amit Singh',
-            businessName: 'Singh Engineering',
-            isVerified: true,
-            averageRating: 4.6,
-            totalReviews: 89
-          },
-          totalPrice: 140000,
-          currency: 'INR',
-          status: 'pending' as const,
-          submittedAt: new Date('2024-01-17'),
-          items: [
-            { name: 'Premium Industrial Pump', quantity: 5, unitPrice: 28000 }
-          ],
-          message: 'Premium quality with extended warranty and free installation.'
-        }
-      ],
-      whatsapp: [
-        {
-          id: 'wa-001',
-          seller: {
-            name: 'Pradeep Industries',
-            businessName: 'Pradeep Pump Solutions',
-            isVerified: false,
-            averageRating: 4.2,
-            totalReviews: 45
-          },
-          messageContent: 'We can provide industrial pumps at competitive rates. Our price is ₹22,000 per unit.',
-          extractedPrice: 110000,
-          extractedCurrency: 'INR',
-          confidence: 0.85,
-          receivedAt: new Date('2024-01-18'),
-          messageType: 'text' as const
-        }
-      ]
-    },
-    responseAnalytics: {
-      totalResponses: 3,
-      platformResponses: 2,
-      whatsappResponses: 1,
-      averagePrice: 125000,
-      lowestPrice: 110000,
-      highestPrice: 140000,
-      verifiedSellerResponses: 2,
-      lastResponseAt: new Date('2024-01-18')
-    }
-  },
-  {
-    id: 'rfq-002',
-    title: 'Office Furniture Bulk Order',
-    description: 'Looking for modern office furniture for new office setup',
-    category: { name: 'Furniture & Fixtures' },
-    status: 'active',
-    createdAt: new Date('2024-01-20'),
-    expiresAt: new Date('2024-02-20'),
-    budgetMax: 500000,
-    quantity: 50,
-    rfqType: 'product' as const,
-    responses: {
-      platform: [
-        {
-          id: 'quote-003',
-          seller: {
-            name: 'Modern Furniture Co',
-            businessName: 'Modern Furniture Solutions',
-            isVerified: true,
-            averageRating: 4.9,
-            totalReviews: 200
-          },
-          totalPrice: 450000,
-          currency: 'INR',
-          status: 'pending' as const,
-          submittedAt: new Date('2024-01-21'),
-          items: [
-            { name: 'Ergonomic Office Chair', quantity: 50, unitPrice: 8000 },
-            { name: 'Office Desk', quantity: 25, unitPrice: 12000 }
-          ],
-          message: 'Complete office furniture solution with modern design.'
-        }
-      ],
-      whatsapp: []
-    },
-    responseAnalytics: {
-      totalResponses: 1,
-      platformResponses: 1,
-      whatsappResponses: 0,
-      averagePrice: 450000,
-      lowestPrice: 450000,
-      highestPrice: 450000,
-      verifiedSellerResponses: 1,
-      lastResponseAt: new Date('2024-01-21')
-    }
-  }
-];
-
-interface RfqCardProps {
-  rfq: typeof mockRfqs[0];
-  onViewDetails: (rfqId: string) => void;
+interface QuoteActionsProps {
+  quote: QuoteResponse;
+  rfqId: string;
+  onQuoteUpdate: () => void;
 }
 
-function RfqCard({ rfq, onViewDetails }: RfqCardProps) {
+function QuoteActions({ quote, rfqId, onQuoteUpdate }: QuoteActionsProps) {
+  const [showActions, setShowActions] = useState(false);
+  const [showNegotiation, setShowNegotiation] = useState(false);
+  const [showOrderForm, setShowOrderForm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [negotiationMessage, setNegotiationMessage] = useState('');
+  const [counterPrice, setCounterPrice] = useState('');
+  const [deliveryAddress, setDeliveryAddress] = useState({
+    street: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: 'India'
+  });
+  const [paymentMethod, setPaymentMethod] = useState<'cashfree' | 'wallet'>('wallet');
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
+  const handleAcceptQuote = async () => {
+  if (!deliveryAddress.street || !deliveryAddress.city || !deliveryAddress.state || !deliveryAddress.zipCode) {
+      alert('Please fill in all delivery address fields');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // First accept the quote (no body required)
+      await rfqService.acceptQuote(quote.id);
+      
+      // Then convert to order
+      const orderData: CreateOrderFromQuoteData = {
+        quoteId: quote.id,
+        shippingAddress: {
+          street: deliveryAddress.street,
+          city: deliveryAddress.city,
+          state: deliveryAddress.state,
+          postalCode: deliveryAddress.zipCode,
+          country: deliveryAddress.country,
+        },
+        paymentMethod,
+        customerNotes: `Order converted from accepted quote for RFQ ${rfqId}`,
+      };
+
+      const order = await orderService.convertQuoteToOrder(orderData);
+      alert(`Quote accepted and converted to order! Order #: ${order.orderNumber}`);
+      setShowOrderForm(false);
+      setShowActions(false);
+      onQuoteUpdate();
+      // Navigate to order details page if available
+      if (order.orderId) {
+        // best-effort redirect; ignore errors
+        try { (window as any).location.href = `/orders/${order.orderId}`; } catch {}
+      }
+    } catch (error) {
+      console.error('Error accepting quote:', error);
+      alert('Failed to accept quote and create order');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRejectQuote = async () => {
+    setLoading(true);
+    try {
+      await rfqService.rejectQuote(quote.id, 'Not suitable for our requirements');
+      alert('Quote rejected successfully');
+      setShowActions(false);
+      onQuoteUpdate();
+    } catch (error) {
+      console.error('Error rejecting quote:', error);
+      alert('Failed to reject quote');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNegotiate = async () => {
+    if (!negotiationMessage.trim()) {
+      alert('Please enter a negotiation message');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const negotiationData = {
+        message: negotiationMessage,
+        ...(counterPrice && { counterPrice: parseFloat(counterPrice) })
+      };
+      
+      await rfqService.negotiateQuote(quote.id, negotiationData);
+      alert('Negotiation message sent successfully');
+      setShowNegotiation(false);
+      setShowActions(false);
+      setNegotiationMessage('');
+      setCounterPrice('');
+      onQuoteUpdate();
+    } catch (error) {
+      console.error('Error sending negotiation:', error);
+      alert('Failed to send negotiation');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (quote.status === 'accepted') {
+    return (
+      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+        <div className="flex items-center gap-2 text-green-800">
+          <CheckCircle className="h-4 w-4" />
+          <span className="text-sm font-medium">Quote Accepted & Converted to Order</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (quote.status === 'rejected') {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+        <div className="flex items-center gap-2 text-red-800">
+          <X className="h-4 w-4" />
+          <span className="text-sm font-medium">Quote Rejected</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {!showActions && (
+        <button
+          onClick={() => setShowActions(true)}
+          className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Manage Quote
+        </button>
+      )}
+
+      {showActions && (
+        <div className="space-y-3 border rounded-lg p-4 bg-gray-50">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowOrderForm(true)}
+              className="flex-1 bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 flex items-center justify-center gap-2"
+              disabled={loading}
+            >
+              <Check className="h-4 w-4" />
+              Accept & Order
+            </button>
+            <button
+              onClick={() => setShowNegotiation(true)}
+              className="flex-1 bg-orange-600 text-white px-3 py-2 rounded text-sm hover:bg-orange-700 flex items-center justify-center gap-2"
+              disabled={loading}
+            >
+              <MessageCircle className="h-4 w-4" />
+              Negotiate
+            </button>
+            <button
+              onClick={handleRejectQuote}
+              className="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 flex items-center justify-center gap-2"
+              disabled={loading}
+            >
+              <X className="h-4 w-4" />
+              Reject
+            </button>
+          </div>
+          <button
+            onClick={() => setShowActions(false)}
+            className="w-full text-gray-600 text-sm hover:text-gray-800"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {showNegotiation && (
+        <div className="border rounded-lg p-4 bg-white">
+          <h4 className="font-medium mb-3">Negotiate Quote</h4>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium mb-1">Counter Price (Optional)</label>
+              <input
+                type="number"
+                value={counterPrice}
+                onChange={(e) => setCounterPrice(e.target.value)}
+                placeholder={`Current: ${formatCurrency(quote.totalPrice)}`}
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Message</label>
+              <textarea
+                value={negotiationMessage}
+                onChange={(e) => setNegotiationMessage(e.target.value)}
+                placeholder="Explain your negotiation terms..."
+                rows={3}
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleNegotiate}
+                disabled={loading}
+                className="flex-1 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 disabled:opacity-50"
+              >
+                {loading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : 'Send Negotiation'}
+              </button>
+              <button
+                onClick={() => setShowNegotiation(false)}
+                className="px-4 py-2 border rounded hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showOrderForm && (
+        <div className="border rounded-lg p-4 bg-white">
+          <h4 className="font-medium mb-3">Delivery Address for Order</h4>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium mb-1">Street Address</label>
+              <input
+                type="text"
+                value={deliveryAddress.street}
+                onChange={(e) => setDeliveryAddress(prev => ({ ...prev, street: e.target.value }))}
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                placeholder="Enter street address"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-1">City</label>
+                <input
+                  type="text"
+                  value={deliveryAddress.city}
+                  onChange={(e) => setDeliveryAddress(prev => ({ ...prev, city: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="City"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">State</label>
+                <input
+                  type="text"
+                  value={deliveryAddress.state}
+                  onChange={(e) => setDeliveryAddress(prev => ({ ...prev, state: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="State"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-1">Postal Code</label>
+                <input
+                  type="text"
+                  value={deliveryAddress.zipCode}
+                  onChange={(e) => setDeliveryAddress(prev => ({ ...prev, zipCode: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Postal Code"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Country</label>
+                <input
+                  type="text"
+                  value={deliveryAddress.country}
+                  onChange={(e) => setDeliveryAddress(prev => ({ ...prev, country: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Country"
+                />
+              </div>
+            </div>
+            <div className="bg-blue-50 p-3 rounded">
+              <p className="text-sm text-blue-800">
+                <strong>Total Amount: {formatCurrency(quote.totalPrice)}</strong>
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                By accepting this quote, it will be automatically converted to an order.
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Payment Method</label>
+              <select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value as 'cashfree' | 'wallet')}
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="wallet">Wallet</option>
+                <option value="cashfree">Cashfree</option>
+              </select>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleAcceptQuote}
+                disabled={loading}
+                className="flex-1 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingCart className="h-4 w-4" />}
+                {loading ? 'Processing...' : 'Accept & Create Order'}
+              </button>
+              <button
+                onClick={() => setShowOrderForm(false)}
+                className="px-4 py-2 border rounded hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface RfqCardProps {
+  rfq: RfqWithResponses;
+  onViewDetails: (rfqId: string) => void;
+  onQuoteUpdate: () => void;
+}
+
+function RfqCard({ rfq, onViewDetails, onQuoteUpdate }: RfqCardProps) {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -192,7 +377,7 @@ function RfqCard({ rfq, onViewDetails }: RfqCardProps) {
             </span>
             <span className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              {rfq.createdAt.toLocaleDateString()}
+              {new Date(rfq.createdAt).toLocaleDateString()}
             </span>
             {rfq.quantity && (
               <span className="flex items-center gap-1">
@@ -273,32 +458,51 @@ function RfqCard({ rfq, onViewDetails }: RfqCardProps) {
         )}
       </div>
 
-      {/* Quick Response Preview */}
+      {/* Platform Responses */}
       {rfq.responses.platform.length > 0 && (
         <div className="mb-4">
-          <h5 className="text-sm font-medium text-gray-900 mb-2">Latest Platform Response</h5>
-          <div className="bg-blue-50 rounded p-3">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{rfq.responses.platform[0].seller.businessName}</span>
-                {rfq.responses.platform[0].seller.isVerified && (
-                  <CheckCircle className="h-4 w-4 text-blue-600" />
-                )}
-                <div className="flex items-center gap-1">
-                  <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                  <span className="text-xs text-gray-600">
-                    {rfq.responses.platform[0].seller.averageRating}
+          <h5 className="text-sm font-medium text-gray-900 mb-2">Platform Responses</h5>
+          <div className="space-y-3">
+            {rfq.responses.platform.slice(0, 2).map((quote) => (
+              <div key={quote.id} className="bg-blue-50 rounded p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">{quote.seller.businessName || quote.seller.name}</span>
+                    {quote.seller.isVerified && (
+                      <CheckCircle className="h-4 w-4 text-blue-600" />
+                    )}
+                    <div className="flex items-center gap-1">
+                      <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                      <span className="text-xs text-gray-600">
+                        {quote.seller.averageRating}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-sm font-medium text-blue-600">
+                    {formatCurrency(quote.totalPrice)}
                   </span>
                 </div>
+                {quote.message && (
+                  <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                    {quote.message}
+                  </p>
+                )}
+                <QuoteActions 
+                  quote={quote} 
+                  rfqId={rfq.id} 
+                  onQuoteUpdate={onQuoteUpdate}
+                />
               </div>
-              <span className="text-sm font-medium text-blue-600">
-                {formatCurrency(rfq.responses.platform[0].totalPrice)}
-              </span>
-            </div>
-            {rfq.responses.platform[0].message && (
-              <p className="text-sm text-gray-600 line-clamp-2">
-                {rfq.responses.platform[0].message}
-              </p>
+            ))}
+            {rfq.responses.platform.length > 2 && (
+              <div className="text-center">
+                <button
+                  onClick={() => onViewDetails(rfq.id)}
+                  className="text-blue-600 text-sm hover:text-blue-700"
+                >
+                  View {rfq.responses.platform.length - 2} more responses
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -307,22 +511,36 @@ function RfqCard({ rfq, onViewDetails }: RfqCardProps) {
       {/* WhatsApp Response Preview */}
       {rfq.responses.whatsapp.length > 0 && (
         <div className="mb-4">
-          <h5 className="text-sm font-medium text-gray-900 mb-2">Latest WhatsApp Response</h5>
-          <div className="bg-green-50 rounded p-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">{rfq.responses.whatsapp[0].seller.businessName}</span>
-              {rfq.responses.whatsapp[0].extractedPrice && (
-                <span className="text-sm font-medium text-green-600">
-                  {formatCurrency(rfq.responses.whatsapp[0].extractedPrice)}
-                </span>
-              )}
-            </div>
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {rfq.responses.whatsapp[0].messageContent}
-            </p>
-            {rfq.responses.whatsapp[0].confidence && (
-              <div className="mt-2 text-xs text-gray-500">
-                Confidence: {(rfq.responses.whatsapp[0].confidence * 100).toFixed(0)}%
+          <h5 className="text-sm font-medium text-gray-900 mb-2">WhatsApp Responses</h5>
+          <div className="space-y-2">
+            {rfq.responses.whatsapp.slice(0, 2).map((response) => (
+              <div key={response.id} className="bg-green-50 rounded p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">{response.seller.businessName || response.seller.name}</span>
+                  {response.extractedPrice && (
+                    <span className="text-sm font-medium text-green-600">
+                      {formatCurrency(response.extractedPrice)}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-600 line-clamp-2">
+                  {response.messageContent}
+                </p>
+                {response.confidence && (
+                  <div className="mt-2 text-xs text-gray-500">
+                    Confidence: {(response.confidence * 100).toFixed(0)}%
+                  </div>
+                )}
+              </div>
+            ))}
+            {rfq.responses.whatsapp.length > 2 && (
+              <div className="text-center">
+                <button
+                  onClick={() => onViewDetails(rfq.id)}
+                  className="text-green-600 text-sm hover:text-green-700"
+                >
+                  View {rfq.responses.whatsapp.length - 2} more WhatsApp responses
+                </button>
               </div>
             )}
           </div>
@@ -349,37 +567,69 @@ function RfqCard({ rfq, onViewDetails }: RfqCardProps) {
 
 export default function MyRFQsSection() {
   const router = useRouter();
-  const [rfqs, setRfqs] = useState(mockRfqs);
-  const [loading, setLoading] = useState(false);
+  const [rfqs, setRfqs] = useState<RfqWithResponses[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('createdAt');
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+    hasNext: false,
+    hasPrev: false
+  });
+
+  const loadRfqs = async () => {
+    setLoading(true);
+    try {
+      const filters = {
+        page: pagination.page,
+        limit: pagination.limit,
+        sortBy: sortBy as any,
+        sortOrder: 'desc' as const,
+        ...(statusFilter !== 'all' && { status: statusFilter }),
+        ...(searchTerm && { search: searchTerm })
+      };
+
+      const result = await rfqService.getMyRfqsWithResponses(filters);
+      setRfqs(result.rfqs);
+      setPagination(result.pagination);
+    } catch (error) {
+      console.error('Error loading RFQs:', error);
+      // Fallback to empty array on error
+      setRfqs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadRfqs();
+  }, [pagination.page, sortBy, statusFilter]);
+
+  // Debounced search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (pagination.page === 1) {
+        loadRfqs();
+      } else {
+        setPagination(prev => ({ ...prev, page: 1 }));
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
 
   const handleViewDetails = (rfqId: string) => {
-    // Navigate to detailed view
     router.push(`/rfq/${rfqId}`);
   };
 
-  const filteredRfqs = rfqs.filter(rfq => {
-    const matchesSearch = rfq.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         rfq.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || rfq.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
-
-  const sortedRfqs = [...filteredRfqs].sort((a, b) => {
-    switch (sortBy) {
-      case 'createdAt':
-        return b.createdAt.getTime() - a.createdAt.getTime();
-      case 'responses':
-        return b.responseAnalytics.totalResponses - a.responseAnalytics.totalResponses;
-      case 'budget':
-        return (b.budgetMax || 0) - (a.budgetMax || 0);
-      default:
-        return 0;
-    }
-  });
+  const handleQuoteUpdate = () => {
+    // Reload RFQs to get updated data
+    loadRfqs();
+  };
 
   return (
     <div className="space-y-6">
@@ -395,7 +645,7 @@ export default function MyRFQsSection() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <TrendingUp className="h-4 w-4" />
-            <span>{rfqs.length} total RFQs</span>
+            <span>{pagination.total} total RFQs</span>
           </div>
         </div>
       </div>
@@ -440,8 +690,9 @@ export default function MyRFQsSection() {
               className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="createdAt">Newest First</option>
-              <option value="responses">Most Responses</option>
-              <option value="budget">Highest Budget</option>
+              <option value="title">Title</option>
+              <option value="budgetMax">Highest Budget</option>
+              <option value="expiresAt">Expiry Date</option>
             </select>
             <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
           </div>
@@ -459,14 +710,47 @@ export default function MyRFQsSection() {
       {/* RFQ List */}
       {!loading && (
         <div className="space-y-6">
-          {sortedRfqs.length > 0 ? (
-            sortedRfqs.map((rfq) => (
-              <RfqCard 
-                key={rfq.id} 
-                rfq={rfq} 
-                onViewDetails={handleViewDetails}
-              />
-            ))
+          {rfqs.length > 0 ? (
+            <>
+              <div className="space-y-6">
+                {rfqs.map((rfq) => (
+                  <RfqCard 
+                    key={rfq.id} 
+                    rfq={rfq} 
+                    onViewDetails={handleViewDetails}
+                    onQuoteUpdate={handleQuoteUpdate}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {pagination.totalPages > 1 && (
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-500">
+                    Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+                      disabled={!pagination.hasPrev}
+                      className="px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg">
+                      {pagination.page} of {pagination.totalPages}
+                    </span>
+                    <button
+                      onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+                      disabled={!pagination.hasNext}
+                      className="px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-12">
               <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -477,7 +761,10 @@ export default function MyRFQsSection() {
                   : 'You haven\'t created any RFQs yet.'}
               </p>
               {!searchTerm && statusFilter === 'all' && (
-                <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <button 
+                  onClick={() => router.push('/rfq')}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
                   Create Your First RFQ
                 </button>
               )}

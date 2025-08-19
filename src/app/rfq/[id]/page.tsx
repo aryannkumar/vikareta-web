@@ -1,264 +1,57 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { 
   ArrowLeft,
-  Calendar,
-  Package,
-  DollarSign,
-  MapPin,
   Clock,
-  User,
-  MessageSquare,
-  Phone,
-  Mail,
+  Package,
+  Calendar,
+  MapPin,
   Star,
   CheckCircle,
-  AlertCircle,
-  ExternalLink,
+  MessageSquare,
+  User,
+  Building,
+  Phone,
+  Mail,
+  FileText,
   Download,
-  Send,
+  Paperclip,
   ThumbsUp,
   ThumbsDown,
-  MoreHorizontal,
-  Building,
-  Shield,
-  TrendingUp,
-  FileText,
-  Image,
-  Paperclip
+  Send,
+  Loader2,
+  ShoppingCart,
+  
 } from 'lucide-react';
-import { useRouter, useParams } from 'next/navigation';
-
-// Mock data - in real app, this would come from API
-const mockRfqDetails = {
-  id: 'rfq-001',
-  title: 'Industrial Pumps Required',
-  description: 'We need high-quality industrial pumps for our water treatment facility. The pumps should be capable of handling 1000 gallons per minute and must be corrosion-resistant. Installation and training should be included in the proposal.',
-  category: { 
-    id: 'cat-001',
-    name: 'Machinery & Equipment',
-    slug: 'machinery-equipment'
-  },
-  subcategory: {
-    id: 'subcat-001', 
-    name: 'Industrial Pumps',
-    slug: 'industrial-pumps'
-  },
-  status: 'active',
-  createdAt: new Date('2024-01-15'),
-  expiresAt: new Date('2024-02-15'),
-  budgetMin: 100000,
-  budgetMax: 150000,
-  quantity: 5,
-  deliveryLocation: 'Mumbai, Maharashtra',
-  deliveryTimeline: 'Within 45 days',
-  rfqType: 'product',
-  specifications: [
-    'Flow rate: 1000 GPM minimum',
-    'Material: Stainless steel or equivalent corrosion-resistant material',
-    'Pressure rating: 150 PSI minimum',
-    'Power supply: 415V, 50Hz, 3-phase',
-    'Certification: ISI marked'
-  ],
-  attachments: [
-    { name: 'Technical_Specifications.pdf', url: '/files/tech-specs.pdf', size: '2.4 MB' },
-    { name: 'Site_Layout.jpg', url: '/files/site-layout.jpg', size: '1.2 MB' }
-  ],
-  buyer: {
-    id: 'buyer-001',
-    firstName: 'Rajesh',
-    lastName: 'Patel',
-    businessName: 'AquaTech Solutions Pvt Ltd',
-    email: 'rajesh@aquatech.com',
-    phone: '+91 98765 43210',
-    verificationTier: 'verified',
-    isVerified: true
-  },
-  responses: {
-    platform: [
-      {
-        id: 'quote-001',
-        sellerId: 'seller-001',
-        seller: {
-          id: 'seller-001',
-          name: 'Kumar Industries',
-          businessName: 'Kumar Industrial Equipment',
-          email: 'sales@kumarindustries.com',
-          phone: '+91 87654 32109',
-          whatsappNumber: '+91 87654 32109',
-          verificationTier: 'verified',
-          isVerified: true,
-          averageRating: 4.8,
-          totalReviews: 124,
-          responseTime: '2 hours',
-          location: 'Pune, Maharashtra'
-        },
-        totalPrice: 125000,
-        currency: 'INR',
-        validUntil: new Date('2024-02-10'),
-        message: 'We can provide high-quality industrial pumps as per your specifications. Our pumps come with 2-year warranty and free installation. We have been in this business for 15 years and have supplied to major industrial clients.',
-        status: 'pending',
-        submittedAt: new Date('2024-01-16'),
-        items: [
-          {
-            name: 'Industrial Centrifugal Pump - Model IP1000',
-            quantity: 5,
-            unitPrice: 22000,
-            description: 'High-efficiency centrifugal pump with stainless steel construction'
-          },
-          {
-            name: 'Installation & Setup',
-            quantity: 1,
-            unitPrice: 15000,
-            description: 'Complete installation, testing, and commissioning'
-          }
-        ],
-        attachments: [
-          { name: 'Product_Brochure.pdf', url: '/files/brochure.pdf', size: '3.2 MB' },
-          { name: 'Warranty_Certificate.pdf', url: '/files/warranty.pdf', size: '1.8 MB' }
-        ],
-        isCounterOffer: false,
-        originalQuoteId: null,
-        estimatedDelivery: '30 days',
-        paymentTerms: '30% advance, 70% on delivery',
-        warrantyInfo: '2 years comprehensive warranty with free maintenance',
-        negotiations: [
-          {
-            id: 'neg-001',
-            type: 'message',
-            from: 'buyer',
-            message: 'Can you improve the price? Our budget is around ₹110,000 for 5 units.',
-            timestamp: new Date('2024-01-17T10:30:00'),
-            attachments: []
-          },
-          {
-            id: 'neg-002', 
-            type: 'counter_offer',
-            from: 'seller',
-            message: 'We can offer ₹115,000 for 5 units with same warranty and installation. This is our best price.',
-            timestamp: new Date('2024-01-17T14:45:00'),
-            counterOffer: {
-              totalPrice: 115000,
-              items: [
-                {
-                  name: 'Industrial Centrifugal Pump - Model IP1000',
-                  quantity: 5,
-                  unitPrice: 20000,
-                  description: 'High-efficiency centrifugal pump with stainless steel construction'
-                },
-                {
-                  name: 'Installation & Setup',
-                  quantity: 1,
-                  unitPrice: 15000,
-                  description: 'Complete installation, testing, and commissioning'
-                }
-              ]
-            }
-          }
-        ]
-      },
-      {
-        id: 'quote-002',
-        sellerId: 'seller-002',
-        seller: {
-          id: 'seller-002',
-          name: 'Singh Engineering',
-          businessName: 'Singh Pump Solutions',
-          email: 'contact@singhpumps.com',
-          phone: '+91 76543 21098',
-          whatsappNumber: '+91 76543 21098',
-          verificationTier: 'verified',
-          isVerified: true,
-          averageRating: 4.6,
-          totalReviews: 89,
-          responseTime: '4 hours',
-          location: 'Ahmedabad, Gujarat'
-        },
-        totalPrice: 140000,
-        currency: 'INR',
-        validUntil: new Date('2024-02-12'),
-        message: 'Premium quality pumps with extended warranty and free installation. We use German technology and provide 24/7 support.',
-        status: 'pending',
-        submittedAt: new Date('2024-01-17'),
-        items: [
-          {
-            name: 'Premium Industrial Pump - Model SP2000',
-            quantity: 5,
-            unitPrice: 26000,
-            description: 'German technology pump with superior efficiency'
-          },
-          {
-            name: 'Premium Installation Package',
-            quantity: 1,
-            unitPrice: 10000,
-            description: 'Installation with 1-year free maintenance'
-          }
-        ],
-        attachments: [
-          { name: 'Technical_Datasheet.pdf', url: '/files/datasheet.pdf', size: '2.8 MB' }
-        ],
-        isCounterOffer: false,
-        originalQuoteId: null,
-        estimatedDelivery: '25 days',
-        paymentTerms: '40% advance, 60% on delivery',
-        warrantyInfo: '3 years warranty with 24/7 support',
-        negotiations: []
-      }
-    ],
-    whatsapp: [
-      {
-        id: 'wa-001',
-        sellerId: 'seller-003',
-        seller: {
-          id: 'seller-003',
-          name: 'Pradeep Industries',
-          businessName: 'Pradeep Pump Solutions',
-          email: 'pradeep@pradeeppumps.com',
-          phone: '+91 65432 10987',
-          whatsappNumber: '+91 65432 10987',
-          verificationTier: 'basic',
-          isVerified: false,
-          averageRating: 4.2,
-          totalReviews: 45,
-          responseTime: '1 hour',
-          location: 'Jaipur, Rajasthan'
-        },
-        messageContent: 'We can provide industrial pumps at competitive rates. Our price is ₹22,000 per unit with 1-year warranty. Total for 5 units: ₹110,000. We can deliver within 40 days.',
-        extractedPrice: 110000,
-        extractedCurrency: 'INR',
-        confidence: 0.85,
-        receivedAt: new Date('2024-01-18'),
-        messageType: 'text',
-        attachments: [],
-        isProcessed: true
-      }
-    ]
-  },
-  responseAnalytics: {
-    totalResponses: 3,
-    platformResponses: 2,
-    whatsappResponses: 1,
-    averagePrice: 125000,
-    lowestPrice: 110000,
-    highestPrice: 140000,
-    averageResponseTime: 2.3,
-    verifiedSellerResponses: 2,
-    lastResponseAt: new Date('2024-01-18')
-  }
-};
+import { rfqService, RfqWithResponses } from '../../../services/rfq.service';
+import { orderService, CreateOrderFromQuoteData } from '../../../services/order.service';
 
 export default function RFQDetailsPage() {
-  const params = useParams();
-  const rfqId = params.id as string;
   const router = useRouter();
-  const [rfq] = useState(mockRfqDetails);
+  const params = useParams();
+  const rfqId = useMemo(() => (params?.id ? String(params.id) : ''), [params]);
+  const [rfq, setRfq] = useState<RfqWithResponses | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'responses' | 'negotiations'>('overview');
   const [selectedResponse, setSelectedResponse] = useState<string | null>(null);
   const [negotiationMessage, setNegotiationMessage] = useState('');
   const [showNegotiationForm, setShowNegotiationForm] = useState(false);
+  const [showOrderForm, setShowOrderForm] = useState(false);
+  const [orderLoading, setOrderLoading] = useState(false);
+  const [address, setAddress] = useState({
+    street: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: 'India',
+  });
+  const [paymentMethod, setPaymentMethod] = useState<'cashfree' | 'wallet'>('wallet');
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount?: number | null) => {
+    if (!amount && amount !== 0) return 'N/A';
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
@@ -279,40 +72,111 @@ export default function RFQDetailsPage() {
     }
   };
 
-  const getDaysRemaining = (expiresAt: Date) => {
+  const getDaysRemaining = (expiresAt?: string | Date | null) => {
+    if (!expiresAt) return 0;
+    const exp = typeof expiresAt === 'string' ? new Date(expiresAt) : expiresAt;
     const today = new Date();
-    const diffTime = expiresAt.getTime() - today.getTime();
+    const diffTime = exp.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   };
+
+  const loadRfq = async () => {
+    if (!rfqId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await rfqService.getRfqWithResponses(rfqId);
+      setRfq(data);
+    } catch (e: any) {
+      setError(e?.message || 'Failed to load RFQ');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadRfq();
+  }, [rfqId]);
 
   const handleNegotiate = (responseId: string) => {
     setSelectedResponse(responseId);
     setShowNegotiationForm(true);
   };
 
-  const handleSendNegotiation = () => {
-    // Here you would send the negotiation message to the API
-    console.log('Sending negotiation:', { responseId: selectedResponse, message: negotiationMessage });
-    setNegotiationMessage('');
-    setShowNegotiationForm(false);
-    setSelectedResponse(null);
+  const handleSendNegotiation = async () => {
+    if (!selectedResponse || !negotiationMessage.trim()) return;
+    try {
+      await rfqService.negotiateQuote(selectedResponse, { message: negotiationMessage });
+      setNegotiationMessage('');
+      setShowNegotiationForm(false);
+      setSelectedResponse(null);
+      await loadRfq();
+    } catch (e) {
+      console.error('Negotiation failed', e);
+      alert('Failed to send negotiation');
+    }
   };
 
   const handleAcceptQuote = (responseId: string) => {
-    console.log('Accepting quote:', responseId);
-    // API call to accept quote
+    setSelectedResponse(responseId);
+    setShowOrderForm(true);
   };
 
-  const handleRejectQuote = (responseId: string) => {
-    console.log('Rejecting quote:', responseId);
-    // API call to reject quote
+  const handleRejectQuote = async (responseId: string) => {
+    try {
+      await rfqService.rejectQuote(responseId, 'Not suitable');
+      await loadRfq();
+    } catch (e) {
+      console.error('Reject quote failed', e);
+      alert('Failed to reject quote');
+    }
+  };
+
+  const submitOrder = async () => {
+    if (!selectedResponse) return;
+    if (!address.street || !address.city || !address.state || !address.postalCode) {
+      alert('Please fill in all required address fields');
+      return;
+    }
+    setOrderLoading(true);
+    try {
+      await rfqService.acceptQuote(selectedResponse);
+      const payload: CreateOrderFromQuoteData = {
+        quoteId: selectedResponse,
+        shippingAddress: address,
+        paymentMethod,
+        customerNotes: `Order from RFQ ${rfqId}`,
+      };
+      const created = await orderService.convertQuoteToOrder(payload);
+      setShowOrderForm(false);
+      if (created.orderId) router.push(`/orders/${created.orderId}`);
+      else alert(`Order created: ${created.orderNumber}`);
+    } catch (e: any) {
+      console.error('Order conversion failed', e);
+      alert(e?.message || 'Failed to accept quote/create order');
+    } finally {
+      setOrderLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        {loading && (
+          <div className="flex items-center justify-center py-12 text-gray-600">
+            <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading RFQ...
+          </div>
+        )}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded mb-4">{error}</div>
+        )}
+        {!rfq && !loading && (
+          <div className="text-center text-gray-600">RFQ not found</div>
+        )}
+  {rfq && (
+  <>
+  {/* Header */}
         <div className="mb-6">
           <button
             onClick={() => router.back()}
@@ -328,21 +192,30 @@ export default function RFQDetailsPage() {
               <div className="flex items-center gap-4 text-sm text-gray-600">
                 <span className="flex items-center gap-1">
                   <Package className="h-4 w-4" />
-                  {rfq.category.name}
+                  {rfq.category?.name}
+                  {rfq.subcategory?.name ? (
+                    <>
+                      <span className="mx-1 text-gray-400">›</span>
+                      <span>{rfq.subcategory?.name}</span>
+                    </>
+                  ) : null}
                 </span>
                 <span className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  Created {rfq.createdAt.toLocaleDateString()}
+                  Created {new Date(String(rfq.createdAt)).toLocaleDateString()}
                 </span>
                 <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(rfq.status)}`}>
                   {rfq.status.charAt(0).toUpperCase() + rfq.status.slice(1)}
+                </span>
+                <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  {rfq.rfqType === 'service' ? 'Service Order' : 'Product Order'}
                 </span>
               </div>
             </div>
             
             <div className="text-right">
               <div className="text-lg font-semibold text-gray-900 mb-1">
-                {rfq.responseAnalytics.totalResponses} Responses
+                {rfq.responseAnalytics?.totalResponses || 0} Responses
               </div>
               <div className="text-sm text-gray-600">
                 Expires in {getDaysRemaining(rfq.expiresAt)} days
@@ -375,7 +248,7 @@ export default function RFQDetailsPage() {
                 }`}
               >
                 <MessageSquare className="h-5 w-5 inline mr-2" />
-                Responses ({rfq.responseAnalytics.totalResponses})
+                Responses ({rfq.responseAnalytics?.totalResponses || 0})
               </button>
               <button
                 onClick={() => setActiveTab('negotiations')}
@@ -407,39 +280,57 @@ export default function RFQDetailsPage() {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
-                      <p className="text-gray-600">{rfq.quantity} units</p>
-                    </div>
+                    {rfq.quantity !== undefined && rfq.quantity !== null && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+                        <p className="text-gray-600">{rfq.quantity} units</p>
+                      </div>
+                    )}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Budget Range</label>
                       <p className="text-gray-600">
                         {formatCurrency(rfq.budgetMin)} - {formatCurrency(rfq.budgetMax)}
                       </p>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Delivery Location</label>
-                      <p className="text-gray-600 flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        {rfq.deliveryLocation}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Timeline</label>
-                      <p className="text-gray-600 flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {rfq.deliveryTimeline}
-                      </p>
-                    </div>
+                    {rfq.deliveryLocation && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Delivery Location</label>
+                        <p className="text-gray-600 flex items-center gap-1">
+                          <MapPin className="h-4 w-4" />
+                          {rfq.deliveryLocation}
+                        </p>
+                      </div>
+                    )}
+                    {rfq.deliveryTimeline && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{rfq.rfqType === 'service' ? 'Preferred Timeline' : 'Timeline'}</label>
+                        <p className="text-gray-600 flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {rfq.deliveryTimeline}
+                        </p>
+                      </div>
+                    )}
+                    {rfq.rfqType === 'service' && rfq.serviceType && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Service Type</label>
+                        <p className="text-gray-600">{rfq.serviceType}</p>
+                      </div>
+                    )}
+                    {rfq.rfqType === 'service' && rfq.preferredLocation && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Location</label>
+                        <p className="text-gray-600">{rfq.preferredLocation}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* Specifications */}
               <div className="bg-white rounded-lg border p-6">
-                <h2 className="text-xl font-semibold mb-4">Technical Specifications</h2>
+                <h2 className="text-xl font-semibold mb-4">{rfq.rfqType === 'service' ? 'Requirements' : 'Technical Specifications'}</h2>
                 <ul className="space-y-2">
-                  {rfq.specifications.map((spec, index) => (
+                  {((rfq.specifications && rfq.specifications.length > 0) ? rfq.specifications : (rfq.requirements || [])).map((spec, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                       <span className="text-gray-600">{spec}</span>
@@ -449,24 +340,24 @@ export default function RFQDetailsPage() {
               </div>
 
               {/* Attachments */}
-              {rfq.attachments.length > 0 && (
+              {(rfq.attachments && rfq.attachments.length > 0) && (
                 <div className="bg-white rounded-lg border p-6">
                   <h2 className="text-xl font-semibold mb-4">Attachments</h2>
                   <div className="space-y-3">
-                    {rfq.attachments.map((attachment, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    {rfq.attachments.map((url, index) => (
+                      <a key={index} href={url} target="_blank" rel="noreferrer" className="flex items-center justify-between p-3 border rounded-lg">
                         <div className="flex items-center gap-3">
                           <FileText className="h-5 w-5 text-gray-400" />
                           <div>
-                            <p className="font-medium text-gray-900">{attachment.name}</p>
-                            <p className="text-sm text-gray-500">{attachment.size}</p>
+                            <p className="font-medium text-gray-900">Attachment {index + 1}</p>
+                            <p className="text-sm text-gray-500 truncate max-w-xs">{url}</p>
                           </div>
                         </div>
-                        <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                        <span className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
                           <Download className="h-4 w-4" />
-                          Download
-                        </button>
-                      </div>
+                          Open
+                        </span>
+                      </a>
                     ))}
                   </div>
                 </div>
@@ -481,29 +372,29 @@ export default function RFQDetailsPage() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Total Responses</span>
-                    <span className="font-medium">{rfq.responseAnalytics.totalResponses}</span>
+                    <span className="font-medium">{rfq.responseAnalytics?.totalResponses || 0}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Platform Quotes</span>
-                    <span className="font-medium text-blue-600">{rfq.responseAnalytics.platformResponses}</span>
+                    <span className="font-medium text-blue-600">{rfq.responseAnalytics?.platformResponses || 0}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">WhatsApp Responses</span>
-                    <span className="font-medium text-green-600">{rfq.responseAnalytics.whatsappResponses}</span>
+                    <span className="font-medium text-green-600">{rfq.responseAnalytics?.whatsappResponses || 0}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Verified Sellers</span>
-                    <span className="font-medium text-purple-600">{rfq.responseAnalytics.verifiedSellerResponses}</span>
+                    <span className="font-medium text-purple-600">{rfq.responseAnalytics?.verifiedSellerResponses || 0}</span>
                   </div>
                   <hr />
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Price Range</span>
                     <div className="text-right">
                       <div className="text-sm text-green-600">
-                        Low: {formatCurrency(rfq.responseAnalytics.lowestPrice)}
+                        Low: {formatCurrency(rfq.responseAnalytics?.lowestPrice)}
                       </div>
                       <div className="text-sm text-red-600">
-                        High: {formatCurrency(rfq.responseAnalytics.highestPrice)}
+                        High: {formatCurrency(rfq.responseAnalytics?.highestPrice)}
                       </div>
                     </div>
                   </div>
@@ -517,28 +408,21 @@ export default function RFQDetailsPage() {
                   <div className="flex items-center gap-3">
                     <User className="h-5 w-5 text-gray-400" />
                     <div>
-                      <p className="font-medium">{rfq.buyer.firstName} {rfq.buyer.lastName}</p>
-                      <p className="text-sm text-gray-600">{rfq.buyer.businessName}</p>
+                      <p className="font-medium">{rfq.buyer?.firstName} {rfq.buyer?.lastName}</p>
+                      <p className="text-sm text-gray-600">{rfq.buyer?.businessName}</p>
                     </div>
-                    {rfq.buyer.isVerified && (
+                    {rfq.buyer?.isVerified && (
                       <CheckCircle className="h-5 w-5 text-blue-600" />
                     )}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-600">{rfq.buyer.email}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-600">{rfq.buyer.phone}</span>
-                  </div>
+                  {/* Contact details not available in buyer type; hidden */}
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {activeTab === 'responses' && (
+        {activeTab === 'responses' && rfq && (
           <div className="space-y-6">
             {/* Platform Responses */}
             <div>
@@ -553,7 +437,7 @@ export default function RFQDetailsPage() {
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-lg">{response.seller.businessName}</h3>
+                            <h3 className="font-semibold text-lg">{response.seller.businessName || response.seller.name}</h3>
                             {response.seller.isVerified && (
                               <CheckCircle className="h-5 w-5 text-blue-600" />
                             )}
@@ -563,8 +447,7 @@ export default function RFQDetailsPage() {
                               <Star className="h-4 w-4 text-yellow-500 fill-current" />
                               {response.seller.averageRating} ({response.seller.totalReviews} reviews)
                             </span>
-                            <span>{response.seller.location}</span>
-                            <span>Responds in {response.seller.responseTime}</span>
+                            {/* Optional info not always available */}
                           </div>
                         </div>
                       </div>
@@ -573,7 +456,7 @@ export default function RFQDetailsPage() {
                           {formatCurrency(response.totalPrice)}
                         </div>
                         <div className="text-sm text-gray-600">
-                          Valid until {response.validUntil?.toLocaleDateString()}
+                          {response.validUntil ? `Valid until ${new Date(String(response.validUntil)).toLocaleDateString()}` : ''}
                         </div>
                       </div>
                     </div>
@@ -622,14 +505,17 @@ export default function RFQDetailsPage() {
                       <div className="mb-4">
                         <h4 className="font-medium mb-2">Attachments</h4>
                         <div className="flex flex-wrap gap-2">
-                          {response.attachments.map((attachment, index) => (
-                            <button
+                          {response.attachments.map((url, index) => (
+                            <a
                               key={index}
+                              href={url}
+                              target="_blank"
+                              rel="noreferrer"
                               className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50"
                             >
                               <Paperclip className="h-4 w-4" />
-                              <span className="text-sm">{attachment.name}</span>
-                            </button>
+                              <span className="text-sm">Attachment {index + 1}</span>
+                            </a>
                           ))}
                         </div>
                       </div>
@@ -687,7 +573,7 @@ export default function RFQDetailsPage() {
                           <div>
                             <h3 className="font-semibold">{response.seller.businessName}</h3>
                             <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <span>{response.seller.location}</span>
+                              {/* location not present in seller type */}
                               {response.extractedPrice && (
                                 <span className="text-green-600 font-medium">
                                   {formatCurrency(response.extractedPrice)}
@@ -697,7 +583,7 @@ export default function RFQDetailsPage() {
                           </div>
                         </div>
                         <div className="text-sm text-gray-500">
-                          {response.receivedAt.toLocaleDateString()}
+                          {new Date(String(response.receivedAt)).toLocaleDateString()}
                         </div>
                       </div>
                       
@@ -727,83 +613,37 @@ export default function RFQDetailsPage() {
               </div>
             )}
           </div>
-        )}
+  )}
 
-        {activeTab === 'negotiations' && (
+        {activeTab === 'negotiations' && rfq && (
           <div className="space-y-6">
             <h2 className="text-xl font-semibold">Ongoing Negotiations</h2>
             
-            {rfq.responses.platform
-              .filter(response => response.negotiations && response.negotiations.length > 0)
-              .map((response) => (
-                <div key={response.id} className="bg-white rounded-lg border p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Building className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{response.seller.businessName}</h3>
-                      <p className="text-sm text-gray-600">Original Quote: {formatCurrency(response.totalPrice)}</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    {response.negotiations?.map((negotiation) => (
-                      <div
-                        key={negotiation.id}
-                        className={`flex ${negotiation.from === 'buyer' ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div
-                          className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
-                            negotiation.from === 'buyer'
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-gray-100 text-gray-900'
-                          }`}
-                        >
-                          <p className="text-sm">{negotiation.message}</p>
-                          {negotiation.counterOffer && (
-                            <div className="mt-2 pt-2 border-t border-opacity-20">
-                              <p className="text-xs opacity-90">Counter Offer: {formatCurrency(negotiation.counterOffer.totalPrice)}</p>
-                            </div>
-                          )}
-                          <p className="text-xs opacity-75 mt-1">
-                            {negotiation.timestamp.toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t">
-                    <div className="flex gap-3">
-                      <input
-                        type="text"
-                        placeholder="Type your message..."
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={negotiationMessage}
-                        onChange={(e) => setNegotiationMessage(e.target.value)}
-                      />
-                      <button
-                        onClick={handleSendNegotiation}
-                        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                      >
-                        <Send className="h-4 w-4" />
-                        Send
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-            {rfq.responses.platform.every(response => !response.negotiations || response.negotiations.length === 0) && (
-              <div className="text-center py-12">
-                <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Negotiations</h3>
-                <p className="text-gray-600">
-                  Start negotiating with suppliers by clicking "Negotiate" on their quotes.
-                </p>
+            <div className="text-center py-12">
+              <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Negotiation Threads</h3>
+              <p className="text-gray-600">Use the Negotiate button under responses to send a message.</p>
+              <div className="mt-4 max-w-md mx-auto flex gap-3">
+                <input
+                  type="text"
+                  placeholder="Type a quick negotiation message..."
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={negotiationMessage}
+                  onChange={(e) => setNegotiationMessage(e.target.value)}
+                />
+                <button
+                  onClick={handleSendNegotiation}
+                  className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  disabled={!selectedResponse}
+                >
+                  <Send className="h-4 w-4" />
+                  Send
+                </button>
               </div>
-            )}
+              {!selectedResponse && (
+                <p className="text-xs text-gray-500 mt-2">Select a quote in the Responses tab to send a negotiation.</p>
+              )}
+            </div>
           </div>
         )}
 
@@ -845,6 +685,105 @@ export default function RFQDetailsPage() {
             </div>
           </div>
         )}
+
+        {/* Accept & Order Modal */}
+        {showOrderForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-md w-full p-6">
+              <h3 className="text-lg font-semibold mb-4">{rfq?.rfqType === 'service' ? 'Service Address & Payment' : 'Delivery Address & Payment'}</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Street Address</label>
+                  <input
+                    type="text"
+                    value={address.street}
+                    onChange={(e) => setAddress(prev => ({ ...prev, street: e.target.value }))}
+                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="Enter street address"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">City</label>
+                    <input
+                      type="text"
+                      value={address.city}
+                      onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="City"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">State</label>
+                    <input
+                      type="text"
+                      value={address.state}
+                      onChange={(e) => setAddress(prev => ({ ...prev, state: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="State"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Postal Code</label>
+                    <input
+                      type="text"
+                      value={address.postalCode}
+                      onChange={(e) => setAddress(prev => ({ ...prev, postalCode: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="Postal Code"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Country</label>
+                    <input
+                      type="text"
+                      value={address.country}
+                      onChange={(e) => setAddress(prev => ({ ...prev, country: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="Country"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Payment Method</label>
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value as 'cashfree' | 'wallet')}
+                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="wallet">Wallet</option>
+                    <option value="cashfree">Cashfree</option>
+                  </select>
+                </div>
+                <div className="bg-blue-50 p-3 rounded">
+                  <p className="text-sm text-blue-800">
+                    By accepting, the quote will be converted to an order.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={submitOrder}
+                    disabled={orderLoading}
+                    className="flex-1 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {orderLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingCart className="h-4 w-4" />}
+                    {orderLoading ? 'Processing...' : 'Accept & Create Order'}
+                  </button>
+                  <button
+                    onClick={() => setShowOrderForm(false)}
+                    className="px-4 py-2 border rounded hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+    </>
+    )}
       </div>
     </div>
   );

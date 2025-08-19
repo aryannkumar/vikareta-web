@@ -1,80 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
-import { 
-  FileText, 
-  X, 
-  Plus,
-  AlertCircle,
-  Loader2,
-  CheckCircle
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { FileText, X, Plus, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
+import { rfqService } from '../../services/rfq.service';
 import MyRFQsSection from './MyRFQsSection';
 
 // Types for My RFQ section
-interface QuoteResponse {
-  id: string;
-  sellerId: string;
-  seller: {
-    name: string;
-    rating: number;
-    responseTime: string;
-  };
-  price: number;
-  deliveryTime: string;
-  description: string;
-  status: 'pending' | 'accepted' | 'rejected';
-  createdAt: string;
-  negotiationCount: number;
-}
+// Types for RFQ list/details live in the respective components
 
-interface RfqDetails {
-  id: string;
-  title: string;
-  description: string;
-  categoryName: string;
-  quantity: number;
-  unit: string;
-  budget: number;
-  timeline: string;
-  location: string;
-  status: 'active' | 'closed' | 'draft';
-  createdAt: string;
-  buyer: {
-    name: string;
-    email: string;
-  };
-  category: {
-    name: string;
-    slug: string;
-  };
-  subcategory?: {
-    name: string;
-    slug: string;
-  };
-  totalResponses: number;
-  avgResponsePrice: number;
-  bestOffer?: QuoteResponse;
-  specifications: { key: string; value: string }[];
-  attachments: File[];
-}
-
-interface RfqWithResponses extends RfqDetails {
-  responses: {
-    platform: QuoteResponse[];
-    whatsapp: any[];
-  };
-  responseAnalytics: {
-    totalResponses: number;
-    avgPrice: number;
-    priceRange: { min: number; max: number };
-    avgDeliveryTime: number;
-  };
-}
+// RfqWithResponses is defined in the RFQ list/detail components; not needed here
 
 interface RFQFormData {
+  rfqType: 'product' | 'service';
   title: string;
   category: string;
+  subcategory?: string;
   description: string;
   quantity: string;
   unit: string;
@@ -94,8 +34,10 @@ interface RFQFormData {
 export default function RFQPage() {
   const [activeTab, setActiveTab] = useState<'new' | 'my'>('new');
   const [formData, setFormData] = useState<RFQFormData>({
+  rfqType: 'product',
     title: '',
     category: '',
+  subcategory: '',
     description: '',
     quantity: '',
     unit: '',
@@ -115,10 +57,41 @@ export default function RFQPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [subcategories, setSubcategories] = useState<any[]>([]);
 
-  const categories = [
-    'Electronics', 'Fashion', 'Home & Garden', 'Sports', 'Books', 'Health', 'Automotive', 'Business'
-  ];
+  // Load categories on component mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const cats = await rfqService.getCategories();
+        setCategories(cats);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+        setCategories([]);
+      }
+    };
+
+    loadCategories();
+  }, []);
+
+  // Load subcategories when category changes
+  useEffect(() => {
+    const loadSubs = async () => {
+      if (!formData.category) {
+        setSubcategories([]);
+        return;
+      }
+      try {
+        const subs = await rfqService.getSubcategories(formData.category);
+        setSubcategories(subs);
+      } catch (error) {
+        console.error('Error loading subcategories:', error);
+        setSubcategories([]);
+      }
+    };
+    loadSubs();
+  }, [formData.category]);
 
   const units = ['pieces', 'kg', 'tons', 'meters', 'liters', 'boxes', 'sets'];
 
@@ -131,14 +104,19 @@ export default function RFQPage() {
     if (!formData.category) {
       newErrors['category'] = 'Category is required';
     }
+    if (subcategories.length > 0 && !formData.subcategory) {
+      newErrors['subcategory'] = 'Subcategory is required';
+    }
     if (!formData.description.trim()) {
       newErrors['description'] = 'Description is required';
     }
-    if (!formData.quantity.trim()) {
-      newErrors['quantity'] = 'Quantity is required';
-    }
-    if (!formData.unit) {
-      newErrors['unit'] = 'Unit is required';
+    if (formData.rfqType === 'product') {
+      if (!formData.quantity.trim()) {
+        newErrors['quantity'] = 'Quantity is required';
+      }
+      if (!formData.unit) {
+        newErrors['unit'] = 'Unit is required';
+      }
     }
     if (!formData.budget.trim()) {
       newErrors['budget'] = 'Budget is required';
@@ -146,8 +124,10 @@ export default function RFQPage() {
     if (!formData.timeline.trim()) {
       newErrors['timeline'] = 'Timeline is required';
     }
-    if (!formData.location.trim()) {
-      newErrors['location'] = 'Location is required';
+    if (formData.rfqType === 'product') {
+      if (!formData.location.trim()) {
+        newErrors['location'] = 'Location is required';
+      }
     }
     if (!formData.contactInfo.name.trim()) {
       newErrors['contactInfo.name'] = 'Name is required';
@@ -175,6 +155,9 @@ export default function RFQPage() {
       }));
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
+      if (field === 'category') {
+        setFormData(prev => ({ ...prev, subcategory: '' }));
+      }
     }
     
     // Clear error when user starts typing
@@ -192,12 +175,55 @@ export default function RFQPage() {
 
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setSubmitted(true);
-      console.log('RFQ submitted:', formData);
+      // Upload attachments first
+      const attachmentUrls: string[] = [];
+      for (const file of formData.attachments) {
+        const url = await rfqService.uploadAttachment(file);
+        attachmentUrls.push(url);
+      }
+
+      // Prepare RFQ data by type
+      const budgetMax = parseFloat(formData.budget.replace(/[^0-9.-]+/g, ''));
+      const baseDesc = `${formData.description}\n\nContact Information:\nName: ${formData.contactInfo.name}\nEmail: ${formData.contactInfo.email}\nPhone: ${formData.contactInfo.phone}${formData.contactInfo.company ? `\nCompany: ${formData.contactInfo.company}` : ''}`;
+
+      if (formData.rfqType === 'service') {
+        const serviceData = {
+          title: formData.title,
+          description: baseDesc,
+          categoryId: formData.category,
+          subcategoryId: formData.subcategory || undefined,
+          serviceType: 'one_time' as const,
+          budgetMax,
+          preferredLocation: 'both' as const,
+          preferredTimeline: formData.timeline,
+          urgency: 'medium' as const,
+          attachments: attachmentUrls,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        };
+        const result = await rfqService.createServiceRfq(serviceData);
+        setSubmitted(true);
+        console.log('Service RFQ created successfully:', result);
+      } else {
+        const productData = {
+          title: formData.title,
+          description: baseDesc,
+          categoryId: formData.category,
+          subcategoryId: formData.subcategory || undefined,
+          quantity: parseInt(formData.quantity),
+          budgetMax,
+          deliveryTimeline: formData.timeline,
+          deliveryLocation: formData.location,
+          specifications: formData.specifications.filter(Boolean),
+          attachments: attachmentUrls,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        };
+        const result = await rfqService.createProductRfq(productData);
+        setSubmitted(true);
+        console.log('Product RFQ created successfully:', result);
+      }
     } catch (error) {
       console.error('Error submitting RFQ:', error);
+      setErrors({ submit: error instanceof Error ? error.message : 'Failed to submit RFQ' });
     } finally {
       setLoading(false);
     }
@@ -264,8 +290,10 @@ export default function RFQPage() {
                   onClick={() => {
                     setSubmitted(false);
                     setFormData({
+                      rfqType: 'product',
                       title: '',
                       category: '',
+                      subcategory: '',
                       description: '',
                       quantity: '',
                       unit: '',
@@ -341,6 +369,33 @@ export default function RFQPage() {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium mb-2">
+                RFQ Type <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-4">
+                <label className="inline-flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="rfqType"
+                    value="product"
+                    checked={formData.rfqType === 'product'}
+                    onChange={() => handleInputChange('rfqType', 'product')}
+                  />
+                  Product Order
+                </label>
+                <label className="inline-flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="rfqType"
+                    value="service"
+                    checked={formData.rfqType === 'service'}
+                    onChange={() => handleInputChange('rfqType', 'service')}
+                  />
+                  Service Order
+                </label>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">
                 RFQ Title <span className="text-red-500">*</span>
               </label>
               <input
@@ -372,11 +427,13 @@ export default function RFQPage() {
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                     errors.category ? 'border-red-500' : ''
                   }`}
-                  disabled={loading}
+                  disabled={loading || categories.length === 0}
                 >
                   <option value="">Select Category</option>
                   {categories.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
+                    <option key={cat.id || cat} value={cat.id || cat}>
+                      {cat.name || cat}
+                    </option>
                   ))}
                 </select>
                 {errors.category && (
@@ -387,6 +444,36 @@ export default function RFQPage() {
                 )}
               </div>
 
+              {subcategories.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Subcategory <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={formData.subcategory}
+                    onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
+                      errors.subcategory ? 'border-red-500' : ''
+                    }`}
+                    disabled={loading}
+                  >
+                    <option value="">Select Subcategory</option>
+                    {subcategories.map((sub) => (
+                      <option key={sub.id || sub} value={sub.id || sub}>
+                        {sub.name || sub}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.subcategory && (
+                    <div className="flex items-center gap-1 mt-1 text-red-500 text-xs">
+                      <AlertCircle className="h-3 w-3" />
+                      {errors.subcategory}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {formData.rfqType === 'product' && (
               <div>
                 <label className="block text-sm font-medium mb-2">
                   Location <span className="text-red-500">*</span>
@@ -408,6 +495,7 @@ export default function RFQPage() {
                   </div>
                 )}
               </div>
+              )}
             </div>
 
             <div>
@@ -435,11 +523,12 @@ export default function RFQPage() {
         </div>
 
         {/* Quantity and Budget */}
-        <div className="bg-card rounded-lg border p-6">
+    <div className="bg-card rounded-lg border p-6">
           <h2 className="text-xl font-semibold mb-6">Quantity & Budget</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
+      {formData.rfqType === 'product' && (
+      <div>
               <label className="block text-sm font-medium mb-2">
                 Quantity <span className="text-red-500">*</span>
               </label>
@@ -459,9 +548,11 @@ export default function RFQPage() {
                   {errors.quantity}
                 </div>
               )}
-            </div>
+      </div>
+      )}
 
-            <div>
+      {formData.rfqType === 'product' && (
+      <div>
               <label className="block text-sm font-medium mb-2">
                 Unit <span className="text-red-500">*</span>
               </label>
@@ -484,7 +575,8 @@ export default function RFQPage() {
                   {errors.unit}
                 </div>
               )}
-            </div>
+      </div>
+      )}
 
             <div>
               <label className="block text-sm font-medium mb-2">
@@ -622,6 +714,8 @@ export default function RFQPage() {
             )}
           </div>
         </div>
+
+        
 
         {/* Contact Information */}
         <div className="bg-card rounded-lg border p-6">
