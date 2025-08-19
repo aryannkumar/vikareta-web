@@ -2,22 +2,22 @@
 export const designSystem = {
   colors: {
     primary: {
-      50: '#fff7ed',
-      100: '#ffedd5',
-      200: '#fed7aa',
-      300: '#fdba74',
-      400: '#fb923c',
-      500: '#f97316', // Main orange
-      600: '#ea580c',
-      700: '#c2410c',
-      800: '#9a3412',
-      900: '#7c2d12',
-      950: '#431407'
+      50: '#eff6ff',
+      100: '#dbeafe',
+      200: '#bfdbfe',
+      300: '#93c5fd',
+      400: '#60a5fa',
+      500: '#3b82f6', // Main blue
+      600: '#2563eb',
+      700: '#1d4ed8',
+      800: '#1e40af',
+      900: '#1e3a8a',
+      950: '#172554'
     },
     accent: {
-      orange: '#f97316',
-      gold: '#f59e0b',
-      amber: '#fbbf24'
+      blue: '#3b82f6',
+      cyan: '#06b6d4',
+      indigo: '#6366f1'
     },
     neutral: {
       50: '#fafaf9',
@@ -91,13 +91,13 @@ export const designSystem = {
     md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
     lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
     xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-    premium: '0 25px 50px -12px rgba(249, 115, 22, 0.25)'
+  premium: '0 25px 50px -12px rgba(59, 130, 246, 0.25)'
   },
   
   gradients: {
-    primary: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-    subtle: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)',
-    hero: 'linear-gradient(135deg, #f97316 0%, #fb923c 25%, #fdba74 50%, #fed7aa 75%, #fff7ed 100%)',
+  primary: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+  subtle: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+  hero: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 25%, #93c5fd 50%, #bfdbfe 75%, #dbeafe 100%)',
     card: 'linear-gradient(145deg, #ffffff 0%, #fafaf9 100%)'
   }
 };
@@ -118,6 +118,6 @@ export const premiumComponents = {
   badge: {
     primary: "bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium",
     success: "bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium",
-    premium: "bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 px-3 py-1 rounded-full text-sm font-medium border border-amber-200"
+  premium: "bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium border border-blue-200"
   }
 };

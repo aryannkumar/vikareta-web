@@ -119,13 +119,13 @@ export const AnimatedButton: React.FC<{
   onClick,
   disabled = false 
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-orange-500/25';
+  const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-500/25';
   
   const variants = {
-    primary: 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl',
+  primary: 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl',
     secondary: 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl',
-    outline: 'border-2 border-orange-500 text-orange-600 bg-white hover:bg-orange-500 hover:text-white dark:bg-gray-900 dark:text-orange-400',
-    ghost: 'hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-900/20 dark:hover:text-orange-400',
+  outline: 'border-2 border-blue-600 text-blue-600 bg-white hover:bg-blue-600 hover:text-white dark:bg-gray-900 dark:text-blue-400',
+  ghost: 'hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400',
   };
   
   const sizes = {

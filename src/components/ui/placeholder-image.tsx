@@ -13,20 +13,20 @@ export function PlaceholderImage({ type, className = '', size = 200 }: Placehold
   const getIcon = () => {
     switch (type) {
       case 'product':
-        return <Package className="h-12 w-12 text-orange-400" />;
+        return <Package className="h-12 w-12 text-blue-500" />;
       case 'service':
-        return <Users className="h-12 w-12 text-orange-400" />;
+  return <Users className="h-12 w-12 text-blue-500" />;
       case 'business':
       case 'provider':
-        return <Store className="h-12 w-12 text-orange-400" />;
+  return <Store className="h-12 w-12 text-blue-500" />;
       default:
-        return <Package className="h-12 w-12 text-orange-400" />;
+  return <Package className="h-12 w-12 text-blue-500" />;
     }
   };
 
   return (
     <div 
-      className={`bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 flex items-center justify-center ${className}`}
+      className={`bg-gradient-to-br from-blue-50 to-cyan-100 dark:from-blue-900/20 dark:to-indigo-800/20 flex items-center justify-center ${className}`}
       style={{ width: size, height: size }}
     >
       {getIcon()}

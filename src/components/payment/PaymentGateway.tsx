@@ -278,7 +278,7 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
+  <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
         <span className="ml-3 text-gray-600">Loading payment options...</span>
       </div>
     );
@@ -299,7 +299,7 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
         </div>
         
         {/* Order Summary */}
-        <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-4">
+  <div className="bg-gradient-to-r from-blue-50 to-cyan-100 border border-blue-200 rounded-xl p-4">
           <div className="flex justify-between items-center">
             <div>
               <p className="text-sm text-gray-600">Order #{order.orderSerialNo}</p>
@@ -342,10 +342,10 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleGatewaySelect(gateway)}
-                className="w-full p-4 border border-gray-200 rounded-lg hover:border-orange-300 hover:bg-orange-50 transition-all duration-200 flex items-center justify-between group"
+                className="w-full p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 flex items-center justify-between group"
               >
                 <div className="flex items-center">
-                  <div className="p-2 bg-gray-100 rounded-lg mr-4 group-hover:bg-orange-100">
+                  <div className="p-2 bg-gray-100 rounded-lg mr-4 group-hover:bg-blue-100">
                     {getGatewayIcon(gateway.slug)}
                   </div>
                   <div className="text-left">
@@ -355,7 +355,7 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
                     </p>
                   </div>
                 </div>
-                <div className="text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
                   →
                 </div>
               </motion.button>
@@ -379,7 +379,7 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
 
           <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
             <div className="flex items-center mb-4">
-              <div className="p-3 bg-orange-100 rounded-lg mr-4">
+              <div className="p-3 bg-blue-100 rounded-lg mr-4">
                 {getGatewayIcon(selectedGateway.slug)}
               </div>
               <div>
@@ -419,7 +419,7 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
               <div className="border-t pt-2 mt-2">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-gray-900">Total</span>
-                  <span className="text-lg font-bold text-orange-600">₹{order.total.toLocaleString()}</span>
+                  <span className="text-lg font-bold text-blue-600">₹{order.total.toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -430,7 +430,7 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
             whileTap={{ scale: 0.98 }}
             onClick={processPayment}
             disabled={processing}
-            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-blue-600 via-cyan-500 to-indigo-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-blue-700 hover:via-cyan-600 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {processing ? (
               <>

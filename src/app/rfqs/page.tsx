@@ -76,7 +76,7 @@ export default function PublicRFQsPage() {
 
   const Stat = ({ label, value, icon: Icon }: { label: string; value: string; icon: any }) => (
     <div className="flex items-center gap-3 rounded-2xl border bg-white/60 dark:bg-gray-900/60 backdrop-blur p-4">
-      <div className="p-2 rounded-lg bg-gradient-to-br from-orange-500/15 to-orange-600/10 text-orange-600 dark:text-orange-400">
+      <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/15 to-cyan-600/10 text-blue-600 dark:text-blue-400">
         <Icon className="h-5 w-5" />
       </div>
       <div>
@@ -87,14 +87,14 @@ export default function PublicRFQsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white dark:from-gray-950 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-950 dark:to-gray-900">
       {/* Hero */}
       <section className="relative border-b overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none opacity-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-400 via-transparent to-transparent" />
+        <div className="absolute inset-0 pointer-events-none opacity-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-400 via-transparent to-transparent" />
         {!prefersReducedMotion && (
           <>
             <motion.div
-              className="absolute -top-10 -left-10 w-72 h-72 bg-gradient-to-br from-orange-300/30 to-orange-500/20 rounded-full blur-3xl"
+              className="absolute -top-10 -left-10 w-72 h-72 bg-gradient-to-br from-blue-300/30 to-cyan-500/20 rounded-full blur-3xl"
               animate={{ x: [0, 25, -20, 0], y: [0, -15, 20, 0], rotate: [0, 120, 240, 360] }}
               transition={{ duration: 30, repeat: Infinity, ease: 'easeInOut' }}
             />
@@ -107,7 +107,7 @@ export default function PublicRFQsPage() {
         )}
         <div className="container mx-auto px-6 py-12">
           <div className="flex flex-col items-center text-center gap-4">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 border border-orange-200/50">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200/50">
               <Sparkles className="h-4 w-4" />
               <span className="text-xs font-semibold tracking-wide">Premium RFQs Marketplace</span>
             </motion.div>
@@ -128,7 +128,7 @@ export default function PublicRFQsPage() {
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder="Search RFQs (e.g. Steel rods, Packaging, Logistics)"
-                      className="w-full h-12 pl-11 pr-4 rounded-xl border bg-background focus:ring-2 focus:ring-orange-500/30"
+                      className="w-full h-12 pl-11 pr-4 rounded-xl border bg-background focus:ring-2 focus:ring-blue-500/30"
                     />
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -159,10 +159,10 @@ export default function PublicRFQsPage() {
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3 mt-6">
-              <Link href="/auth/register" className="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-lg hover:shadow-xl">
+              <Link href="/auth/register" className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold shadow-lg hover:shadow-xl">
                 Join as Supplier
               </Link>
-              <Link href="/auth/login" className="px-6 py-3 rounded-xl border-2 border-orange-500 text-orange-600 hover:bg-orange-50">
+              <Link href="/auth/login" className="px-6 py-3 rounded-xl border-2 border-blue-500 text-blue-600 hover:bg-blue-50">
                 Sign In to Quote
               </Link>
             </div>
@@ -223,12 +223,12 @@ export default function PublicRFQsPage() {
                         ? `From ${formatCurrency(rfq.budgetMin)}`
                         : 'Budget TBD';
                   return (
-                    <motion.div key={rfq.id} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }} className="group relative rounded-2xl border bg-white/70 dark:bg-gray-900/70 backdrop-blur p-6 hover:shadow-xl hover:border-orange-200/70">
-                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-orange-500/0 to-orange-500/0 group-hover:from-orange-500/5 group-hover:to-orange-500/10 transition-colors" />
+                    <motion.div key={rfq.id} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }} className="group relative rounded-2xl border bg-white/70 dark:bg-gray-900/70 backdrop-blur p-6 hover:shadow-xl hover:border-blue-200/70">
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/0 to-blue-500/0 group-hover:from-blue-500/5 group-hover:to-blue-500/10 transition-colors" />
                       <div className="relative">
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <div className="inline-flex items-center gap-2 text-xs font-medium px-2 py-1 rounded-full border bg-orange-50 text-orange-700">
+                            <div className="inline-flex items-center gap-2 text-xs font-medium px-2 py-1 rounded-full border bg-blue-50 text-blue-700">
                               {isProduct ? 'Product RFQ' : 'Service RFQ'}
                             </div>
                             <h3 className="mt-3 text-lg font-bold leading-snug">
@@ -252,7 +252,7 @@ export default function PublicRFQsPage() {
                           <div className="flex items-center gap-2">
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Active</span>
                           </div>
-                          <Link href="/auth/login" className="inline-flex items-center gap-1 text-sm font-semibold text-orange-600 hover:text-orange-700">
+                          <Link href="/auth/login" className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700">
                             View details <ChevronRight className="h-4 w-4" />
                           </Link>
                         </div>
@@ -264,14 +264,14 @@ export default function PublicRFQsPage() {
             )}
 
             {/* Marketing CTA */}
-            <div className="mt-10 rounded-2xl border bg-gradient-to-r from-orange-500 to-orange-600 text-white p-8 shadow-xl">
+    <div className="mt-10 rounded-2xl border bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-8 shadow-xl">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
                   <h3 className="text-2xl font-extrabold">Ready to win new business?</h3>
                   <p className="mt-1 text-white/90">Sign in to view buyer details and submit competitive quotes within minutes.</p>
                 </div>
                 <div className="flex gap-3">
-                  <Link href="/auth/login" className="px-5 py-3 rounded-xl bg-white text-orange-600 font-semibold hover:bg-white/90">Sign In</Link>
+      <Link href="/auth/login" className="px-5 py-3 rounded-xl bg-white text-blue-600 font-semibold hover:bg-white/90">Sign In</Link>
                   <Link href="/auth/register" className="px-5 py-3 rounded-xl border-2 border-white text-white font-semibold hover:bg-white/10">Create Free Account</Link>
                 </div>
               </div>

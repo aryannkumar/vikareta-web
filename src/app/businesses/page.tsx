@@ -158,13 +158,13 @@ export default function BusinessesPage() {
       initial="initial"
       animate="animate"
       variants={pageVariants}
-      className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
     >
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700">
+    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700">
         {/* Background Pattern */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-transparent"></div>
           <div className="absolute inset-0" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}></div>
@@ -195,12 +195,12 @@ export default function BusinessesPage() {
             
             <motion.h1 variants={itemVariants} className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
               Discover India's 
-              <span className="block bg-gradient-to-r from-yellow-300 to-orange-200 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
                 Premier Suppliers
               </span>
             </motion.h1>
             
-            <motion.p variants={itemVariants} className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <motion.p variants={itemVariants} className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
               Connect with verified manufacturers, wholesalers, and service providers across India. 
               Build lasting business relationships with confidence.
             </motion.p>
@@ -209,15 +209,15 @@ export default function BusinessesPage() {
             <motion.div variants={itemVariants} className="grid grid-cols-3 gap-6 max-w-lg mx-auto mb-8">
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">{stats.total}+</div>
-                <div className="text-orange-200 text-sm">Suppliers</div>
+                <div className="text-blue-200 text-sm">Suppliers</div>
               </div>
-              <div className="text-center border-x border-orange-400/30">
+              <div className="text-center border-x border-blue-400/30">
                 <div className="text-3xl font-bold text-white">{stats.verified}+</div>
-                <div className="text-orange-200 text-sm">Verified</div>
+                <div className="text-blue-200 text-sm">Verified</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">{stats.premium}+</div>
-                <div className="text-orange-200 text-sm">Premium</div>
+                <div className="text-blue-200 text-sm">Premium</div>
               </div>
             </motion.div>
           </motion.div>
@@ -246,7 +246,7 @@ export default function BusinessesPage() {
                 setQuery(value);
                 handleSearch(value);
               }}
-              className="w-full pl-12 pr-4 py-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+              className="w-full pl-12 pr-4 py-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
             />
           </div>
 
@@ -261,21 +261,21 @@ export default function BusinessesPage() {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`relative flex items-center gap-3 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                     isActive
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
+                      ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-500'}`} />
                   <div className="text-left">
                     <div className="font-semibold">{tab.label}</div>
-                    <div className={`text-xs ${isActive ? 'text-orange-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <div className={`text-xs ${isActive ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
                       {tab.description}
                     </div>
                   </div>
                   {isActive && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute inset-0 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl -z-10"
+                      className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl -z-10"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
@@ -322,8 +322,8 @@ export default function BusinessesPage() {
             animate="show"
             className="text-center py-16"
           >
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full flex items-center justify-center">
-              <Sparkles className="w-12 h-12 text-orange-600" />
+            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center">
+              <Sparkles className="w-12 h-12 text-blue-600" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">No suppliers found</h3>
             <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
@@ -332,14 +332,14 @@ export default function BusinessesPage() {
             <div className="flex flex-wrap gap-4 justify-center">
               <button 
                 onClick={() => { setQuery(''); setFiltered(businesses); }}
-                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center gap-2"
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center gap-2"
               >
                 Show All Suppliers
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button 
                 onClick={() => { setActiveTab('featured'); loadBusinesses('featured'); }}
-                className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-2 border-orange-500 text-orange-600 dark:text-orange-400 px-6 py-3 rounded-lg font-semibold transition-all duration-300"
+                className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-2 border-blue-500 text-blue-600 dark:text-blue-400 px-6 py-3 rounded-lg font-semibold transition-all duration-300"
               >
                 Browse Featured
               </button>

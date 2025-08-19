@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useRef, useState } from 'react';
-import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useMotionEnabled } from '@/lib/useMotionEnabled';
 import { fadeInUp, staggerContainer, floatSlow } from '@/lib/motion';
 import HeroParticles from '@/components/hero/HeroParticles';
 import Link from 'next/link';
@@ -15,7 +16,7 @@ export function HeroSection() {
   const router = useRouter();
   const { isAuthenticated, user } = useSSOAuth();
 
-  const prefersReducedMotion = useReducedMotion();
+  const motionEnabled = useMotionEnabled();
 
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const mx = useMotionValue(0);
@@ -26,7 +27,7 @@ export function HeroSection() {
   const yLarge = useSpring(useTransform(my, [-0.5, 0.5], [-30, 30]), { stiffness: 70, damping: 18, mass: 0.25 });
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (prefersReducedMotion) return;
+  if (!motionEnabled) return;
     const rect = sectionRef.current?.getBoundingClientRect();
     if (!rect) return;
     const px = (e.clientX - rect.left) / rect.width - 0.5;
@@ -50,7 +51,7 @@ export function HeroSection() {
       <section
         ref={sectionRef}
         onMouseMove={handleMouseMove}
-        className="relative bg-gradient-to-br from-white via-blue-50 to-orange-50 dark:from-gray-900 dark:via-blue-900/10 dark:to-orange-900/10 py-24 overflow-hidden"
+        className="relative bg-gradient-to-br from-white via-blue-50 to-blue-50 dark:from-gray-900 dark:via-blue-900/10 dark:to-blue-900/10 py-24 overflow-hidden"
       >
         {/* Particle / Gradient Background */}
         <HeroParticles className="mix-blend-screen opacity-60" />
@@ -65,13 +66,13 @@ export function HeroSection() {
           />
         </div>
 
-        {/* Animated Gradient Blobs (Parallax) */}
-        {!prefersReducedMotion && (
+  {/* Animated Gradient Blobs (Parallax) */}
+  {motionEnabled && (
           <>
             <motion.div
               aria-hidden
               style={{ x: xLarge, y: yLarge }}
-              className="absolute -top-10 -left-10 w-72 h-72 bg-gradient-to-br from-orange-300/30 to-orange-500/20 dark:from-orange-500/15 dark:to-red-500/10 rounded-full blur-3xl"
+              className="absolute -top-10 -left-10 w-72 h-72 bg-gradient-to-br from-blue-300/25 to-indigo-400/20 dark:from-blue-500/15 dark:to-indigo-500/10 rounded-full blur-3xl"
               animate={{ rotate: [0, 360] }}
               transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
             />
@@ -86,7 +87,7 @@ export function HeroSection() {
         )}
 
         {/* Floating Elements */}
-        {!prefersReducedMotion && (
+  {motionEnabled && (
           <>
             <motion.div
               variants={floatSlow}
@@ -97,7 +98,7 @@ export function HeroSection() {
               variants={floatSlow}
               animate="animate"
               style={{ animationDelay: '0.6s' }}
-              className="absolute bottom-20 right-10 w-32 h-32 bg-orange-500/10 rounded-full blur-xl"
+              className="absolute bottom-20 right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-xl"
             />
             <motion.div
               variants={floatSlow}
@@ -109,12 +110,12 @@ export function HeroSection() {
         )}
 
         {/* Micro moving accents near heading */}
-        {!prefersReducedMotion && (
+  {motionEnabled && (
           <div className="pointer-events-none absolute inset-x-0 top-28 flex justify-center gap-6">
             {[0, 1, 2].map((i) => (
               <motion.span
                 key={i}
-                className="w-2 h-2 rounded-full bg-orange-400/70"
+                className="w-2 h-2 rounded-full bg-blue-400/70"
                 animate={{ y: [0, -6, 0], opacity: [0.7, 1, 0.7] }}
                 transition={{ duration: 2 + i * 0.4, repeat: Infinity, ease: 'easeInOut', delay: i * 0.2 }}
               />
@@ -135,8 +136,8 @@ export function HeroSection() {
                 India's Leading{' '}
                 <motion.span
                   className="text-gradient-orange-blue inline-block"
-                  animate={prefersReducedMotion ? undefined : { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-                  transition={prefersReducedMotion ? undefined : { duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                  animate={motionEnabled ? { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] } : undefined}
+                  transition={motionEnabled ? { duration: 10, repeat: Infinity, ease: "easeInOut" } : undefined}
                 >
                   B2B Marketplace
                 </motion.span>
@@ -181,7 +182,7 @@ export function HeroSection() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all"
+                      className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all"
                       onClick={() => {
                         const dashboardUrl = process.env.NODE_ENV === 'development'
                           ? 'http://localhost:3001/dashboard'
@@ -199,8 +200,8 @@ export function HeroSection() {
                       Go to Dashboard
                     </Button>
                   ) : (
-                    <Link href="/rfq">
-                      <Button variant="outline" size="lg" className="border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all">
+            <Link href="/rfq">
+              <Button variant="outline" size="lg" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all">
                         Post RFQ
                       </Button>
                     </Link>
@@ -218,13 +219,13 @@ export function HeroSection() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search for products, suppliers, or categories..."
-                  className="w-full pl-16 pr-36 py-6 text-lg border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 bg-white dark:bg-gray-800 shadow-xl transition-all duration-300 placeholder-gray-500 dark:placeholder-gray-400"
+          className="w-full pl-16 pr-36 py-6 text-lg border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white dark:bg-gray-800 shadow-xl transition-all duration-300 placeholder-gray-500 dark:placeholder-gray-400"
                 />
                 <motion.div className="absolute right-3 top-3 bottom-3 rounded-xl overflow-hidden">
-                  {!prefersReducedMotion && (
+                  {motionEnabled && (
                     <motion.div
                       aria-hidden
-                      className="absolute inset-0 bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 opacity-80"
+            className="absolute inset-0 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 opacity-80"
                       animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
                       transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                       style={{ backgroundSize: "200% 200%" }}
@@ -249,7 +250,7 @@ export function HeroSection() {
                       setSearchQuery(term);
                       router.push(`/search?q=${encodeURIComponent(term)}`);
                     }}
-                    className="text-sm bg-white dark:bg-gray-800 hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-all duration-200 font-medium"
+                    className="text-sm bg-white dark:bg-gray-800 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-all duration-200 font-medium"
                   >
                     {term}
                   </button>
@@ -260,24 +261,24 @@ export function HeroSection() {
             {/* Trust Indicators */}
             <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto" variants={staggerContainer}>
               <motion.div className="text-center group" variants={fadeInUp}>
-                <div className="flex items-center justify-center w-20 h-20 bg-orange-100 dark:bg-orange-900/30 rounded-2xl mx-auto mb-6 group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
-                  <Users className="h-10 w-10 text-orange-500" />
+                <div className="flex items-center justify-center w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mx-auto mb-6 group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
+                  <Users className="h-10 w-10 text-blue-600" />
                 </div>
                 <div className="text-4xl font-bold mb-3 text-gray-900 dark:text-white">5,000+</div>
                 <div className="text-gray-600 dark:text-gray-300 font-semibold text-lg">Verified Suppliers</div>
               </motion.div>
 
               <motion.div className="text-center group" variants={fadeInUp}>
-                <div className="flex items-center justify-center w-20 h-20 bg-orange-100 dark:bg-orange-900/30 rounded-2xl mx-auto mb-6 group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
-                  <TrendingUp className="h-10 w-10 text-orange-600" />
+                <div className="flex items-center justify-center w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mx-auto mb-6 group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
+                  <TrendingUp className="h-10 w-10 text-blue-700" />
                 </div>
                 <div className="text-4xl font-bold mb-3 text-gray-900 dark:text-white">₹500Cr+</div>
                 <div className="text-gray-600 dark:text-gray-300 font-semibold text-lg">Trade Volume</div>
               </motion.div>
 
               <motion.div className="text-center group" variants={fadeInUp}>
-                <div className="flex items-center justify-center w-20 h-20 bg-orange-100 dark:bg-orange-900/30 rounded-2xl mx-auto mb-6 group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
-                  <Shield className="h-10 w-10 text-orange-500" />
+                <div className="flex items-center justify-center w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mx-auto mb-6 group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
+                  <Shield className="h-10 w-10 text-blue-600" />
                 </div>
                 <div className="text-4xl font-bold mb-3 text-gray-900 dark:text-white">100%</div>
                 <div className="text-gray-600 dark:text-gray-300 font-semibold text-lg">Secure Transactions</div>
@@ -287,7 +288,7 @@ export function HeroSection() {
             {/* Video/Demo Section */}
             <div className="mt-20">
               <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="group flex items-center justify-center mx-auto bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800 rounded-2xl px-8 py-4 shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 dark:border-gray-600">
-                <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
                   <Play className="h-6 w-6 text-white ml-1" />
                 </div>
                 <span className="text-gray-700 dark:text-gray-300 font-semibold text-lg">Watch How It Works</span>

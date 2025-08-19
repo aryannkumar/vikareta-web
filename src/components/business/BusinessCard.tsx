@@ -97,7 +97,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
             className="object-cover group-hover:scale-105 transition-transform duration-500" 
           />
         ) : (
-          <div className="h-full w-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 relative overflow-hidden">
+          <div className="h-full w-full bg-gradient-to-br from-blue-500 via-indigo-600 to-cyan-600 relative overflow-hidden">
             {/* Animated background pattern */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
             <div className="absolute inset-0 flex items-center justify-center">
@@ -124,12 +124,12 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
               Verified
             </motion.div>
           )}
-          {businessData.verificationTier === 'premium' && (
+      {businessData.verificationTier === 'premium' && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
-              className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold"
+        className="bg-gradient-to-r from-cyan-400 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold"
             >
               Premium
             </motion.div>
@@ -157,7 +157,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
               className="w-full h-full object-cover" 
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-xl">
+            <div className="w-full h-full bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center text-white font-bold text-xl">
               {businessData.name.charAt(0)}
             </div>
           )}
@@ -168,7 +168,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
       <div className="pt-12 p-6">
         {/* Business name and location */}
         <div className="mb-4">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-orange-600 transition-colors duration-300">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition-colors duration-300">
             {businessData.name}
           </h3>
           <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
@@ -186,7 +186,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
         <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
           <div className="text-center">
             <div className="flex items-center justify-center mb-1">
-              <Package className="w-4 h-4 text-orange-500" />
+              <Package className="w-4 h-4 text-blue-500" />
             </div>
             <div className="text-lg font-bold text-gray-900 dark:text-white">
               {businessData.productCount}
@@ -195,7 +195,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
           </div>
           <div className="text-center border-x border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-center mb-1">
-              <TrendingUp className="w-4 h-4 text-orange-500" />
+              <TrendingUp className="w-4 h-4 text-blue-500" />
             </div>
             <div className="text-lg font-bold text-gray-900 dark:text-white">
               {businessData.serviceCount}
@@ -204,7 +204,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center mb-1">
-              <Users className="w-4 h-4 text-orange-500" />
+              <Users className="w-4 h-4 text-blue-500" />
             </div>
             <div className="text-lg font-bold text-gray-900 dark:text-white">
               {businessData.completedOrders}
@@ -219,7 +219,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
             {tags.slice(0, 2).map((tag, index) => (
               <span
                 key={index}
-                className="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 px-3 py-1 rounded-full text-xs font-medium"
+                className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 px-3 py-1 rounded-full text-xs font-medium"
               >
                 {tag}
               </span>
@@ -232,7 +232,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
           <Link
             href={`/businesses/${businessData.id}`}
             onClick={(e) => e.stopPropagation()}
-            className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-2.5 px-4 rounded-lg font-semibold text-center transition-all duration-300 flex items-center justify-center gap-2 group/btn"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-2.5 px-4 rounded-lg font-semibold text-center transition-all duration-300 flex items-center justify-center gap-2 group/btn"
           >
             View Profile
             <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
@@ -247,7 +247,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
                 window.location.href = `mailto:${businessData.email}`;
               }
             }}
-            className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-2 border-orange-500 text-orange-600 dark:text-orange-400 p-2.5 rounded-lg transition-all duration-300 hover:scale-105"
+            className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-2 border-blue-500 text-blue-600 dark:text-blue-400 p-2.5 rounded-lg transition-all duration-300 hover:scale-105"
           >
             {businessData.phone ? <Phone className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
           </button>

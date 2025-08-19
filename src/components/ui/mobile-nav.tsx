@@ -68,7 +68,7 @@ export function MobileNav({ isOpen, onToggle }: MobileNavProps) {
               {isAuthenticated && user && (
                 <div className="p-6 border-b border-gray-200/50 dark:border-gray-700/50">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-blue-500 rounded-xl flex items-center justify-center shadow-medium">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-medium">
                       <span className="text-sm font-bold text-white">
                         {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
                       </span>
@@ -82,7 +82,7 @@ export function MobileNav({ isOpen, onToggle }: MobileNavProps) {
                   </div>
                   
                   {user.verificationTier && (
-                    <Badge className="bg-gradient-to-r from-orange-500 to-blue-500 text-white">
+                    <Badge className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white">
                       {user.verificationTier.charAt(0).toUpperCase() + user.verificationTier.slice(1)}
                     </Badge>
                   )}
@@ -97,13 +97,13 @@ export function MobileNav({ isOpen, onToggle }: MobileNavProps) {
                       key={item.href}
                       href={item.href}
                       onClick={onToggle}
-                      className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-orange-50 hover:to-blue-50 dark:hover:from-orange-900/20 dark:hover:to-blue-900/20 transition-all duration-200 group"
+                      className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 dark:hover:from-blue-900/20 dark:hover:to-cyan-900/20 transition-all duration-200 group"
                     >
-                      <item.icon className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-orange-500 transition-colors" />
+                      <item.icon className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-blue-600 transition-colors" />
                       <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
                         {item.label}
                       </span>
-                      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-orange-500 group-hover:translate-x-1 transition-all duration-200 ml-auto" />
+                      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-200 ml-auto" />
                     </Link>
                   ))}
                 </nav>
@@ -116,14 +116,14 @@ export function MobileNav({ isOpen, onToggle }: MobileNavProps) {
                       <Link
                         href="/cart"
                         onClick={onToggle}
-                        className="flex items-center justify-between p-3 rounded-xl hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors group"
+                        className="flex items-center justify-between p-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group"
                       >
                         <div className="flex items-center space-x-3">
-                          <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-orange-500" />
+                          <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-blue-600" />
                           <span className="font-medium text-gray-700 dark:text-gray-300">Cart</span>
                         </div>
                         {cartItemCount > 0 && (
-                          <Badge className="bg-orange-500 text-white">
+                          <Badge className="bg-blue-600 text-white">
                             {cartItemCount}
                           </Badge>
                         )}

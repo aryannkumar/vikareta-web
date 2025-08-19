@@ -274,7 +274,7 @@ function SearchPageContent() {
                 placeholder="Search products, services, businesses..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-background"
+                className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background"
               />
               <Button type="submit" className="absolute right-2 top-2 bottom-2 btn-primary">
                 Search
@@ -603,7 +603,7 @@ function SearchPageContent() {
                       </Button>
                     </Link>
                     {result.provider && (
-                      <Button variant="outline" className="text-sm px-3 py-2 hover:border-orange-500 hover:text-orange-600">
+                      <Button variant="outline" className="text-sm px-3 py-2 hover:border-blue-500 hover:text-blue-600">
                         <MessageCircle className="h-4 w-4" />
                       </Button>
                     )}

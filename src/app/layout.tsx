@@ -8,6 +8,7 @@ import { ToastProvider } from '@/components/ui/toast-provider';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import Entrance from '@/components/Animated';
+import MotionBoot from '@/components/motion/MotionBoot';
 
 // Premium font combinations for B2B design
 const inter = Inter({ 
@@ -72,7 +73,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${lexend.variable} ${poppins.variable}`}>
-      <body className={`${inter.className} bg-gradient-to-br from-gray-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-900 dark:text-white antialiased font-inter selection:bg-orange-200 selection:text-orange-900 dark:selection:bg-orange-800 dark:selection:text-orange-100`}>
+  <body className={`${inter.className} bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-900 dark:text-white antialiased font-inter selection:bg-blue-200 selection:text-blue-900 dark:selection:bg-blue-800 dark:selection:text-blue-100`}>
         {/* Google Identity Services */}
         <Script
           src="https://accounts.google.com/gsi/client"
@@ -94,8 +95,9 @@ export default function RootLayout({
               <div className="min-h-screen flex flex-col relative overflow-hidden">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-blue-500/5 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-slate-500/5 pointer-events-none"></div>
                 
+                <MotionBoot />
                 <Header />
                 <main className="flex-1 relative z-10">
                   <Entrance>

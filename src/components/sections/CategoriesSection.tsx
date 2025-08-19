@@ -42,7 +42,7 @@ export function CategoriesSection() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+  <section className="py-16 bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4 text-gradient-orange-blue">Browse by Category</h2>
@@ -62,7 +62,7 @@ export function CategoriesSection() {
 
   if (error) {
     return (
-      <section className="py-16 bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+  <section className="py-16 bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4 text-gradient-orange-blue">Browse by Category</h2>
@@ -84,7 +84,7 @@ export function CategoriesSection() {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+  <section className="py-20 bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-6 text-gradient-orange-blue">Browse by Category</h2>
@@ -105,14 +105,14 @@ export function CategoriesSection() {
                   <IconBackground
                     category={category}
                     size={80}
-                    className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-orange-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600 group-hover:from-blue-100 group-hover:to-orange-100 dark:group-hover:from-gray-700 dark:group-hover:to-gray-600 transition-all duration-500"
-                    iconClassName="text-blue-600 dark:text-blue-400 group-hover:text-orange-500 group-hover:scale-110 transition-all duration-500"
+                    className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600 group-hover:from-blue-100 group-hover:to-blue-100 dark:group-hover:from-gray-700 dark:group-hover:to-gray-600 transition-all duration-500"
+                    iconClassName="text-blue-600 dark:text-blue-400 group-hover:text-blue-700 group-hover:scale-110 transition-all duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                   
                   {/* Trending Badge */}
                   {index < 3 && (
-                    <div className="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1 shadow-lg">
+                    <div className="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1 shadow-lg">
                       <TrendingUp className="h-3 w-3" />
                       TRENDING
                     </div>
@@ -131,7 +131,7 @@ export function CategoriesSection() {
                       <span className="font-semibold">{(category.productCount || 0).toLocaleString()} Products</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <Users className="h-4 w-4 text-orange-500" />
+                      <Users className="h-4 w-4 text-blue-600" />
                       <span className="font-semibold">{Math.floor((category.productCount || 0) / 10)} Suppliers</span>
                     </div>
                   </div>
@@ -155,10 +155,10 @@ export function CategoriesSection() {
                   )}
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-blue-600 dark:text-blue-400 font-bold group-hover:text-orange-500 transition-colors">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold group-hover:text-blue-700 transition-colors">
                       Explore Category
                     </span>
-                    <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 group-hover:text-orange-500 group-hover:translate-x-2 transition-all duration-300" />
+                    <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 group-hover:text-blue-700 group-hover:translate-x-2 transition-all duration-300" />
                   </div>
                 </div>
               </div>

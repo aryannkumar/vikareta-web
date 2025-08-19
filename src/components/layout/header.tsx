@@ -167,7 +167,7 @@ export function Header() {
       animate="visible"
     >
       {/* Premium announcement bar */}
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-center py-2 text-sm font-medium">
+  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white text-center py-2 text-sm font-medium">
         <div className="flex items-center justify-center space-x-2">
           <Zap className="w-4 h-4" />
           <span>🎉 Special Launch Offer: Get 20% off on first order! Use code: WELCOME20</span>
@@ -186,14 +186,14 @@ export function Header() {
                 className="relative"
               >
                 <Logo className="h-12 w-12" />
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/15 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </motion.div>
               <div className="flex flex-col">
                 <motion.span 
                   initial={{ opacity: 0, x: -20 }} 
                   animate={{ opacity: 1, x: 0 }} 
                   transition={{ delay: 0.15 }}
-                  className="text-2xl font-bold text-gradient bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent font-lexend"
+                  className="text-2xl font-bold text-gradient bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent font-lexend"
                 >
                   Vikareta
                 </motion.span>
@@ -212,14 +212,14 @@ export function Header() {
           {/* Premium Search Bar - Desktop */}
           <motion.div variants={itemVariants} className="hidden md:flex flex-1 max-w-2xl mx-8">
             <form onSubmit={handleSearch} className="relative w-full group">
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-blue-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 z-10" />
               <input
                 type="text"
                 placeholder="Search products, suppliers, services..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-14 pr-6 py-4 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-4 focus:ring-orange-500/25 focus:border-orange-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300 hover:border-orange-300 dark:hover:border-orange-500 shadow-sm hover:shadow-md relative z-10"
+                className="w-full pl-14 pr-6 py-4 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/25 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-500 shadow-sm hover:shadow-md relative z-10"
               />
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
                 <kbd className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 rounded border text-gray-500 dark:text-gray-400">⌘K</kbd>
@@ -244,7 +244,7 @@ export function Header() {
               >
                 <Link 
                   href={item.href}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 rounded-xl transition-all duration-300 hover:bg-orange-50 dark:hover:bg-orange-900/20 group"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all duration-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 group"
                 >
                   <item.icon className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
                   <span>{item.label}</span>
@@ -259,7 +259,7 @@ export function Header() {
             {isAuthenticated && (
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link href="/notifications">
-                  <Button variant="ghost" size="sm" className="relative p-3 hover:bg-orange-50 dark:hover:bg-orange-900/20">
+                  <Button variant="ghost" size="sm" className="relative p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20">
                     <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                     {unreadNotifications > 0 && (
                       <span className="absolute -top-1 -right-1 h-6 w-6 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
@@ -275,7 +275,7 @@ export function Header() {
             {isAuthenticated && (
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link href="/wishlist">
-                  <Button variant="ghost" size="sm" className="relative p-3 hover:bg-orange-50 dark:hover:bg-orange-900/20">
+                  <Button variant="ghost" size="sm" className="relative p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20">
                     <Heart className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                     {wishlistCount > 0 && (
                       <span className="absolute -top-1 -right-1 h-6 w-6 bg-gradient-to-r from-pink-500 to-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
@@ -290,10 +290,10 @@ export function Header() {
             {/* Cart */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link href="/cart">
-                <Button variant="ghost" size="sm" className="relative p-3 hover:bg-orange-50 dark:hover:bg-orange-900/20">
+                <Button variant="ghost" size="sm" className="relative p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20">
                   <ShoppingCart className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   {cartItemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-6 w-6 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
+                    <span className="absolute -top-1 -right-1 h-6 w-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
                       {cartItemCount > 99 ? '99+' : cartItemCount}
                     </span>
                   )}
@@ -307,7 +307,7 @@ export function Header() {
                 <Button 
                   size="sm" 
                   variant="outline"
-                  className="hidden sm:flex items-center space-x-2 border-2 border-orange-500 text-orange-600 hover:bg-orange-50 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-orange-900/20"
+                  className="hidden sm:flex items-center space-x-2 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
                   onClick={async () => {
                     try {
                       try { localStorage.setItem('auth_return_url', window.location.href); } catch {}
@@ -435,14 +435,14 @@ export function Header() {
               <div className="flex items-center space-x-3">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link href="/auth/login">
-                    <Button variant="ghost" size="sm" className="text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 font-semibold">
+                    <Button variant="ghost" size="sm" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-semibold">
                       Login
                     </Button>
                   </Link>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link href="/auth/register">
-                    <Button size="sm" className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl">
+                    <Button size="sm" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl">
                       Sign Up Free
                     </Button>
                   </Link>
@@ -508,7 +508,7 @@ export function Header() {
                   placeholder="Search products, suppliers..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-500/25 focus:border-orange-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
+                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/25 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
                 />
               </motion.form>
 
@@ -529,7 +529,7 @@ export function Header() {
                   >
                     <Link 
                       href={item.href}
-                      className="flex items-center space-x-3 px-4 py-4 text-base font-semibold text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-xl transition-all duration-300"
+                      className="flex items-center space-x-3 px-4 py-4 text-base font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <item.icon className="w-5 h-5" />
@@ -543,12 +543,12 @@ export function Header() {
               {!isAuthenticated ? (
                 <motion.div variants={itemVariants} className="mt-6 space-y-3">
                   <Link href="/auth/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full justify-center py-4 border-2 border-orange-500 text-orange-600 hover:bg-orange-50 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-orange-900/20">
+                    <Button variant="outline" className="w-full justify-center py-4 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20">
                       Login to Your Account
                     </Button>
                   </Link>
                   <Link href="/auth/register" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full justify-center py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl">
+                    <Button className="w-full justify-center py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl">
                       Create Free Account
                     </Button>
                   </Link>
@@ -557,7 +557,7 @@ export function Header() {
                 <motion.div variants={itemVariants} className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 space-y-2">
                   <Link 
                     href="/orders" 
-                    className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-xl transition-all duration-300"
+                    className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <Package className="w-5 h-5" />

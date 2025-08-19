@@ -123,7 +123,7 @@ export function FeaturedProductsDashboard({ supplierId }: { supplierId: string }
 
   const getPromotionColor = (type: string) => {
     switch (type) {
-      case 'premium': return 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white';
+      case 'premium': return 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white';
       case 'organic': return 'bg-gradient-to-r from-green-400 to-emerald-500 text-white';
       default: return 'bg-blue-500 text-white';
     }
@@ -217,7 +217,7 @@ export function FeaturedProductsDashboard({ supplierId }: { supplierId: string }
                   <p className="text-sm text-muted-foreground">Conversion Rate</p>
                   <p className="text-2xl font-bold">{stats.conversionRate}%</p>
                 </div>
-                <TrendingUp className="h-8 w-8 text-orange-500" />
+                <TrendingUp className="h-8 w-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>

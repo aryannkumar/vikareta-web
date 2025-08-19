@@ -70,7 +70,7 @@ export function Footer() {
     <footer className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 border-t border-gray-200 dark:border-gray-700 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-orange-500/50 to-transparent" />
+  <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
       
       <div className="container mx-auto px-6 relative">
         {/* Trust Indicators */}
@@ -120,8 +120,8 @@ export function Footer() {
                 icon: Award,
                 title: "Quality Assured",
                 description: "Verified Suppliers",
-                color: "text-orange-500",
-                bgColor: "bg-orange-100 dark:bg-orange-900/20"
+                color: "text-blue-500",
+                bgColor: "bg-blue-100 dark:bg-blue-900/20"
               }
             ].map((item, index) => (
               <motion.div 
@@ -181,7 +181,7 @@ export function Footer() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your business email"
-                    className="flex-1 px-4 py-3 text-sm border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-500/25 focus:border-orange-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-all duration-300"
+                    className="flex-1 px-4 py-3 text-sm border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/25 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-all duration-300"
                     required
                   />
                   <motion.button
@@ -189,7 +189,7 @@ export function Footer() {
                     disabled={isSubscribing}
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isSubscribing ? (
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -279,7 +279,7 @@ export function Footer() {
                   <li key={linkIndex}>
                     <Link 
                       href={link.href} 
-                      className="text-gray-600 dark:text-gray-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-200 hover:underline"
+                      className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 hover:underline"
                     >
                       {link.label}
                     </Link>
@@ -301,7 +301,7 @@ export function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <motion.div variants={itemVariants} className="text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start space-x-3 mb-3">
-                <MapPin className="w-5 h-5 text-orange-500" />
+                <MapPin className="w-5 h-5 text-blue-500" />
                 <h4 className="font-semibold text-gray-900 dark:text-white">Our Office</h4>
               </div>
               <p className="text-gray-600 dark:text-gray-400">
@@ -313,11 +313,11 @@ export function Footer() {
 
             <motion.div variants={itemVariants} className="text-center">
               <div className="flex items-center justify-center space-x-3 mb-3">
-                <Phone className="w-5 h-5 text-orange-500" />
+                <Phone className="w-5 h-5 text-blue-500" />
                 <h4 className="font-semibold text-gray-900 dark:text-white">Contact</h4>
               </div>
               <p className="text-gray-600 dark:text-gray-400">
-                <a href="tel:+919876543210" className="hover:text-orange-500 transition-colors">
+                <a href="tel:+919876543210" className="hover:text-blue-600 transition-colors">
                   +91 98765 43210
                 </a>
               </p>
@@ -325,11 +325,11 @@ export function Footer() {
 
             <motion.div variants={itemVariants} className="text-center md:text-right">
               <div className="flex items-center justify-center md:justify-end space-x-3 mb-3">
-                <Mail className="w-5 h-5 text-orange-500" />
+                <Mail className="w-5 h-5 text-blue-500" />
                 <h4 className="font-semibold text-gray-900 dark:text-white">Email</h4>
               </div>
               <p className="text-gray-600 dark:text-gray-400">
-                <a href="mailto:support@vikareta.com" className="hover:text-orange-500 transition-colors">
+                <a href="mailto:support@vikareta.com" className="hover:text-blue-600 transition-colors">
                   support@vikareta.com
                 </a>
               </p>
@@ -366,19 +366,19 @@ export function Footer() {
               <div className="flex space-x-6">
                 <Link 
                   href="/privacy" 
-                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
                   Privacy Policy
                 </Link>
                 <Link 
                   href="/terms" 
-                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
                   Terms of Service
                 </Link>
                 <Link 
                   href="/cookies" 
-                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
                   Cookie Policy
                 </Link>

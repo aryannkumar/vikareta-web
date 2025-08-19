@@ -313,7 +313,7 @@ export default function MarketplacePage() {
   const getPromotionBadgeColor = (promotionType: string) => {
     switch (promotionType) {
       case 'premium':
-        return 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white';
+        return 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-white';
       case 'trending':
         return 'bg-gradient-to-r from-pink-400 to-red-500 text-white';
       case 'featured':
@@ -379,7 +379,7 @@ export default function MarketplacePage() {
 
       <div className={viewMode === 'list' ? 'flex-1' : 'p-4'}>
         <div className="flex items-center justify-between mb-2">
-          <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 text-xs font-medium">
+          <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-xs font-medium">
             {item.category}
           </Badge>
           <div className="flex items-center gap-1 text-xs text-gray-500">
@@ -482,7 +482,7 @@ export default function MarketplacePage() {
             </Button>
           )}
           <Link href={`/${item.type}s/${item.id}`}>
-            <Button variant="outline" className="px-4 py-2 border-2 border-gray-300 hover:border-orange-500 hover:text-orange-600 transition-colors">
+            <Button variant="outline" className="px-4 py-2 border-2 border-gray-300 hover:border-blue-500 hover:text-blue-600 transition-colors">
               View Details
             </Button>
           </Link>
@@ -596,7 +596,7 @@ export default function MarketplacePage() {
             Contact Business
           </Button>
           <Link href={`/businesses/${business.id}`}>
-            <Button variant="outline" className="px-4 py-2 border-2 border-gray-300 hover:border-orange-500 hover:text-orange-600 transition-colors">
+            <Button variant="outline" className="px-4 py-2 border-2 border-gray-300 hover:border-blue-500 hover:text-blue-600 transition-colors">
               View Profile
             </Button>
           </Link>
@@ -634,7 +634,7 @@ export default function MarketplacePage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            <span className="text-gradient-orange-blue">Marketplace</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-cyan-500 to-indigo-600">Marketplace</span>
           </h1>
           <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto text-lg">
             Discover trending products, services, and nearby businesses in your area
@@ -764,7 +764,7 @@ export default function MarketplacePage() {
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 ⚡ Hot Services
               </h2>
-              <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300">
+              <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
                 {trendingServices.length} services
               </Badge>
             </div>
@@ -828,7 +828,7 @@ export default function MarketplacePage() {
         </Tabs>
 
         {/* Call to Action */}
-        <div className="mt-16 text-center bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-12 text-white">
+        <div className="mt-16 text-center bg-gradient-to-r from-blue-600 via-cyan-500 to-indigo-600 rounded-2xl p-12 text-white">
           <h3 className="text-3xl font-bold mb-4">
             Want to Feature Your Business?
           </h3>
@@ -837,12 +837,12 @@ export default function MarketplacePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/register?type=seller">
-              <Button className="bg-white text-orange-600 hover:bg-gray-100 px-8 py-3 font-bold rounded-lg">
+              <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 font-bold rounded-lg">
                 Become a Seller
               </Button>
             </Link>
             <Link href="/dashboard">
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 px-8 py-3 font-bold rounded-lg">
+              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 font-bold rounded-lg">
                 Promote Your Products
               </Button>
             </Link>

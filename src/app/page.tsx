@@ -250,7 +250,7 @@ export default function HomePage() {
   // Enhanced loading component with skeleton states
   if (data.loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+  <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -268,13 +268,13 @@ export default function HomePage() {
                 >
                   <div className="w-20 h-20 mx-auto mb-6 relative">
                     <motion.div
-                      className="w-full h-full border-4 border-orange-200 border-t-orange-500 rounded-full"
+                      className="w-full h-full border-4 border-blue-200 border-t-blue-500 rounded-full"
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                     />
                   </div>
                   <motion.h1 
-                    className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent mb-4"
+                    className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-4"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
@@ -302,7 +302,7 @@ export default function HomePage() {
                     { label: 'Categories', icon: '📂', bgColor: 'bg-purple-50 dark:bg-purple-900/30', progressColor: 'from-purple-500 to-purple-600' },
                     { label: 'Products', icon: '📦', bgColor: 'bg-blue-50 dark:bg-blue-900/30', progressColor: 'from-blue-500 to-cyan-500' },
                     { label: 'Services', icon: '⚙️', bgColor: 'bg-emerald-50 dark:bg-emerald-900/30', progressColor: 'from-emerald-500 to-green-500' },
-                    { label: 'Suppliers', icon: '🏢', bgColor: 'bg-orange-50 dark:bg-orange-900/30', progressColor: 'from-orange-500 to-red-500' }
+                    { label: 'Suppliers', icon: '🏢', bgColor: 'bg-indigo-50 dark:bg-indigo-900/30', progressColor: 'from-indigo-500 to-purple-500' }
                   ].map((item, index) => (
                     <motion.div
                       key={item.label}
@@ -339,19 +339,19 @@ export default function HomePage() {
 
   return (
     <motion.main 
-      className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden"
+      className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden"
       variants={pageVariants}
       initial="initial"
       animate="animate"
     >
       {/* Premium Background Elements */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-blue-500/5 pointer-events-none" />
+  <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
+  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
       
       {/* Enhanced Floating Decorative Elements with Animations */}
-      <FloatingElement className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-br from-orange-400/20 to-orange-600/20 rounded-full blur-xl" delay={0} />
+  <FloatingElement className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-cyan-600/20 rounded-full blur-xl" delay={0} />
       <FloatingElement className="absolute top-40 right-20 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full blur-xl" delay={2} />
-      <FloatingElement className="absolute bottom-40 left-20 w-24 h-24 bg-gradient-to-br from-orange-500/20 to-pink-500/20 rounded-full blur-xl" delay={4} />
+  <FloatingElement className="absolute bottom-40 left-20 w-24 h-24 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-xl" delay={4} />
       
       {/* Additional Moving Elements */}
       <motion.div
@@ -411,7 +411,7 @@ export default function HomePage() {
           {/* Animated Background Elements */}
           <div className="absolute inset-0 -z-10">
             <motion.div
-              className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-orange-400/20 to-red-400/20 rounded-full blur-3xl"
+              className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl"
               animate={{
                 x: [0, 30, -30, 0],
                 y: [0, -20, 20, 0],
@@ -464,16 +464,16 @@ export default function HomePage() {
                   initial={{ opacity: 0, scale: 0.8, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300 px-6 py-3 rounded-full text-sm font-semibold mb-8 shadow-lg backdrop-blur-sm"
+                  className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 px-6 py-3 rounded-full text-sm font-semibold mb-8 shadow-lg backdrop-blur-sm"
                 >
                   <motion.div
                     className="relative"
                     animate={{ rotate: [0, 360] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                   >
-                    <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
                     <motion.div
-                      className="absolute inset-0 w-2 h-2 bg-orange-400 rounded-full"
+                      className="absolute inset-0 w-2 h-2 bg-blue-400 rounded-full"
                       animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     />
@@ -512,7 +512,7 @@ export default function HomePage() {
                         backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
                       }}
                       transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                      className="bg-gradient-to-r from-gray-900 via-orange-600 via-red-600 to-gray-900 bg-[length:300%_auto] bg-clip-text text-transparent dark:from-white dark:via-orange-400 dark:via-red-400 dark:to-white font-extrabold"
+                      className="bg-gradient-to-r from-gray-900 via-blue-600 via-cyan-600 to-gray-900 bg-[length:300%_auto] bg-clip-text text-transparent dark:from-white dark:via-blue-400 dark:via-cyan-400 dark:to-white font-extrabold"
                     >
                       Professional B2B
                     </motion.span>
@@ -523,7 +523,7 @@ export default function HomePage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6, duration: 0.8 }}
                   >
-                    <span className="bg-gradient-to-r from-orange-600 via-red-600 to-orange-700 bg-clip-text text-transparent font-extrabold">
+                    <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 bg-clip-text text-transparent font-extrabold">
                       Commerce Platform
                     </span>
                   </motion.span>
@@ -556,14 +556,14 @@ export default function HomePage() {
                     <div className="flex flex-col lg:flex-row gap-3">
                       {/* Professional Search Type Toggle */}
                       <div className="flex bg-gray-50 dark:bg-gray-700/50 rounded-xl p-1.5 backdrop-blur-sm">
-                        <motion.button
+        <motion.button
                           onClick={() => setSearch(prev => ({ ...prev, type: 'products' }))}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className={`flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${
                             search.type === 'products'
-                              ? 'bg-white dark:bg-gray-600 text-orange-600 dark:text-orange-400 shadow-lg'
-                              : 'text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400'
+          ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-lg'
+          : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400'
                           }`}
                         >
                           <Package className="w-4 h-4" />
@@ -614,7 +614,7 @@ export default function HomePage() {
                               ? 'logistics, manufacturing, consulting...'
                               : 'verified suppliers, manufacturers, distributors...'
                           }`}
-                          className="w-full px-6 py-4 text-lg rounded-xl border-0 focus:ring-2 focus:ring-orange-500/50 focus:outline-none bg-gray-50/80 dark:bg-gray-700/80 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 backdrop-blur-sm transition-all duration-300"
+                          className="w-full px-6 py-4 text-lg rounded-xl border-0 focus:ring-2 focus:ring-blue-500/50 focus:outline-none bg-gray-50/80 dark:bg-gray-700/80 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 backdrop-blur-sm transition-all duration-300"
                         />
                         <Search className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         
@@ -641,14 +641,14 @@ export default function HomePage() {
                       </div>
 
                       {/* Premium Search Button */}
-                      <motion.button
+          <motion.button
                         onClick={handleSearch}
                         disabled={!search.query.trim() || search.isSearching}
                         whileHover={{ scale: search.query.trim() ? 1.05 : 1 }}
                         whileTap={{ scale: search.query.trim() ? 0.95 : 1 }}
                         className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 shadow-lg ${
                           search.query.trim()
-                            ? 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white shadow-orange-500/25 hover:shadow-xl hover:shadow-orange-500/30'
+            ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30'
                             : 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed shadow-none'
                         }`}
                       >
@@ -688,7 +688,7 @@ export default function HomePage() {
                         onClick={() => setSearch({ query: suggestion.term, type: suggestion.type as 'products' | 'services', isSearching: false, suggestions: [] })}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-orange-100 dark:hover:bg-orange-900/30 hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-200"
+                        className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
                       >
                         {suggestion.term}
                       </motion.button>
@@ -732,9 +732,9 @@ export default function HomePage() {
                       label: 'Successful Deals', 
                       value: data.stats.successfulDeals.toLocaleString(),
                       icon: '🤝',
-                      color: 'from-orange-500 to-red-500',
-                      bgColor: 'bg-orange-50 dark:bg-orange-900/20',
-                      iconColor: 'text-orange-600'
+                      color: 'from-indigo-500 to-purple-500',
+                      bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
+                      iconColor: 'text-indigo-600'
                     }
                   ].map((stat, index) => (
                     <motion.div
@@ -796,7 +796,7 @@ export default function HomePage() {
                   <motion.button
                     whileHover={{ scale: 1.05, y: -3 }}
                     whileTap={{ scale: 0.95 }}
-                    className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-bold text-lg px-12 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 border-0 backdrop-blur-sm"
+                    className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold text-lg px-12 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 border-0 backdrop-blur-sm"
                     onClick={() => router.push('/products')}
                   >
                     <motion.span
@@ -822,7 +822,7 @@ export default function HomePage() {
                   <motion.button
                     whileHover={{ scale: 1.05, y: -3 }}
                     whileTap={{ scale: 0.95 }}
-                    className="bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white border-2 border-gray-300 dark:border-gray-600 hover:border-orange-500 dark:hover:border-orange-500 hover:bg-white dark:hover:bg-gray-800 font-bold text-lg px-12 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 backdrop-blur-sm"
+                    className="bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-white dark:hover:bg-gray-800 font-bold text-lg px-12 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 backdrop-blur-sm"
                     onClick={() => router.push('/auth/register?type=supplier')}
                   >
                     <motion.span
@@ -849,7 +849,7 @@ export default function HomePage() {
         <section className="container mx-auto px-4 py-16">
           <div className="text-center mb-12">
             <motion.h2 
-              className="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent"
+              className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
@@ -894,7 +894,7 @@ export default function HomePage() {
                       className="w-full h-48 object-cover hover:scale-110 transition-transform duration-300"
                     />
                     {product.discount && (
-                      <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-lg text-sm font-semibold">
+                      <div className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-lg text-sm font-semibold">
                         -{product.discount}%
                       </div>
                     )}
@@ -907,7 +907,7 @@ export default function HomePage() {
                   </p>
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex flex-col">
-                      <span className="text-2xl font-bold text-orange-600">
+                      <span className="text-2xl font-bold text-blue-600">
                         ₹{(product.price || 999).toLocaleString()}
                       </span>
                       {product.originalPrice && (
@@ -943,7 +943,7 @@ export default function HomePage() {
 
           <div className="text-center mt-8">
             <motion.button
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push('/products')}
@@ -1067,7 +1067,7 @@ export default function HomePage() {
         <section className="container mx-auto px-4 py-16">
           <div className="text-center mb-12">
             <motion.h2 
-              className="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent"
+              className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
@@ -1114,9 +1114,9 @@ export default function HomePage() {
                 label: 'Successful Deals',
                 value: data.stats.successfulDeals.toLocaleString(),
                 icon: '🤝',
-                color: 'from-orange-500 to-red-500',
-                bgColor: 'bg-orange-50 dark:bg-orange-900/20',
-                iconColor: 'text-orange-600'
+                color: 'from-indigo-500 to-purple-500',
+                bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
+                iconColor: 'text-indigo-600'
               }
             ].map((stat, index) => (
               <motion.div
@@ -1176,7 +1176,7 @@ export default function HomePage() {
                 className="relative"
               >
                 {/* Background with enhanced gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 rounded-3xl opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-3xl opacity-90" />
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-3xl" />
                 
                 {/* Content */}
@@ -1202,7 +1202,7 @@ export default function HomePage() {
                     </motion.h2>
                     
                     <motion.p 
-                      className="text-xl lg:text-2xl text-orange-100 mb-8 max-w-3xl mx-auto leading-relaxed"
+                      className="text-xl lg:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed"
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
@@ -1224,14 +1224,14 @@ export default function HomePage() {
                       <motion.button
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-8 py-4 bg-white text-orange-600 rounded-xl font-semibold hover:bg-orange-50 transition-all duration-300 shadow-lg hover:shadow-xl text-lg"
+                        className="px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl text-lg"
                       >
                         Subscribe Now
                       </motion.button>
                     </motion.div>
 
                     <motion.div 
-                      className="flex flex-wrap justify-center gap-6 text-sm text-orange-100"
+                      className="flex flex-wrap justify-center gap-6 text-sm text-blue-100"
                       initial={{ opacity: 0 }}
                       whileInView={{ opacity: 1 }}
                       transition={{ delay: 0.5 }}

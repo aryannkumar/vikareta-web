@@ -203,7 +203,7 @@ function QuoteActions({ quote, rfqId, onQuoteUpdate }: QuoteActionsProps) {
                 value={counterPrice}
                 onChange={(e) => setCounterPrice(e.target.value)}
                 placeholder={`Current: ${formatCurrency(quote.totalPrice)}`}
-                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
@@ -213,14 +213,14 @@ function QuoteActions({ quote, rfqId, onQuoteUpdate }: QuoteActionsProps) {
                 onChange={(e) => setNegotiationMessage(e.target.value)}
                 placeholder="Explain your negotiation terms..."
                 rows={3}
-                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex gap-2">
               <button
                 onClick={handleNegotiate}
                 disabled={loading}
-                className="flex-1 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 disabled:opacity-50"
+                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : 'Send Negotiation'}
               </button>
@@ -434,7 +434,7 @@ function RfqCard({ rfq, onViewDetails, onQuoteUpdate }: RfqCardProps) {
           </div>
           
           <div className="text-center">
-            <div className="flex items-center justify-center gap-1 text-orange-600 mb-1">
+            <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
               <DollarSign className="h-4 w-4" />
               <span className="font-medium">
                 {rfq.responseAnalytics.averagePrice ? formatCurrency(rfq.responseAnalytics.averagePrice) : 'N/A'}
