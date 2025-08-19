@@ -235,7 +235,8 @@ export function Header() {
               { href: '/products', label: 'Products', icon: Star },
               { href: '/services', label: 'Services', icon: TrendingUp },
               { href: '/businesses', label: 'Businesses', icon: Store },
-              { href: '/rfq', label: 'RFQ', icon: FileText }
+              { href: '/rfqs', label: 'Browse RFQs', icon: FileText },
+              { href: '/rfq', label: 'My RFQs', icon: FileText }
             ].map((item) => (
               <motion.div
                 key={item.href}
@@ -520,7 +521,8 @@ export function Header() {
                   { href: '/products', label: 'Products', icon: Star, color: 'purple' },
                   { href: '/services', label: 'Services', icon: TrendingUp, color: 'green' },
                   { href: '/businesses', label: 'Businesses', icon: Store, color: 'indigo' },
-                  { href: '/rfq', label: 'RFQ', icon: FileText, color: 'orange' }
+                  { href: '/rfqs', label: 'Browse RFQs', icon: FileText, color: 'orange' },
+                  { href: '/rfq', label: 'My RFQs', icon: FileText, color: 'orange' }
                 ].map((item, index) => (
                   <motion.div
                     key={item.href}
