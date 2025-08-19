@@ -517,7 +517,7 @@ export class RFQService {
   async getPublicRecentRfqs(limit = 5): Promise<Array<{ id: string; title: string; quantity: number | null; budgetMin: number | null; budgetMax: number | null; createdAt: string }>> {
     try {
       const params = new URLSearchParams({ limit: String(limit) });
-      const response = await fetch(`${API_BASE_URL}/rfqs/public/recent?${params.toString()}`);
+      const response = await fetch(`${API_BASE_URL}/public/rfqs/recent?${params.toString()}`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error?.message || 'Failed to fetch recent RFQs');

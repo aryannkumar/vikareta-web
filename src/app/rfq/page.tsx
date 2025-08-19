@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FileText, X, Plus, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
+import { X, Plus, AlertCircle, Loader2, CheckCircle, FileText } from 'lucide-react';
 import { rfqService } from '../../services/rfq.service';
 import MyRFQsSection from './MyRFQsSection';
 
@@ -59,9 +59,6 @@ export default function RFQPage() {
   const [submitted, setSubmitted] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [subcategories, setSubcategories] = useState<any[]>([]);
-  const [recentRfqs, setRecentRfqs] = useState<Array<{ id: string; title: string; quantity: number | null; budgetMin: number | null; budgetMax: number | null; createdAt: string }>>([]);
-  const [recentLoading, setRecentLoading] = useState(true);
-  const [recentError, setRecentError] = useState<string | null>(null);
 
   // Load categories on component mount
   useEffect(() => {
@@ -96,20 +93,7 @@ export default function RFQPage() {
     loadSubs();
   }, [formData.category]);
 
-  // Fetch top 5 recent RFQs for guests
-  useEffect(() => {
-    (async () => {
-      try {
-        setRecentLoading(true);
-        const rfqs = await rfqService.getPublicRecentRfqs(5);
-        setRecentRfqs(rfqs);
-      } catch (e: any) {
-        setRecentError(e?.message || 'Failed to load recent RFQs');
-      } finally {
-        setRecentLoading(false);
-      }
-    })();
-  }, []);
+
 
   const units = ['pieces', 'kg', 'tons', 'meters', 'liters', 'boxes', 'sets'];
 
@@ -323,41 +307,7 @@ export default function RFQPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-2">Request for Quotation (RFQ)</h1>
-          <p className="text-sm text-muted-foreground mb-8">Top 5 recent RFQs are visible to everyone. Sign in to view full details and create your own RFQ.</p>
-
-          {/* Recent RFQs (Public) */}
-          <div className="bg-card rounded-lg border p-6 mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Recent RFQs (Public)</h2>
-              <span className="text-xs text-muted-foreground">Showing title, qty, and budget only</span>
-            </div>
-            {recentLoading ? (
-              <div className="text-sm text-muted-foreground">Loading recent RFQs...</div>
-            ) : recentError ? (
-              <div className="text-sm text-red-600">{recentError}</div>
-            ) : recentRfqs.length === 0 ? (
-              <div className="text-sm text-muted-foreground">No RFQs available yet.</div>
-            ) : (
-              <ul className="divide-y">
-                {recentRfqs.map((r) => (
-                  <li key={r.id} className="py-3 flex items-center justify-between">
-                    <div>
-                      <div className="font-medium">{r.title}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {r.quantity !== null ? `Qty: ${r.quantity}` : 'Service RFQ'}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm">
-                        {r.budgetMin || r.budgetMax ? `Budget: ${r.budgetMin ? `₹${r.budgetMin}` : ''}${r.budgetMin && r.budgetMax ? ' - ' : ''}${r.budgetMax ? `₹${r.budgetMax}` : ''}` : 'Budget: N/A'}
-                      </div>
-                      <div className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString()}</div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <p className="text-sm text-muted-foreground mb-4">Create new RFQ or manage your existing ones. Browse public RFQs at <a href="/rfqs" className="text-blue-600 hover:underline">/rfqs</a>.</p>
 
           {/* Tab Navigation */}
           <div className="flex space-x-1 mb-8 bg-muted p-1 rounded-lg">
