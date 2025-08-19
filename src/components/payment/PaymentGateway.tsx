@@ -76,8 +76,12 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
         paymentMethod: selectedGateway.slug,
         amount: order.total,
         currency: 'INR',
+        customerName: order.user?.name || order.address?.firstName + ' ' + order.address?.lastName || 'Unknown Customer',
+        customerEmail: order.user?.email || order.address?.email || '',
+        customerPhone: order.user?.phone || order.address?.phone || '',
         returnUrl: `${window.location.origin}/payment/success`,
         cancelUrl: `${window.location.origin}/payment/cancel`,
+        notifyUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/payments/webhook`,
         description: `Payment for Order #${order.orderSerialNo}`,
         metadata: {
           customerName: order.user?.name,
@@ -113,7 +117,7 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
 
   const processRazorpayPayment = async (request: PaymentRequest) => {
     const gateway = gateways.find(g => g.slug === 'razorpay');
-    const keyId = gateway?.gatewayOptions.find(opt => opt.option === 'razorpay_key')?.value;
+    const keyId = gateway?.gatewayOptions?.find(opt => opt.option === 'razorpay_key')?.value;
 
     if (!keyId) {
       throw new Error('Razorpay configuration missing');
@@ -130,7 +134,8 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
         try {
           const result = await paymentService.processRazorpayPayment(
             request.orderId,
-            response.razorpay_payment_id
+            response.razorpay_payment_id,
+            response.razorpay_signature
           );
           
           if (result.success) {
@@ -164,7 +169,7 @@ export const PaymentGatewayComponent: React.FC<PaymentGatewayComponentProps> = (
   const processStripePayment = async (_request: PaymentRequest) => {
     // Implement Stripe payment processing
     const gateway = gateways.find(g => g.slug === 'stripe');
-    const publicKey = gateway?.gatewayOptions.find(opt => opt.option === 'stripe_public_key')?.value;
+    const publicKey = gateway?.gatewayOptions?.find(opt => opt.option === 'stripe_public_key')?.value;
 
     if (!publicKey) {
       throw new Error('Stripe configuration missing');

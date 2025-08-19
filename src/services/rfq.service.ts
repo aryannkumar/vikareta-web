@@ -67,6 +67,99 @@ export interface RfqFilters {
   sortOrder?: 'asc' | 'desc';
 }
 
+export interface SellerContact {
+  id: string;
+  name: string;
+  businessName: string | null;
+  phone: string | null;
+  email: string;
+  whatsappNumber: string | null;
+  verificationTier: string;
+  isVerified: boolean;
+  averageRating: number | null;
+  totalReviews: number;
+  responseTime: string | null;
+}
+
+export interface QuoteResponse {
+  id: string;
+  sellerId: string;
+  seller: SellerContact;
+  totalPrice: number;
+  currency: string;
+  validUntil: Date | null;
+  message: string | null;
+  status: 'pending' | 'accepted' | 'rejected' | 'expired';
+  submittedAt: Date;
+  items: Array<{
+    name: string;
+    quantity: number;
+    unitPrice: number;
+    description: string | null;
+  }>;
+  attachments: string[];
+  isCounterOffer: boolean;
+  originalQuoteId: string | null;
+  estimatedDelivery: string | null;
+  paymentTerms: string | null;
+  warrantyInfo: string | null;
+}
+
+export interface WhatsAppResponse {
+  id: string;
+  sellerId: string;
+  seller: SellerContact;
+  messageContent: string;
+  receivedAt: Date;
+  messageType: 'text' | 'image' | 'document' | 'audio';
+  attachments: string[];
+  isProcessed: boolean;
+  extractedPrice: number | null;
+  extractedCurrency: string | null;
+  confidence: number | null;
+}
+
+export interface RfqWithResponses extends RfqDetails {
+  responses: {
+    platform: QuoteResponse[];
+    whatsapp: WhatsAppResponse[];
+  };
+  responseAnalytics: {
+    totalResponses: number;
+    platformResponses: number;
+    whatsappResponses: number;
+    averagePrice: number | null;
+    lowestPrice: number | null;
+    highestPrice: number | null;
+    averageResponseTime: number | null;
+    verifiedSellerResponses: number;
+    lastResponseAt: Date | null;
+  };
+}
+
+export interface MyRfqsWithResponsesResult {
+  rfqs: RfqWithResponses[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+  summary: {
+    totalRfqs: number;
+    totalResponses: number;
+    averageResponsesPerRfq: number;
+    rfqsWithResponses: number;
+    rfqsWithoutResponses: number;
+    platformResponsesTotal: number;
+    whatsappResponsesTotal: number;
+    totalValueQuoted: number;
+    averageQuoteValue: number;
+  };
+}
+
 export interface RfqDetails {
   id: string;
   title: string;
@@ -241,6 +334,35 @@ export class RFQService {
       return result.data;
     } catch (error) {
       console.error('Error fetching RFQs:', error);
+      throw error;
+    }
+  }
+
+  async getMyRfqsWithResponses(filters?: RfqFilters): Promise<MyRfqsWithResponsesResult> {
+    try {
+      const queryParams = new URLSearchParams();
+      
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            queryParams.append(key, value.toString());
+          }
+        });
+      }
+
+      const response = await fetch(`${API_BASE_URL}/rfqs/my-with-responses?${queryParams.toString()}`, {
+        headers: this.getHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to fetch RFQs with responses');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching RFQs with responses:', error);
       throw error;
     }
   }

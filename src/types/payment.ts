@@ -78,6 +78,7 @@ export interface User {
 
 export interface PaymentRequest {
   orderId: string;
+  paymentMethod?: string;
   amount: number;
   currency: string;
   customerName: string;
@@ -85,6 +86,7 @@ export interface PaymentRequest {
   customerPhone: string;
   description?: string;
   returnUrl: string;
+  cancelUrl?: string;
   notifyUrl: string;
   metadata?: Record<string, any>;
   gateway?: string;
