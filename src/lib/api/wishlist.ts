@@ -40,7 +40,10 @@ export const wishlistApi = {
 
   // Add item to wishlist
   async addToWishlist(data: AddToWishlistData) {
-    return apiClient.post('/wishlist', data);
+    console.log('Adding to wishlist with data:', data);
+    const response = await apiClient.post('/wishlist', data);
+    console.log('Wishlist add response:', response);
+    return response;
   },
 
   // Remove item from wishlist by wishlist ID

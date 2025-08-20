@@ -59,7 +59,7 @@ export const useWishlistStore = create<WishlistState>()(
             return true;
           } else {
             // Handle specific error cases
-            if (response.error?.includes('403') || response.error?.includes('Forbidden')) {
+            if (response.error?.includes('403') || response.error?.includes('Forbidden') || response.error?.includes('Access denied')) {
               set({ error: 'Authentication required. Please login again.' });
             } else {
               set({ error: response.error || 'Failed to add to wishlist' });
@@ -69,7 +69,7 @@ export const useWishlistStore = create<WishlistState>()(
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Failed to add to wishlist';
           // Handle authentication errors specifically
-          if (errorMessage.includes('403') || errorMessage.includes('Forbidden')) {
+          if (errorMessage.includes('403') || errorMessage.includes('Forbidden') || errorMessage.includes('Access denied')) {
             set({ error: 'Authentication required. Please login again.' });
           } else {
             set({ error: errorMessage });

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { marketplaceApi } from '@/lib/api/marketplace';
 import { useSSOAuth } from '@/lib/auth/use-sso-auth';
+import { navigateToLogin } from '@/lib/auth/secure-cross-domain-auth';
 import { useWishlistStore } from '@/lib/stores/wishlist';
 import { useToast } from '@/components/ui/toast-provider';
 import { 
@@ -79,7 +80,7 @@ export default function BusinessProfilePage(props: any) {
   const [business, setBusiness] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'services' | 'reviews'>('overview');
-  const { isAuthenticated } = useSSOAuth();
+  const { isAuthenticated, refreshSession } = useSSOAuth();
   const { isInWishlist, addToWishlist, removeItemFromWishlist } = useWishlistStore();
   const toast = useToast();
   const id = props?.params?.id as string;
@@ -90,10 +91,17 @@ export default function BusinessProfilePage(props: any) {
   const handleWishlistToggle = async () => {
     if (!isAuthenticated) {
       toast.error('Authentication Required', 'Please login to add businesses to your wishlist');
-      // Redirect to login page
-      window.location.href = '/auth/login';
+      // Use secure navigation instead of direct redirect
+      navigateToLogin();
       return;
     }
+
+    // Additional check to ensure user session is valid
+    console.log('Authentication check:', { 
+      isAuthenticated, 
+      cookies: document.cookie.includes('auth') || document.cookie.includes('session') || document.cookie.includes('token'),
+      cookieCount: document.cookie.split(';').length
+    });
 
     try {
       if (inWishlist) {
@@ -108,12 +116,24 @@ export default function BusinessProfilePage(props: any) {
         if (success) {
           toast.success('Added', 'Business added to wishlist');
         } else {
-          toast.error('Error', 'Failed to add business to wishlist. Please try logging in again.');
+          // Try refreshing session and retry once
+          console.log('Wishlist add failed, refreshing session and retrying...');
+          await refreshSession();
+          const retrySuccess = await addToWishlist(id, 'business');
+          if (retrySuccess) {
+            toast.success('Added', 'Business added to wishlist');
+          } else {
+            toast.error('Error', 'Failed to add business to wishlist. Please try logging in again.');
+            // If still failing, redirect to secure login
+            navigateToLogin();
+          }
         }
       }
     } catch (error) {
       console.error('Wishlist toggle error:', error);
       toast.error('Error', 'An error occurred while updating wishlist. Please try logging in again.');
+      // On error, also redirect to secure login
+      navigateToLogin();
     }
   };
 

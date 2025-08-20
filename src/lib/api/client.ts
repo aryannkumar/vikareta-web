@@ -5,10 +5,29 @@ interface ApiResponse<T = any> {
   message?: string;
 }
 
+/**
+ * Get CSRF token from cookie (consistent with secure auth)
+ */
+function getCSRFToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  
+  const cookies = document.cookie.split(';');
+  const csrfCookie = cookies.find(cookie => 
+    cookie.trim().startsWith('XSRF-TOKEN=')
+  );
+  
+  if (csrfCookie) {
+    return decodeURIComponent(csrfCookie.split('=')[1]);
+  }
+  
+  return null;
+}
+
 class ApiClient {
   private baseURL: string;
 
-  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com') {
+  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_BASE || 'https://api.vikareta.com') {
+    // Ensure consistent base URL with secure auth system
     // The baseURL should include /api if not already present
     if (baseURL.endsWith('/api')) {
       this.baseURL = baseURL;
@@ -22,18 +41,7 @@ class ApiClient {
    * Get CSRF token from cookie
    */
   private getCSRFToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    
-    const cookies = document.cookie.split(';');
-    const csrfCookie = cookies.find(cookie => 
-      cookie.trim().startsWith('XSRF-TOKEN=')
-    );
-    
-    if (csrfCookie) {
-      return decodeURIComponent(csrfCookie.split('=')[1]);
-    }
-    
-    return null;
+    return getCSRFToken();
   }
 
   private async request<T>(
@@ -82,10 +90,30 @@ class ApiClient {
       if (!response.ok) {
         console.error(`API request failed: ${response.status} ${response.statusText} for ${url}`);
         
+        // Try to get the response body for better error info
+        let responseErrorData;
+        try {
+          responseErrorData = await response.json();
+          console.error('Error response body:', responseErrorData);
+        } catch {
+          console.error('Failed to parse error response as JSON');
+        }
+        
         // Handle authentication errors
         if (response.status === 401) {
           console.log('Authentication required - redirecting to login');
           // Let the SSO system handle this
+        }
+        
+        // Handle forbidden errors
+        if (response.status === 403) {
+          console.error('Access forbidden - check authentication and permissions');
+          // Note: Don't automatically redirect here, let the calling code decide
+          return {
+            success: false,
+            data: [] as T,
+            error: responseErrorData?.message || responseErrorData?.error || 'Access denied. Please login again.',
+          };
         }
         
         // Handle different HTTP status codes

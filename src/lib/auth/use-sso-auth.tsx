@@ -53,9 +53,8 @@ export function SSOAuthProvider({ children }: { children: React.ReactNode }) {
 
   // Secure API request helper
   const secureRequest = useCallback(async (endpoint: string, options: RequestInit = {}) => {
-    // Get backend API base URL
-    const apiBase = process.env.NEXT_PUBLIC_API_BASE || 
-      (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
+    // Use the same API base as the main API client for consistency
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://api.vikareta.com';
     
     // Build full URL for backend API
     const fullUrl = endpoint.startsWith('http') ? endpoint : `${apiBase}${endpoint}`;
