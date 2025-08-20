@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Plus, AlertCircle, Loader2, CheckCircle, FileText } from 'lucide-react';
 import { rfqService } from '../../services/rfq.service';
 import MyRFQsSection from './MyRFQsSection';
@@ -75,7 +75,7 @@ export default function RFQPage() {
     loadCategories();
   }, []);
 
-  const resetForm = useCallback(() => {
+  const resetForm = () => {
     setFormData({
       rfqType: 'product',
       title: '',
@@ -93,7 +93,7 @@ export default function RFQPage() {
     });
     setErrors({});
     setSubmitted(false);
-  }, []);
+  };
 
   // Load subcategories when category changes
   useEffect(() => {
@@ -165,53 +165,37 @@ export default function RFQPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Create a ref to avoid errors dependency in useCallback
-  const errorsRef = useRef<Record<string, string>>({});
-  errorsRef.current = errors;
-
-  const handleInputChange = useCallback((field: string, value: string) => {
+  // Simple input change helper
+  const updateField = (field: string, value: string) => {
     const fieldParts = field.split('.');
     
-    // Optimized form data update with change detection
-    setFormData(prev => {
-      let newData: RFQFormData;
-      
-      if (fieldParts.length === 2 && fieldParts[0] === 'contactInfo') {
-        // Check if contact info value actually changed
-        if (prev.contactInfo[fieldParts[1] as keyof typeof prev.contactInfo] === value) {
-          return prev;
+    if (fieldParts.length === 2 && fieldParts[0] === 'contactInfo') {
+      setFormData(prev => ({
+        ...prev,
+        contactInfo: {
+          ...prev.contactInfo,
+          [fieldParts[1]]: value
         }
-        newData = {
-          ...prev,
-          contactInfo: {
-            ...prev.contactInfo,
-            [fieldParts[1]]: value
-          }
-        };
-      } else {
-        // Check if field value actually changed
-        if (prev[field as keyof RFQFormData] === value) {
-          return prev;
-        }
-        newData = { ...prev, [field]: value };
-        
+      }));
+    } else {
+      setFormData(prev => {
+        const newData = { ...prev, [field]: value };
         // Clear subcategory when category changes
         if (field === 'category') {
           newData.subcategory = '';
         }
-      }
-      
-      return newData;
-    });
+        return newData;
+      });
+    }
     
-    // Clear error using ref to avoid dependency
-    if (errorsRef.current[field]) {
+    // Clear error if exists
+    if (errors[field]) {
       setErrors(prev => {
         const { [field]: _, ...rest } = prev;
         return rest;
       });
     }
-  }, []);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -259,33 +243,28 @@ export default function RFQPage() {
     }
   };
 
-  const addSpecification = useCallback(() => {
+  const addSpecification = () => {
     setFormData(prev => ({
       ...prev,
       specifications: [...prev.specifications, '']
     }));
-  }, []);
+  };
 
-  const removeSpecification = useCallback((index: number) => {
+  const removeSpecification = (index: number) => {
     setFormData(prev => ({
       ...prev,
       specifications: prev.specifications.filter((_, i) => i !== index)
     }));
-  }, []);
+  };
 
-  const updateSpecification = useCallback((index: number, value: string) => {
-    setFormData(prev => {
-      // Check if the value actually changed
-      if (prev.specifications[index] === value) return prev;
-      
-      return {
-        ...prev,
-        specifications: prev.specifications.map((spec, i) => i === index ? value : spec)
-      };
-    });
-  }, []);
+  const updateSpecification = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      specifications: prev.specifications.map((spec, i) => i === index ? value : spec)
+    }));
+  };
 
-  const handleFileUpload = useCallback((files: FileList | null) => {
+  const handleFileUpload = (files: FileList | null) => {
     if (files) {
       const newFiles = Array.from(files);
       setFormData(prev => ({
@@ -293,14 +272,14 @@ export default function RFQPage() {
         attachments: [...prev.attachments, ...newFiles]
       }));
     }
-  }, []);
+  };
 
-  const removeAttachment = useCallback((index: number) => {
+  const removeAttachment = (index: number) => {
     setFormData(prev => ({
       ...prev,
       attachments: prev.attachments.filter((_, i) => i !== index)
     }));
-  }, []);
+  };
 
   if (submitted) {
     return (
@@ -397,7 +376,7 @@ export default function RFQPage() {
                     name="rfqType"
                     value="product"
                     checked={formData.rfqType === 'product'}
-                    onChange={() => handleInputChange('rfqType', 'product')}
+                    onChange={() => updateField('rfqType', 'product')}
                   />
                   Product Order
                 </label>
@@ -407,7 +386,7 @@ export default function RFQPage() {
                     name="rfqType"
                     value="service"
                     checked={formData.rfqType === 'service'}
-                    onChange={() => handleInputChange('rfqType', 'service')}
+                    onChange={() => updateField('rfqType', 'service')}
                   />
                   Service Order
                 </label>
@@ -420,7 +399,15 @@ export default function RFQPage() {
               <input
                 type="text"
                 value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, title: e.target.value }));
+                  if (errors.title) {
+                    setErrors(prev => {
+                      const { title: _, ...rest } = prev;
+                      return rest;
+                    });
+                  }
+                }}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                   errors.title ? 'border-red-500' : ''
                 }`}
@@ -442,7 +429,7 @@ export default function RFQPage() {
                 </label>
                 <select
                   value={formData.category}
-                  onChange={(e) => handleInputChange('category', e.target.value)}
+                  onChange={(e) => updateField('category', e.target.value)}
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                     errors.category ? 'border-red-500' : ''
                   }`}
@@ -470,7 +457,7 @@ export default function RFQPage() {
                   </label>
                   <select
                     value={formData.subcategory}
-                    onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                    onChange={(e) => updateField('subcategory', e.target.value)}
                     className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                       errors.subcategory ? 'border-red-500' : ''
                     }`}
@@ -500,7 +487,7 @@ export default function RFQPage() {
                 <input
                   type="text"
                   value={formData.location}
-                  onChange={(e) => handleInputChange('location', e.target.value)}
+                  onChange={(e) => updateField('location', e.target.value)}
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                     errors.location ? 'border-red-500' : ''
                   }`}
@@ -524,7 +511,7 @@ export default function RFQPage() {
               <textarea
                 rows={4}
                 value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={(e) => updateField('description', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                   errors.description ? 'border-red-500' : ''
                 }`}
@@ -554,7 +541,7 @@ export default function RFQPage() {
               <input
                 type="number"
                 value={formData.quantity}
-                onChange={(e) => handleInputChange('quantity', e.target.value)}
+                onChange={(e) => updateField('quantity', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                   errors.quantity ? 'border-red-500' : ''
                 }`}
@@ -577,7 +564,7 @@ export default function RFQPage() {
               </label>
               <select
                 value={formData.unit}
-                onChange={(e) => handleInputChange('unit', e.target.value)}
+                onChange={(e) => updateField('unit', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                   errors.unit ? 'border-red-500' : ''
                 }`}
@@ -604,7 +591,7 @@ export default function RFQPage() {
               <input
                 type="text"
                 value={formData.budget}
-                onChange={(e) => handleInputChange('budget', e.target.value)}
+                onChange={(e) => updateField('budget', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                   errors.budget ? 'border-red-500' : ''
                 }`}
@@ -627,7 +614,7 @@ export default function RFQPage() {
             <input
               type="text"
               value={formData.timeline}
-              onChange={(e) => handleInputChange('timeline', e.target.value)}
+              onChange={(e) => updateField('timeline', e.target.value)}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                 errors.timeline ? 'border-red-500' : ''
               }`}
@@ -748,7 +735,7 @@ export default function RFQPage() {
               <input
                 type="text"
                 value={formData.contactInfo.name}
-                onChange={(e) => handleInputChange('contactInfo.name', e.target.value)}
+                onChange={(e) => updateField('contactInfo.name', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                   errors['contactInfo.name'] ? 'border-red-500' : ''
                 }`}
@@ -770,7 +757,7 @@ export default function RFQPage() {
               <input
                 type="email"
                 value={formData.contactInfo.email}
-                onChange={(e) => handleInputChange('contactInfo.email', e.target.value)}
+                onChange={(e) => updateField('contactInfo.email', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                   errors['contactInfo.email'] ? 'border-red-500' : ''
                 }`}
@@ -792,7 +779,7 @@ export default function RFQPage() {
               <input
                 type="tel"
                 value={formData.contactInfo.phone}
-                onChange={(e) => handleInputChange('contactInfo.phone', e.target.value)}
+                onChange={(e) => updateField('contactInfo.phone', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
                   errors['contactInfo.phone'] ? 'border-red-500' : ''
                 }`}
@@ -814,7 +801,7 @@ export default function RFQPage() {
               <input
                 type="text"
                 value={formData.contactInfo.company}
-                onChange={(e) => handleInputChange('contactInfo.company', e.target.value)}
+                onChange={(e) => updateField('contactInfo.company', e.target.value)}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
                 placeholder="Enter company name (optional)"
                 disabled={loading}

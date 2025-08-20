@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -196,8 +196,8 @@ export default function RegisterPage() {
     return () => clearInterval(interval);
   }, [otpTimer]);
 
-  // Validation functions (memoized to avoid stale closures)
-  const validateStep = useCallback((step: RegistrationStep): boolean => {
+  // Validation functions
+  const validateStep = (step: RegistrationStep): boolean => {
     const newErrors: Record<string, string> = {};
 
     switch (step) {
@@ -275,72 +275,21 @@ export default function RegisterPage() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData]);
+  };
 
-  // Create a ref to avoid errors dependency in useCallback
-  const errorsRef = useRef<Record<string, string>>({});
-  errorsRef.current = errors;
-
-  // Handle input changes with optimized updates
-  const handleInputChange = useCallback((field: keyof FormData, value: string | boolean) => {
-    setFormData(prev => {
-      // Only update if value actually changed to prevent unnecessary re-renders
-      if (prev[field] === value) return prev;
-      return { ...prev, [field]: value };
-    });
-    
-    // Clear error immediately but only if it exists
-    if (errorsRef.current[field]) {
+  // Simple input change helper
+  const updateField = (field: keyof FormData, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
       setErrors(prev => {
         const { [field]: _, ...rest } = prev;
         return rest;
       });
     }
-  }, []);
-
-  // Format phone number - improved to avoid cursor jumps
-  const formatPhoneNumber = useCallback((value: string) => {
-    const cleaned = value.replace(/\D/g, '');
-    if (cleaned.length === 0) return '';
-    if (cleaned.startsWith('91') && cleaned.length > 2) {
-      return `+91 ${cleaned.slice(2)}`;
-    }
-    if (cleaned.length === 10 && !cleaned.startsWith('91')) {
-      return `+91 ${cleaned}`;
-    }
-    if (cleaned.length < 10 && !cleaned.startsWith('91')) {
-      return cleaned === '' ? '' : `+91 ${cleaned}`;
-    }
-    if (cleaned.startsWith('91')) {
-      return `+${cleaned}`;
-    }
-    return `+91 ${cleaned}`;
-  }, []);
-
-  // Special handler for phone to avoid cursor issues
-  const handlePhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const formatted = formatPhoneNumber(value);
-    
-    setFormData(prev => {
-      // Only update if value changed
-      if (prev.phone === formatted) return prev;
-      return { ...prev, phone: formatted };
-    });
-    
-    // Clear phone error using ref to avoid dependency
-    if (errorsRef.current.phone) {
-      setErrors(prev => {
-        const { phone: _, ...rest } = prev;
-        return rest;
-      });
-    }
-  }, [formatPhoneNumber]);
-
-  
+  };
 
   // Step navigation
-  const nextStep = useCallback(() => {
+  const nextStep = () => {
     if (validateStep(currentStep)) {
       const steps: RegistrationStep[] = ['userType', 'personal', 'business', 'verification', 'complete'];
       const currentIndex = steps.indexOf(currentStep);
@@ -348,18 +297,18 @@ export default function RegisterPage() {
         setCurrentStep(steps[currentIndex + 1]);
       }
     }
-  }, [currentStep, validateStep]);
+  };
 
-  const prevStep = useCallback(() => {
+  const prevStep = () => {
     const steps: RegistrationStep[] = ['userType', 'personal', 'business', 'verification', 'complete'];
     const currentIndex = steps.indexOf(currentStep);
     if (currentIndex > 0) {
       setCurrentStep(steps[currentIndex - 1]);
     }
-  }, [currentStep]);
+  };
 
   // OTP functions
-  const sendOTP = useCallback(async (type: 'email' | 'phone') => {
+  const sendOTP = async (type: 'email' | 'phone') => {
     setOtpLoading(true);
     setCurrentOtpType(type);
     
@@ -378,9 +327,9 @@ export default function RegisterPage() {
     } finally {
       setOtpLoading(false);
     }
-  }, []);
+  };
 
-  const verifyOTP = useCallback(async (code: string, type: 'email' | 'phone') => {
+  const verifyOTP = async (code: string, type: 'email' | 'phone') => {
     setLoading(true);
     
     try {
@@ -401,10 +350,10 @@ export default function RegisterPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   // Final registration
-  const handleFinalSubmit = useCallback(async () => {
+  const handleFinalSubmit = async () => {
     if (!validateStep('verification')) return;
 
     setLoading(true);
@@ -438,10 +387,10 @@ export default function RegisterPage() {
     } finally {
       setLoading(false);
     }
-  }, [formData, registerUser, validateStep]);
+  };
 
   // Social registration handlers
-  const handleSocialRegister = useCallback(async (provider: string) => {
+  const handleSocialRegister = async (provider: string) => {
     try {
       setLoading(true);
       
@@ -456,14 +405,14 @@ export default function RegisterPage() {
       toast.error('Error', `Failed to initialize ${provider} registration`);
       setLoading(false);
     }
-  }, []);
+  };
 
   // Progress calculation
-  const getProgress = useCallback(() => {
+  const getProgress = () => {
     const steps = ['userType', 'personal', 'business', 'verification', 'complete'];
     const currentIndex = steps.indexOf(currentStep);
     return ((currentIndex + 1) / steps.length) * 100;
-  }, [currentStep]);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 relative overflow-hidden">
@@ -676,7 +625,7 @@ export default function RegisterPage() {
           {/* Buyer Option */}
           <motion.button
             type="button"
-            onClick={() => handleInputChange('userType', 'buyer')}
+            onClick={() => setFormData(prev => ({ ...prev, userType: 'buyer' }))}
             className={`p-6 border-2 rounded-2xl text-left transition-all duration-300 hover:shadow-lg ${
               formData.userType === 'buyer'
                 ? 'border-amber-500 bg-amber-50 shadow-md'
@@ -708,7 +657,7 @@ export default function RegisterPage() {
           {/* Seller Option */}
           <motion.button
             type="button"
-            onClick={() => handleInputChange('userType', 'seller')}
+            onClick={() => setFormData(prev => ({ ...prev, userType: 'seller' }))}
             className={`p-6 border-2 rounded-2xl text-left transition-all duration-300 hover:shadow-lg ${
               formData.userType === 'seller'
                 ? 'border-amber-500 bg-amber-50 shadow-md'
@@ -740,7 +689,7 @@ export default function RegisterPage() {
           {/* Business Option */}
           <motion.button
             type="button"
-            onClick={() => handleInputChange('userType', 'business')}
+            onClick={() => setFormData(prev => ({ ...prev, userType: 'business' }))}
             className={`p-6 border-2 rounded-2xl text-left transition-all duration-300 hover:shadow-lg ${
               formData.userType === 'business'
                 ? 'border-amber-500 bg-amber-50 shadow-md'
@@ -866,6 +815,11 @@ export default function RegisterPage() {
 
   // Personal Information Step
   function PersonalInfoStep() {
+    const handleFormSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      nextStep();
+    };
+
     return (
       <motion.div
         key="personal"
@@ -880,7 +834,7 @@ export default function RegisterPage() {
           <p className="text-gray-600">Tell us about yourself</p>
         </div>
 
-        <div className="space-y-6">
+        <form onSubmit={handleFormSubmit} className="space-y-6" id="personal-info-form">
           {/* Name Fields */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -893,7 +847,15 @@ export default function RegisterPage() {
                   id="firstName"
                   type="text"
                   value={formData.firstName}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  onChange={(e) => {
+                    setFormData(prev => ({ ...prev, firstName: e.target.value }));
+                    if (errors.firstName) {
+                      setErrors(prev => {
+                        const { firstName: _, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
                   className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
                     errors.firstName ? 'border-red-500' : 'border-gray-200 hover:border-amber-300'
                   }`}
@@ -923,7 +885,15 @@ export default function RegisterPage() {
                   id="lastName"
                   type="text"
                   value={formData.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  onChange={(e) => {
+                    setFormData(prev => ({ ...prev, lastName: e.target.value }));
+                    if (errors.lastName) {
+                      setErrors(prev => {
+                        const { lastName: _, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
                   className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
                     errors.lastName ? 'border-red-500' : 'border-gray-200 hover:border-amber-300'
                   }`}
@@ -955,7 +925,15 @@ export default function RegisterPage() {
                 id="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, email: e.target.value }));
+                  if (errors.email) {
+                    setErrors(prev => {
+                      const { email: _, ...rest } = prev;
+                      return rest;
+                    });
+                  }
+                }}
                 className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
                   errors.email ? 'border-red-500' : 'border-gray-200 hover:border-amber-300'
                 }`}
@@ -986,7 +964,31 @@ export default function RegisterPage() {
                 id="phone"
                 type="tel"
                 value={formData.phone}
-                onChange={handlePhoneChange}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const cleaned = value.replace(/\D/g, '');
+                  let formatted = '';
+                  
+                  if (cleaned.length === 0) {
+                    formatted = '';
+                  } else if (cleaned.startsWith('91') && cleaned.length > 2) {
+                    formatted = `+91 ${cleaned.slice(2)}`;
+                  } else if (cleaned.length === 10 && !cleaned.startsWith('91')) {
+                    formatted = `+91 ${cleaned}`;
+                  } else if (cleaned.startsWith('91')) {
+                    formatted = `+${cleaned}`;
+                  } else {
+                    formatted = `+91 ${cleaned}`;
+                  }
+                  
+                  setFormData(prev => ({ ...prev, phone: formatted }));
+                  if (errors.phone) {
+                    setErrors(prev => {
+                      const { phone: _, ...rest } = prev;
+                      return rest;
+                    });
+                  }
+                }}
                 className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
                   errors.phone ? 'border-red-500' : 'border-gray-200 hover:border-amber-300'
                 }`}
@@ -1018,7 +1020,15 @@ export default function RegisterPage() {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  onChange={(e) => {
+                    setFormData(prev => ({ ...prev, password: e.target.value }));
+                    if (errors.password) {
+                      setErrors(prev => {
+                        const { password: _, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
                   className={`w-full pl-12 pr-14 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
                     errors.password ? 'border-red-500' : 'border-gray-200 hover:border-amber-300'
                   }`}
@@ -1056,7 +1066,15 @@ export default function RegisterPage() {
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                  onChange={(e) => {
+                    setFormData(prev => ({ ...prev, confirmPassword: e.target.value }));
+                    if (errors.confirmPassword) {
+                      setErrors(prev => {
+                        const { confirmPassword: _, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
                   className={`w-full pl-12 pr-14 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
                     errors.confirmPassword ? 'border-red-500' : 'border-gray-200 hover:border-amber-300'
                   }`}
@@ -1084,7 +1102,7 @@ export default function RegisterPage() {
               )}
             </div>
           </div>
-        </div>
+        </form>
 
         {/* Navigation Buttons */}
         <div className="flex gap-4 pt-6">
@@ -1100,8 +1118,8 @@ export default function RegisterPage() {
           </motion.button>
 
           <motion.button
-            type="button"
-            onClick={nextStep}
+            type="submit"
+            form="personal-info-form"
             disabled={loading}
             className={`flex-1 py-4 rounded-2xl font-semibold text-white transition-all duration-300 flex items-center justify-center space-x-2 ${
               loading
@@ -1164,7 +1182,7 @@ export default function RegisterPage() {
                     id="businessName"
                     type="text"
                     value={formData.businessName}
-                    onChange={(e) => handleInputChange('businessName', e.target.value)}
+                    onChange={(e) => updateField('businessName', e.target.value)}
                     className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
                       errors.businessName ? 'border-red-500' : 'border-gray-200 hover:border-amber-300'
                     }`}
@@ -1194,7 +1212,7 @@ export default function RegisterPage() {
                   <select
                     id="businessType"
                     value={formData.businessType}
-                    onChange={(e) => handleInputChange('businessType', e.target.value)}
+                    onChange={(e) => updateField('businessType', e.target.value)}
                     className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 transition-all duration-300 ${
                       errors.businessType ? 'border-red-500' : 'border-gray-200 hover:border-amber-300'
                     }`}
@@ -1235,7 +1253,7 @@ export default function RegisterPage() {
                     id="gstin"
                     type="text"
                     value={formData.gstin}
-                    onChange={(e) => handleInputChange('gstin', e.target.value.toUpperCase())}
+                    onChange={(e) => updateField('gstin', e.target.value.toUpperCase())}
                     className="w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 border-gray-200 hover:border-amber-300"
                     placeholder="Enter your GSTIN (e.g., 29ABCDE1234F1Z5)"
                     disabled={loading}
@@ -1258,7 +1276,7 @@ export default function RegisterPage() {
                   id="city"
                   type="text"
                   value={formData.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
+                  onChange={(e) => updateField('city', e.target.value)}
                   className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
                     errors.city ? 'border-red-500' : 'border-gray-200 hover:border-amber-300'
                   }`}
@@ -1288,7 +1306,7 @@ export default function RegisterPage() {
                   id="state"
                   type="text"
                   value={formData.state}
-                  onChange={(e) => handleInputChange('state', e.target.value)}
+                  onChange={(e) => updateField('state', e.target.value)}
                   className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
                     errors.state ? 'border-red-500' : 'border-gray-200 hover:border-amber-300'
                   }`}
@@ -1320,7 +1338,7 @@ export default function RegisterPage() {
                   id="pincode"
                   type="text"
                   value={formData.pincode}
-                  onChange={(e) => handleInputChange('pincode', e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => updateField('pincode', e.target.value.replace(/\D/g, ''))}
                   className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
                     errors.pincode ? 'border-red-500' : 'border-gray-200 hover:border-amber-300'
                   }`}
@@ -1351,7 +1369,7 @@ export default function RegisterPage() {
                   id="country"
                   type="text"
                   value={formData.country}
-                  onChange={(e) => handleInputChange('country', e.target.value)}
+                  onChange={(e) => updateField('country', e.target.value)}
                   className="w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 border-gray-200 hover:border-amber-300"
                   placeholder="Country"
                   disabled={loading}
@@ -1370,7 +1388,7 @@ export default function RegisterPage() {
               <textarea
                 id="address"
                 value={formData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
+                onChange={(e) => updateField('address', e.target.value)}
                 className="w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 border-gray-200 hover:border-amber-300 min-h-[100px] resize-none"
                 placeholder="Enter your complete address"
                 disabled={loading}
@@ -1385,7 +1403,7 @@ export default function RegisterPage() {
               <input
                 type="checkbox"
                 checked={formData.agreeToTerms}
-                onChange={(e) => handleInputChange('agreeToTerms', e.target.checked)}
+                onChange={(e) => updateField('agreeToTerms', e.target.checked)}
                 className="mt-1 rounded border-gray-300 text-amber-500 focus:ring-amber-500 w-5 h-5"
                 disabled={loading}
               />
@@ -1415,7 +1433,7 @@ export default function RegisterPage() {
               <input
                 type="checkbox"
                 checked={formData.agreeToMarketing}
-                onChange={(e) => handleInputChange('agreeToMarketing', e.target.checked)}
+                onChange={(e) => updateField('agreeToMarketing', e.target.checked)}
                 className="mt-1 rounded border-gray-300 text-amber-500 focus:ring-amber-500 w-5 h-5"
                 disabled={loading}
               />
