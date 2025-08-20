@@ -24,10 +24,10 @@ import {
   ShoppingCart,
   Eye
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { getCategoryById, getSubcategoryById, type Category, type Subcategory } from '@/lib/api/categories';
+import { Button } from '../../../../components/ui/button';
+import { Badge } from '../../../../components/ui/badge';
+import { Card, CardContent, CardHeader } from '../../../../components/ui/card';
+import { getCategoryById, getSubcategoryById, type Category, type Subcategory } from '../../../../lib/api/categories';
 
 export default function SubcategoryPage() {
   const params = useParams();
@@ -301,11 +301,11 @@ export default function SubcategoryPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 mb-8 text-sm">
-          <Link href="/categories" className="text-primary hover:underline">
+          <Link href="/categories" className="text-amber-600 hover:underline hover:text-amber-700">
             Categories
           </Link>
           <span className="text-muted-foreground">/</span>
-          <Link href={`/categories/${categoryId}`} className="text-primary hover:underline">
+          <Link href={`/categories/${categoryId}`} className="text-amber-600 hover:underline hover:text-amber-700">
             {category?.name || 'Category'}
           </Link>
           <span className="text-muted-foreground">/</span>
@@ -323,9 +323,9 @@ export default function SubcategoryPage() {
         </div>
 
         {/* Subcategory Header */}
-        <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-8 mb-8">
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-8 mb-8 border border-amber-200">
           <div className="flex items-start gap-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-16 h-16 bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0">
               <Package className="h-8 w-8 text-white" />
             </div>
 

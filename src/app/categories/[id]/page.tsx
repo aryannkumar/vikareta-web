@@ -17,14 +17,14 @@ import {
   Building,
   AlertCircle
 } from 'lucide-react';
-import { CategoryIcon } from '@/components/ui/dynamic-icon';
-import { PlaceholderImage } from '@/components/ui/placeholder-image';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui/toast-provider';
-import { formatPrice } from '@/lib/utils';
-import { categoriesApi, type CategoryWithProducts } from '@/lib/api/categories';
-import { useCartStore } from '@/lib/stores/cart';
+import { CategoryIcon } from '../../../components/ui/dynamic-icon';
+import { PlaceholderImage } from '../../../components/ui/placeholder-image';
+import { Button } from '../../../components/ui/button';
+import { Badge } from '../../../components/ui/badge';
+import { useToast } from '../../../components/ui/toast-provider';
+import { formatPrice } from '../../../lib/utils';
+import { categoriesApi, type CategoryWithProducts } from '../../../lib/api/categories';
+import { useCartStore } from '../../../lib/stores/cart';
 
 interface CategoryProduct {
   id: string;
@@ -163,7 +163,7 @@ export default function CategoryDetailPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 mb-8 text-sm">
-          <Link href="/categories" className="text-primary hover:underline">
+          <Link href="/categories" className="text-amber-600 hover:underline hover:text-amber-700">
             Categories
           </Link>
           <span className="text-muted-foreground">/</span>
@@ -171,9 +171,9 @@ export default function CategoryDetailPage() {
         </div>
 
         {/* Category Header */}
-        <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-8 mb-8">
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-8 mb-8 border border-amber-200">
           <div className="flex items-start gap-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-16 h-16 bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0">
               <CategoryIcon category={categoryData} size={32} className="text-white" />
             </div>
             
@@ -185,7 +185,7 @@ export default function CategoryDetailPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="flex items-center gap-3">
-                  <Package className="h-5 w-5 text-primary" />
+                  <Package className="h-5 w-5 text-amber-600" />
                   <div>
                     <div className="font-semibold">{(categoryData.productCount || 0).toLocaleString()}</div>
                     <div className="text-sm text-muted-foreground">Products</div>
@@ -193,7 +193,7 @@ export default function CategoryDetailPage() {
                 </div>
                 
                 <div className="flex items-center gap-3">
-                  <Users className="h-5 w-5 text-primary" />
+                  <Users className="h-5 w-5 text-amber-600" />
                   <div>
                     <div className="font-semibold">500+</div>
                     <div className="text-sm text-muted-foreground">Suppliers</div>
@@ -201,7 +201,7 @@ export default function CategoryDetailPage() {
                 </div>
                 
                 <div className="flex items-center gap-3">
-                  <Building className="h-5 w-5 text-primary" />
+                  <Building className="h-5 w-5 text-amber-600" />
                   <div>
                     <div className="font-semibold">50+</div>
                     <div className="text-sm text-muted-foreground">Cities</div>
@@ -221,17 +221,17 @@ export default function CategoryDetailPage() {
                 <Link
                   key={subcategory.id}
                   href={`/categories/${categoryData.id}/${subcategory.id}`}
-                  className="bg-card rounded-lg border p-4 hover:shadow-md transition-shadow"
+                  className="bg-card rounded-lg border border-amber-200 p-4 hover:shadow-md hover:border-amber-300 transition-all"
                 >
-                  <h3 className="font-semibold mb-2">{subcategory.name}</h3>
+                  <h3 className="font-semibold mb-2 text-amber-800">{subcategory.name}</h3>
                   <p className="text-sm text-muted-foreground mb-3">
                     {subcategory.description}
                   </p>
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs border-amber-300 text-amber-700">
                       {subcategory.productCount} products
                     </Badge>
-                    <TrendingUp className="h-4 w-4 text-primary" />
+                    <TrendingUp className="h-4 w-4 text-amber-600" />
                   </div>
                 </Link>
               ))}
@@ -251,7 +251,7 @@ export default function CategoryDetailPage() {
                   placeholder="Search products..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-64 pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background"
+                  className="w-64 pl-10 pr-4 py-2 border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-background"
                 />
               </div>
 
@@ -260,7 +260,7 @@ export default function CategoryDetailPage() {
                 <select
                   value={selectedSubcategory}
                   onChange={(e) => setSelectedSubcategory(e.target.value)}
-                  className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+                  className="px-3 py-2 border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-background"
                 >
                   <option value="">All Subcategories</option>
                   {categoryData.subcategories?.map((subcategory) => (
@@ -277,7 +277,7 @@ export default function CategoryDetailPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+                className="px-3 py-2 border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-background"
               >
                 {sortOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -287,12 +287,15 @@ export default function CategoryDetailPage() {
               </select>
 
               {/* View Mode */}
-              <div className="flex border rounded-lg">
+              <div className="flex border border-amber-200 rounded-lg">
                 <Button
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('grid')}
-                  className="rounded-r-none"
+                  className={`rounded-r-none ${viewMode === 'grid' 
+                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700' 
+                    : 'hover:bg-amber-50 text-amber-700'
+                  }`}
                 >
                   <Grid className="h-4 w-4" />
                 </Button>
@@ -300,7 +303,10 @@ export default function CategoryDetailPage() {
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('list')}
-                  className="rounded-l-none"
+                  className={`rounded-l-none ${viewMode === 'list' 
+                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700' 
+                    : 'hover:bg-amber-50 text-amber-700'
+                  }`}
                 >
                   <List className="h-4 w-4" />
                 </Button>
@@ -327,7 +333,7 @@ export default function CategoryDetailPage() {
             <Button onClick={() => {
               setSearchQuery('');
               setSelectedSubcategory('');
-            }}>
+            }} className="bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700">
               Clear Filters
             </Button>
           </div>
@@ -379,7 +385,7 @@ export default function CategoryDetailPage() {
                   </div>
 
                   <Link href={`/products/${product.id}`}>
-                    <h3 className="font-semibold text-sm mb-2 hover:text-primary transition-colors line-clamp-2">
+                    <h3 className="font-semibold text-sm mb-2 hover:text-amber-600 transition-colors line-clamp-2">
                       {product.name}
                     </h3>
                   </Link>
@@ -404,7 +410,7 @@ export default function CategoryDetailPage() {
 
                   <div className="mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-lg text-primary">
+                      <span className="font-bold text-lg text-amber-600">
                         {formatPrice(product.price)}
                       </span>
                       {product.originalPrice && (
@@ -418,7 +424,7 @@ export default function CategoryDetailPage() {
                   <div className="mb-3">
                     <Link
                       href={`/suppliers/${product.supplier.id}`}
-                      className="text-xs text-primary hover:underline font-medium"
+                      className="text-xs text-amber-600 hover:underline hover:text-amber-700 font-medium"
                     >
                       {product.supplier.name}
                       {product.supplier.verified && (
@@ -432,7 +438,7 @@ export default function CategoryDetailPage() {
 
                   <div className="flex gap-2">
                     <Link href={`/products/${product.id}`} className="flex-1">
-                      <Button className="w-full btn-primary text-sm px-3 py-2">
+                      <Button className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700 text-sm px-3 py-2">
                         View Details
                       </Button>
                     </Link>

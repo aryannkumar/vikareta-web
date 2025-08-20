@@ -110,7 +110,7 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('featured');
+  const [sortBy, setSortBy] = useState('createdAt');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [categories, setCategories] = useState<string[]>(['all']);
 
@@ -139,6 +139,7 @@ export default function ServicesPage() {
           page: 1,
           limit: 50,
           sortBy: sortBy as any,
+          sortOrder: sortBy === 'price' ? 'asc' : 'desc',
           ...(selectedCategory !== 'all' && { categoryId: selectedCategory })
         };
 
@@ -198,17 +199,17 @@ export default function ServicesPage() {
 
     // Sort services
     switch (sortBy) {
-      case 'featured':
-        filtered = filtered.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+      case 'createdAt':
+        filtered = filtered.sort((a, b) => new Date(b.id).getTime() - new Date(a.id).getTime());
         break;
-      case 'price-low':
+      case 'price':
         filtered = filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-high':
-        filtered = filtered.sort((a, b) => b.price - a.price);
         break;
       case 'rating':
         filtered = filtered.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'title':
+        filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));
         break;
       default:
         break;
@@ -218,10 +219,10 @@ export default function ServicesPage() {
   }, [services, searchQuery, selectedCategory, sortBy]);
 
   const sortOptions = [
-    { value: 'featured', label: 'Featured First' },
-    { value: 'price-low', label: 'Price: Low to High' },
-    { value: 'price-high', label: 'Price: High to Low' },
-    { value: 'rating', label: 'Highest Rated' }
+    { value: 'createdAt', label: 'Newest First' },
+    { value: 'price', label: 'Price: Low to High' },
+    { value: 'rating', label: 'Highest Rated' },
+    { value: 'title', label: 'Title A-Z' }
   ];
 
   if (loading) {
@@ -328,6 +329,7 @@ export default function ServicesPage() {
                 onClick={() => {
                   setSearchQuery('');
                   setSelectedCategory('all');
+                  setSortBy('createdAt');
                 }}
                 className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 font-medium"
               >
@@ -508,6 +510,7 @@ export default function ServicesPage() {
               onClick={() => {
                 setSearchQuery('');
                 setSelectedCategory('all');
+                setSortBy('createdAt');
               }}
               className="hover:bg-orange-50 hover:border-orange-300"
             >

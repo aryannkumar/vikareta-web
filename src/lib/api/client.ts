@@ -9,12 +9,13 @@ class ApiClient {
   private baseURL: string;
 
   constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com') {
-    // Ensure baseURL doesn't end with /api since we'll add it in endpoints
+    // The baseURL should include /api if not already present
     if (baseURL.endsWith('/api')) {
-      this.baseURL = baseURL.replace(/\/api$/, '');
-    } else {
       this.baseURL = baseURL;
+    } else {
+      this.baseURL = baseURL + '/api';
     }
+    console.log('API Client initialized with baseURL:', this.baseURL);
   }
 
   /**
@@ -41,6 +42,9 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     // Build the URL - endpoint should already include /api prefix
     const url = `${this.baseURL}${endpoint}`;
+    console.log('API Request URL:', url);
+    console.log('Base URL:', this.baseURL);
+    console.log('Endpoint:', endpoint);
     
     const config: RequestInit = {
       headers: {
