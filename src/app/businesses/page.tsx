@@ -257,7 +257,7 @@ export default function BusinessesPage() {
       label: 'Nearby', 
       icon: MapPin, 
       description: 'Businesses in your area',
-      color: 'from-blue-600 to-cyan-600'
+      color: 'from-amber-600 to-orange-600'
     },
     { 
       id: 'popular', 
@@ -271,7 +271,7 @@ export default function BusinessesPage() {
       label: 'Featured', 
       icon: Award, 
       description: 'Premium verified suppliers',
-      color: 'from-purple-600 to-pink-600'
+      color: 'from-red-600 to-pink-600'
     }
   ];
 
@@ -285,17 +285,17 @@ export default function BusinessesPage() {
       <BusinessesHero />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
-        {/* Search and Filters Card */}
+          {/* Search and Filters Card */}
         <motion.div 
           variants={itemVariants}
           initial="hidden"
           animate="show"
-          className="bg-white rounded-3xl shadow-2xl p-8 mb-12 border border-gray-200"
+          className="bg-white rounded-3xl shadow-2xl p-8 mb-12 border border-amber-200"
         >
           {/* Search Bar */}
           <div className="relative mb-8">
             <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-              <Search className="w-6 h-6 text-gray-400" />
+              <Search className="w-6 h-6 text-gray-500" />
             </div>
             <input
               type="text"
@@ -306,7 +306,7 @@ export default function BusinessesPage() {
                 setQuery(value);
                 handleSearch(value);
               }}
-              className="w-full pl-16 pr-6 py-5 text-lg border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-300"
+              className="w-full pl-16 pr-6 py-5 text-lg border-2 border-amber-200 rounded-2xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-300 font-medium"
             />
           </div>
 
@@ -322,7 +322,7 @@ export default function BusinessesPage() {
                   className={`relative flex items-center gap-4 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 min-w-[200px] ${
                     isActive
                       ? 'text-white shadow-xl transform scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-102'
+                      : 'bg-gray-100 text-gray-700 hover:bg-amber-50 hover:scale-102'
                   }`}
                   whileHover={{ scale: isActive ? 1.05 : 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -353,23 +353,23 @@ export default function BusinessesPage() {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors duration-300"
+                className="flex items-center gap-2 px-6 py-3 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-xl transition-colors duration-300 font-medium"
               >
                 <SlidersHorizontal className="w-5 h-5" />
                 Filters
               </button>
               
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-700 font-medium">
                 {filtered.length} {filtered.length === 1 ? 'business' : 'businesses'} found
               </div>
             </div>
 
-            <div className="flex items-center gap-2 bg-gray-100 rounded-xl p-1">
+            <div className="flex items-center gap-2 bg-amber-100 rounded-xl p-1">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-lg transition-colors duration-300 ${
                   viewMode === 'grid' 
-                    ? 'bg-white shadow-sm text-indigo-600' 
+                    ? 'bg-white shadow-sm text-amber-600' 
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -379,7 +379,7 @@ export default function BusinessesPage() {
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-lg transition-colors duration-300 ${
                   viewMode === 'list' 
-                    ? 'bg-white shadow-sm text-indigo-600' 
+                    ? 'bg-white shadow-sm text-amber-600' 
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -417,7 +417,7 @@ export default function BusinessesPage() {
             <p className="text-gray-600 mb-8 max-w-md mx-auto">{error}</p>
             <button 
               onClick={() => loadBusinesses(activeTab)}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               Try Again
             </button>
@@ -439,14 +439,14 @@ export default function BusinessesPage() {
             <div className="flex flex-wrap gap-4 justify-center">
               <button 
                 onClick={() => { setQuery(''); setFiltered(businesses); }}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-3"
+                className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-3"
               >
                 Show All Businesses
                 <ArrowRight className="w-5 h-5" />
               </button>
               <button 
                 onClick={() => { setActiveTab('featured'); loadBusinesses('featured'); }}
-                className="bg-white hover:bg-gray-50 border-2 border-indigo-500 text-indigo-600 px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="bg-white hover:bg-amber-50 border-2 border-amber-500 text-amber-600 px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
               >
                 Browse Featured
               </button>

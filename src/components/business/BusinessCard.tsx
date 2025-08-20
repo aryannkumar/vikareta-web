@@ -88,7 +88,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
         viewport={{ once: true, amount: 0.1 }}
         variants={cardVariants}
         onClick={handleCardClick}
-        className="group flex bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-gray-700 cursor-pointer"
+        className="group flex bg-gradient-to-r from-white to-amber-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-200 dark:border-gray-700 cursor-pointer"
       >
         {/* Image Section */}
         <div className="relative w-48 h-32 flex-shrink-0 overflow-hidden">
@@ -100,7 +100,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
               className="object-cover group-hover:scale-105 transition-transform duration-500" 
             />
           ) : (
-            <div className="h-full w-full bg-gradient-to-br from-blue-500 via-indigo-600 to-cyan-600 relative overflow-hidden">
+            <div className="h-full w-full bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-white/20 text-3xl font-bold">
@@ -122,7 +122,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
                   className="w-full h-full object-cover" 
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center text-white font-bold text-sm">
+                <div className="w-full h-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center text-white font-bold text-sm">
                   {businessData.name.charAt(0)}
                 </div>
               )}
@@ -136,7 +136,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
             {/* Header */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 transition-colors duration-300">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-amber-600 transition-colors duration-300">
                   {businessData.name}
                 </h3>
                 <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
@@ -170,7 +170,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
                   </span>
                 )}
                 {businessData.verificationTier === 'premium' && (
-                  <span className="bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-800 dark:from-cyan-900/30 dark:to-blue-900/30 dark:text-cyan-300 px-3 py-1 rounded-full text-xs font-medium">
+                  <span className="bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 dark:from-amber-900/30 dark:to-orange-900/30 dark:text-amber-300 px-3 py-1 rounded-full text-xs font-medium">
                     Premium
                   </span>
                 )}
@@ -195,7 +195,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
             <Link
               href={`/businesses/${businessData.id}`}
               onClick={(e) => e.stopPropagation()}
-              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-2 px-4 rounded-lg font-semibold text-center transition-all duration-300 flex items-center justify-center gap-2 group/btn"
+              className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white py-2 px-4 rounded-lg font-semibold text-center transition-all duration-300 flex items-center justify-center gap-2 group/btn"
             >
               View Profile
               <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
@@ -210,7 +210,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
                   window.location.href = `mailto:${businessData.email}`;
                 }
               }}
-              className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-2 border-blue-500 text-blue-600 dark:text-blue-400 py-2 px-4 rounded-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+              className="bg-white hover:bg-amber-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-2 border-amber-500 text-amber-600 dark:text-amber-400 py-2 px-4 rounded-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
             >
               {businessData.phone ? <Phone className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
               Contact
@@ -231,10 +231,10 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
       viewport={{ once: true, amount: 0.1 }}
       variants={cardVariants}
       onClick={handleCardClick}
-      className="group relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-gray-700 cursor-pointer"
+      className="group relative bg-gradient-to-br from-white to-amber-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-200 dark:border-gray-700 cursor-pointer h-[400px] flex flex-col"
     >
       {/* Cover Image / Gradient Background */}
-      <div className="relative h-48 w-full overflow-hidden">
+      <div className="relative h-40 w-full overflow-hidden flex-shrink-0">
         {businessData.coverImage ? (
           <Image 
             src={businessData.coverImage} 
@@ -243,11 +243,11 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
             className="object-cover group-hover:scale-105 transition-transform duration-500" 
           />
         ) : (
-          <div className="h-full w-full bg-gradient-to-br from-blue-500 via-indigo-600 to-cyan-600 relative overflow-hidden">
+          <div className="h-full w-full bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 relative overflow-hidden">
             {/* Animated background pattern */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-white/20 text-6xl font-bold">
+              <div className="text-white/20 text-4xl font-bold">
                 {businessData.name.charAt(0)}
               </div>
             </div>
@@ -258,24 +258,24 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
         
         {/* Top badges */}
-        <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1">
           {businessData.isVerified && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+              className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
             >
               <Award className="w-3 h-3" />
               Verified
             </motion.div>
           )}
-      {businessData.verificationTier === 'premium' && (
+          {businessData.verificationTier === 'premium' && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
-        className="bg-gradient-to-r from-cyan-400 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold"
+              className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-2 py-1 rounded-full text-xs font-semibold"
             >
               Premium
             </motion.div>
@@ -283,27 +283,27 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
         </div>
         
         {/* Rating badge */}
-        <div className="absolute top-4 right-4 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1">
-          <Star className="w-4 h-4 text-yellow-400 fill-current" />
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">
+        <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
+          <Star className="w-3 h-3 text-yellow-400 fill-current" />
+          <span className="text-xs font-semibold text-gray-900 dark:text-white">
             {businessData.rating.toFixed(1)}
           </span>
         </div>
       </div>
 
       {/* Business Logo */}
-      <div className="absolute -mt-8 left-6 z-10">
-        <div className="w-16 h-16 rounded-xl bg-white dark:bg-gray-800 shadow-lg border-4 border-white dark:border-gray-800 overflow-hidden">
+      <div className="absolute top-32 left-4 z-10">
+        <div className="w-12 h-12 rounded-xl bg-white dark:bg-gray-800 shadow-lg border-3 border-white dark:border-gray-800 overflow-hidden">
           {businessData.logo ? (
             <Image 
               src={businessData.logo} 
               alt={businessData.name} 
-              width={64} 
-              height={64} 
+              width={48} 
+              height={48} 
               className="w-full h-full object-cover" 
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center text-white font-bold text-xl">
+            <div className="w-full h-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center text-white font-bold text-lg">
               {businessData.name.charAt(0)}
             </div>
           )}
@@ -311,48 +311,48 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
       </div>
 
       {/* Content */}
-      <div className="pt-12 p-6">
+      <div className="pt-8 p-4 flex-1 flex flex-col">
         {/* Business name and location */}
-        <div className="mb-4">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition-colors duration-300">
+        <div className="mb-3 flex-shrink-0">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 group-hover:text-amber-600 transition-colors duration-300 line-clamp-2">
             {businessData.name}
           </h3>
-          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-            <MapPin className="w-4 h-4 flex-shrink-0" />
-            <span className="text-sm truncate">{businessData.location}</span>
+          <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+            <MapPin className="w-3 h-3 flex-shrink-0" />
+            <span className="text-xs truncate">{businessData.location}</span>
           </div>
         </div>
 
         {/* Description */}
-        <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 line-clamp-2 leading-relaxed">
+        <p className="text-gray-700 dark:text-gray-300 text-sm mb-3 line-clamp-2 leading-relaxed flex-shrink-0">
           {businessData.description}
         </p>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+        <div className="grid grid-cols-3 gap-2 mb-3 p-2 bg-amber-50 dark:bg-gray-800/50 rounded-lg flex-shrink-0">
           <div className="text-center">
             <div className="flex items-center justify-center mb-1">
-              <Package className="w-4 h-4 text-blue-500" />
+              <Package className="w-3 h-3 text-amber-600" />
             </div>
-            <div className="text-lg font-bold text-gray-900 dark:text-white">
+            <div className="text-sm font-bold text-gray-900 dark:text-white">
               {businessData.productCount}
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-400">Products</div>
           </div>
-          <div className="text-center border-x border-gray-200 dark:border-gray-700">
+          <div className="text-center border-x border-amber-200 dark:border-gray-700">
             <div className="flex items-center justify-center mb-1">
-              <TrendingUp className="w-4 h-4 text-blue-500" />
+              <TrendingUp className="w-3 h-3 text-amber-600" />
             </div>
-            <div className="text-lg font-bold text-gray-900 dark:text-white">
+            <div className="text-sm font-bold text-gray-900 dark:text-white">
               {businessData.serviceCount}
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-400">Services</div>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center mb-1">
-              <Users className="w-4 h-4 text-blue-500" />
+              <Users className="w-3 h-3 text-amber-600" />
             </div>
-            <div className="text-lg font-bold text-gray-900 dark:text-white">
+            <div className="text-sm font-bold text-gray-900 dark:text-white">
               {businessData.completedOrders}
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-400">Orders</div>
@@ -361,11 +361,11 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
 
         {/* Tags */}
         {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap gap-1 mb-3 flex-shrink-0">
             {tags.slice(0, 2).map((tag, index) => (
               <span
                 key={index}
-                className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 px-3 py-1 rounded-full text-xs font-medium"
+                className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 px-2 py-1 rounded-full text-xs font-medium"
               >
                 {tag}
               </span>
@@ -373,15 +373,15 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
           </div>
         )}
 
-        {/* Action buttons */}
-        <div className="flex gap-3">
+        {/* Action buttons - pushed to bottom */}
+        <div className="flex gap-2 mt-auto">
           <Link
             href={`/businesses/${businessData.id}`}
             onClick={(e) => e.stopPropagation()}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-2.5 px-4 rounded-lg font-semibold text-center transition-all duration-300 flex items-center justify-center gap-2 group/btn"
+            className="flex-1 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white py-2 px-3 rounded-lg font-semibold text-center transition-all duration-300 flex items-center justify-center gap-1 group/btn text-sm"
           >
             View Profile
-            <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
+            <ArrowRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform duration-300" />
           </Link>
           
           <button
@@ -393,7 +393,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
                 window.location.href = `mailto:${businessData.email}`;
               }
             }}
-            className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-2 border-blue-500 text-blue-600 dark:text-blue-400 p-2.5 rounded-lg transition-all duration-300 hover:scale-105"
+            className="bg-white hover:bg-amber-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-2 border-amber-500 text-amber-600 dark:text-amber-400 p-2 rounded-lg transition-all duration-300 hover:scale-105"
           >
             {businessData.phone ? <Phone className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
           </button>

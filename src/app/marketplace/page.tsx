@@ -14,12 +14,11 @@ import {
   Building2,
   Package,
   Clock,
-  ArrowRight
+  Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { marketplaceApi } from '@/lib/api/marketplace';
 
 // Enhanced animated hero section for Marketplace
@@ -107,33 +106,36 @@ const MarketplaceHero = () => {
 
 export default function MarketplacePage() {
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('trending');
   const [selectedLocation, setSelectedLocation] = useState('All Locations');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [trendingProducts, setTrendingProducts] = useState<any[]>([]);
   const [nearbyBusinesses, setNearbyBusinesses] = useState<any[]>([]);
+  const [featuredServices, setFeaturedServices] = useState<any[]>([]);
 
   const locations = ['All Locations', 'Mumbai', 'Delhi NCR', 'Bangalore', 'Chennai', 'Pune', 'Hyderabad'];
   const categories = ['All Categories', 'Technology', 'Manufacturing', 'Healthcare', 'Office Supplies', 'Construction'];
 
-  // Load data from API
+  // Load all data from APIs
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        // Load trending products and businesses
-        const [trendingResponse, businessesResponse] = await Promise.all([
+        // Load all marketplace data
+        const [trendingResponse, businessesResponse, servicesResponse] = await Promise.all([
           marketplaceApi.getTrendingProducts(),
-          marketplaceApi.getNearbyBusinesses()
+          marketplaceApi.getNearbyBusinesses(),
+          marketplaceApi.getTrendingServices()
         ]);
         setTrendingProducts(trendingResponse.data || []);
         setNearbyBusinesses(businessesResponse.data || []);
+        setFeaturedServices(servicesResponse.data || []);
       } catch (error) {
         console.error('Error loading marketplace data:', error);
         // Set empty arrays on error instead of fallback mock data
         setTrendingProducts([]);
         setNearbyBusinesses([]);
+        setFeaturedServices([]);
       } finally {
         setLoading(false);
       }
@@ -144,10 +146,10 @@ export default function MarketplacePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading marketplace...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
+          <p className="text-gray-700 font-medium">Loading marketplace...</p>
         </div>
       </div>
     );
@@ -160,7 +162,7 @@ export default function MarketplacePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Enhanced Search and Filter Controls */}
         <motion.div 
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8"
+          className="bg-white rounded-2xl shadow-lg border border-amber-200 p-6 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -173,10 +175,10 @@ export default function MarketplacePage() {
                 <select
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="px-4 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white text-gray-900 font-medium"
                 >
                   {locations.map((location) => (
-                    <option key={location} value={location}>
+                    <option key={location} value={location} className="text-gray-900">
                       {location}
                     </option>
                   ))}
@@ -188,10 +190,10 @@ export default function MarketplacePage() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="px-4 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white text-gray-900 font-medium"
                 >
                   {categories.map((category) => (
-                    <option key={category} value={category}>
+                    <option key={category} value={category} className="text-gray-900">
                       {category}
                     </option>
                   ))}
@@ -200,14 +202,14 @@ export default function MarketplacePage() {
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex border border-gray-200 rounded-lg overflow-hidden">
+            <div className="flex border border-amber-200 rounded-lg overflow-hidden">
               <Button
                 variant={viewMode === 'grid' ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode('grid')}
                 className={viewMode === 'grid' 
-                  ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white" 
-                  : "hover:bg-gray-50"
+                  ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700" 
+                  : "hover:bg-amber-50 text-gray-700"
                 }
               >
                 <Grid className="w-4 h-4" />
@@ -217,8 +219,8 @@ export default function MarketplacePage() {
                 size="sm"
                 onClick={() => setViewMode('list')}
                 className={viewMode === 'list' 
-                  ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white" 
-                  : "hover:bg-gray-50"
+                  ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700" 
+                  : "hover:bg-amber-50 text-gray-700"
                 }
               >
                 <List className="w-4 h-4" />
@@ -227,166 +229,240 @@ export default function MarketplacePage() {
           </div>
         </motion.div>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8 bg-white border border-gray-200">
-            <TabsTrigger value="trending" className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Trending Products
-            </TabsTrigger>
-            <TabsTrigger value="services" className="flex items-center gap-2">
-              <Package className="w-4 h-4" />
-              Services
-            </TabsTrigger>
-            <TabsTrigger value="businesses" className="flex items-center gap-2">
-              <Building2 className="w-4 h-4" />
-              Nearby Businesses
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="trending">
-            <motion.div 
-              className={viewMode === 'grid' 
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
-                : 'space-y-4'
-              }
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
+        {/* Unified Marketplace Grid */}
+        <div className="space-y-12">
+          {/* Trending Products Section */}
+          {trendingProducts.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
             >
-              {trendingProducts.map((product, index) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -5 }}
-                >
-                  <Card className="group h-full bg-white shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden relative">
-                    <CardContent className="p-6">
-                      <div className="aspect-video bg-gray-100 rounded-lg mb-4"></div>
-                      
-                      <h3 className="font-bold text-lg text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2 mb-2">
-                        {product.name}
-                      </h3>
-                      
-                      <div className="flex items-center gap-1 mb-2">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm font-medium text-gray-900">
-                          {product.rating}
-                        </span>
-                        <span className="text-sm text-gray-500">
-                          ({product.reviews} reviews)
-                        </span>
-                      </div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Trending Products</h2>
+                  <p className="text-gray-600">Popular products in high demand</p>
+                </div>
+              </div>
+              
+              <div className={viewMode === 'grid' 
+                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6' 
+                : 'space-y-4'
+              }>
+                {trendingProducts.slice(0, 8).map((product, index) => (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ y: -5 }}
+                  >
+                    <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
+                      <CardContent className="p-4">
+                        <div className="aspect-square bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg mb-3 flex items-center justify-center">
+                          <Package className="w-8 h-8 text-amber-600" />
+                        </div>
+                        
+                        <h3 className="font-bold text-base text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 mb-2">
+                          {product.name}
+                        </h3>
+                        
+                        <div className="flex items-center gap-1 mb-2">
+                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                          <span className="text-xs font-medium text-gray-900">
+                            {product.rating}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            ({product.reviews})
+                          </span>
+                        </div>
 
-                      <div className="text-lg font-bold text-gray-900 mb-3">
-                        ₹{product.price.toLocaleString()}
-                      </div>
+                        <div className="text-lg font-bold text-amber-600 mb-2">
+                          ₹{product.price?.toLocaleString()}
+                        </div>
 
-                      <div className="text-sm text-gray-600 mb-2">
-                        <strong>{product.supplier}</strong>
-                      </div>
-                      
-                      <div className="flex items-center text-sm text-gray-500 mb-4">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {product.location}
-                      </div>
+                        <div className="text-xs text-gray-600 mb-2 truncate">
+                          <strong>{product.supplier}</strong>
+                        </div>
+                        
+                        <div className="flex items-center text-xs text-gray-500 mb-3">
+                          <MapPin className="w-3 h-3 mr-1" />
+                          {product.location}
+                        </div>
 
-                      <div className="flex gap-2">
-                        <Button className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700">
+                        <Button size="sm" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white">
                           View Details
                         </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </motion.div>
-          </TabsContent>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          )}
 
-          <TabsContent value="services">
-            <div className="text-center py-12">
-              <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">Services Coming Soon</h3>
-              <p className="text-gray-600">
-                Explore professional services in your area
-              </p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="businesses">
-            <motion.div 
-              className="space-y-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
+          {/* Nearby Businesses Section */}
+          {nearbyBusinesses.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
             >
-              {nearbyBusinesses.map((business, index) => (
-                <motion.div
-                  key={business.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <Card className="group bg-white shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
-                    <CardContent className="p-6">
-                      <div className="flex items-center space-x-6">
-                        <div className="w-16 h-16 bg-gradient-to-r from-orange-600 to-amber-600 rounded-xl flex items-center justify-center">
-                          <Building2 className="w-8 h-8 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors">
-                                {business.name}
-                              </h3>
-                              <p className="text-gray-600 mt-1">
-                                {business.category}
-                              </p>
-                            </div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl flex items-center justify-center">
+                  <Building2 className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Nearby Businesses</h2>
+                  <p className="text-gray-600">Verified suppliers in your area</p>
+                </div>
+              </div>
+              
+              <div className={viewMode === 'grid' 
+                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
+                : 'space-y-4'
+              }>
+                {nearbyBusinesses.slice(0, 6).map((business, index) => (
+                  <motion.div
+                    key={business.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ y: -5 }}
+                  >
+                    <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-12 h-12 bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl flex items-center justify-center">
+                            <Building2 className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-base text-gray-900 group-hover:text-amber-600 transition-colors truncate">
+                              {business.name}
+                            </h3>
                             {business.verified && (
-                              <Badge className="bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0">
+                              <Badge className="bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0 text-xs">
                                 Verified
                               </Badge>
                             )}
                           </div>
-                          <div className="flex items-center justify-between mt-4">
-                            <div className="flex items-center space-x-4">
-                              <div className="flex items-center">
-                                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                <span className="text-sm font-medium text-gray-900 ml-1">
-                                  {business.rating}
-                                </span>
-                                <span className="text-sm text-gray-500 ml-1">
-                                  ({business.reviews})
-                                </span>
-                              </div>
-                              <div className="flex items-center text-sm text-gray-500">
-                                <MapPin className="w-4 h-4 mr-1" />
-                                {business.distance}
-                              </div>
-                              <div className="flex items-center text-sm text-gray-500">
-                                <Clock className="w-4 h-4 mr-1" />
-                                Responds in {business.responseTime}
-                              </div>
-                            </div>
-                          </div>
                         </div>
-                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </motion.div>
-          </TabsContent>
-        </Tabs>
+                        
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                          {business.category}
+                        </p>
+
+                        <div className="flex items-center gap-1 mb-3">
+                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                          <span className="text-xs font-medium text-gray-900">
+                            {business.rating}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            ({business.reviews})
+                          </span>
+                        </div>
+
+                        <div className="flex items-center text-xs text-gray-500 mb-3">
+                          <MapPin className="w-3 h-3 mr-1" />
+                          {business.distance || business.location}
+                        </div>
+
+                        <div className="flex items-center text-xs text-gray-500 mb-4">
+                          <Clock className="w-3 h-3 mr-1" />
+                          Responds in {business.responseTime || '2h'}
+                        </div>
+
+                        <Button size="sm" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white">
+                          View Profile
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
+          {/* Featured Services Section */}
+          {featuredServices.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
+                  <Package className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Featured Services</h2>
+                  <p className="text-gray-600">Professional services for your business</p>
+                </div>
+              </div>
+              
+              <div className={viewMode === 'grid' 
+                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6' 
+                : 'space-y-4'
+              }>
+                {featuredServices.slice(0, 8).map((service, index) => (
+                  <motion.div
+                    key={service.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ y: -5 }}
+                  >
+                    <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
+                      <CardContent className="p-4">
+                        <div className="aspect-square bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg mb-3 flex items-center justify-center">
+                          <Settings className="w-8 h-8 text-orange-600" />
+                        </div>
+                        
+                        <h3 className="font-bold text-base text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 mb-2">
+                          {service.name}
+                        </h3>
+                        
+                        <div className="flex items-center gap-1 mb-2">
+                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                          <span className="text-xs font-medium text-gray-900">
+                            {service.rating}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            ({service.reviewCount})
+                          </span>
+                        </div>
+
+                        <div className="text-lg font-bold text-orange-600 mb-2">
+                          ₹{service.basePrice?.toLocaleString()}/hr
+                        </div>
+
+                        <div className="text-xs text-gray-600 mb-2 truncate">
+                          <strong>{service.provider?.name}</strong>
+                        </div>
+                        
+                        <div className="flex items-center text-xs text-gray-500 mb-3">
+                          <Clock className="w-3 h-3 mr-1" />
+                          {service.deliveryTime || '1-2 days'}
+                        </div>
+
+                        <Button size="sm" className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white">
+                          View Service
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          )}
+        </div>
 
         {/* CTA Section */}
         <motion.div 
-          className="mt-16 text-center bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl p-12 text-white"
+          className="mt-16 text-center bg-gradient-to-r from-amber-600 to-orange-600 rounded-2xl p-12 text-white"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
@@ -398,10 +474,10 @@ export default function MarketplacePage() {
             Join thousands of businesses already growing with our platform
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100">
+            <Button size="lg" className="bg-white text-amber-600 hover:bg-gray-100 font-semibold">
               List Your Business
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600">
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-amber-600 font-semibold">
               Learn More
             </Button>
           </div>

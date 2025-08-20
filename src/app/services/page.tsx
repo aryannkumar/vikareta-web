@@ -242,7 +242,7 @@ export default function ServicesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Enhanced Search and Filter Controls */}
         <motion.div 
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8"
+          className="bg-white rounded-2xl shadow-lg border border-amber-200 p-6 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -250,13 +250,13 @@ export default function ServicesPage() {
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
             {/* Search Bar */}
             <div className="relative flex-1 max-w-lg">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-5 w-5" />
               <input
                 type="text"
                 placeholder="Search services..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full pl-10 pr-4 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white text-gray-900 placeholder-gray-500 font-medium"
               />
             </div>
 
@@ -266,10 +266,10 @@ export default function ServicesPage() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="px-4 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white text-gray-900 font-medium"
               >
                 {categories.map((category) => (
-                  <option key={category} value={category}>
+                  <option key={category} value={category} className="text-gray-900">
                     {category === 'all' ? 'All Categories' : category}
                   </option>
                 ))}
@@ -279,24 +279,24 @@ export default function ServicesPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="px-4 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white text-gray-900 font-medium"
               >
                 {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
+                  <option key={option.value} value={option.value} className="text-gray-900">
                     {option.label}
                   </option>
                 ))}
               </select>
 
               {/* View Mode Toggle */}
-              <div className="flex border border-gray-200 rounded-lg overflow-hidden">
+              <div className="flex border border-amber-200 rounded-lg overflow-hidden">
                 <Button
                   variant={viewMode === 'grid' ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode('grid')}
                   className={viewMode === 'grid' 
-                    ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white" 
-                    : "hover:bg-gray-50"
+                    ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700" 
+                    : "hover:bg-amber-50 text-gray-700"
                   }
                 >
                   <Grid className="w-4 h-4" />
@@ -306,8 +306,8 @@ export default function ServicesPage() {
                   size="sm"
                   onClick={() => setViewMode('list')}
                   className={viewMode === 'list' 
-                    ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white" 
-                    : "hover:bg-gray-50"
+                    ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700" 
+                    : "hover:bg-amber-50 text-gray-700"
                   }
                 >
                   <List className="w-4 h-4" />
@@ -317,8 +317,8 @@ export default function ServicesPage() {
           </div>
 
           {/* Results Summary */}
-          <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
-            <span>
+          <div className="mt-4 flex items-center justify-between text-sm text-gray-700">
+            <span className="font-medium">
               Showing {filteredServices.length} of {services.length} services
             </span>
             {(searchQuery || selectedCategory !== 'all') && (
@@ -329,7 +329,7 @@ export default function ServicesPage() {
                   setSearchQuery('');
                   setSelectedCategory('all');
                 }}
-                className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 font-medium"
               >
                 Clear Filters
               </Button>
@@ -354,16 +354,16 @@ export default function ServicesPage() {
                 whileHover={{ y: -5 }}
               >
                 <Link href={`/services/${service.id}`}>
-                  <Card className="group h-full bg-white shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden">
+                  <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
                     <CardContent className="p-6">
                       {/* Service Header */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
-                          <h3 className="font-bold text-lg text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2 mb-2">
+                          <h3 className="font-bold text-lg text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 mb-2">
                             {service.title}
                           </h3>
                           {service.featured && (
-                            <Badge className="bg-gradient-to-r from-orange-600 to-amber-600 text-white border-0 mb-2">
+                            <Badge className="bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0 mb-2">
                               Featured
                             </Badge>
                           )}
@@ -392,7 +392,7 @@ export default function ServicesPage() {
 
                         {/* Supplier */}
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 bg-gradient-to-r from-orange-600 to-amber-600 rounded-full flex items-center justify-center">
+                          <div className="w-6 h-6 bg-gradient-to-r from-amber-600 to-orange-600 rounded-full flex items-center justify-center">
                             <Users className="w-3 h-3 text-white" />
                           </div>
                           <span className="text-sm text-gray-600">{service.supplier.name}</span>
@@ -402,8 +402,8 @@ export default function ServicesPage() {
                         </div>
 
                         {/* Price and Delivery */}
-                        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                          <div className="text-lg font-bold text-gray-900">
+                        <div className="flex items-center justify-between pt-2 border-t border-amber-100">
+                          <div className="text-lg font-bold text-amber-600">
                             ₹{service.price?.toLocaleString()}/hour
                           </div>
                           <div className="flex items-center text-sm text-gray-500">
@@ -434,16 +434,16 @@ export default function ServicesPage() {
                 whileHover={{ scale: 1.02 }}
               >
                 <Link href={`/services/${service.id}`}>
-                  <Card className="group bg-white shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
+                  <Card className="group bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300">
                     <CardContent className="p-6">
                       <div className="flex items-center space-x-6">
-                        <div className="w-16 h-16 bg-gradient-to-r from-orange-600 to-amber-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <div className="w-16 h-16 bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                           <Settings className="w-8 h-8 text-white" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-start justify-between">
                             <div>
-                              <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors">
+                              <h3 className="font-bold text-xl text-gray-900 group-hover:text-amber-600 transition-colors">
                                 {service.title}
                               </h3>
                               <p className="text-gray-600 mt-1 leading-relaxed line-clamp-2">
@@ -451,7 +451,7 @@ export default function ServicesPage() {
                               </p>
                             </div>
                             {service.featured && (
-                              <Badge className="bg-gradient-to-r from-orange-600 to-amber-600 text-white border-0">
+                              <Badge className="bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0">
                                 Featured
                               </Badge>
                             )}
@@ -467,19 +467,19 @@ export default function ServicesPage() {
                                   ({service.reviewCount})
                                 </span>
                               </div>
-                              <Badge variant="outline" className="text-orange-600 border-orange-600">
+                              <Badge variant="outline" className="text-amber-600 border-amber-600">
                                 {service.category}
                               </Badge>
                             </div>
                             <div className="text-right">
-                              <div className="text-lg font-bold text-gray-900">
+                              <div className="text-lg font-bold text-amber-600">
                                 ₹{service.price?.toLocaleString()}/hour
                               </div>
                               <div className="text-sm text-gray-500">{service.deliveryTime}</div>
                             </div>
                           </div>
                         </div>
-                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" />
+                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-amber-600 group-hover:translate-x-1 transition-all" />
                       </div>
                     </CardContent>
                   </Card>
