@@ -99,8 +99,10 @@ export default function BusinessProfilePage(props: any) {
     // Additional check to ensure user session is valid
     console.log('Authentication check:', { 
       isAuthenticated, 
-      cookies: document.cookie.includes('auth') || document.cookie.includes('session') || document.cookie.includes('token'),
-      cookieCount: document.cookie.split(';').length
+      allCookies: document.cookie,
+      cookieCount: document.cookie.split(';').filter(c => c.trim()).length,
+      hasXSRF: document.cookie.includes('XSRF-TOKEN'),
+      cookieNames: document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean)
     });
 
     try {

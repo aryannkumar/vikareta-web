@@ -38,6 +38,37 @@ class ApiClient {
   }
 
   /**
+   * Get CSRF token from backend if not available in cookies
+   */
+  private async ensureCSRFToken(): Promise<string | null> {
+    let csrfToken = this.getCSRFToken();
+    
+    if (!csrfToken) {
+      try {
+        // Try to get CSRF token from backend auth check
+        const response = await fetch(`${this.baseURL}/auth/me`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (response.ok) {
+          // After this request, the CSRF token should be set in cookies
+          csrfToken = this.getCSRFToken();
+          console.log('Fetched CSRF token after auth check:', !!csrfToken);
+        }
+      } catch (error) {
+        console.log('Could not fetch CSRF token from backend:', error);
+      }
+    }
+    
+    return csrfToken;
+  }
+
+  /**
    * Get CSRF token from cookie
    */
   private getCSRFToken(): string | null {
@@ -74,7 +105,13 @@ class ApiClient {
 
     // Add CSRF token for state-changing requests (from cookie)
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method || 'GET')) {
-      const csrfToken = this.getCSRFToken();
+      const csrfToken = await this.ensureCSRFToken();
+      console.log('CSRF Debug:', {
+        method: options.method,
+        hasCSRF: !!csrfToken,
+        allCookies: typeof window !== 'undefined' ? document.cookie : 'server-side',
+        cookieCount: typeof window !== 'undefined' ? document.cookie.split(';').filter(c => c.trim()).length : 0
+      });
       if (csrfToken) {
         config.headers = {
           ...config.headers,
