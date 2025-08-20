@@ -43,7 +43,11 @@ const useSecureSSOAuth = () => {
   const register = async (registrationData: any) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/register', {
+      // Get backend API base URL
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE || 
+        (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
+      
+      const response = await fetch(`${apiBase}/api/auth/register`, {
         method: 'POST',
         credentials: 'include', // Critical: Include HttpOnly cookies
         headers: {

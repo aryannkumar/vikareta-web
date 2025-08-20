@@ -53,6 +53,13 @@ export function SSOAuthProvider({ children }: { children: React.ReactNode }) {
 
   // Secure API request helper
   const secureRequest = useCallback(async (endpoint: string, options: RequestInit = {}) => {
+    // Get backend API base URL
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE || 
+      (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
+    
+    // Build full URL for backend API
+    const fullUrl = endpoint.startsWith('http') ? endpoint : `${apiBase}${endpoint}`;
+    
     const config: RequestInit = {
       credentials: 'include', // Critical: Always include HttpOnly cookies
       headers: {
@@ -73,7 +80,7 @@ export function SSOAuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    const response = await fetch(endpoint, config);
+    const response = await fetch(fullUrl, config);
     
     if (!response.ok) {
       if (response.status === 401) {

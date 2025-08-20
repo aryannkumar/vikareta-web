@@ -72,8 +72,12 @@ export default function ForgotPasswordPage() {
     setError('');
 
     try {
+      // Get backend API base URL
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE || 
+        (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
+      
       // Secure forgot password using HttpOnly cookie authentication
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch(`${apiBase}/api/auth/forgot-password`, {
         method: 'POST',
         credentials: 'include', // Include HttpOnly cookies
         headers: {
@@ -103,8 +107,12 @@ export default function ForgotPasswordPage() {
   const handleResend = async () => {
     setLoading(true);
     try {
+      // Get backend API base URL
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE || 
+        (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
+      
       // Secure resend using HttpOnly cookie authentication
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch(`${apiBase}/api/auth/forgot-password`, {
         method: 'POST',
         credentials: 'include', // Include HttpOnly cookies
         headers: {

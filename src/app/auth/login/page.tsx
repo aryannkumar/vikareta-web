@@ -24,10 +24,17 @@ const useSecureSSOAuth = () => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Get backend API base URL
+  const getBackendUrl = () => {
+    return process.env.NEXT_PUBLIC_API_BASE || 
+      (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
+  };
+
   const login = async (loginData: any) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
+      const backendUrl = getBackendUrl();
+      const response = await fetch(`${backendUrl}/api/auth/login`, {
         method: 'POST',
         credentials: 'include', // Critical: Include HttpOnly cookies
         headers: {
@@ -57,7 +64,8 @@ const useSecureSSOAuth = () => {
 
   const checkSession = async () => {
     try {
-      const response = await fetch('/api/auth/me', {
+      const backendUrl = getBackendUrl();
+      const response = await fetch(`${backendUrl}/api/auth/me`, {
         credentials: 'include', // Include HttpOnly cookies
       });
       

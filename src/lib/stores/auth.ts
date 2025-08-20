@@ -11,15 +11,11 @@ const syncSSOToSubdomains = async (targets: string[]) => {
     for (const host of targets) {
       const p = (async () => {
         try {
-          const resp = await fetch('/api/auth/sso-token', {
+          const data = await apiCall('/auth/sso-token', {
             method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ target: host }),
           });
 
-          if (!resp.ok) return;
-          const data = await resp.json();
           const token = data?.token;
           if (!token) return;
 
@@ -206,10 +202,8 @@ export const useAuthStore = create<AuthState>()(
       logout: async () => {
         try {
           // Secure logout using HttpOnly cookies
-          await fetch('/api/auth/logout', {
+          await apiCall('/auth/logout', {
             method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' }
           });
         } catch {
           // Silent fail for logout
