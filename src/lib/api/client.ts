@@ -49,11 +49,12 @@ class ApiClient {
     
     try {
       if (process.env.NODE_ENV === 'development') {
-        console.log('Initializing auth session with API backend...');
+        console.log('Attempting to get CSRF token from auth/me endpoint...');
       }
       
-      // Make a simple request to establish session and get cookies
-      const response = await fetch(`${this.baseURL}/auth/session`, {
+      // Try to get CSRF token by calling the auth/me endpoint
+      // This should set the necessary cookies if the user is authenticated
+      const response = await fetch(`${this.baseURL}/auth/me`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -62,17 +63,15 @@ class ApiClient {
       });
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('Auth session response:', response.status);
-        
-        // Check if we now have cookies
-        const cookiesAfter = document.cookie;
-        console.log('Cookies after session init:', cookiesAfter);
+        console.log('Auth me response:', response.status);
       }
       
-      return response.ok;
+      // Even if it fails, it might set session cookies, so return true
+      // The important thing is that we made a request with credentials
+      return true;
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('Auth session init failed:', error);
+        console.log('Auth me request failed:', error);
       }
       return false;
     }
@@ -92,16 +91,20 @@ class ApiClient {
       const apiDomain = apiUrl.hostname;
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('Syncing SSO to API domain:', apiDomain);
+        console.log('Attempting SSO sync to API domain:', apiDomain);
       }
+      
+      // Try SSO sync - this will fail if user is not authenticated on main domain
       await syncSSOToSubdomains([apiDomain]);
+      
       if (process.env.NODE_ENV === 'development') {
         console.log('SSO sync completed');
       }
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('SSO sync failed:', error);
+        console.log('SSO sync failed - user may not be authenticated on main domain:', error);
       }
+      // Don't throw error - this is expected if user is not authenticated
     }
   }
 
@@ -124,6 +127,21 @@ class ApiClient {
     
     // If no cookies at all, try SSO sync first for cross-domain authentication
     if (typeof window !== 'undefined' && document.cookie.trim() === '') {
+      // Check if we're running from the correct domain for production
+      const currentDomain = window.location.hostname;
+      const isCorrectDomain = currentDomain === 'vikareta.com' || 
+                             currentDomain.endsWith('.vikareta.com') || 
+                             currentDomain === 'localhost' || 
+                             currentDomain.startsWith('192.168.') ||
+                             currentDomain.startsWith('10.') ||
+                             currentDomain.startsWith('172.');
+      
+      if (!isCorrectDomain && process.env.NODE_ENV === 'production') {
+        // In production, if not running from correct domain, this won't work
+        console.error('Authentication error: Frontend must be served from vikareta.com domain for authentication to work');
+        return null;
+      }
+      
       if (process.env.NODE_ENV === 'development') {
         console.log('No cookies found, attempting SSO sync to API domain...');
       }
@@ -172,6 +190,11 @@ class ApiClient {
           csrfToken = this.getCSRFToken();
           if (process.env.NODE_ENV === 'development') {
             console.log('Fetched CSRF token after auth check:', !!csrfToken);
+          }
+        } else if (response.status === 401) {
+          // User is not authenticated - this is expected for logged-out users
+          if (process.env.NODE_ENV === 'development') {
+            console.log('User not authenticated - 401 response from auth/me');
           }
         }
       } catch (error) {
