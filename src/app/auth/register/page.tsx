@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -277,16 +277,25 @@ export default function RegisterPage() {
     return Object.keys(newErrors).length === 0;
   }, [formData]);
 
-  // Handle input changes with debouncing for better performance
+  // Create a ref to avoid errors dependency in useCallback
+  const errorsRef = useRef<Record<string, string>>({});
+  errorsRef.current = errors;
+
+  // Handle input changes with optimized updates
   const handleInputChange = useCallback((field: keyof FormData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear errors immediately for better UX
-    setErrors(prev => {
-      if (prev[field]) {
-        return { ...prev, [field]: '' };
-      }
-      return prev;
+    setFormData(prev => {
+      // Only update if value actually changed to prevent unnecessary re-renders
+      if (prev[field] === value) return prev;
+      return { ...prev, [field]: value };
     });
+    
+    // Clear error immediately but only if it exists
+    if (errorsRef.current[field]) {
+      setErrors(prev => {
+        const { [field]: _, ...rest } = prev;
+        return rest;
+      });
+    }
   }, []);
 
   // Format phone number - improved to avoid cursor jumps
@@ -312,13 +321,20 @@ export default function RegisterPage() {
   const handlePhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const formatted = formatPhoneNumber(value);
-    setFormData(prev => ({ ...prev, phone: formatted }));
-    setErrors(prev => {
-      if (prev.phone) {
-        return { ...prev, phone: '' };
-      }
-      return prev;
+    
+    setFormData(prev => {
+      // Only update if value changed
+      if (prev.phone === formatted) return prev;
+      return { ...prev, phone: formatted };
     });
+    
+    // Clear phone error using ref to avoid dependency
+    if (errorsRef.current.phone) {
+      setErrors(prev => {
+        const { phone: _, ...rest } = prev;
+        return rest;
+      });
+    }
   }, [formatPhoneNumber]);
 
   

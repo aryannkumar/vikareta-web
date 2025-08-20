@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Plus, AlertCircle, Loader2, CheckCircle, FileText } from 'lucide-react';
 import { rfqService } from '../../services/rfq.service';
 import MyRFQsSection from './MyRFQsSection';
@@ -111,7 +111,7 @@ export default function RFQPage() {
       }
     };
     loadSubs();
-  }, [formData.category]);
+  }, [formData.category]); // Only depend on category, not entire formData
 
 
 
@@ -165,13 +165,22 @@ export default function RFQPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Create a ref to avoid errors dependency in useCallback
+  const errorsRef = useRef<Record<string, string>>({});
+  errorsRef.current = errors;
+
   const handleInputChange = useCallback((field: string, value: string) => {
     const fieldParts = field.split('.');
     
+    // Optimized form data update with change detection
     setFormData(prev => {
       let newData: RFQFormData;
       
       if (fieldParts.length === 2 && fieldParts[0] === 'contactInfo') {
+        // Check if contact info value actually changed
+        if (prev.contactInfo[fieldParts[1] as keyof typeof prev.contactInfo] === value) {
+          return prev;
+        }
         newData = {
           ...prev,
           contactInfo: {
@@ -180,6 +189,10 @@ export default function RFQPage() {
           }
         };
       } else {
+        // Check if field value actually changed
+        if (prev[field as keyof RFQFormData] === value) {
+          return prev;
+        }
         newData = { ...prev, [field]: value };
         
         // Clear subcategory when category changes
@@ -191,14 +204,13 @@ export default function RFQPage() {
       return newData;
     });
     
-    // Clear error when user starts typing
-    setErrors(prev => {
-      if (prev[field]) {
+    // Clear error using ref to avoid dependency
+    if (errorsRef.current[field]) {
+      setErrors(prev => {
         const { [field]: _, ...rest } = prev;
         return rest;
-      }
-      return prev;
-    });
+      });
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -262,10 +274,15 @@ export default function RFQPage() {
   }, []);
 
   const updateSpecification = useCallback((index: number, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      specifications: prev.specifications.map((spec, i) => i === index ? value : spec)
-    }));
+    setFormData(prev => {
+      // Check if the value actually changed
+      if (prev.specifications[index] === value) return prev;
+      
+      return {
+        ...prev,
+        specifications: prev.specifications.map((spec, i) => i === index ? value : spec)
+      };
+    });
   }, []);
 
   const handleFileUpload = useCallback((files: FileList | null) => {
