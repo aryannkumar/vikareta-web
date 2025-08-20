@@ -1,52 +1,68 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { SSOAuthClient } from '@/lib/auth/sso-client';
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [redirecting, setRedirecting] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    checkAuthAndRedirect();
+    checkAuthStatus();
   }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      checkAuthAndRedirect();
+    }
+  }, [loading, user, isAuthenticated]);
+
+  const checkAuthStatus = async () => {
+    try {
+      // Check authentication using secure HttpOnly cookies
+      const response = await fetch('/api/auth/me', {
+        credentials: 'include', // Include HttpOnly cookies
+      });
+      
+      const result = await response.json();
+      
+      if (result.success && result.user) {
+        setUser(result.user);
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const checkAuthAndRedirect = async () => {
     try {
-      const ssoClient = new SSOAuthClient();
       console.log('Dashboard: Checking authentication...');
-      
-      const user = await ssoClient.getCurrentUser();
       console.log('Dashboard: User result:', user ? 'User found' : 'No user');
       
-      if (user) {
-        // User is authenticated, redirect to dashboard with token
+      if (isAuthenticated && user) {
+        // User is authenticated, redirect to dashboard
         console.log('Dashboard: User authenticated, redirecting to dashboard');
         setRedirecting(true);
-        
-        // Get the access token to pass to dashboard
-        let accessToken = ssoClient.getCurrentAccessToken();
-        
-        // Fallback to localStorage if SSO client doesn't have it
-        if (!accessToken) {
-          accessToken = localStorage.getItem('vikareta_access_token');
-        }
-        
-        console.log('Dashboard: Access token available:', !!accessToken);
-        console.log('Dashboard: Token source:', accessToken ? 'Found' : 'Not found');
         
         const dashboardUrl = process.env.NODE_ENV === 'production' 
           ? 'https://dashboard.vikareta.com' 
           : 'https://dashboard.vikareta.com';
         
-        // Add token as URL parameter for cross-domain authentication
-        const redirectUrl = accessToken 
-          ? `${dashboardUrl}?token=${encodeURIComponent(accessToken)}&redirect=main`
-          : dashboardUrl;
+        // With HttpOnly cookies, no need to pass tokens via URL
+        // The browser will automatically include authentication cookies
         
         // Add a small delay to show the redirect message
         setTimeout(() => {
-          window.location.href = redirectUrl;
+          window.location.href = dashboardUrl;
         }, 1000);
       } else {
         // User not authenticated, redirect to login
@@ -56,13 +72,11 @@ export default function DashboardPage() {
         }, 1000);
       }
     } catch (error) {
-      // If there's an error (like 401), redirect to login
+      // If there's an error, redirect to login
       console.error('Dashboard: Authentication error:', error);
       setTimeout(() => {
         window.location.href = '/auth/login';
       }, 1000);
-    } finally {
-      setLoading(false);
     }
   };
 

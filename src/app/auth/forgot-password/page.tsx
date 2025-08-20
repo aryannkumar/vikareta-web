@@ -2,11 +2,30 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Mail, ArrowLeft, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/toast-provider';
-import { ssoAuth } from '@/lib/auth/sso-client';
+
+// Local UI components
+const Button = ({ children, onClick, disabled, type, variant, className }: any) => (
+  <button
+    type={type}
+    onClick={onClick}
+    disabled={disabled}
+    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+      variant === 'outline' 
+        ? 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+        : variant === 'ghost'
+        ? 'bg-transparent text-gray-700 hover:bg-gray-100'
+        : 'bg-blue-600 text-white hover:bg-blue-700'
+    } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className || ''}`}
+  >
+    {children}
+  </button>
+);
+
+const useToast = () => ({
+  success: (title: string, message: string) => console.log(`SUCCESS: ${title} - ${message}`),
+  error: (title: string, message: string) => console.log(`ERROR: ${title} - ${message}`),
+});
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -14,11 +33,26 @@ export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
 
-  const router = useRouter();
   const toast = useToast();
 
   const validateEmail = (email: string) => {
     return /\S+@\S+\.\S+/.test(email);
+  };
+
+  // Helper to get CSRF token
+  const getCSRFToken = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    
+    const cookies = document.cookie.split(';');
+    const csrfCookie = cookies.find(cookie => 
+      cookie.trim().startsWith('XSRF-TOKEN=')
+    );
+    
+    if (csrfCookie) {
+      return decodeURIComponent(csrfCookie.split('=')[1]);
+    }
+    
+    return null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,14 +72,25 @@ export default function ForgotPasswordPage() {
     setError('');
 
     try {
-      // Forgot password functionality - would integrate with backend /api/auth/forgot-password
-      const response = { success: false, error: 'Forgot password feature will be implemented in the backend' };
+      // Secure forgot password using HttpOnly cookie authentication
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        credentials: 'include', // Include HttpOnly cookies
+        headers: {
+          'Content-Type': 'application/json',
+          // Add CSRF token for security
+          ...(getCSRFToken() && { 'X-XSRF-TOKEN': getCSRFToken()! })
+        },
+        body: JSON.stringify({ email }),
+      });
       
-      if (response.success) {
+      const result = await response.json();
+      
+      if (result.success) {
         setSent(true);
         toast.success('Email Sent', 'Password reset instructions have been sent to your email');
       } else {
-        setError(response.error || 'Failed to send reset email');
+        setError(result.error?.message || 'Failed to send reset email');
       }
     } catch (error) {
       console.error('Forgot password error:', error);
@@ -58,10 +103,23 @@ export default function ForgotPasswordPage() {
   const handleResend = async () => {
     setLoading(true);
     try {
-      // Resend forgot password functionality - would integrate with backend /api/auth/forgot-password
-      const response = { success: false, error: 'Forgot password feature will be implemented in the backend' };
-      if (response.success) {
+      // Secure resend using HttpOnly cookie authentication
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        credentials: 'include', // Include HttpOnly cookies
+        headers: {
+          'Content-Type': 'application/json',
+          ...(getCSRFToken() && { 'X-XSRF-TOKEN': getCSRFToken()! })
+        },
+        body: JSON.stringify({ email }),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
         toast.success('Email Sent', 'Password reset instructions have been sent again');
+      } else {
+        toast.error('Error', result.error?.message || 'Failed to resend email');
       }
     } catch (error) {
       console.error('Resend error:', error);

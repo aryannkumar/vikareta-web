@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { marketplaceApi } from '@/lib/api/marketplace';
+import { useSSOAuth } from '@/lib/auth/use-sso-auth';
 import { 
   Star, 
   Award, 
@@ -77,12 +78,14 @@ export default function BusinessProfilePage(props: any) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'services' | 'reviews'>('overview');
   const [isFollowing, setIsFollowing] = useState(false);
+  const { user, isAuthenticated } = useSSOAuth();
   const id = props?.params?.id as string;
 
   useEffect(() => {
     const fetchBusiness = async () => {
       try {
         setLoading(true);
+        
         // Fetch the business directly by id
         const businessRes = await marketplaceApi.getBusinessById(id);
         if (businessRes && businessRes.success && businessRes.data) {
@@ -241,7 +244,7 @@ export default function BusinessProfilePage(props: any) {
       className="min-h-screen bg-gray-50"
     >
       {/* Enhanced Hero Section */}
-      <section className="relative min-h-[70vh] bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 overflow-hidden">
+      <section className="relative min-h-[70vh] bg-gradient-to-br from-amber-900 via-orange-900 to-red-900 overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0">
           <motion.div
@@ -254,7 +257,7 @@ export default function BusinessProfilePage(props: any) {
             transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
-            className="absolute bottom-20 right-20 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl"
+            className="absolute bottom-20 right-20 w-80 h-80 bg-amber-400/20 rounded-full blur-3xl"
             animate={{ 
               x: [0, -120, 80, 0], 
               y: [0, 60, -40, 0],
@@ -263,7 +266,7 @@ export default function BusinessProfilePage(props: any) {
             transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
-            className="absolute top-1/3 left-1/3 w-72 h-72 bg-purple-400/15 rounded-full blur-3xl"
+            className="absolute top-1/3 left-1/3 w-72 h-72 bg-orange-400/15 rounded-full blur-3xl"
             animate={{ rotate: [0, 360] }}
             transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
           />
@@ -286,20 +289,28 @@ export default function BusinessProfilePage(props: any) {
             </Link>
 
             <div className="flex items-center gap-3">
-              <button 
-                onClick={() => setIsFollowing(!isFollowing)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 ${
-                  isFollowing 
-                    ? 'bg-red-500 hover:bg-red-600 text-white' 
-                    : 'bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white'
-                }`}
-              >
-                <Heart className={`w-5 h-5 ${isFollowing ? 'fill-current' : ''}`} />
-                {isFollowing ? 'Following' : 'Follow'}
-              </button>
-              <button className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-300 hover:scale-105">
-                <Share2 className="w-5 h-5" />
-              </button>
+              {isAuthenticated ? (
+                <>
+                  <button 
+                    onClick={() => setIsFollowing(!isFollowing)}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 ${
+                      isFollowing 
+                        ? 'bg-red-500 hover:bg-red-600 text-white' 
+                        : 'bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white'
+                    }`}
+                  >
+                    <Heart className={`w-5 h-5 ${isFollowing ? 'fill-current' : ''}`} />
+                    {isFollowing ? 'Following' : 'Follow'}
+                  </button>
+                  <button className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-300 hover:scale-105">
+                    <Share2 className="w-5 h-5" />
+                  </button>
+                </>
+              ) : (
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-2 text-white">
+                  <span className="text-sm">Login to follow and share</span>
+                </div>
+              )}
             </div>
           </motion.div>
 
@@ -324,7 +335,7 @@ export default function BusinessProfilePage(props: any) {
                         className="w-full h-full object-cover rounded-3xl" 
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl flex items-center justify-center text-white font-bold text-4xl">
+                      <div className="w-full h-full bg-gradient-to-br from-amber-600 to-orange-600 rounded-3xl flex items-center justify-center text-white font-bold text-4xl">
                         {businessData.name.charAt(0)}
                       </div>
                     )}
@@ -731,12 +742,63 @@ export default function BusinessProfilePage(props: any) {
                 Ready to start your business relationship with {businessData.name}?
               </p>
               <div className="space-y-3">
-                <button className="w-full bg-white text-green-600 py-3 px-4 rounded-2xl font-bold hover:bg-green-50 transition-colors duration-300">
-                  Request Quote
-                </button>
-                <button className="w-full bg-green-400 hover:bg-green-300 text-green-900 py-3 px-4 rounded-2xl font-bold transition-colors duration-300">
-                  Send Inquiry
-                </button>
+                {isAuthenticated ? (
+                  <>
+                    <button 
+                      onClick={() => setIsFollowing(!isFollowing)}
+                      className={`w-full py-3 px-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+                        isFollowing 
+                          ? 'bg-red-500 hover:bg-red-600 text-white' 
+                          : 'bg-white text-green-600 hover:bg-green-50'
+                      }`}
+                    >
+                      <Heart className={`w-5 h-5 ${isFollowing ? 'fill-current' : ''}`} />
+                      {isFollowing ? 'Following' : 'Follow Business'}
+                    </button>
+                    <button className="w-full bg-white text-green-600 py-3 px-4 rounded-2xl font-bold hover:bg-green-50 transition-colors duration-300">
+                      Request Quote
+                    </button>
+                    <button className="w-full bg-green-400 hover:bg-green-300 text-green-900 py-3 px-4 rounded-2xl font-bold transition-colors duration-300">
+                      Send Inquiry
+                    </button>
+                    <button 
+                      onClick={() => {
+                        if (navigator.share) {
+                          navigator.share({
+                            title: businessData.name,
+                            text: `Check out ${businessData.name} on Vikareta`,
+                            url: window.location.href
+                          });
+                        } else {
+                          navigator.clipboard.writeText(window.location.href);
+                          alert('Link copied to clipboard!');
+                        }
+                      }}
+                      className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white py-3 px-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      <Share2 className="w-5 h-5" />
+                      Share Business
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center">
+                      <p className="text-green-100 mb-3">
+                        Login to access premium features like following businesses, requesting quotes, and more!
+                      </p>
+                      <Link 
+                        href="/auth/login" 
+                        className="inline-block bg-white text-green-600 py-2 px-6 rounded-xl font-semibold hover:bg-green-50 transition-colors duration-300"
+                      >
+                        Login Now
+                      </Link>
+                    </div>
+                    <button className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white py-3 px-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                      <Eye className="w-5 h-5" />
+                      View Contact (Login Required)
+                    </button>
+                  </>
+                )}
                 <button className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white py-3 px-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2">
                   <Download className="w-5 h-5" />
                   Download Brochure

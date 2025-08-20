@@ -240,7 +240,7 @@ export default function HomePage() {
                 >
                   smarter & faster
                 </motion.span>
-                with trusted suppliers
+                with trusted Businesses
               </motion.h1>
 
               <motion.p
@@ -259,7 +259,7 @@ export default function HomePage() {
                 className="flex flex-col sm:flex-row gap-4 mb-8"
               >
                 <motion.button
-                  onClick={() => router.push('/rfq')}
+                  onClick={() => router.push('/rfqs')}
                   className="group bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-lg"
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
@@ -347,7 +347,7 @@ export default function HomePage() {
                     transition={{ delay: 0.5, duration: 0.8 }}
                   >
                     <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-700 to-indigo-600 bg-clip-text text-transparent mb-4">
-                      Global B2B Trade Network
+                      Our Trade Network
                     </h3>
                     <p className="text-blue-600/80 dark:text-blue-400/80 text-lg">
                       Connecting suppliers, manufacturers, and businesses worldwide
@@ -699,7 +699,6 @@ export default function HomePage() {
                         }}
                         transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
                       >
-                        <div className="text-xs font-medium text-orange-600 dark:text-orange-400">Global Reach</div>
                         <div className="text-lg font-bold text-gray-900 dark:text-white">150+ Countries</div>
                       </motion.div>
                     </div>
@@ -740,7 +739,7 @@ export default function HomePage() {
                         animate={{ scale: [1, 1.1, 1] }}
                         transition={{ duration: 3, repeat: Infinity, delay: 2 }}
                       >
-                        50K+
+                        1K+
                       </motion.div>
                       <div className="text-sm text-orange-600/80 dark:text-orange-400/80">Active Traders</div>
                     </div>

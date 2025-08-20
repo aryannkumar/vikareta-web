@@ -1,236 +1,168 @@
 /**
- * React Hook for SSO Authentication
- * Provides authentication state and methods across the application
+ * Secure SSO Authentication Hook - HttpOnly Cookie Based
+ * No localStorage for enhanced security
  */
 
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { ssoAuth, User, LoginCredentials, AuthResponse } from './sso-client';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+
+export interface User {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  name: string;
+  userType: 'buyer' | 'seller' | 'admin' | 'both';
+  role?: 'buyer' | 'seller' | 'admin' | 'both'; // For backwards compatibility
+  verified: boolean;
+  avatar?: string;
+  createdAt: string;
+}
 
 interface AuthContextType {
-    user: User | null;
-    isAuthenticated: boolean;
-    isLoading: boolean;
-    error: string | null;
-    login: (credentials: LoginCredentials) => Promise<boolean>;
-    logout: () => Promise<void>;
-    register: (userData: any) => Promise<boolean>;
-    refreshSession: () => Promise<void>;
-    clearError: () => void;
+  user: User | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  logout: () => Promise<void>;
+  refreshSession: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface AuthProviderProps {
-    children: ReactNode;
-}
+export function SSOAuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-export function SSOAuthProvider({ children }: AuthProviderProps) {
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    const isAuthenticated = !!user;
-
-    /**
-     * Check session on app load and periodically
-     */
-    const checkSession = async () => {
-        try {
-            setIsLoading(true);
-            const response = await ssoAuth.checkSession();
-
-            if (response.success && response.user) {
-                setUser(response.user);
-                setError(null);
-            } else {
-                setUser(null);
-                if (response.error?.code !== 'SESSION_ERROR') {
-                    setError(response.error?.message || 'Session check failed');
-                }
-            }
-        } catch (err) {
-            console.error('Session check failed:', err);
-            setUser(null);
-            setError('Session check failed');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    /**
-     * Login with credentials
-     */
-    const login = async (credentials: LoginCredentials): Promise<boolean> => {
-        try {
-            setIsLoading(true);
-            setError(null);
-
-            const response = await ssoAuth.login(credentials);
-
-            if (response.success && response.user) {
-                setUser(response.user);
-                return true;
-            } else {
-                setError(response.error?.message || 'Login failed');
-                return false;
-            }
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Login failed';
-            setError(errorMessage);
-            return false;
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    /**
-     * Register new user
-     */
-    const register = async (userData: any): Promise<boolean> => {
-        try {
-            setIsLoading(true);
-            setError(null);
-
-            const response = await ssoAuth.register(userData);
-
-            if (response.success && response.user) {
-                setUser(response.user);
-                return true;
-            } else {
-                setError(response.error?.message || 'Registration failed');
-                return false;
-            }
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Registration failed';
-            setError(errorMessage);
-            return false;
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    /**
-     * Logout and clear session
-     */
-    const logout = async () => {
-        try {
-            setIsLoading(true);
-            await ssoAuth.logout();
-            setUser(null);
-            setError(null);
-        } catch (err) {
-            console.error('Logout failed:', err);
-            // Clear local state even if logout request fails
-            setUser(null);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    /**
-     * Refresh session manually
-     */
-    const refreshSession = async () => {
-        await checkSession();
-    };
-
-    /**
-     * Clear error state
-     */
-    const clearError = () => {
-        setError(null);
-    };
-
-    // Always check session on mount.
-    // Rationale: HttpOnly cookies (used by SSO) are not visible to JS via document.cookie,
-    // so attempting to detect them client-side is unreliable and can prevent session hydration
-    // after social OAuth redirects. A lightweight GET to /api/auth/me will either return the
-    // current user (when cookies/tokens are valid) or 401 quickly.
-    useEffect(() => {
-        checkSession();
-    }, []);
-
-    // Set up periodic session check (every 5 minutes)
-    useEffect(() => {
-        if (!isAuthenticated) return;
-
-        const interval = setInterval(() => {
-            checkSession();
-        }, 5 * 60 * 1000); // 5 minutes
-
-        return () => clearInterval(interval);
-    }, [isAuthenticated]);
-
-    // Listen for storage events to sync logout across tabs
-    useEffect(() => {
-        const handleStorageChange = (e: StorageEvent) => {
-            if (e.key === 'sso_logout' && e.newValue) {
-                setUser(null);
-                setError(null);
-            }
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
-    }, []);
-
-    const value: AuthContextType = {
-        user,
-        isAuthenticated,
-        isLoading,
-        error,
-        login,
-        logout,
-        register,
-        refreshSession,
-        clearError,
-    };
-
-    return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>
+  // Helper function to get CSRF token
+  const getCSRFToken = useCallback((): string | null => {
+    if (typeof window === 'undefined') return null;
+    
+    const cookies = document.cookie.split(';');
+    const csrfCookie = cookies.find(cookie => 
+      cookie.trim().startsWith('XSRF-TOKEN=')
     );
-}
-
-/**
- * Hook to use SSO authentication
- */
-export function useSSOAuth() {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error('useSSOAuth must be used within a SSOAuthProvider');
+    
+    if (csrfCookie) {
+      return decodeURIComponent(csrfCookie.split('=')[1]);
     }
-    return context;
+    
+    return null;
+  }, []);
+
+  // Secure API request helper
+  const secureRequest = useCallback(async (endpoint: string, options: RequestInit = {}) => {
+    const config: RequestInit = {
+      credentials: 'include', // Critical: Always include HttpOnly cookies
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    };
+
+    // Add CSRF token for state-changing requests
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method || 'GET')) {
+      const csrfToken = getCSRFToken();
+      if (csrfToken) {
+        config.headers = {
+          ...config.headers,
+          'X-XSRF-TOKEN': csrfToken,
+        };
+      }
+    }
+
+    const response = await fetch(endpoint, config);
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        // Unauthorized - clear auth state
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return response.json();
+  }, [getCSRFToken]);
+
+  // Check current session using HttpOnly cookies
+  const checkSession = useCallback(async () => {
+    try {
+      setLoading(true);
+      
+      const response = await secureRequest('/api/auth/me');
+      
+      if (response.success && response.user) {
+        setUser(response.user);
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    } catch {
+      // 401 is expected when not logged in
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
+    }
+  }, [secureRequest]);
+
+  // Secure logout function
+  const logout = useCallback(async () => {
+    try {
+      // Call backend logout to clear HttpOnly cookies
+      await secureRequest('/api/auth/logout', {
+        method: 'POST',
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Always clear local state
+      setUser(null);
+      setIsAuthenticated(false);
+      
+      // Redirect to login
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+    }
+  }, [secureRequest]);
+
+  // Check session on mount
+  useEffect(() => {
+    checkSession();
+  }, [checkSession]);
+
+  // Periodic session refresh (every 5 minutes)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const interval = setInterval(() => {
+      checkSession();
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, checkSession]);
+
+  const value: AuthContextType = {
+    user,
+    isAuthenticated,
+    loading,
+    logout,
+    refreshSession: checkSession,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-/**
- * Higher-order component for protected routes
- */
-export function withSSOAuth<P extends object>(
-    Component: React.ComponentType<P>
-) {
-    return function AuthenticatedComponent(props: P) {
-        const { isAuthenticated, isLoading } = useSSOAuth();
-
-        if (isLoading) {
-            return (
-                <div className="flex items-center justify-center min-h-screen">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                </div>
-            );
-        }
-
-        if (!isAuthenticated) {
-            // Redirect to login
-            if (typeof window !== 'undefined') {
-                window.location.href = '/auth/login';
-            }
-            return null;
-        }
-
-        return <Component {...props} />;
-    };
+export function useSSOAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useSSOAuth must be used within a SSOAuthProvider');
+  }
+  return context;
 }

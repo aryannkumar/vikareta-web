@@ -3,6 +3,57 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+// Secure SSO sync function
+const syncSSOToSubdomains = async (targets: string[]) => {
+  try {
+    const syncPromises: Promise<void>[] = [];
+
+    for (const host of targets) {
+      const p = (async () => {
+        try {
+          const resp = await fetch('/api/auth/sso-token', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target: host }),
+          });
+
+          if (!resp.ok) return;
+          const data = await resp.json();
+          const token = data?.token;
+          if (!token) return;
+
+          await new Promise<void>((resolve) => {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = `https://${host}/sso/receive?token=${encodeURIComponent(token)}`;
+
+            const cleanup = () => {
+              try { window.removeEventListener('message', onMessage); } catch {}
+              try { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch {}
+              resolve();
+            };
+
+            const onMessage = (e: MessageEvent) => {
+              if (e.origin === `https://${host}` && e.data?.sso === 'ok') {
+                cleanup();
+              }
+            };
+
+            window.addEventListener('message', onMessage);
+            document.body.appendChild(iframe);
+            setTimeout(() => cleanup(), 5000);
+          });
+        } catch {}
+      })();
+
+      syncPromises.push(p);
+    }
+
+    await Promise.all(syncPromises);
+  } catch {}
+};
+
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api').replace(/\/api\/api$/, '/api');
 
 export interface User {
@@ -67,8 +118,9 @@ interface AuthState {
 
 const apiCall = async (endpoint: string, options: RequestInit = {}) => {
   try {
-  // Attach CSRF token (if stored) to match backend CSRF middleware expectations
-  const csrfToken = typeof window !== 'undefined' ? localStorage.getItem('csrf_token') : null;
+  // Get CSRF token from cookie (not localStorage for security)
+  const csrfToken = typeof window !== 'undefined' ? 
+    document.cookie.split(';').find(cookie => cookie.trim().startsWith('XSRF-TOKEN='))?.split('=')[1] : null;
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
@@ -84,7 +136,7 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
     let data;
     try {
       data = await response.json();
-    } catch (parseError) {
+    } catch {
       throw new Error('Invalid response format');
     }
 
@@ -121,23 +173,22 @@ export const useAuthStore = create<AuthState>()(
             body: JSON.stringify(loginData),
           });
 
-          const { user, token, refreshToken } = response.data;
+          const { user } = response.data;
           
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('auth_token', token);
-            if (refreshToken) {
-              localStorage.setItem('refresh_token', refreshToken);
-            }
-            
-            // Sync authentication across domains
-            const { syncAuthAcrossDomains } = await import('../utils/cross-domain-auth');
-            syncAuthAcrossDomains({ user, tokens: { accessToken: token, refreshToken } });
+          // With HttpOnly cookies, no localStorage needed for tokens
+          // Authentication is automatically handled by browser cookies
+          
+          // Secure SSO sync across domains using HttpOnly cookies
+          try {
+            await syncSSOToSubdomains(['dashboard.vikareta.com', 'admin.vikareta.com']);
+          } catch (error) {
+            console.warn('SSO sync failed:', error);
           }
 
           set({
             user,
-            token,
-            refreshToken,
+            token: null, // No token storage in client
+            refreshToken: null, // No refresh token in client
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -153,14 +204,17 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('refresh_token');
-          
-          // Sync logout across domains
-          const { syncAuthAcrossDomains } = await import('../utils/cross-domain-auth');
-          syncAuthAcrossDomains(null);
+        try {
+          // Secure logout using HttpOnly cookies
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' }
+          });
+        } catch {
+          // Silent fail for logout
         }
+        
         set({ 
           user: null, 
           token: null, 
@@ -190,18 +244,13 @@ export const useAuthStore = create<AuthState>()(
 
           const { token: newToken, refreshToken: newRefreshToken } = response.data;
           
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('auth_token', newToken);
-            if (newRefreshToken) {
-              localStorage.setItem('refresh_token', newRefreshToken);
-            }
-          }
+          // HttpOnly cookies are managed by the browser - no localStorage needed
 
           set({
             token: newToken,
             refreshToken: newRefreshToken,
           });
-        } catch (error) {
+        } catch {
           get().logout();
         }
       },
@@ -217,12 +266,7 @@ export const useAuthStore = create<AuthState>()(
 
           const { user, token, refreshToken } = response.data;
           
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('auth_token', token);
-            if (refreshToken) {
-              localStorage.setItem('refresh_token', refreshToken);
-            }
-          }
+          // HttpOnly cookies are managed by the browser - no localStorage needed
 
           set({
             user,
@@ -255,12 +299,7 @@ export const useAuthStore = create<AuthState>()(
 
           const { user, token, refreshToken } = response.data;
           
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('auth_token', token);
-            if (refreshToken) {
-              localStorage.setItem('refresh_token', refreshToken);
-            }
-          }
+          // HttpOnly cookies are managed by the browser - no localStorage needed
 
           set({
             user,
@@ -333,7 +372,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             error: null,
           });
-        } catch (error) {
+        } catch {
           // Silently logout on auth check failure
           set({ 
             user: null, 
@@ -343,10 +382,7 @@ export const useAuthStore = create<AuthState>()(
             error: null 
           });
           
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('refresh_token');
-          }
+          // HttpOnly cookies are cleared by the backend - no localStorage cleanup needed
         }
       },
 
