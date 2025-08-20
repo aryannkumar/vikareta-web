@@ -79,7 +79,6 @@ export default function BusinessProfilePage(props: any) {
   const [business, setBusiness] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'services' | 'reviews'>('overview');
-  const [isFollowing, setIsFollowing] = useState(false);
   const { isAuthenticated } = useSSOAuth();
   const { isInWishlist, addToWishlist, removeItemFromWishlist } = useWishlistStore();
   const toast = useToast();
@@ -91,6 +90,8 @@ export default function BusinessProfilePage(props: any) {
   const handleWishlistToggle = async () => {
     if (!isAuthenticated) {
       toast.error('Authentication Required', 'Please login to add businesses to your wishlist');
+      // Redirect to login page
+      window.location.href = '/auth/login';
       return;
     }
 
@@ -107,12 +108,12 @@ export default function BusinessProfilePage(props: any) {
         if (success) {
           toast.success('Added', 'Business added to wishlist');
         } else {
-          toast.error('Error', 'Failed to add business to wishlist');
+          toast.error('Error', 'Failed to add business to wishlist. Please try logging in again.');
         }
       }
     } catch (error) {
       console.error('Wishlist toggle error:', error);
-      toast.error('Error', 'An error occurred while updating wishlist');
+      toast.error('Error', 'An error occurred while updating wishlist. Please try logging in again.');
     }
   };
 
@@ -326,17 +327,6 @@ export default function BusinessProfilePage(props: any) {
             <div className="flex items-center gap-3">
               {isAuthenticated ? (
                 <>
-                  <button 
-                    onClick={() => setIsFollowing(!isFollowing)}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 ${
-                      isFollowing 
-                        ? 'bg-red-500 hover:bg-red-600 text-white' 
-                        : 'bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white'
-                    }`}
-                  >
-                    <Heart className={`w-5 h-5 ${isFollowing ? 'fill-current' : ''}`} />
-                    {isFollowing ? 'Following' : 'Follow'}
-                  </button>
                   <button 
                     onClick={handleWishlistToggle}
                     className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 ${
@@ -790,17 +780,6 @@ export default function BusinessProfilePage(props: any) {
               <div className="space-y-3">
                 {isAuthenticated ? (
                   <>
-                    <button 
-                      onClick={() => setIsFollowing(!isFollowing)}
-                      className={`w-full py-3 px-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
-                        isFollowing 
-                          ? 'bg-red-500 hover:bg-red-600 text-white' 
-                          : 'bg-white text-green-600 hover:bg-green-50'
-                      }`}
-                    >
-                      <Heart className={`w-5 h-5 ${isFollowing ? 'fill-current' : ''}`} />
-                      {isFollowing ? 'Following' : 'Follow Business'}
-                    </button>
                     <button 
                       onClick={handleWishlistToggle}
                       className={`w-full py-3 px-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2 ${

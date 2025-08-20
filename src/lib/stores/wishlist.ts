@@ -58,11 +58,22 @@ export const useWishlistStore = create<WishlistState>()(
             await get().fetchWishlist();
             return true;
           } else {
-            set({ error: response.error || 'Failed to add to wishlist' });
+            // Handle specific error cases
+            if (response.error?.includes('403') || response.error?.includes('Forbidden')) {
+              set({ error: 'Authentication required. Please login again.' });
+            } else {
+              set({ error: response.error || 'Failed to add to wishlist' });
+            }
             return false;
           }
         } catch (error) {
-          set({ error: error instanceof Error ? error.message : 'Failed to add to wishlist' });
+          const errorMessage = error instanceof Error ? error.message : 'Failed to add to wishlist';
+          // Handle authentication errors specifically
+          if (errorMessage.includes('403') || errorMessage.includes('Forbidden')) {
+            set({ error: 'Authentication required. Please login again.' });
+          } else {
+            set({ error: errorMessage });
+          }
           return false;
         }
       },

@@ -8,7 +8,7 @@ interface ApiResponse<T = any> {
 class ApiClient {
   private baseURL: string;
 
-  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com') {
+  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com') {
     // The baseURL should include /api if not already present
     if (baseURL.endsWith('/api')) {
       this.baseURL = baseURL;
