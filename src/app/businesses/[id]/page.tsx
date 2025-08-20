@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { marketplaceApi } from '@/lib/api/marketplace';
 import { useSSOAuth } from '@/lib/auth/use-sso-auth';
+import { useWishlistStore } from '@/lib/stores/wishlist';
+import { useToast } from '@/components/ui/toast-provider';
 import { 
   Star, 
   Award, 
@@ -79,7 +81,40 @@ export default function BusinessProfilePage(props: any) {
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'services' | 'reviews'>('overview');
   const [isFollowing, setIsFollowing] = useState(false);
   const { user, isAuthenticated } = useSSOAuth();
+  const { isInWishlist, addToWishlist, removeItemFromWishlist } = useWishlistStore();
+  const toast = useToast();
   const id = props?.params?.id as string;
+
+  // Check if business is in wishlist
+  const inWishlist = isInWishlist('business', id);
+
+  const handleWishlistToggle = async () => {
+    if (!isAuthenticated) {
+      toast.error('Authentication Required', 'Please login to add businesses to your wishlist');
+      return;
+    }
+
+    try {
+      if (inWishlist) {
+        const success = await removeItemFromWishlist('business', id);
+        if (success) {
+          toast.success('Removed', 'Business removed from wishlist');
+        } else {
+          toast.error('Error', 'Failed to remove business from wishlist');
+        }
+      } else {
+        const success = await addToWishlist(id, 'business');
+        if (success) {
+          toast.success('Added', 'Business added to wishlist');
+        } else {
+          toast.error('Error', 'Failed to add business to wishlist');
+        }
+      }
+    } catch (error) {
+      console.error('Wishlist toggle error:', error);
+      toast.error('Error', 'An error occurred while updating wishlist');
+    }
+  };
 
   useEffect(() => {
     const fetchBusiness = async () => {
@@ -302,13 +337,24 @@ export default function BusinessProfilePage(props: any) {
                     <Heart className={`w-5 h-5 ${isFollowing ? 'fill-current' : ''}`} />
                     {isFollowing ? 'Following' : 'Follow'}
                   </button>
+                  <button 
+                    onClick={handleWishlistToggle}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 ${
+                      inWishlist 
+                        ? 'bg-amber-500 hover:bg-amber-600 text-white' 
+                        : 'bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white'
+                    }`}
+                  >
+                    <Heart className={`w-5 h-5 ${inWishlist ? 'fill-current' : ''}`} />
+                    {inWishlist ? 'In Wishlist' : 'Add to Wishlist'}
+                  </button>
                   <button className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-300 hover:scale-105">
                     <Share2 className="w-5 h-5" />
                   </button>
                 </>
               ) : (
                 <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-2 text-white">
-                  <span className="text-sm">Login to follow and share</span>
+                  <span className="text-sm">Login to follow and save to wishlist</span>
                 </div>
               )}
             </div>
@@ -754,6 +800,17 @@ export default function BusinessProfilePage(props: any) {
                     >
                       <Heart className={`w-5 h-5 ${isFollowing ? 'fill-current' : ''}`} />
                       {isFollowing ? 'Following' : 'Follow Business'}
+                    </button>
+                    <button 
+                      onClick={handleWishlistToggle}
+                      className={`w-full py-3 px-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+                        inWishlist 
+                          ? 'bg-amber-500 hover:bg-amber-600 text-white' 
+                          : 'bg-white text-green-600 hover:bg-green-50'
+                      }`}
+                    >
+                      <Heart className={`w-5 h-5 ${inWishlist ? 'fill-current' : ''}`} />
+                      {inWishlist ? 'In Wishlist' : 'Add to Wishlist'}
                     </button>
                     <button className="w-full bg-white text-green-600 py-3 px-4 rounded-2xl font-bold hover:bg-green-50 transition-colors duration-300">
                       Request Quote

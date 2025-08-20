@@ -41,6 +41,12 @@ export default function WishlistPage() {
   };
 
   const addToCart = (item: typeof wishlistItems[0]) => {
+    // Only products and services can be added to cart, not businesses
+    if (item.type === 'business') {
+      toast.info('Info', 'Business profiles cannot be added to cart');
+      return;
+    }
+
     addItem({
       id: item.itemId, // Use the actual product/service ID
       name: item.name,
@@ -136,14 +142,26 @@ export default function WishlistPage() {
             <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-4">Your wishlist is empty</h2>
             <p className="text-muted-foreground mb-8">
-              Start adding products and services you love to your wishlist
+              Start adding products, services, and businesses you love to your wishlist
             </p>
-            <Link href="/products">
-              <Button className="btn-primary">
-                <Package className="h-4 w-4 mr-2" />
-                Browse Products
-              </Button>
-            </Link>
+            <div className="flex gap-4 justify-center flex-wrap">
+              <Link href="/products">
+                <Button className="btn-primary">
+                  <Package className="h-4 w-4 mr-2" />
+                  Browse Products
+                </Button>
+              </Link>
+              <Link href="/services">
+                <Button variant="outline">
+                  Browse Services
+                </Button>
+              </Link>
+              <Link href="/businesses">
+                <Button variant="outline">
+                  Browse Businesses
+                </Button>
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -177,7 +195,8 @@ export default function WishlistPage() {
                 <div className="p-4">
                   <div className="mb-2">
                     <Badge variant="outline" className="text-xs">
-                      {item.type === 'product' ? 'Product' : 'Service'}
+                      {item.type === 'product' ? 'Product' : 
+                       item.type === 'service' ? 'Service' : 'Business'}
                     </Badge>
                   </div>
 
@@ -200,28 +219,52 @@ export default function WishlistPage() {
                   </p>
 
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl font-bold text-primary">
-                        {formatPrice(item.price)}
-                      </span>
-                      {item.originalPrice && (
-                        <span className="text-sm text-muted-foreground line-through">
-                          {formatPrice(item.originalPrice)}
+                    {item.type !== 'business' ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl font-bold text-primary">
+                          {formatPrice(item.price)}
                         </span>
-                      )}
-                    </div>
+                        {item.originalPrice && (
+                          <span className="text-sm text-muted-foreground line-through">
+                            {formatPrice(item.originalPrice)}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">
+                          Business Profile
+                        </span>
+                        {item.isVerified && (
+                          <Badge variant="secondary" className="text-xs">
+                            Verified
+                          </Badge>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex gap-2">
-                    <Button
-                      className="flex-1 btn-primary"
-                      disabled={!item.available}
-                      onClick={() => addToCart(item)}
-                    >
-                      <ShoppingCart className="h-4 w-4 mr-2" />
-                      Add to Cart
-                    </Button>
-                    <Link href={`/${item.type}s/${item.itemId}`}>
+                    {item.type !== 'business' ? (
+                      <Button
+                        className="flex-1 btn-primary"
+                        disabled={!item.available}
+                        onClick={() => addToCart(item)}
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Add to Cart
+                      </Button>
+                    ) : (
+                      <Button
+                        className="flex-1 btn-primary"
+                        asChild
+                      >
+                        <Link href={`/businesses/${item.itemId}`}>
+                          View Profile
+                        </Link>
+                      </Button>
+                    )}
+                    <Link href={`/${item.type === 'business' ? 'businesses' : `${item.type}s`}/${item.itemId}`}>
                       <Button variant="outline" size="sm">
                         View
                       </Button>

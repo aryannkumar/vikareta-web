@@ -2,7 +2,7 @@ import { apiClient } from './client';
 
 export interface WishlistItem {
   id: string;
-  type: 'product' | 'service';
+  type: 'product' | 'service' | 'business';
   itemId: string;
   name: string;
   price: number;
@@ -15,11 +15,16 @@ export interface WishlistItem {
   reviewCount: number;
   available: boolean;
   addedAt: string;
+  // Business-specific fields
+  location?: string;
+  bio?: string;
+  website?: string;
+  isVerified?: boolean;
 }
 
 export interface AddToWishlistData {
   itemId: string;
-  type: 'product' | 'service';
+  type: 'product' | 'service' | 'business';
 }
 
 export interface WishlistCheckResponse {
@@ -44,12 +49,12 @@ export const wishlistApi = {
   },
 
   // Remove item from wishlist by item ID and type
-  async removeItemFromWishlist(type: 'product' | 'service', itemId: string) {
+  async removeItemFromWishlist(type: 'product' | 'service' | 'business', itemId: string) {
     return apiClient.delete(`/wishlist/item/${type}/${itemId}`);
   },
 
   // Check if item is in wishlist
-  async checkWishlist(type: 'product' | 'service', itemId: string) {
+  async checkWishlist(type: 'product' | 'service' | 'business', itemId: string) {
     return apiClient.get<WishlistCheckResponse>(`/wishlist/check/${type}/${itemId}`);
   },
 

@@ -12,12 +12,12 @@ interface WishlistState {
   
   // Actions
   fetchWishlist: () => Promise<void>;
-  addToWishlist: (itemId: string, type: 'product' | 'service') => Promise<boolean>;
+  addToWishlist: (itemId: string, type: 'product' | 'service' | 'business') => Promise<boolean>;
   removeFromWishlist: (wishlistId: string) => Promise<boolean>;
-  removeItemFromWishlist: (type: 'product' | 'service', itemId: string) => Promise<boolean>;
-  checkWishlist: (type: 'product' | 'service', itemId: string) => Promise<boolean>;
+  removeItemFromWishlist: (type: 'product' | 'service' | 'business', itemId: string) => Promise<boolean>;
+  checkWishlist: (type: 'product' | 'service' | 'business', itemId: string) => Promise<boolean>;
   clearWishlist: () => Promise<boolean>;
-  isInWishlist: (type: 'product' | 'service', itemId: string) => boolean;
+  isInWishlist: (type: 'product' | 'service' | 'business', itemId: string) => boolean;
   clearError: () => void;
 }
 
@@ -50,7 +50,7 @@ export const useWishlistStore = create<WishlistState>()(
         }
       },
 
-      addToWishlist: async (itemId: string, type: 'product' | 'service') => {
+      addToWishlist: async (itemId: string, type: 'product' | 'service' | 'business') => {
         try {
           const response = await wishlistApi.addToWishlist({ itemId, type });
           if (response.success) {
@@ -86,7 +86,7 @@ export const useWishlistStore = create<WishlistState>()(
         }
       },
 
-      removeItemFromWishlist: async (type: 'product' | 'service', itemId: string) => {
+      removeItemFromWishlist: async (type: 'product' | 'service' | 'business', itemId: string) => {
         try {
           const response = await wishlistApi.removeItemFromWishlist(type, itemId);
           if (response.success) {
@@ -105,7 +105,7 @@ export const useWishlistStore = create<WishlistState>()(
         }
       },
 
-      checkWishlist: async (type: 'product' | 'service', itemId: string) => {
+      checkWishlist: async (type: 'product' | 'service' | 'business', itemId: string) => {
         try {
           const response = await wishlistApi.checkWishlist(type, itemId);
           if (response.success) {
@@ -134,7 +134,7 @@ export const useWishlistStore = create<WishlistState>()(
         }
       },
 
-      isInWishlist: (type: 'product' | 'service', itemId: string) => {
+      isInWishlist: (type: 'product' | 'service' | 'business', itemId: string) => {
         const { items } = get();
         return items.some(item => item.type === type && item.itemId === itemId);
       },
