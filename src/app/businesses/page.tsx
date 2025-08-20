@@ -5,86 +5,129 @@ import { motion } from 'framer-motion';
 import { marketplaceApi, type NearbyBusiness } from '@/lib/api/marketplace';
 import BusinessCard from '@/components/business/BusinessCard';
 import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
-import { Search, Filter, TrendingUp, Award, MapPin, Building2, Sparkles, ArrowRight, Users, BarChart, Package } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { 
+  Search, 
+  TrendingUp, 
+  Award, 
+  MapPin, 
+  Building2, 
+  Sparkles, 
+  ArrowRight, 
+  Users, 
+  Globe,
+  ShieldCheck,
+  ExternalLink,
+  Grid,
+  List,
+  SlidersHorizontal
+} from 'lucide-react';
 
-// Enhanced animated hero section for Businesses
+// Modern hero section with better design
 const BusinessesHero = () => {
   return (
-    <motion.section 
-      className="relative bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 overflow-hidden"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-    >
+    <section className="relative min-h-[60vh] bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-orange-400/20 to-amber-400/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-orange-300/10 to-amber-300/10 rounded-full blur-3xl animate-pulse delay-500" />
+        <motion.div
+          className="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl"
+          animate={{ 
+            x: [0, 100, 0], 
+            y: [0, -50, 0],
+            scale: [1, 1.2, 1]
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl"
+          animate={{ 
+            x: [0, -80, 0], 
+            y: [0, 40, 0],
+            scale: [1, 0.8, 1]
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-purple-400/20 rounded-full blur-3xl"
+          animate={{ rotate: [0, 360] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        />
       </div>
 
+      {/* Content */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center">
-          <motion.h1 
-            className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-6"
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 mb-8"
           >
-            Verified Businesses
+            <Building2 className="w-5 h-5 text-cyan-300" />
+            <span className="text-white font-medium">Verified Business Directory</span>
+          </motion.div>
+          
+          <motion.h1 
+            className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            <span className="text-white">Connect with</span>
+            <br />
+            <span className="bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
+              Trusted Partners
+            </span>
           </motion.h1>
           
           <motion.p 
-            className="text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed"
+            className="text-xl text-indigo-100 max-w-3xl mx-auto mb-12 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
           >
-            Connect with trusted businesses in your area. Discover established companies, 
-            growing startups, and reliable service providers for all your B2B needs.
+            Discover verified manufacturers, suppliers, and service providers across India. 
+            Build meaningful business relationships with confidence and transparency.
           </motion.p>
 
-          {/* Business stats */}
+          {/* Enhanced stats with animations */}
           <motion.div 
-            className="flex flex-wrap justify-center gap-8 mt-12"
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
           >
             {[
-              { icon: Building2, label: 'Verified Businesses', value: '10K+', color: 'from-blue-500 to-cyan-500' },
-              { icon: Award, label: 'Featured Companies', value: '500+', color: 'from-orange-500 to-amber-500' },
-              { icon: Users, label: 'Business Network', value: '25K+', color: 'from-green-500 to-emerald-500' },
-              { icon: BarChart, label: 'Success Rate', value: '94%', color: 'from-purple-500 to-pink-500' }
+              { icon: Building2, label: 'Active Businesses', value: '15K+', color: 'from-blue-400 to-cyan-400' },
+              { icon: ShieldCheck, label: 'Verified Partners', value: '8K+', color: 'from-green-400 to-emerald-400' },
+              { icon: Globe, label: 'Cities Covered', value: '200+', color: 'from-purple-400 to-pink-400' },
+              { icon: Users, label: 'Success Stories', value: '98%', color: 'from-orange-400 to-red-400' }
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
-                className="flex flex-col items-center"
+                className="text-center"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8 + index * 0.1, duration: 0.5 }}
+                transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
+                whileHover={{ scale: 1.05 }}
               >
-                <div className={`w-16 h-16 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mb-3 shadow-lg`}>
+                <div className={`w-16 h-16 mx-auto mb-4 bg-gradient-to-r ${stat.color} rounded-2xl flex items-center justify-center shadow-lg`}>
                   <stat.icon className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                <div className="text-sm text-gray-600">{stat.label}</div>
+                <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
+                <div className="text-sm text-indigo-200">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 };
 
 const pageVariants = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0 },
   animate: { 
-    opacity: 1, 
-    y: 0,
+    opacity: 1,
     transition: {
       duration: 0.6,
       ease: "easeOut"
@@ -104,7 +147,7 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   show: { 
     opacity: 1, 
     y: 0,
@@ -123,7 +166,8 @@ export default function BusinessesPage() {
   const [query, setQuery] = useState('');
   const [filtered, setFiltered] = useState<NearbyBusiness[]>([]);
   const [debounceTimeout, setDebounceTimeout] = useState<number | null>(null);
-  const [stats, setStats] = useState({ total: 0, verified: 0, premium: 0 });
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showFilters, setShowFilters] = useState(false);
 
   const loadBusinesses = async (tab: typeof activeTab = activeTab) => {
     try {
@@ -148,30 +192,17 @@ export default function BusinessesPage() {
 
         const loaded = source || [];
         setBusinesses(loaded as NearbyBusiness[]);
-
-        // Calculate stats
-        const totalCount = loaded.length;
-        const verifiedCount = loaded.filter((b: any) => b.isVerified || b.verificationTier === 'premium').length;
-        const premiumCount = loaded.filter((b: any) => b.verificationTier === 'premium').length;
-        setStats({ total: totalCount, verified: verifiedCount, premium: premiumCount });
-
-        // Apply query filter immediately
-        if (query.trim() === '') {
-          setFiltered(loaded as NearbyBusiness[]);
-        } else {
-          const q = query.toLowerCase();
-          setFiltered((loaded as NearbyBusiness[]).filter(b => 
-            (b.name || '').toLowerCase().includes(q) || 
-            (b.category || '').toLowerCase().includes(q) || 
-            (b.address || '').toLowerCase().includes(q)
-          ));
-        }
+        setFiltered(loaded as NearbyBusiness[]);
       } else {
         setError((res as any).error || 'Failed to load businesses');
+        setBusinesses([]);
+        setFiltered([]);
       }
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : 'Failed to load businesses');
+      setBusinesses([]);
+      setFiltered([]);
     } finally {
       setLoading(false);
     }
@@ -221,9 +252,27 @@ export default function BusinessesPage() {
   };
 
   const tabs = [
-    { id: 'nearby', label: 'Nearby', icon: MapPin, description: 'Businesses in your area' },
-    { id: 'popular', label: 'Popular', icon: TrendingUp, description: 'Most ordered suppliers' },
-    { id: 'featured', label: 'Featured', icon: Award, description: 'Premium verified suppliers' }
+    { 
+      id: 'nearby', 
+      label: 'Nearby', 
+      icon: MapPin, 
+      description: 'Businesses in your area',
+      color: 'from-blue-600 to-cyan-600'
+    },
+    { 
+      id: 'popular', 
+      label: 'Popular', 
+      icon: TrendingUp, 
+      description: 'Most trusted suppliers',
+      color: 'from-orange-600 to-red-600'
+    },
+    { 
+      id: 'featured', 
+      label: 'Featured', 
+      icon: Award, 
+      description: 'Premium verified suppliers',
+      color: 'from-purple-600 to-pink-600'
+    }
   ];
 
   return (
@@ -231,131 +280,112 @@ export default function BusinessesPage() {
       initial="initial"
       animate="animate"
       variants={pageVariants}
-    className="min-h-screen bg-white"
+      className="min-h-screen bg-gray-50"
     >
       <BusinessesHero />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Background Pattern */}
-        <div className="absolute inset-0">
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-transparent"></div>
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}></div>
-          {/* Subtle moving blobs */}
-          <motion.div
-            className="absolute -top-10 -left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl"
-            animate={{ x: [0, 30, -20, 0], y: [0, -20, 15, 0] }}
-            transition={{ duration: 30, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute -bottom-16 -right-12 w-80 h-80 bg-white/10 rounded-full blur-3xl"
-            animate={{ x: [0, -25, 25, 0], y: [0, 20, -20, 0] }}
-            transition={{ duration: 34, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
-          />
-        </div>
-
-        <div className="relative container mx-auto px-6 py-16">
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="text-center max-w-4xl mx-auto"
-          >
-            <motion.div variants={itemVariants} className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-              <Building2 className="w-5 h-5 text-white" />
-              <span className="text-white font-medium">Premium B2B Directory</span>
-            </motion.div>
-            
-            <motion.h1 variants={itemVariants} className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              Discover India's 
-              <span className="block bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
-                Premier Suppliers
-              </span>
-            </motion.h1>
-            
-            <motion.p variants={itemVariants} className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Connect with verified manufacturers, wholesalers, and service providers across India. 
-              Build lasting business relationships with confidence.
-            </motion.p>
-
-            {/* Stats */}
-            <motion.div variants={itemVariants} className="grid grid-cols-3 gap-6 max-w-lg mx-auto mb-8">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-white">{stats.total}+</div>
-                <div className="text-blue-200 text-sm">Suppliers</div>
-              </div>
-              <div className="text-center border-x border-blue-400/30">
-                <div className="text-3xl font-bold text-white">{stats.verified}+</div>
-                <div className="text-blue-200 text-sm">Verified</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-white">{stats.premium}+</div>
-                <div className="text-blue-200 text-sm">Premium</div>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-6 -mt-8 relative z-10">
-        {/* Search and Filters */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
+        {/* Search and Filters Card */}
         <motion.div 
           variants={itemVariants}
           initial="hidden"
           animate="show"
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 mb-8 border border-gray-200 dark:border-gray-700"
+          className="bg-white rounded-3xl shadow-2xl p-8 mb-12 border border-gray-200"
         >
           {/* Search Bar */}
-          <div className="relative mb-6">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <Search className="w-5 h-5 text-gray-400" />
+          <div className="relative mb-8">
+            <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+              <Search className="w-6 h-6 text-gray-400" />
             </div>
             <input
               type="text"
-              placeholder="Search by business name, category, or location..."
+              placeholder="Search businesses, categories, or locations..."
               value={query}
               onChange={(e) => {
                 const value = e.target.value;
                 setQuery(value);
                 handleSearch(value);
               }}
-              className="w-full pl-12 pr-4 py-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+              className="w-full pl-16 pr-6 py-5 text-lg border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-300"
             />
           </div>
 
           {/* Category Tabs */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-4 mb-6">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
-                <button
+                <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`relative flex items-center gap-3 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                  className={`relative flex items-center gap-4 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 min-w-[200px] ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      ? 'text-white shadow-xl transform scale-105'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-102'
                   }`}
+                  whileHover={{ scale: isActive ? 1.05 : 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-500'}`} />
-                  <div className="text-left">
-                    <div className="font-semibold">{tab.label}</div>
-                    <div className={`text-xs ${isActive ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
-                      {tab.description}
-                    </div>
-                  </div>
                   {isActive && (
                     <motion.div
-                      layoutId="activeTab"
-                      className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl -z-10"
+                      layoutId="activeTabBg"
+                      className={`absolute inset-0 bg-gradient-to-r ${tab.color} rounded-2xl`}
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
-                </button>
+                  <div className="relative flex items-center gap-4">
+                    <Icon className="w-6 h-6" />
+                    <div className="text-left">
+                      <div className="font-bold text-lg">{tab.label}</div>
+                      <div className={`text-sm ${isActive ? 'text-white/80' : 'text-gray-500'}`}>
+                        {tab.description}
+                      </div>
+                    </div>
+                  </div>
+                </motion.button>
               );
             })}
+          </div>
+
+          {/* Controls */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors duration-300"
+              >
+                <SlidersHorizontal className="w-5 h-5" />
+                Filters
+              </button>
+              
+              <div className="text-sm text-gray-600">
+                {filtered.length} {filtered.length === 1 ? 'business' : 'businesses'} found
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 bg-gray-100 rounded-xl p-1">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded-lg transition-colors duration-300 ${
+                  viewMode === 'grid' 
+                    ? 'bg-white shadow-sm text-indigo-600' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <Grid className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-2 rounded-lg transition-colors duration-300 ${
+                  viewMode === 'list' 
+                    ? 'bg-white shadow-sm text-indigo-600' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <List className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </motion.div>
 
@@ -365,7 +395,7 @@ export default function BusinessesPage() {
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className={`grid gap-8 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}
           >
             {Array.from({ length: 6 }).map((_, i) => (
               <motion.div key={i} variants={itemVariants}>
@@ -378,13 +408,16 @@ export default function BusinessesPage() {
             variants={itemVariants}
             initial="hidden"
             animate="show"
-            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-8 text-center"
+            className="bg-white border border-red-200 rounded-3xl p-12 text-center shadow-lg"
           >
-            <div className="text-red-600 dark:text-red-400 text-lg font-semibold mb-2">Failed to load businesses</div>
-            <div className="text-red-500 dark:text-red-300 mb-4">{error}</div>
+            <div className="w-16 h-16 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
+              <ExternalLink className="w-8 h-8 text-red-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Unable to load businesses</h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">{error}</p>
             <button 
               onClick={() => loadBusinesses(activeTab)}
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors duration-300"
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               Try Again
             </button>
@@ -394,26 +427,26 @@ export default function BusinessesPage() {
             variants={itemVariants}
             initial="hidden"
             animate="show"
-            className="text-center py-16"
+            className="bg-white rounded-3xl p-16 text-center shadow-lg"
           >
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center">
-              <Sparkles className="w-12 h-12 text-blue-600" />
+            <div className="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
+              <Sparkles className="w-12 h-12 text-indigo-600" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">No suppliers found</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
-              We couldn't find any suppliers matching your criteria. Try adjusting your search or browse different categories.
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">No businesses found</h3>
+            <p className="text-gray-600 mb-10 max-w-lg mx-auto text-lg">
+              We couldn't find any businesses matching your criteria. Try adjusting your search or explore different categories.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <button 
                 onClick={() => { setQuery(''); setFiltered(businesses); }}
-                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center gap-2"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-3"
               >
-                Show All Suppliers
-                <ArrowRight className="w-4 h-4" />
+                Show All Businesses
+                <ArrowRight className="w-5 h-5" />
               </button>
               <button 
                 onClick={() => { setActiveTab('featured'); loadBusinesses('featured'); }}
-                className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-2 border-blue-500 text-blue-600 dark:text-blue-400 px-6 py-3 rounded-lg font-semibold transition-all duration-300"
+                className="bg-white hover:bg-gray-50 border-2 border-indigo-500 text-indigo-600 px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
               >
                 Browse Featured
               </button>
@@ -424,11 +457,15 @@ export default function BusinessesPage() {
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-16"
+            className={`grid gap-8 pb-20 ${
+              viewMode === 'grid' 
+                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                : 'grid-cols-1 max-w-4xl mx-auto'
+            }`}
           >
             {filtered.map((business, index) => (
               <motion.div key={business.id || index} variants={itemVariants}>
-                <BusinessCard business={business} />
+                <BusinessCard business={business} viewMode={viewMode} />
               </motion.div>
             ))}
           </motion.div>

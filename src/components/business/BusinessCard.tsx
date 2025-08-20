@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 
 interface BusinessCardProps {
   business: any;
+  viewMode?: 'grid' | 'list';
 }
 
 const cardVariants = {
@@ -42,7 +43,7 @@ const cardVariants = {
   }
 };
 
-export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
+export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode = 'grid' }) => {
   const router = useRouter();
   
   // Extract business data with fallbacks
@@ -76,6 +77,151 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
     router.push(`/businesses/${businessData.id}`);
   };
 
+  // List view layout
+  if (viewMode === 'list') {
+    return (
+      <motion.article
+        initial="hidden"
+        whileInView="show"
+        whileHover="hover"
+        whileTap="tap"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={cardVariants}
+        onClick={handleCardClick}
+        className="group flex bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-gray-700 cursor-pointer"
+      >
+        {/* Image Section */}
+        <div className="relative w-48 h-32 flex-shrink-0 overflow-hidden">
+          {businessData.coverImage ? (
+            <Image 
+              src={businessData.coverImage} 
+              alt={businessData.name} 
+              fill 
+              className="object-cover group-hover:scale-105 transition-transform duration-500" 
+            />
+          ) : (
+            <div className="h-full w-full bg-gradient-to-br from-blue-500 via-indigo-600 to-cyan-600 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-white/20 text-3xl font-bold">
+                  {businessData.name.charAt(0)}
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Logo overlay */}
+          <div className="absolute bottom-2 left-2">
+            <div className="w-12 h-12 rounded-lg bg-white dark:bg-gray-800 shadow-lg border-2 border-white dark:border-gray-800 overflow-hidden">
+              {businessData.logo ? (
+                <Image 
+                  src={businessData.logo} 
+                  alt={businessData.name} 
+                  width={48} 
+                  height={48} 
+                  className="w-full h-full object-cover" 
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center text-white font-bold text-sm">
+                  {businessData.name.charAt(0)}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="flex-1 p-6 flex justify-between">
+          <div className="flex-1">
+            {/* Header */}
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 transition-colors duration-300">
+                  {businessData.name}
+                </h3>
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
+                  <MapPin className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-sm">{businessData.location}</span>
+                </div>
+              </div>
+              
+              {/* Rating */}
+              <div className="bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1">
+                <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {businessData.rating.toFixed(1)}
+                </span>
+              </div>
+            </div>
+
+            {/* Description */}
+            <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 line-clamp-2 leading-relaxed">
+              {businessData.description}
+            </p>
+
+            {/* Badges and stats */}
+            <div className="flex items-center gap-4 mb-4">
+              {/* Verification badges */}
+              <div className="flex gap-2">
+                {businessData.isVerified && (
+                  <span className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                    <Award className="w-3 h-3" />
+                    Verified
+                  </span>
+                )}
+                {businessData.verificationTier === 'premium' && (
+                  <span className="bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-800 dark:from-cyan-900/30 dark:to-blue-900/30 dark:text-cyan-300 px-3 py-1 rounded-full text-xs font-medium">
+                    Premium
+                  </span>
+                )}
+              </div>
+
+              {/* Quick stats */}
+              <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                <span className="flex items-center gap-1">
+                  <Package className="w-4 h-4" />
+                  {businessData.productCount}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Users className="w-4 h-4" />
+                  {businessData.completedOrders}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex flex-col gap-2 ml-6">
+            <Link
+              href={`/businesses/${businessData.id}`}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-2 px-4 rounded-lg font-semibold text-center transition-all duration-300 flex items-center justify-center gap-2 group/btn"
+            >
+              View Profile
+              <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
+            </Link>
+            
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (businessData.phone) {
+                  window.location.href = `tel:${businessData.phone}`;
+                } else if (businessData.email) {
+                  window.location.href = `mailto:${businessData.email}`;
+                }
+              }}
+              className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 border-2 border-blue-500 text-blue-600 dark:text-blue-400 py-2 px-4 rounded-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+            >
+              {businessData.phone ? <Phone className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
+              Contact
+            </button>
+          </div>
+        </div>
+      </motion.article>
+    );
+  }
+
+  // Grid view layout (default)
   return (
     <motion.article
       initial="hidden"

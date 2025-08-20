@@ -131,44 +131,9 @@ export default function MarketplacePage() {
         setNearbyBusinesses(businessesResponse.data || []);
       } catch (error) {
         console.error('Error loading marketplace data:', error);
-        // Fallback to mock data
-        setTrendingProducts([
-          {
-            id: '1',
-            name: 'Industrial Safety Equipment Set',
-            price: 15000,
-            image: '/api/placeholder/300/200',
-            rating: 4.8,
-            reviews: 124,
-            supplier: 'Safety Corp Ltd',
-            location: 'Mumbai, Maharashtra',
-            trending: true
-          },
-          {
-            id: '2',
-            name: 'Office Furniture Bundle',
-            price: 25000,
-            image: '/api/placeholder/300/200',
-            rating: 4.6,
-            reviews: 89,
-            supplier: 'Workspace Solutions',
-            location: 'Delhi, NCR',
-            trending: true
-          }
-        ]);
-        setNearbyBusinesses([
-          {
-            id: '1',
-            name: 'TechCorp Solutions',
-            category: 'Technology',
-            rating: 4.7,
-            reviews: 342,
-            location: 'Mumbai, Maharashtra',
-            distance: '2.5 km',
-            verified: true,
-            responseTime: '2 hours'
-          }
-        ]);
+        // Set empty arrays on error instead of fallback mock data
+        setTrendingProducts([]);
+        setNearbyBusinesses([]);
       } finally {
         setLoading(false);
       }
