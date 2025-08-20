@@ -75,7 +75,7 @@ export const searchApi = {
       }
     });
 
-    const response = await apiClient.get(`/search?${searchParams.toString()}`);
+    const response = await apiClient.get(`/api/search?${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Search failed');
     }
@@ -100,7 +100,7 @@ export const searchApi = {
 
   // Get search suggestions for autocomplete
   getSuggestions: async (query: string, limit = 10): Promise<AutocompleteResponse> => {
-    const response = await apiClient.get(`/search/suggestions?q=${encodeURIComponent(query)}&limit=${limit}`);
+    const response = await apiClient.get(`/api/search/suggestions?q=${encodeURIComponent(query)}&limit=${limit}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to get suggestions');
     }
@@ -135,7 +135,7 @@ export const searchApi = {
     if (categoryId) params.append('categoryId', categoryId);
     params.append('limit', limit.toString());
     
-    const response = await apiClient.get(`/search/popular?${params.toString()}`);
+    const response = await apiClient.get(`/api/search/popular?${params.toString()}`);
     return response.data as { success: boolean; data: SearchResult[] };
   },
 

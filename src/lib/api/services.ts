@@ -105,7 +105,7 @@ export const servicesApi = {
       }
     });
 
-    const response = await apiClient.get<any>(`/services?${searchParams.toString()}`);
+    const response = await apiClient.get<any>(`/api/services?${searchParams.toString()}`);
 
     // Normalize various possible response shapes from backend
     // Possible shapes:
@@ -199,7 +199,7 @@ export const servicesApi = {
 
   // Get service subcategories
   getSubcategories: async (categoryId: string): Promise<{ success: boolean; data: string[] }> => {
-    const response = await apiClient.get(`/categories/${categoryId}/subcategories`);
+    const response = await apiClient.get(`/api/categories/${categoryId}/subcategories`);
     const raw: any = response as any;
     return {
       success: raw.success,
@@ -212,7 +212,7 @@ export const servicesApi = {
     rating: number;
     comment: string;
   }): Promise<{ success: boolean; data: ServiceReview }> => {
-    const response = await apiClient.post(`/services/${serviceId}/reviews`, review);
+    const response = await apiClient.post(`/api/services/${serviceId}/reviews`, review);
     return {
       success: response.success,
       data: response.data as ServiceReview,
@@ -229,7 +229,7 @@ export const servicesApi = {
       ratingDistribution: Record<number, number>;
     };
   }> => {
-    const response = await apiClient.get(`/services/${serviceId}/reviews?page=${page}&limit=${limit}`);
+    const response = await apiClient.get(`/api/services/${serviceId}/reviews?page=${page}&limit=${limit}`);
     return {
       success: response.success,
       data: response.data as any,
@@ -246,7 +246,7 @@ export const servicesApi = {
       phone?: string;
     };
   }): Promise<{ success: boolean; data: { messageId: string } }> => {
-    const response = await apiClient.post(`/services/${serviceId}/contact`, message);
+    const response = await apiClient.post(`/api/services/${serviceId}/contact`, message);
     return {
       success: response.success,
       data: response.data as any,
@@ -266,7 +266,7 @@ export const servicesApi = {
       company?: string;
     };
   }): Promise<{ success: boolean; data: { quoteId: string } }> => {
-    const response = await apiClient.post(`/services/${serviceId}/quote`, requirements);
+    const response = await apiClient.post(`/api/services/${serviceId}/quote`, requirements);
     return {
       success: response.success,
       data: response.data as any,

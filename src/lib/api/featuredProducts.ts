@@ -67,7 +67,7 @@ export const featuredProductsApi = {
     if (params?.minPrice) searchParams.append('minPrice', params.minPrice.toString());
     if (params?.maxPrice) searchParams.append('maxPrice', params.maxPrice.toString());
 
-    const response = await apiClient.get(`/products?featured=true&${searchParams.toString()}`);
+    const response = await apiClient.get(`/api/products?featured=true&${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch featured products');
     }
@@ -83,7 +83,7 @@ export const featuredProductsApi = {
 
   // Get specific featured product
   getFeaturedProduct: async (id: string): Promise<FeaturedProductResponse> => {
-    const response = await apiClient.get(`/products/${id}`);
+    const response = await apiClient.get(`/api/products/${id}`);
     return {
       success: response.success,
       data: response.data as FeaturedProduct,
@@ -110,7 +110,7 @@ export const featuredProductsApi = {
   // Get featured products statistics
   getFeaturedStats: async (supplierId?: string): Promise<FeaturedStatsResponse> => {
     const params = supplierId ? `?supplierId=${supplierId}` : '';
-    const response = await apiClient.get(`/featured/stats${params}`);
+    const response = await apiClient.get(`/api/featured/stats${params}`);
     return {
       success: response.success,
       data: response.data as FeaturedStatsResponse['data'],
