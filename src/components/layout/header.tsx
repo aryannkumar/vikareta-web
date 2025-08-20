@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/ui/logo';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
 import { 
   ShoppingCart, 
   User, 
@@ -144,7 +143,6 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
-  const router = useRouter();
   const { user, isAuthenticated, logout } = useSSOAuth();
   const { totalItems } = useCartStore();
   const { count: wishlistCount, fetchWishlist } = useWishlistStore();
@@ -191,7 +189,7 @@ export function Header() {
   const handleLogout = async () => {
     try {
       await logout();
-      router.push('/');
+      // The logout function handles the redirect
     } catch (error) {
       console.error('Logout failed:', error);
     }

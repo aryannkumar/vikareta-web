@@ -132,9 +132,9 @@ export function SSOAuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setIsAuthenticated(false);
       
-      // Redirect to login
+      // Redirect to login page
       if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        window.location.href = '/auth/login';
       }
     }
   }, [secureRequest]);
