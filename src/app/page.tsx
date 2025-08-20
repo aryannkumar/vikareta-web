@@ -74,13 +74,13 @@ export default function HomePage() {
       // Load data in parallel for better performance
       const [categoriesResponse, productsResponse, servicesResponse, statsResponse] = await Promise.allSettled([
         // Categories
-        apiClient.get('/categories', { limit: 12 }),
+        apiClient.get('/api/categories', { limit: 12 }),
         // Featured products - use the correct API method
         productsApi.getFeaturedProducts(8),
         // Featured services - use regular services with featured filter
         servicesApi.getServices({ limit: 8, sortBy: 'rating', sortOrder: 'desc' }),
         // Get actual stats from API
-        apiClient.get('/stats')
+        apiClient.get('/api/stats')
       ]);
 
       // Process categories

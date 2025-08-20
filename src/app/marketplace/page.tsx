@@ -122,42 +122,18 @@ export default function MarketplacePage() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // Load all marketplace data using correct backend endpoints
+        // Load all marketplace data using API client functions
         const [popularResponse, businessesResponse, featuredResponse] = await Promise.all([
           // Use popular endpoint for trending products
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/marketplace/popular?type=products&limit=6`).then(res => res.json()),
+          marketplaceApi.getTrendingProducts({ sortBy: 'trending' }),
           marketplaceApi.getNearbyBusinesses(),
           // Use featured endpoint for trending services
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/marketplace/featured?type=services&limit=6`).then(res => res.json())
+          marketplaceApi.getTrendingServices({ sortBy: 'rating' })
         ]);
 
         // Transform popular products to trending format
         if (popularResponse.success && popularResponse.data) {
-          const transformedProducts = popularResponse.data.map((item: any) => ({
-            id: item.id || Math.random().toString(),
-            name: item.name || item.title || 'Product',
-            description: item.description || '',
-            price: item.price || 0,
-            originalPrice: item.originalPrice,
-            image: item.image || item.coverImage || '/api/placeholder/300/200',
-            rating: item.rating || 4.5,
-            reviewCount: item.reviewCount || 0,
-            category: item.category || 'General',
-            type: 'product' as const,
-            provider: {
-              id: item.provider?.id || item.sellerId || item.id,
-              name: item.provider?.name || item.sellerName || item.businessName || 'Provider',
-              location: item.provider?.location || item.location || 'Location',
-              verified: item.provider?.verified || item.verified || false
-            },
-            promotionType: 'trending' as const,
-            trendingRank: 1,
-            views: item.views || 0,
-            likes: item.likes || 0,
-            shares: item.shares || 0,
-            tags: item.tags || []
-          }));
-          setTrendingProducts(transformedProducts);
+          setTrendingProducts(popularResponse.data.slice(0, 6));
         } else {
           setTrendingProducts([]);
         }
@@ -166,31 +142,7 @@ export default function MarketplacePage() {
 
         // Transform featured services to trending format
         if (featuredResponse.success && featuredResponse.data) {
-          const transformedServices = featuredResponse.data.map((item: any) => ({
-            id: item.id || Math.random().toString(),
-            name: item.name || item.title || 'Service',
-            description: item.description || '',
-            price: item.price || 0,
-            originalPrice: item.originalPrice,
-            image: item.image || item.coverImage || '/api/placeholder/300/200',
-            rating: item.rating || 4.5,
-            reviewCount: item.reviewCount || 0,
-            category: item.category || 'General',
-            type: 'service' as const,
-            provider: {
-              id: item.provider?.id || item.sellerId || item.id,
-              name: item.provider?.name || item.sellerName || item.businessName || 'Provider',
-              location: item.provider?.location || item.location || 'Location',
-              verified: item.provider?.verified || item.verified || false
-            },
-            promotionType: 'featured' as const,
-            trendingRank: 1,
-            views: item.views || 0,
-            likes: item.likes || 0,
-            shares: item.shares || 0,
-            tags: item.tags || []
-          }));
-          setFeaturedServices(transformedServices);
+          setFeaturedServices(featuredResponse.data.slice(0, 6));
         } else {
           setFeaturedServices([]);
         }
