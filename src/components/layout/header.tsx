@@ -228,7 +228,7 @@ export function Header() {
                 whileHover={{ scale: 1.05 }} 
                 transition={{ type: 'spring', stiffness: 400, damping: 10 }}
               >
-                <Logo className="h-10 w-auto sm:h-12 md:h-14 lg:h-16" />
+                <Logo className="h-14 w-auto sm:h-16 md:h-18 lg:h-20 xl:h-22" />
               </motion.div>
             </Link>
           </motion.div>

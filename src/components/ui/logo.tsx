@@ -10,6 +10,18 @@ interface LogoProps {
 export function Logo({ className = 'h-10 w-10', showText = false, priority = false }: LogoProps) {
   const [imageError, setImageError] = useState(false);
 
+  // Extract height from className for dynamic sizing
+  const getImageSize = (className: string) => {
+    const heightMatch = className.match(/h-(\d+)/);
+    if (heightMatch) {
+      const size = parseInt(heightMatch[1]) * 4; // Convert Tailwind h-X to pixels (X * 0.25rem * 16)
+      return Math.max(40, Math.min(200, size)); // Clamp between 40-200px
+    }
+    return 40; // Default size
+  };
+
+  const imageSize = getImageSize(className);
+
   // Fallback SVG logo with premium design
   const FallbackLogo = () => (
     <svg 
@@ -66,8 +78,8 @@ export function Logo({ className = 'h-10 w-10', showText = false, priority = fal
         <Image
           src="/img/logo.png"
           alt="Vikareta Logo"
-          width={40}
-          height={40}
+          width={imageSize}
+          height={imageSize}
           className={`${className} object-contain logo-hover`}
           priority={priority}
           onError={() => setImageError(true)}
