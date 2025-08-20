@@ -373,16 +373,98 @@ export default function HomePage() {
               <FloatingElement className="absolute -top-8 -left-8 w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500/40 to-amber-500/40 blur-sm" />
               <FloatingElement className="absolute -bottom-8 -right-8 w-24 h-24 rounded-full bg-gradient-to-br from-amber-400/30 to-orange-600/30 blur-lg" delay={1.5} />
               
-              {/* Success metrics overlay */}
+              {/* B2B Logistics Animation with Cost Savings */}
               <motion.div 
-                className="absolute -top-4 -right-4 bg-white dark:bg-gray-800 rounded-xl p-3 shadow-lg border border-orange-200 dark:border-orange-800"
-                animate={{ y: [-5, 5, -5] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute -top-6 -right-6 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-xl border border-orange-200 dark:border-orange-800 overflow-hidden"
+                animate={{ y: [-8, 8, -8] }}
+                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-green-500" />
-                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">30% Cost Savings</span>
+                <div className="flex items-center gap-3 relative">
+                  {/* Animated Truck */}
+                  <motion.div
+                    className="relative"
+                    animate={{ x: [0, 10, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <svg width="24" height="16" viewBox="0 0 24 16" className="text-orange-600">
+                      <path fill="currentColor" d="M18 8h2.5l1.5 2v4h-1.5c0 1.1-.9 2-2 2s-2-.9-2-2H8c0 1.1-.9 2-2 2s-2-.9-2-2H2V4h16v4zm-1.5 5c0-.3.2-.5.5-.5s.5.2.5.5-.2.5-.5.5-.5-.2-.5-.5zM4.5 13c0-.3.2-.5.5-.5s.5.2.5.5-.2.5-.5.5-.5-.2-.5-.5z"/>
+                      <rect x="2" y="6" width="14" height="6" fill="currentColor" opacity="0.3"/>
+                    </svg>
+                    {/* Animated exhaust */}
+                    <motion.div
+                      className="absolute -left-1 top-1 w-1 h-1 bg-gray-400 rounded-full opacity-60"
+                      animate={{ 
+                        scale: [0, 1, 0],
+                        x: [-5, -10, -15],
+                        opacity: [0.6, 0.3, 0]
+                      }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut' }}
+                    />
+                  </motion.div>
+
+                  {/* Animated Coins */}
+                  <div className="relative">
+                    {[...Array(3)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute w-3 h-3 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full shadow-sm"
+                        style={{ 
+                          left: i * 8,
+                          top: -2
+                        }}
+                        animate={{ 
+                          y: [-2, -8, -2],
+                          rotate: [0, 180, 360],
+                          scale: [1, 0.8, 1]
+                        }}
+                        transition={{ 
+                          duration: 2, 
+                          repeat: Infinity, 
+                          delay: i * 0.3,
+                          ease: 'easeInOut'
+                        }}
+                      >
+                        <div className="w-full h-full bg-gradient-to-br from-yellow-300 to-amber-600 rounded-full flex items-center justify-center">
+                          <span className="text-[6px] font-bold text-yellow-800">₹</span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Savings Text */}
+                  <div className="ml-6">
+                    <div className="flex items-center gap-1">
+                      <TrendingUp className="h-4 w-4 text-green-500" />
+                      <motion.span 
+                        className="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                        animate={{ color: ['#374151', '#059669', '#374151'] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        30% Cost Savings
+                      </motion.span>
+                    </div>
+                    <motion.div 
+                      className="text-xs text-orange-600 font-medium mt-1"
+                      animate={{ opacity: [0.7, 1, 0.7] }}
+                      transition={{ duration: 3, repeat: Infinity }}
+                    >
+                      Fast Delivery
+                    </motion.div>
+                  </div>
                 </div>
+
+                {/* Ship Animation for Maritime B2B */}
+                <motion.div 
+                  className="absolute -bottom-2 -left-2 opacity-20"
+                  animate={{ x: [-20, 0, -20] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+                >
+                  <svg width="20" height="12" viewBox="0 0 20 12" className="text-blue-500">
+                    <path fill="currentColor" d="M18 6l2 2v2h-2l-1-1H3l-1 1H0V8l2-2h16z"/>
+                    <rect x="4" y="2" width="12" height="4" fill="currentColor" opacity="0.6"/>
+                    <path fill="currentColor" d="M8 0h4v2H8z"/>
+                  </svg>
+                </motion.div>
               </motion.div>
             </div>
           </div>
@@ -490,7 +572,7 @@ export default function HomePage() {
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Get Started with Your First RFQ
+                Get Started with RFQ
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </motion.button>
             </motion.div>
@@ -513,7 +595,7 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              Enterprise Products
+              Products
             </motion.h2>
             <motion.p 
               className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
@@ -521,7 +603,7 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              Premium products from verified suppliers, perfect for enterprise procurement needs
+              Premium products from verified suppliers, perfect for your procurement needs
             </motion.p>
           </div>
 
@@ -564,7 +646,7 @@ export default function HomePage() {
                       </motion.div>
                     )}
                     <div className="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                      Enterprise Ready
+                      Ready for You
                     </div>
                   </div>
                   
@@ -611,7 +693,7 @@ export default function HomePage() {
             <div className="text-center py-16">
               <Package className="h-20 w-20 text-gray-300 mx-auto mb-6" />
               <p className="text-gray-500 dark:text-gray-400 text-xl">
-                Enterprise products will appear here soon
+                Products will appear here soon
               </p>
             </div>
           )}
@@ -623,7 +705,7 @@ export default function HomePage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push('/products')}
             >
-              Explore All Enterprise Products
+              Explore All Products
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </div>
@@ -736,7 +818,7 @@ export default function HomePage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push('/services')}
             >
-              Explore All Professional Services
+              Explore All Services
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </div>
@@ -762,7 +844,7 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
               >
-                Built specifically for enterprise procurement teams who need efficiency, compliance, and results
+                Built specifically for procurement teams who need efficiency, compliance, and results
               </motion.p>
             </div>
 
