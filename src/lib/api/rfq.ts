@@ -96,23 +96,23 @@ export const rfqApi = {
       total: number;
       page: number;
       totalPages: number;
-    }>('/api/rfqs', filters);
+    }>('/rfqs', filters);
   },
 
   async getRFQ(id: string) {
-    return apiClient.get<RFQ>(`/api/rfqs/${id}`);
+    return apiClient.get<RFQ>(`/rfqs/${id}`);
   },
 
   async createRFQ(data: CreateRFQData) {
-    return apiClient.post<RFQ>('/api/rfqs', data);
+    return apiClient.post<RFQ>('/rfqs', data);
   },
 
   async updateRFQ(id: string, data: Partial<CreateRFQData>) {
-    return apiClient.put<RFQ>(`/api/rfqs/${id}`, data);
+    return apiClient.put<RFQ>(`/rfqs/${id}`, data);
   },
 
   async deleteRFQ(id: string) {
-    return apiClient.delete(`/api/rfqs/${id}`);
+    return apiClient.delete(`/rfqs/${id}`);
   },
 
   async getMyRFQs(filters?: Omit<RFQFilters, 'search'>) {
@@ -121,11 +121,11 @@ export const rfqApi = {
       total: number;
       page: number;
       totalPages: number;
-    }>('/api/rfqs/my', filters);
+    }>('/rfqs/my', filters);
   },
 
   async getRFQResponses(rfqId: string) {
-    return apiClient.get<RFQResponse[]>(`/api/rfqs/${rfqId}/responses`);
+    return apiClient.get<RFQResponse[]>(`/rfqs/${rfqId}/responses`);
   },
 
   async submitRFQResponse(rfqId: string, data: {
@@ -136,7 +136,7 @@ export const rfqApi = {
     attachments?: string[];
     specifications?: Record<string, any>;
   }) {
-    return apiClient.post<RFQResponse>(`/api/rfqs/${rfqId}/responses`, data);
+    return apiClient.post<RFQResponse>(`/rfqs/${rfqId}/responses`, data);
   },
 
   async updateRFQResponse(rfqId: string, responseId: string, data: {
@@ -147,24 +147,24 @@ export const rfqApi = {
     attachments?: string[];
     specifications?: Record<string, any>;
   }) {
-    return apiClient.put<RFQResponse>(`/api/rfqs/${rfqId}/responses/${responseId}`, data);
+    return apiClient.put<RFQResponse>(`/rfqs/${rfqId}/responses/${responseId}`, data);
   },
 
   async acceptRFQResponse(rfqId: string, responseId: string) {
-    return apiClient.post(`/api/rfqs/${rfqId}/responses/${responseId}/accept`);
+    return apiClient.post(`/rfqs/${rfqId}/responses/${responseId}/accept`);
   },
 
   async rejectRFQResponse(rfqId: string, responseId: string, reason?: string) {
-    return apiClient.post(`/api/rfqs/${rfqId}/responses/${responseId}/reject`, { reason });
+    return apiClient.post(`/rfqs/${rfqId}/responses/${responseId}/reject`, { reason });
   },
 
   async closeRFQ(id: string, reason?: string) {
-    return apiClient.post(`/api/rfqs/${id}/close`, { reason });
+    return apiClient.post(`/rfqs/${id}/close`, { reason });
   },
 
   async uploadAttachment(file: File) {
     const formData = new FormData();
     formData.append('file', file);
-    return apiClient.upload<{ url: string; filename: string }>('/api/rfqs/upload', formData);
+    return apiClient.upload<{ url: string; filename: string }>('/rfqs/upload', formData);
   }
 };

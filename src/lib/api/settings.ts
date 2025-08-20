@@ -25,26 +25,26 @@ export interface UserSettings {
 
 export const settingsApi = {
   async getUserSettings() {
-    return apiClient.get<UserSettings>('/api/user/settings');
+    return apiClient.get<UserSettings>('/user/settings');
   },
 
-  async updateUserSettings(settings: UserSettings) {
-    return apiClient.put<UserSettings>('/api/user/settings', settings);
+  async updateUserSettings(settings: Partial<UserSettings>) {
+    return apiClient.put<UserSettings>('/user/settings', settings);
   },
 
-  async resetToDefaults() {
-    return apiClient.post<UserSettings>('/api/user/settings/reset');
+  async resetUserSettings() {
+    return apiClient.post<UserSettings>('/user/settings/reset');
   },
 
   async updateNotificationSettings(notifications: UserSettings['notifications']) {
-    return apiClient.put<UserSettings['notifications']>('/api/user/settings/notifications', notifications);
+    return apiClient.put<UserSettings['notifications']>('/user/settings/notifications', notifications);
   },
 
   async updatePrivacySettings(privacy: UserSettings['privacy']) {
-    return apiClient.put<UserSettings['privacy']>('/api/user/settings/privacy', privacy);
+    return apiClient.put<UserSettings['privacy']>('/user/settings/privacy', privacy);
   },
 
   async updatePreferences(preferences: UserSettings['preferences']) {
-    return apiClient.put<UserSettings['preferences']>('/api/user/settings/preferences', preferences);
+    return apiClient.put<UserSettings['preferences']>('/user/settings/preferences', preferences);
   }
 };

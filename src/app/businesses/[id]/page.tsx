@@ -80,7 +80,7 @@ export default function BusinessProfilePage(props: any) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'services' | 'reviews'>('overview');
   const [isFollowing, setIsFollowing] = useState(false);
-  const { user, isAuthenticated } = useSSOAuth();
+  const { isAuthenticated } = useSSOAuth();
   const { isInWishlist, addToWishlist, removeItemFromWishlist } = useWishlistStore();
   const toast = useToast();
   const id = props?.params?.id as string;
@@ -279,11 +279,11 @@ export default function BusinessProfilePage(props: any) {
       className="min-h-screen bg-gray-50"
     >
       {/* Enhanced Hero Section */}
-      <section className="relative min-h-[70vh] bg-gradient-to-br from-amber-900 via-orange-900 to-red-900 overflow-hidden">
+      <section className="relative min-h-[70vh] bg-gradient-to-br from-amber-900 via-orange-900 to-amber-800 overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0">
           <motion.div
-            className="absolute top-20 left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+            className="absolute top-20 left-20 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl"
             animate={{ 
               x: [0, 100, -50, 0], 
               y: [0, -80, 50, 0],
@@ -418,11 +418,11 @@ export default function BusinessProfilePage(props: any) {
                   <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
                     {businessData.name}
                   </h1>
-                  <div className="flex items-center gap-3 text-indigo-200 mb-4">
+                  <div className="flex items-center gap-3 text-amber-200 mb-4">
                     <MapPinIcon className="w-6 h-6 flex-shrink-0" />
                     <span className="text-lg">{businessData.location}</span>
                   </div>
-                  <p className="text-xl text-indigo-100 leading-relaxed max-w-3xl">
+                  <p className="text-xl text-amber-100 leading-relaxed max-w-3xl">
                     {businessData.description}
                   </p>
                 </div>
@@ -448,7 +448,7 @@ export default function BusinessProfilePage(props: any) {
                       <div className="text-2xl font-bold text-white mb-1">
                         {stat.value}{stat.suffix}
                       </div>
-                      <div className="text-sm text-indigo-200">{stat.label}</div>
+                      <div className="text-sm text-amber-200">{stat.label}</div>
                     </motion.div>
                   ))}
                 </div>
@@ -506,8 +506,8 @@ export default function BusinessProfilePage(props: any) {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`relative flex items-center gap-3 px-6 py-4 font-semibold transition-all duration-300 ${
                     isActive
-                      ? 'text-indigo-600 border-b-2 border-indigo-600'
-                      : 'text-gray-600 hover:text-indigo-600'
+                      ? 'text-amber-600 border-b-2 border-amber-600'
+                      : 'text-gray-600 hover:text-amber-600'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -515,7 +515,7 @@ export default function BusinessProfilePage(props: any) {
                   {tab.count !== null && tab.count > 0 && (
                     <span className={`px-2 py-1 rounded-full text-xs font-bold ${
                       isActive 
-                        ? 'bg-indigo-100 text-indigo-600' 
+                        ? 'bg-amber-100 text-amber-600' 
                         : 'bg-gray-100 text-gray-600'
                     }`}>
                       {tab.count}
@@ -546,7 +546,7 @@ export default function BusinessProfilePage(props: any) {
                   className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200"
                 >
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center">
                       <BookOpen className="w-6 h-6 text-white" />
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900">About Our Business</h2>
@@ -566,7 +566,7 @@ export default function BusinessProfilePage(props: any) {
                   className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200"
                 >
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center">
                       <Sparkles className="w-6 h-6 text-white" />
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900">Why Choose Us</h2>
@@ -578,8 +578,8 @@ export default function BusinessProfilePage(props: any) {
                       { icon: ThumbsUp, title: 'High Success Rate', desc: `${businessData.successRate}% customer satisfaction` },
                       { icon: Award, title: 'Quality Assurance', desc: 'Premium quality products and services' }
                     ].map((feature, index) => (
-                      <div key={index} className="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl">
-                        <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <div key={index} className="flex items-start gap-4 p-4 bg-amber-50 rounded-2xl">
+                        <div className="w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl flex items-center justify-center flex-shrink-0">
                           <feature.icon className="w-5 h-5 text-white" />
                         </div>
                         <div>
@@ -597,7 +597,7 @@ export default function BusinessProfilePage(props: any) {
                   className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200"
                 >
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center">
                       <Camera className="w-6 h-6 text-white" />
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900">Business Gallery</h2>
@@ -616,7 +616,7 @@ export default function BusinessProfilePage(props: any) {
             {activeTab === 'products' && (
               <motion.div variants={itemVariants} className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center">
                     <Package className="w-6 h-6 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900">Our Products</h2>
@@ -634,7 +634,7 @@ export default function BusinessProfilePage(props: any) {
             {activeTab === 'services' && (
               <motion.div variants={itemVariants} className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center">
                     <Briefcase className="w-6 h-6 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900">Our Services</h2>
@@ -652,7 +652,7 @@ export default function BusinessProfilePage(props: any) {
             {activeTab === 'reviews' && (
               <motion.div variants={itemVariants} className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center">
                     <Star className="w-6 h-6 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900">Customer Reviews</h2>
@@ -673,7 +673,7 @@ export default function BusinessProfilePage(props: any) {
             {/* Quick Contact */}
             <motion.div 
               variants={itemVariants}
-              className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-6 text-white"
+              className="bg-gradient-to-br from-amber-600 to-orange-700 rounded-3xl p-6 text-white"
             >
               <h3 className="text-xl font-bold mb-4">Quick Contact</h3>
               <div className="space-y-4">

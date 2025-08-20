@@ -98,7 +98,7 @@ export const marketplaceApi = {
     if (filters?.category) searchParams.append('categoryId', filters.category);
     if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy);
 
-    const response = await apiClient.get(`/api/marketplace/popular?${searchParams.toString()}`);
+    const response = await apiClient.get(`/marketplace/popular?${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch trending products');
     }
@@ -145,7 +145,7 @@ export const marketplaceApi = {
     if (filters?.category) searchParams.append('categoryId', filters.category);
     if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy);
 
-    const response = await apiClient.get(`/api/marketplace/featured?${searchParams.toString()}`);
+    const response = await apiClient.get(`/marketplace/featured?${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch trending services');
     }
@@ -193,7 +193,7 @@ export const marketplaceApi = {
       if (filters?.radius) searchParams.append('radius', filters.radius.toString());
       if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy);
 
-      const response = await apiClient.get(`/api/marketplace/businesses?${searchParams.toString()}`);
+      const response = await apiClient.get(`/marketplace/businesses?${searchParams.toString()}`);
       if (!response.success) {
         return { success: false, data: [] };
       }
@@ -244,7 +244,7 @@ export const marketplaceApi = {
     // request only businesses
     searchParams.append('type', 'businesses');
 
-    const response = await apiClient.get(`/api/marketplace/featured?${searchParams.toString()}`);
+    const response = await apiClient.get(`/marketplace/featured?${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch featured businesses');
     }
@@ -287,7 +287,7 @@ export const marketplaceApi = {
     // request only businesses
     searchParams.append('type', 'businesses');
 
-    const response = await apiClient.get(`/api/marketplace/popular?${searchParams.toString()}`);
+    const response = await apiClient.get(`/marketplace/popular?${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch popular businesses');
     }
@@ -322,7 +322,7 @@ export const marketplaceApi = {
   // Get marketplace statistics
   getMarketplaceStats: async (location?: string): Promise<MarketplaceStatsResponse> => {
     const params = location ? `?location=${location}` : '';
-    const response = await apiClient.get(`/api/marketplace/stats${params}`);
+    const response = await apiClient.get(`/marketplace/stats${params}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch marketplace stats');
     }
@@ -339,7 +339,7 @@ export const marketplaceApi = {
     
     try {
       // Backend exposes provider details at /api/providers/:id
-      const response = await apiClient.get(`/api/providers/${encodeURIComponent(id)}`);
+      const response = await apiClient.get(`/providers/${encodeURIComponent(id)}`);
       if (!response.success) {
         return { success: false, data: null };
       }
@@ -376,7 +376,7 @@ export const marketplaceApi = {
   // Get promotional campaigns
   getPromotionalCampaigns: async (location?: string) => {
     const params = location ? `?location=${location}` : '';
-    const response = await apiClient.get(`/api/marketplace/promotions${params}`);
+    const response = await apiClient.get(`/marketplace/promotions${params}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch promotional campaigns');
     }
@@ -398,7 +398,7 @@ export const marketplaceApi = {
     if (filters?.maxPrice) searchParams.append('maxPrice', filters.maxPrice.toString());
     if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy);
 
-    const response = await apiClient.get(`/api/marketplace/search?${searchParams.toString()}`);
+    const response = await apiClient.get(`/marketplace/search?${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to search marketplace');
     }

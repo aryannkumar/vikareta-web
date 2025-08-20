@@ -127,7 +127,7 @@ export default function SettingsPage() {
 
   const resetToDefaults = async () => {
     try {
-      const response = await settingsApi.resetToDefaults();
+      const response = await settingsApi.resetUserSettings();
       if (response.success) {
         setSettings(response.data);
         setHasChanges(true);
