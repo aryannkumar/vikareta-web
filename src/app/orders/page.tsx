@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { 
   Package, 
   Clock, 
@@ -17,15 +18,19 @@ import {
   Calendar,
   Truck,
   AlertCircle,
-  Download
+  Download,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
 import { ordersApi, type Order } from '@/lib/api/orders';
+import { useSSOAuth } from '@/lib/auth/use-sso-auth';
 
 export default function OrdersPage() {
+  const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useSSOAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,6 +41,30 @@ export default function OrdersPage() {
   const [totalPages, setTotalPages] = useState(1);
 
   const toast = useToast();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/auth/login');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const statusOptions = [
     { value: '', label: 'All Status' },
@@ -54,6 +83,11 @@ export default function OrdersPage() {
   ];
 
   const fetchOrders = useCallback(async () => {
+    // Only fetch orders if authenticated
+    if (!isAuthenticated) {
+      return;
+    }
+
     setLoading(true);
     setError(null);
     
@@ -82,11 +116,14 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, typeFilter, currentPage]);
+  }, [statusFilter, typeFilter, currentPage, isAuthenticated]);
 
   useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+    // Only fetch orders when authenticated and not loading auth state
+    if (!authLoading && isAuthenticated) {
+      fetchOrders();
+    }
+  }, [fetchOrders, authLoading, isAuthenticated]);
 
   const handleCancelOrder = async (orderId: string) => {
     try {
