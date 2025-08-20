@@ -1,6 +1,11 @@
 import { RFQRequest, RFQResponse } from '../types/payment';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+// Normalize API host: remove trailing /api if present; always prefix endpoints with /api
+const API_HOST = (
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://api.vikareta.com')
+).replace(/\/api$/, '');
+const apiUrl = (path: string) => `${API_HOST}/api${path}`;
 
 export interface CreateRfqData {
   title: string;
@@ -248,7 +253,7 @@ export class RFQService {
 
   async createServiceRfq(data: ServiceRfqData): Promise<RfqDetails> {
     try {
-      const response = await fetch(`${API_BASE_URL}/rfqs/service`, {
+  const response = await fetch(apiUrl('/rfqs/service'), {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify(data),
@@ -269,7 +274,7 @@ export class RFQService {
 
   async createProductRfq(data: ProductRfqData): Promise<RfqDetails> {
     try {
-      const response = await fetch(`${API_BASE_URL}/rfqs/product`, {
+  const response = await fetch(apiUrl('/rfqs/product'), {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify(data),
@@ -290,7 +295,7 @@ export class RFQService {
 
   async createRfq(data: CreateRfqData): Promise<RfqDetails> {
     try {
-      const response = await fetch(`${API_BASE_URL}/rfqs`, {
+  const response = await fetch(apiUrl('/rfqs'), {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify(data),
@@ -321,7 +326,7 @@ export class RFQService {
         });
       }
 
-      const response = await fetch(`${API_BASE_URL}/rfqs?${queryParams.toString()}`, {
+  const response = await fetch(apiUrl(`/rfqs?${queryParams.toString()}`), {
         headers: this.getHeaders(),
       });
 
@@ -350,7 +355,7 @@ export class RFQService {
         });
       }
 
-      const response = await fetch(`${API_BASE_URL}/rfqs/my-with-responses?${queryParams.toString()}`, {
+  const response = await fetch(apiUrl(`/rfqs/my-with-responses?${queryParams.toString()}`), {
         headers: this.getHeaders(),
       });
 
@@ -369,7 +374,7 @@ export class RFQService {
 
   async getRfqById(rfqId: string): Promise<RfqDetails> {
     try {
-      const response = await fetch(`${API_BASE_URL}/rfqs/${rfqId}`, {
+  const response = await fetch(apiUrl(`/rfqs/${rfqId}`), {
         headers: this.getHeaders(),
       });
 
@@ -398,7 +403,7 @@ export class RFQService {
         });
       }
 
-      const response = await fetch(`${API_BASE_URL}/rfqs/relevant?${queryParams.toString()}`, {
+  const response = await fetch(apiUrl(`/rfqs/relevant?${queryParams.toString()}`), {
         headers: this.getHeaders(),
       });
 
@@ -417,7 +422,7 @@ export class RFQService {
 
   async updateRfq(rfqId: string, updateData: Partial<CreateRfqData>): Promise<RfqDetails> {
     try {
-      const response = await fetch(`${API_BASE_URL}/rfqs/${rfqId}`, {
+  const response = await fetch(apiUrl(`/rfqs/${rfqId}`), {
         method: 'PUT',
         headers: this.getHeaders(),
         body: JSON.stringify(updateData),
@@ -438,7 +443,7 @@ export class RFQService {
 
   async updateRfqStatus(rfqId: string, status: string): Promise<RfqDetails> {
     try {
-      const response = await fetch(`${API_BASE_URL}/rfqs/${rfqId}/status`, {
+  const response = await fetch(apiUrl(`/rfqs/${rfqId}/status`), {
         method: 'PATCH',
         headers: this.getHeaders(),
         body: JSON.stringify({ status }),
@@ -459,7 +464,7 @@ export class RFQService {
 
   async extendRfqExpiry(rfqId: string, newExpiryDate: Date): Promise<RfqDetails> {
     try {
-      const response = await fetch(`${API_BASE_URL}/rfqs/${rfqId}/extend`, {
+  const response = await fetch(apiUrl(`/rfqs/${rfqId}/extend`), {
         method: 'PATCH',
         headers: this.getHeaders(),
         body: JSON.stringify({ expiresAt: newExpiryDate.toISOString() }),
@@ -480,7 +485,7 @@ export class RFQService {
 
   async deleteRfq(rfqId: string): Promise<void> {
     try {
-      const response = await fetch(`${API_BASE_URL}/rfqs/${rfqId}`, {
+  const response = await fetch(apiUrl(`/rfqs/${rfqId}`), {
         method: 'DELETE',
         headers: this.getHeaders(),
       });
@@ -497,7 +502,7 @@ export class RFQService {
 
   async getRfqAnalytics(): Promise<any> {
     try {
-      const response = await fetch(`${API_BASE_URL}/rfqs/stats`, {
+  const response = await fetch(apiUrl('/rfqs/stats'), {
         headers: this.getHeaders(),
       });
 
@@ -517,7 +522,7 @@ export class RFQService {
   async getPublicRecentRfqs(limit = 5): Promise<Array<{ id: string; title: string; quantity: number | null; budgetMin: number | null; budgetMax: number | null; createdAt: string }>> {
     try {
       const params = new URLSearchParams({ limit: String(limit) });
-      const response = await fetch(`${API_BASE_URL}/public/rfqs/recent?${params.toString()}`);
+  const response = await fetch(apiUrl(`/public/rfqs/recent?${params.toString()}`));
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error?.message || 'Failed to fetch recent RFQs');
@@ -535,7 +540,7 @@ export class RFQService {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch(`${API_BASE_URL}/rfqs/upload`, {
+  const response = await fetch(apiUrl('/rfqs/upload'), {
         method: 'POST',
         headers: {
           ...(this.authToken && { 'Authorization': `Bearer ${this.authToken}` }),
@@ -559,7 +564,7 @@ export class RFQService {
   // Quote management methods
   async submitQuote(rfqId: string, quoteData: any): Promise<any> {
     try {
-      const response = await fetch(`${API_BASE_URL}/rfqs/${rfqId}/quotes`, {
+  const response = await fetch(apiUrl(`/rfqs/${rfqId}/quotes`), {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify(quoteData),
@@ -580,7 +585,7 @@ export class RFQService {
 
   async updateQuoteStatus(quoteId: string, status: string, notes?: string): Promise<any> {
     try {
-      const response = await fetch(`${API_BASE_URL}/quotes/${quoteId}/status`, {
+  const response = await fetch(apiUrl(`/quotes/${quoteId}/status`), {
         method: 'PATCH',
         headers: this.getHeaders(),
         body: JSON.stringify({ status, notes }),
@@ -601,7 +606,7 @@ export class RFQService {
 
   async acceptQuote(quoteId: string): Promise<any> {
     try {
-      const response = await fetch(`${API_BASE_URL}/quotes/${quoteId}/accept`, {
+  const response = await fetch(apiUrl(`/quotes/${quoteId}/accept`), {
         method: 'POST',
         headers: this.getHeaders(),
         // backend expects no body; only quoteId in path
@@ -622,7 +627,7 @@ export class RFQService {
 
   async rejectQuote(quoteId: string, reason?: string): Promise<any> {
     try {
-      const response = await fetch(`${API_BASE_URL}/quotes/${quoteId}/reject`, {
+  const response = await fetch(apiUrl(`/quotes/${quoteId}/reject`), {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify({ reason }),
@@ -647,7 +652,7 @@ export class RFQService {
     requestedChanges?: string[];
   }): Promise<any> {
     try {
-      const response = await fetch(`${API_BASE_URL}/quotes/${quoteId}/negotiate`, {
+  const response = await fetch(apiUrl(`/quotes/${quoteId}/negotiate`), {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify(negotiationData),
@@ -668,7 +673,7 @@ export class RFQService {
 
   async getRfqWithResponses(rfqId: string): Promise<RfqWithResponses> {
     try {
-      const response = await fetch(`${API_BASE_URL}/rfqs/${rfqId}/with-responses`, {
+  const response = await fetch(apiUrl(`/rfqs/${rfqId}/with-responses`), {
         headers: this.getHeaders(),
       });
 
@@ -687,7 +692,7 @@ export class RFQService {
 
   async getCategories(): Promise<any[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/categories`, {
+  const response = await fetch(apiUrl('/categories'), {
         headers: this.getHeaders(),
       });
 
@@ -706,7 +711,7 @@ export class RFQService {
 
   async getSubcategories(categoryId: string): Promise<any[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/categories/${categoryId}/subcategories`, {
+  const response = await fetch(apiUrl(`/categories/${categoryId}/subcategories`), {
         headers: this.getHeaders(),
       });
 

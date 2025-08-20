@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X, Plus, AlertCircle, Loader2, CheckCircle, FileText } from 'lucide-react';
 import { rfqService } from '../../services/rfq.service';
 import MyRFQsSection from './MyRFQsSection';
@@ -75,6 +75,26 @@ export default function RFQPage() {
     loadCategories();
   }, []);
 
+  const resetForm = useCallback(() => {
+    setFormData({
+      rfqType: 'product',
+      title: '',
+      category: '',
+      subcategory: '',
+      description: '',
+      quantity: '',
+      unit: '',
+      budget: '',
+      timeline: '',
+      location: '',
+      specifications: [''],
+      attachments: [],
+      contactInfo: { name: '', email: '', phone: '', company: '' }
+    });
+    setErrors({});
+    setSubmitted(false);
+  }, []);
+
   // Load subcategories when category changes
   useEffect(() => {
     const loadSubs = async () => {
@@ -145,28 +165,41 @@ export default function RFQPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = useCallback((field: string, value: string) => {
     const fieldParts = field.split('.');
-    if (fieldParts.length === 2 && fieldParts[0] === 'contactInfo') {
-      setFormData(prev => ({
-        ...prev,
-        contactInfo: {
-          ...prev.contactInfo,
-          [fieldParts[1]]: value
+    
+    setFormData(prev => {
+      let newData: RFQFormData;
+      
+      if (fieldParts.length === 2 && fieldParts[0] === 'contactInfo') {
+        newData = {
+          ...prev,
+          contactInfo: {
+            ...prev.contactInfo,
+            [fieldParts[1]]: value
+          }
+        };
+      } else {
+        newData = { ...prev, [field]: value };
+        
+        // Clear subcategory when category changes
+        if (field === 'category') {
+          newData.subcategory = '';
         }
-      }));
-    } else {
-      setFormData(prev => ({ ...prev, [field]: value }));
-      if (field === 'category') {
-        setFormData(prev => ({ ...prev, subcategory: '' }));
       }
-    }
+      
+      return newData;
+    });
     
     // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  };
+    setErrors(prev => {
+      if (prev[field]) {
+        const { [field]: _, ...rest } = prev;
+        return rest;
+      }
+      return prev;
+    });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -214,28 +247,28 @@ export default function RFQPage() {
     }
   };
 
-  const addSpecification = () => {
+  const addSpecification = useCallback(() => {
     setFormData(prev => ({
       ...prev,
       specifications: [...prev.specifications, '']
     }));
-  };
+  }, []);
 
-  const removeSpecification = (index: number) => {
+  const removeSpecification = useCallback((index: number) => {
     setFormData(prev => ({
       ...prev,
       specifications: prev.specifications.filter((_, i) => i !== index)
     }));
-  };
+  }, []);
 
-  const updateSpecification = (index: number, value: string) => {
+  const updateSpecification = useCallback((index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
       specifications: prev.specifications.map((spec, i) => i === index ? value : spec)
     }));
-  };
+  }, []);
 
-  const handleFileUpload = (files: FileList | null) => {
+  const handleFileUpload = useCallback((files: FileList | null) => {
     if (files) {
       const newFiles = Array.from(files);
       setFormData(prev => ({
@@ -243,14 +276,14 @@ export default function RFQPage() {
         attachments: [...prev.attachments, ...newFiles]
       }));
     }
-  };
+  }, []);
 
-  const removeAttachment = (index: number) => {
+  const removeAttachment = useCallback((index: number) => {
     setFormData(prev => ({
       ...prev,
       attachments: prev.attachments.filter((_, i) => i !== index)
     }));
-  };
+  }, []);
 
   if (submitted) {
     return (
@@ -272,24 +305,7 @@ export default function RFQPage() {
                   View My RFQs
                 </button>
                 <button
-                  onClick={() => {
-                    setSubmitted(false);
-                    setFormData({
-                      rfqType: 'product',
-                      title: '',
-                      category: '',
-                      subcategory: '',
-                      description: '',
-                      quantity: '',
-                      unit: '',
-                      budget: '',
-                      timeline: '',
-                      location: '',
-                      specifications: [''],
-                      attachments: [],
-                      contactInfo: { name: '', email: '', phone: '', company: '' }
-                    });
-                  }}
+                  onClick={resetForm}
                   className="border border-green-600 text-green-600 px-6 py-2 rounded-lg hover:bg-green-50"
                 >
                   Create New RFQ

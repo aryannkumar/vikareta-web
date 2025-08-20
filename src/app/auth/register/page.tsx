@@ -196,8 +196,8 @@ export default function RegisterPage() {
     return () => clearInterval(interval);
   }, [otpTimer]);
 
-  // Validation functions
-  const validateStep = (step: RegistrationStep): boolean => {
+  // Validation functions (memoized to avoid stale closures)
+  const validateStep = useCallback((step: RegistrationStep): boolean => {
     const newErrors: Record<string, string> = {};
 
     switch (step) {
@@ -275,60 +275,56 @@ export default function RegisterPage() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [formData]);
 
   // Handle input changes with debouncing for better performance
   const handleInputChange = useCallback((field: keyof FormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear errors immediately for better UX
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+    setErrors(prev => {
+      if (prev[field]) {
+        return { ...prev, [field]: '' };
+      }
+      return prev;
+    });
+  }, []);
+
+  // Format phone number - improved to avoid cursor jumps
+  const formatPhoneNumber = useCallback((value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length === 0) return '';
+    if (cleaned.startsWith('91') && cleaned.length > 2) {
+      return `+91 ${cleaned.slice(2)}`;
     }
-  }, [errors]);
+    if (cleaned.length === 10 && !cleaned.startsWith('91')) {
+      return `+91 ${cleaned}`;
+    }
+    if (cleaned.length < 10 && !cleaned.startsWith('91')) {
+      return cleaned === '' ? '' : `+91 ${cleaned}`;
+    }
+    if (cleaned.startsWith('91')) {
+      return `+${cleaned}`;
+    }
+    return `+91 ${cleaned}`;
+  }, []);
 
   // Special handler for phone to avoid cursor issues
   const handlePhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const formatted = formatPhoneNumber(value);
     setFormData(prev => ({ ...prev, phone: formatted }));
-    if (errors.phone) {
-      setErrors(prev => ({ ...prev, phone: '' }));
-    }
-  }, [errors.phone]);
+    setErrors(prev => {
+      if (prev.phone) {
+        return { ...prev, phone: '' };
+      }
+      return prev;
+    });
+  }, [formatPhoneNumber]);
 
-  // Format phone number - improved to avoid cursor jumps
-  const formatPhoneNumber = (value: string) => {
-    // Remove all non-digits
-    const cleaned = value.replace(/\D/g, '');
-    
-    // Handle different input scenarios more carefully
-    if (cleaned.length === 0) return '';
-    
-    // If it starts with 91, format as +91...
-    if (cleaned.startsWith('91') && cleaned.length > 2) {
-      return `+91 ${cleaned.slice(2)}`;
-    }
-    
-    // If it's 10 digits without country code, add +91
-    if (cleaned.length === 10 && !cleaned.startsWith('91')) {
-      return `+91 ${cleaned}`;
-    }
-    
-    // If it's less than 10 digits and doesn't start with 91, assume it needs +91
-    if (cleaned.length < 10 && !cleaned.startsWith('91')) {
-      return cleaned === '' ? '' : `+91 ${cleaned}`;
-    }
-    
-    // For other cases, just add + if it starts with a country code
-    if (cleaned.startsWith('91')) {
-      return `+${cleaned}`;
-    }
-    
-    return `+91 ${cleaned}`;
-  };
+  
 
   // Step navigation
-  const nextStep = () => {
+  const nextStep = useCallback(() => {
     if (validateStep(currentStep)) {
       const steps: RegistrationStep[] = ['userType', 'personal', 'business', 'verification', 'complete'];
       const currentIndex = steps.indexOf(currentStep);
@@ -336,18 +332,18 @@ export default function RegisterPage() {
         setCurrentStep(steps[currentIndex + 1]);
       }
     }
-  };
+  }, [currentStep, validateStep]);
 
-  const prevStep = () => {
+  const prevStep = useCallback(() => {
     const steps: RegistrationStep[] = ['userType', 'personal', 'business', 'verification', 'complete'];
     const currentIndex = steps.indexOf(currentStep);
     if (currentIndex > 0) {
       setCurrentStep(steps[currentIndex - 1]);
     }
-  };
+  }, [currentStep]);
 
   // OTP functions
-  const sendOTP = async (type: 'email' | 'phone') => {
+  const sendOTP = useCallback(async (type: 'email' | 'phone') => {
     setOtpLoading(true);
     setCurrentOtpType(type);
     
@@ -366,9 +362,9 @@ export default function RegisterPage() {
     } finally {
       setOtpLoading(false);
     }
-  };
+  }, []);
 
-  const verifyOTP = async (code: string, type: 'email' | 'phone') => {
+  const verifyOTP = useCallback(async (code: string, type: 'email' | 'phone') => {
     setLoading(true);
     
     try {
@@ -389,10 +385,10 @@ export default function RegisterPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Final registration
-  const handleFinalSubmit = async () => {
+  const handleFinalSubmit = useCallback(async () => {
     if (!validateStep('verification')) return;
 
     setLoading(true);
@@ -426,10 +422,10 @@ export default function RegisterPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [formData, registerUser, validateStep]);
 
   // Social registration handlers
-  const handleSocialRegister = async (provider: string) => {
+  const handleSocialRegister = useCallback(async (provider: string) => {
     try {
       setLoading(true);
       
@@ -444,14 +440,14 @@ export default function RegisterPage() {
       toast.error('Error', `Failed to initialize ${provider} registration`);
       setLoading(false);
     }
-  };
+  }, []);
 
   // Progress calculation
-  const getProgress = () => {
+  const getProgress = useCallback(() => {
     const steps = ['userType', 'personal', 'business', 'verification', 'complete'];
     const currentIndex = steps.indexOf(currentStep);
     return ((currentIndex + 1) / steps.length) * 100;
-  };
+  }, [currentStep]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 relative overflow-hidden">
