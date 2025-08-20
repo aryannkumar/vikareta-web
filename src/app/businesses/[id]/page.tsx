@@ -96,14 +96,18 @@ export default function BusinessProfilePage(props: any) {
       return;
     }
 
-    // Additional check to ensure user session is valid
-    console.log('Authentication check:', { 
-      isAuthenticated, 
-      allCookies: document.cookie,
-      cookieCount: document.cookie.split(';').filter(c => c.trim()).length,
-      hasXSRF: document.cookie.includes('XSRF-TOKEN'),
-      cookieNames: document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean)
-    });
+    // Debug authentication status in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Authentication Debug:', { 
+        isAuthenticated, 
+        allCookies: document.cookie,
+        cookieCount: document.cookie.split(';').filter(c => c.trim()).length,
+        hasXSRF: document.cookie.includes('XSRF-TOKEN'),
+        cookieNames: document.cookie.split(';').map(c => c.trim().split('=')[0]).filter(Boolean),
+        apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE,
+        currentDomain: window.location.hostname
+      });
+    }
 
     try {
       if (inWishlist) {
@@ -119,7 +123,9 @@ export default function BusinessProfilePage(props: any) {
           toast.success('Added', 'Business added to wishlist');
         } else {
           // Try refreshing session and retry once
-          console.log('Wishlist add failed, refreshing session and retrying...');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Wishlist add failed, refreshing session and retrying...');
+          }
           await refreshSession();
           const retrySuccess = await addToWishlist(id, 'business');
           if (retrySuccess) {

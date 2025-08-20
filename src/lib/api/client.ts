@@ -125,54 +125,15 @@ class ApiClient {
       });
     }
     
-    // If no cookies at all, try SSO sync first for cross-domain authentication
-    if (typeof window !== 'undefined' && document.cookie.trim() === '') {
-      // Check if we're running from the correct domain for production
-      const currentDomain = window.location.hostname;
-      const isCorrectDomain = currentDomain === 'vikareta.com' || 
-                             currentDomain.endsWith('.vikareta.com') || 
-                             currentDomain === 'localhost' || 
-                             currentDomain.startsWith('192.168.') ||
-                             currentDomain.startsWith('10.') ||
-                             currentDomain.startsWith('172.');
-      
-      if (!isCorrectDomain && process.env.NODE_ENV === 'production') {
-        // In production, if not running from correct domain, this won't work
-        console.error('Authentication error: Frontend must be served from vikareta.com domain for authentication to work');
-        return null;
-      }
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('No cookies found, attempting SSO sync to API domain...');
-      }
-      await this.syncAuthToAPI();
-      
-      // Check again after SSO sync
-      csrfToken = this.getCSRFToken();
-      if (process.env.NODE_ENV === 'development') {
-        console.log('CSRF token after SSO sync:', !!csrfToken);
-      }
-      
-      // If still no CSRF token, try to initialize auth session
-      if (!csrfToken) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('SSO sync failed, trying auth session init...');
-        }
-        await this.initializeAuth();
-        csrfToken = this.getCSRFToken();
-        if (process.env.NODE_ENV === 'development') {
-          console.log('CSRF token after session init:', !!csrfToken);
-        }
-      }
-    }
-    
-    if (!csrfToken) {
+    // For development, try to establish a session with the backend
+    if (process.env.NODE_ENV === 'development' && !csrfToken) {
       try {
-        // Try to get CSRF token from backend auth check
+        // First try to get current session status
         if (process.env.NODE_ENV === 'development') {
-          console.log('Attempting to fetch CSRF token from:', `${this.baseURL}/auth/me`);
+          console.log('Attempting to establish session with backend...');
         }
-        const response = await fetch(`${this.baseURL}/auth/me`, {
+        
+        const sessionResponse = await fetch(`${this.baseURL}/auth/session`, {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -182,26 +143,50 @@ class ApiClient {
         });
         
         if (process.env.NODE_ENV === 'development') {
-          console.log('Auth check response:', response.status, response.ok);
+          console.log('Session check response:', sessionResponse.status);
         }
         
-        if (response.ok) {
-          // After this request, the CSRF token should be set in cookies
-          csrfToken = this.getCSRFToken();
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Fetched CSRF token after auth check:', !!csrfToken);
-          }
-        } else if (response.status === 401) {
-          // User is not authenticated - this is expected for logged-out users
-          if (process.env.NODE_ENV === 'development') {
-            console.log('User not authenticated - 401 response from auth/me');
-          }
+        // Try to check if we can get user info (this should set cookies)
+        const meResponse = await fetch(`${this.baseURL}/auth/me`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Auth me response:', meResponse.status);
         }
+        
+        // Check if CSRF token is now available
+        csrfToken = this.getCSRFToken();
+        if (process.env.NODE_ENV === 'development') {
+          console.log('CSRF token after session check:', !!csrfToken);
+        }
+        
       } catch (error) {
         if (process.env.NODE_ENV === 'development') {
-          console.log('Could not fetch CSRF token from backend:', error);
+          console.log('Could not establish session with backend:', error);
         }
       }
+    }
+    
+    // For production, try SSO sync if no cookies
+    if (process.env.NODE_ENV === 'production' && typeof window !== 'undefined' && document.cookie.trim() === '') {
+      // Check if we're running from the correct domain for production
+      const currentDomain = window.location.hostname;
+      const isCorrectDomain = currentDomain === 'vikareta.com' || 
+                             currentDomain.endsWith('.vikareta.com');
+      
+      if (!isCorrectDomain) {
+        console.error('Authentication error: Frontend must be served from vikareta.com domain for authentication to work');
+        return null;
+      }
+      
+      await this.syncAuthToAPI();
+      csrfToken = this.getCSRFToken();
     }
     
     return csrfToken;
