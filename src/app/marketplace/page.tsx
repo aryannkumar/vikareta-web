@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
   TrendingUp, 
@@ -323,44 +324,46 @@ export default function MarketplacePage() {
                     transition={{ delay: index * 0.1 }}
                     whileHover={{ y: -5 }}
                   >
-                    <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
-                      <CardContent className="p-4">
-                        <div className="aspect-square bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg mb-3 flex items-center justify-center">
-                          <Package className="w-8 h-8 text-amber-600" />
-                        </div>
-                        
-                        <h3 className="font-bold text-base text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 mb-2">
-                          {product.name}
-                        </h3>
-                        
-                        <div className="flex items-center gap-1 mb-2">
-                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <span className="text-xs font-medium text-gray-900">
-                            {product.rating}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            ({product.reviews})
-                          </span>
-                        </div>
+                    <Link href={`/products/${product.id}`} className="block h-full">
+                      <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
+                        <CardContent className="p-4">
+                          <div className="aspect-square bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg mb-3 flex items-center justify-center">
+                            <Package className="w-8 h-8 text-amber-600" />
+                          </div>
+                          
+                          <h3 className="font-bold text-base text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 mb-2">
+                            {product.name}
+                          </h3>
+                          
+                          <div className="flex items-center gap-1 mb-2">
+                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            <span className="text-xs font-medium text-gray-900">
+                              {product.rating}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              ({product.reviews})
+                            </span>
+                          </div>
 
-                        <div className="text-lg font-bold text-amber-600 mb-2">
-                          ₹{product.price?.toLocaleString()}
-                        </div>
+                          <div className="text-lg font-bold text-amber-600 mb-2">
+                            ₹{product.price?.toLocaleString()}
+                          </div>
 
-                        <div className="text-xs text-gray-600 mb-2 truncate">
-                          <strong>{product.supplier}</strong>
-                        </div>
-                        
-                        <div className="flex items-center text-xs text-gray-500 mb-3">
-                          <MapPin className="w-3 h-3 mr-1" />
-                          {product.location}
-                        </div>
+                          <div className="text-xs text-gray-600 mb-2 truncate">
+                            <strong>{product.supplier}</strong>
+                          </div>
+                          
+                          <div className="flex items-center text-xs text-gray-500 mb-3">
+                            <MapPin className="w-3 h-3 mr-1" />
+                            {product.location}
+                          </div>
 
-                        <Button size="sm" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white">
-                          View Details
-                        </Button>
-                      </CardContent>
-                    </Card>
+                          <Button size="sm" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white">
+                            View Details
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </Link>
                   </motion.div>
                 ))}
               </div>
@@ -396,53 +399,55 @@ export default function MarketplacePage() {
                     transition={{ delay: index * 0.1 }}
                     whileHover={{ y: -5 }}
                   >
-                    <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="w-12 h-12 bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl flex items-center justify-center">
-                            <Building2 className="w-6 h-6 text-white" />
+                    <Link href={`/businesses/${business.id}`} className="block h-full">
+                      <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-12 h-12 bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl flex items-center justify-center">
+                              <Building2 className="w-6 h-6 text-white" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-bold text-base text-gray-900 group-hover:text-amber-600 transition-colors truncate">
+                                {business.name}
+                              </h3>
+                              {business.verified && (
+                                <Badge className="bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0 text-xs">
+                                  Verified
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-base text-gray-900 group-hover:text-amber-600 transition-colors truncate">
-                              {business.name}
-                            </h3>
-                            {business.verified && (
-                              <Badge className="bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0 text-xs">
-                                Verified
-                              </Badge>
-                            )}
+                          
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                            {business.category}
+                          </p>
+
+                          <div className="flex items-center gap-1 mb-3">
+                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            <span className="text-xs font-medium text-gray-900">
+                              {business.rating}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              ({business.reviews})
+                            </span>
                           </div>
-                        </div>
-                        
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                          {business.category}
-                        </p>
 
-                        <div className="flex items-center gap-1 mb-3">
-                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <span className="text-xs font-medium text-gray-900">
-                            {business.rating}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            ({business.reviews})
-                          </span>
-                        </div>
+                          <div className="flex items-center text-xs text-gray-500 mb-3">
+                            <MapPin className="w-3 h-3 mr-1" />
+                            {business.distance || business.location}
+                          </div>
 
-                        <div className="flex items-center text-xs text-gray-500 mb-3">
-                          <MapPin className="w-3 h-3 mr-1" />
-                          {business.distance || business.location}
-                        </div>
+                          <div className="flex items-center text-xs text-gray-500 mb-4">
+                            <Clock className="w-3 h-3 mr-1" />
+                            Responds in {business.responseTime || '2h'}
+                          </div>
 
-                        <div className="flex items-center text-xs text-gray-500 mb-4">
-                          <Clock className="w-3 h-3 mr-1" />
-                          Responds in {business.responseTime || '2h'}
-                        </div>
-
-                        <Button size="sm" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white">
-                          View Profile
-                        </Button>
-                      </CardContent>
-                    </Card>
+                          <Button size="sm" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white">
+                            View Profile
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </Link>
                   </motion.div>
                 ))}
               </div>
@@ -478,44 +483,46 @@ export default function MarketplacePage() {
                     transition={{ delay: index * 0.1 }}
                     whileHover={{ y: -5 }}
                   >
-                    <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
-                      <CardContent className="p-4">
-                        <div className="aspect-square bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg mb-3 flex items-center justify-center">
-                          <Settings className="w-8 h-8 text-orange-600" />
-                        </div>
-                        
-                        <h3 className="font-bold text-base text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 mb-2">
-                          {service.name}
-                        </h3>
-                        
-                        <div className="flex items-center gap-1 mb-2">
-                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <span className="text-xs font-medium text-gray-900">
-                            {service.rating}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            ({service.reviewCount})
-                          </span>
-                        </div>
+                    <Link href={`/services/${service.id}`} className="block h-full">
+                      <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
+                        <CardContent className="p-4">
+                          <div className="aspect-square bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg mb-3 flex items-center justify-center">
+                            <Settings className="w-8 h-8 text-orange-600" />
+                          </div>
+                          
+                          <h3 className="font-bold text-base text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 mb-2">
+                            {service.name}
+                          </h3>
+                          
+                          <div className="flex items-center gap-1 mb-2">
+                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            <span className="text-xs font-medium text-gray-900">
+                              {service.rating}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              ({service.reviewCount})
+                            </span>
+                          </div>
 
-                        <div className="text-lg font-bold text-orange-600 mb-2">
-                          ₹{service.basePrice?.toLocaleString()}/hr
-                        </div>
+                          <div className="text-lg font-bold text-orange-600 mb-2">
+                            ₹{service.basePrice?.toLocaleString()}/hr
+                          </div>
 
-                        <div className="text-xs text-gray-600 mb-2 truncate">
-                          <strong>{service.provider?.name}</strong>
-                        </div>
-                        
-                        <div className="flex items-center text-xs text-gray-500 mb-3">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {service.deliveryTime || '1-2 days'}
-                        </div>
+                          <div className="text-xs text-gray-600 mb-2 truncate">
+                            <strong>{service.provider?.name}</strong>
+                          </div>
+                          
+                          <div className="flex items-center text-xs text-gray-500 mb-3">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {service.deliveryTime || '1-2 days'}
+                          </div>
 
-                        <Button size="sm" className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white">
-                          View Service
-                        </Button>
-                      </CardContent>
-                    </Card>
+                          <Button size="sm" className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white">
+                            View Service
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </Link>
                   </motion.div>
                 ))}
               </div>
