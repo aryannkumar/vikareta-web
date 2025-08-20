@@ -6,7 +6,6 @@ import { Logo } from '@/components/ui/logo';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { 
-  Search, 
   ShoppingCart, 
   User, 
   Menu, 
@@ -88,7 +87,6 @@ const mobileMenuVariants = {
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
@@ -135,15 +133,6 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery('');
-      setIsMenuOpen(false);
-    }
-  };
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -175,60 +164,24 @@ export function Header() {
         </div>
       </div>
 
-      <div className="container mx-auto px-6">
-        <div className="flex h-20 items-center justify-between">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex h-16 sm:h-20 items-center justify-between">
           {/* Premium Logo Section */}
           <motion.div variants={itemVariants}>
-            <Link href="/" className="flex items-center space-x-3 group">
+            <Link href="/" className="flex items-center group">
               <motion.div 
                 whileHover={{ scale: 1.08, rotate: 5 }} 
                 transition={{ type: 'spring', stiffness: 400, damping: 10 }}
                 className="relative"
               >
-                <Logo className="h-12 w-12" />
+                <Logo className="h-10 w-10 sm:h-12 sm:w-12" />
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-600/15 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </motion.div>
-              <div className="flex flex-col">
-                <motion.span 
-                  initial={{ opacity: 0, x: -20 }} 
-                  animate={{ opacity: 1, x: 0 }} 
-                  transition={{ delay: 0.15 }}
-                  className="text-2xl font-bold text-gradient bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent font-lexend"
-                >
-                  Vikareta
-                </motion.span>
-                <motion.span 
-                  initial={{ opacity: 0, x: -20 }} 
-                  animate={{ opacity: 1, x: 0 }} 
-                  transition={{ delay: 0.25 }}
-                  className="text-xs text-gray-600 dark:text-gray-400 font-medium"
-                >
-                  Premium B2B Marketplace
-                </motion.span>
-              </div>
             </Link>
           </motion.div>
 
-          {/* Premium Search Bar - Desktop */}
-          <motion.div variants={itemVariants} className="hidden md:flex flex-1 max-w-2xl mx-8">
-            <form onSubmit={handleSearch} className="relative w-full group">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-cyan-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 z-10" />
-              <input
-                type="text"
-                placeholder="Search products, suppliers, services..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-14 pr-6 py-4 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/25 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-500 shadow-sm hover:shadow-md relative z-10"
-              />
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
-                <kbd className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 rounded border text-gray-500 dark:text-gray-400">⌘K</kbd>
-              </div>
-            </form>
-          </motion.div>
-
           {/* Premium Navigation - Desktop */}
-          <motion.nav variants={itemVariants} className="hidden lg:flex items-center space-x-1">
+          <motion.nav variants={itemVariants} className="hidden lg:flex items-center space-x-1 flex-1 justify-center">
             {[
               { href: '/marketplace', label: 'Marketplace', icon: Globe },
               { href: '/categories', label: 'Categories', icon: Package },
@@ -316,11 +269,11 @@ export function Header() {
                       const dashboardUrl = process.env.NODE_ENV === 'development' 
                         ? 'http://localhost:3001' 
                         : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
-                      window.location.href = dashboardUrl;
+                      window.open(dashboardUrl, '_blank', 'noopener,noreferrer');
                     } catch (err) {
                       console.error('Failed to open dashboard via SSO:', err);
                       const fallback = process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
-                      window.location.href = fallback;
+                      window.open(fallback, '_blank', 'noopener,noreferrer');
                     }
                   }}
                 >
@@ -393,11 +346,11 @@ export function Header() {
                             const dashboardUrl = process.env.NODE_ENV === 'development' 
                               ? 'http://localhost:3001' 
                               : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
-                            window.location.href = dashboardUrl;
+                            window.open(dashboardUrl, '_blank', 'noopener,noreferrer');
                           } catch (err) {
                             console.error('Failed to open dashboard via SSO:', err);
                             const fallback = process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
-                            window.location.href = fallback;
+                            window.open(fallback, '_blank', 'noopener,noreferrer');
                           }
                         }}>
                           <Store className="mr-2 h-4 w-4" />
@@ -496,22 +449,6 @@ export function Header() {
               exit="hidden"
               className="lg:hidden border-t border-gray-200 dark:border-gray-700 py-6 bg-white dark:bg-gray-900 overflow-hidden"
             >
-              {/* Mobile Search */}
-              <motion.form 
-                onSubmit={handleSearch} 
-                className="relative mb-6"
-                variants={itemVariants}
-              >
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="text"
-                  placeholder="Search products, suppliers..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/25 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
-                />
-              </motion.form>
-
               {/* Mobile Navigation */}
               <nav className="space-y-2">
                 {[
