@@ -89,45 +89,97 @@ export interface MarketplaceStatsResponse {
 }
 
 export const marketplaceApi = {
-  // Get trending products
+  // Get trending products (using popular endpoint)
   getTrendingProducts: async (filters?: MarketplaceFilters): Promise<TrendingResponse> => {
     const searchParams = new URLSearchParams();
+    searchParams.append('type', 'products');
     
     if (filters?.location) searchParams.append('location', filters.location);
-    if (filters?.category) searchParams.append('category', filters.category);
-    if (filters?.minPrice) searchParams.append('minPrice', filters.minPrice.toString());
-    if (filters?.maxPrice) searchParams.append('maxPrice', filters.maxPrice.toString());
+    if (filters?.category) searchParams.append('categoryId', filters.category);
     if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy);
 
-    const response = await apiClient.get(`/marketplace/trending/products?${searchParams.toString()}`);
+    const response = await apiClient.get(`/marketplace/popular?${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch trending products');
     }
     
+    // Transform backend data to frontend format
+    const responseData = Array.isArray(response.data) ? response.data : [];
+    const transformedData = responseData.map((item: any) => ({
+      id: item.id || Math.random().toString(),
+      name: item.name || item.title || 'Product',
+      description: item.description || '',
+      price: item.price || 0,
+      originalPrice: item.originalPrice,
+      image: item.image || item.coverImage || '/api/placeholder/300/200',
+      rating: item.rating || 4.5,
+      reviewCount: item.reviewCount || 0,
+      category: item.category || 'General',
+      type: 'product' as const,
+      provider: {
+        id: item.provider?.id || item.sellerId || item.id,
+        name: item.provider?.name || item.sellerName || item.businessName || 'Provider',
+        location: item.provider?.location || item.location || 'Location',
+        verified: item.provider?.verified || item.verified || false
+      },
+      promotionType: 'trending' as const,
+      trendingRank: 1,
+      views: item.views || 0,
+      likes: item.likes || 0,
+      shares: item.shares || 0,
+      tags: item.tags || []
+    }));
+
     return {
       success: true,
-      data: (response.data as TrendingItem[]) || []
+      data: transformedData
     };
   },
 
-  // Get trending services
+  // Get trending services (using featured endpoint)
   getTrendingServices: async (filters?: MarketplaceFilters): Promise<TrendingResponse> => {
     const searchParams = new URLSearchParams();
+    searchParams.append('type', 'services');
     
     if (filters?.location) searchParams.append('location', filters.location);
-    if (filters?.category) searchParams.append('category', filters.category);
-    if (filters?.minPrice) searchParams.append('minPrice', filters.minPrice.toString());
-    if (filters?.maxPrice) searchParams.append('maxPrice', filters.maxPrice.toString());
+    if (filters?.category) searchParams.append('categoryId', filters.category);
     if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy);
 
-    const response = await apiClient.get(`/marketplace/trending/services?${searchParams.toString()}`);
+    const response = await apiClient.get(`/marketplace/featured?${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch trending services');
     }
     
+    // Transform backend data to frontend format
+    const responseData = Array.isArray(response.data) ? response.data : [];
+    const transformedData = responseData.map((item: any) => ({
+      id: item.id || Math.random().toString(),
+      name: item.name || item.title || 'Service',
+      description: item.description || '',
+      price: item.price || 0,
+      originalPrice: item.originalPrice,
+      image: item.image || item.coverImage || '/api/placeholder/300/200',
+      rating: item.rating || 4.5,
+      reviewCount: item.reviewCount || 0,
+      category: item.category || 'General',
+      type: 'service' as const,
+      provider: {
+        id: item.provider?.id || item.sellerId || item.id,
+        name: item.provider?.name || item.sellerName || item.businessName || 'Provider',
+        location: item.provider?.location || item.location || 'Location',
+        verified: item.provider?.verified || item.verified || false
+      },
+      promotionType: 'featured' as const,
+      trendingRank: 1,
+      views: item.views || 0,
+      likes: item.likes || 0,
+      shares: item.shares || 0,
+      tags: item.tags || []
+    }));
+
     return {
       success: true,
-      data: (response.data as TrendingItem[]) || []
+      data: transformedData
     };
   },
 
