@@ -34,7 +34,11 @@ class ApiClient {
     } else {
       this.baseURL = baseURL + '/api';
     }
-    console.log('API Client initialized with baseURL:', this.baseURL);
+    
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('API Client initialized with baseURL:', this.baseURL);
+    }
   }
 
   /**
@@ -44,7 +48,9 @@ class ApiClient {
     if (typeof window === 'undefined') return false;
     
     try {
-      console.log('Initializing auth session with API backend...');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Initializing auth session with API backend...');
+      }
       
       // Make a simple request to establish session and get cookies
       const response = await fetch(`${this.baseURL}/auth/session`, {
@@ -55,15 +61,19 @@ class ApiClient {
         },
       });
       
-      console.log('Auth session response:', response.status);
-      
-      // Check if we now have cookies
-      const cookiesAfter = document.cookie;
-      console.log('Cookies after session init:', cookiesAfter);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Auth session response:', response.status);
+        
+        // Check if we now have cookies
+        const cookiesAfter = document.cookie;
+        console.log('Cookies after session init:', cookiesAfter);
+      }
       
       return response.ok;
     } catch (error) {
-      console.log('Auth session init failed:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Auth session init failed:', error);
+      }
       return false;
     }
   }
@@ -81,11 +91,17 @@ class ApiClient {
       const apiUrl = new URL(this.baseURL);
       const apiDomain = apiUrl.hostname;
       
-      console.log('Syncing SSO to API domain:', apiDomain);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Syncing SSO to API domain:', apiDomain);
+      }
       await syncSSOToSubdomains([apiDomain]);
-      console.log('SSO sync completed');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('SSO sync completed');
+      }
     } catch (error) {
-      console.log('SSO sync failed:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('SSO sync failed:', error);
+      }
     }
   }
 
@@ -95,36 +111,49 @@ class ApiClient {
   private async ensureCSRFToken(): Promise<string | null> {
     let csrfToken = this.getCSRFToken();
     
-    console.log('Cookie Debug:', {
-      currentDomain: typeof window !== 'undefined' ? window.location.hostname : 'server',
-      apiDomain: this.baseURL,
-      allCookies: typeof window !== 'undefined' ? document.cookie : 'server-side',
-      cookieCount: typeof window !== 'undefined' ? document.cookie.split(';').filter(c => c.trim()).length : 0,
-      hasXSRF: typeof window !== 'undefined' ? document.cookie.includes('XSRF-TOKEN') : false
-    });
+    // Only log debug information in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Cookie Debug:', {
+        currentDomain: typeof window !== 'undefined' ? window.location.hostname : 'server',
+        apiDomain: this.baseURL,
+        cookieCount: typeof window !== 'undefined' ? document.cookie.split(';').filter(c => c.trim()).length : 0,
+        hasXSRF: typeof window !== 'undefined' ? document.cookie.includes('XSRF-TOKEN') : false,
+        expectedDomain: 'vikareta.com subdomains'
+      });
+    }
     
-    // If no cookies at all, try to initialize auth session first
+    // If no cookies at all, try SSO sync first for cross-domain authentication
     if (typeof window !== 'undefined' && document.cookie.trim() === '') {
-      console.log('No cookies found, attempting to initialize auth session...');
-      await this.initializeAuth();
+      if (process.env.NODE_ENV === 'development') {
+        console.log('No cookies found, attempting SSO sync to API domain...');
+      }
+      await this.syncAuthToAPI();
       
-      // Check again after session init
+      // Check again after SSO sync
       csrfToken = this.getCSRFToken();
-      console.log('CSRF token after session init:', !!csrfToken);
-      
-      // If still no cookies, try SSO sync as fallback
-      if (!csrfToken) {
-        console.log('Session init failed, trying SSO sync...');
-        await this.syncAuthToAPI();
-        csrfToken = this.getCSRFToken();
+      if (process.env.NODE_ENV === 'development') {
         console.log('CSRF token after SSO sync:', !!csrfToken);
+      }
+      
+      // If still no CSRF token, try to initialize auth session
+      if (!csrfToken) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('SSO sync failed, trying auth session init...');
+        }
+        await this.initializeAuth();
+        csrfToken = this.getCSRFToken();
+        if (process.env.NODE_ENV === 'development') {
+          console.log('CSRF token after session init:', !!csrfToken);
+        }
       }
     }
     
     if (!csrfToken) {
       try {
         // Try to get CSRF token from backend auth check
-        console.log('Attempting to fetch CSRF token from:', `${this.baseURL}/auth/me`);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Attempting to fetch CSRF token from:', `${this.baseURL}/auth/me`);
+        }
         const response = await fetch(`${this.baseURL}/auth/me`, {
           method: 'GET',
           credentials: 'include',
@@ -134,16 +163,21 @@ class ApiClient {
           },
         });
         
-        console.log('Auth check response:', response.status, response.ok);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Auth check response:', response.status, response.ok);
+        }
         
         if (response.ok) {
           // After this request, the CSRF token should be set in cookies
           csrfToken = this.getCSRFToken();
-          console.log('Fetched CSRF token after auth check:', !!csrfToken);
-          console.log('Cookies after auth check:', typeof window !== 'undefined' ? document.cookie : 'server-side');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Fetched CSRF token after auth check:', !!csrfToken);
+          }
         }
       } catch (error) {
-        console.log('Could not fetch CSRF token from backend:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Could not fetch CSRF token from backend:', error);
+        }
       }
     }
     
@@ -163,9 +197,13 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     // Build the URL - endpoint should already include /api prefix
     const url = `${this.baseURL}${endpoint}`;
-    console.log('API Request URL:', url);
-    console.log('Base URL:', this.baseURL);
-    console.log('Endpoint:', endpoint);
+    
+    // Only log request details in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('API Request URL:', url);
+      console.log('Base URL:', this.baseURL);
+      console.log('Endpoint:', endpoint);
+    }
     
     const config: RequestInit = {
       headers: {
@@ -188,12 +226,16 @@ class ApiClient {
     // Add CSRF token for state-changing requests (from cookie)
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method || 'GET')) {
       const csrfToken = await this.ensureCSRFToken();
-      console.log('CSRF Debug:', {
-        method: options.method,
-        hasCSRF: !!csrfToken,
-        allCookies: typeof window !== 'undefined' ? document.cookie : 'server-side',
-        cookieCount: typeof window !== 'undefined' ? document.cookie.split(';').filter(c => c.trim()).length : 0
-      });
+      
+      // Only log CSRF debug info in development (without exposing cookies)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('CSRF Debug:', {
+          method: options.method,
+          hasCSRF: !!csrfToken,
+          cookieCount: typeof window !== 'undefined' ? document.cookie.split(';').filter(c => c.trim()).length : 0
+        });
+      }
+      
       if (csrfToken) {
         config.headers = {
           ...config.headers,
