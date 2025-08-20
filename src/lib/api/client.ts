@@ -38,14 +38,93 @@ class ApiClient {
   }
 
   /**
+   * Initialize authentication session with the API backend
+   */
+  private async initializeAuth(): Promise<boolean> {
+    if (typeof window === 'undefined') return false;
+    
+    try {
+      console.log('Initializing auth session with API backend...');
+      
+      // Make a simple request to establish session and get cookies
+      const response = await fetch(`${this.baseURL}/auth/session`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+      
+      console.log('Auth session response:', response.status);
+      
+      // Check if we now have cookies
+      const cookiesAfter = document.cookie;
+      console.log('Cookies after session init:', cookiesAfter);
+      
+      return response.ok;
+    } catch (error) {
+      console.log('Auth session init failed:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Sync authentication to API domain if needed
+   */
+  private async syncAuthToAPI(): Promise<void> {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const { syncSSOToSubdomains } = await import('../auth/secure-cross-domain-auth');
+      
+      // Extract API domain from base URL
+      const apiUrl = new URL(this.baseURL);
+      const apiDomain = apiUrl.hostname;
+      
+      console.log('Syncing SSO to API domain:', apiDomain);
+      await syncSSOToSubdomains([apiDomain]);
+      console.log('SSO sync completed');
+    } catch (error) {
+      console.log('SSO sync failed:', error);
+    }
+  }
+
+  /**
    * Get CSRF token from backend if not available in cookies
    */
   private async ensureCSRFToken(): Promise<string | null> {
     let csrfToken = this.getCSRFToken();
     
+    console.log('Cookie Debug:', {
+      currentDomain: typeof window !== 'undefined' ? window.location.hostname : 'server',
+      apiDomain: this.baseURL,
+      allCookies: typeof window !== 'undefined' ? document.cookie : 'server-side',
+      cookieCount: typeof window !== 'undefined' ? document.cookie.split(';').filter(c => c.trim()).length : 0,
+      hasXSRF: typeof window !== 'undefined' ? document.cookie.includes('XSRF-TOKEN') : false
+    });
+    
+    // If no cookies at all, try to initialize auth session first
+    if (typeof window !== 'undefined' && document.cookie.trim() === '') {
+      console.log('No cookies found, attempting to initialize auth session...');
+      await this.initializeAuth();
+      
+      // Check again after session init
+      csrfToken = this.getCSRFToken();
+      console.log('CSRF token after session init:', !!csrfToken);
+      
+      // If still no cookies, try SSO sync as fallback
+      if (!csrfToken) {
+        console.log('Session init failed, trying SSO sync...');
+        await this.syncAuthToAPI();
+        csrfToken = this.getCSRFToken();
+        console.log('CSRF token after SSO sync:', !!csrfToken);
+      }
+    }
+    
     if (!csrfToken) {
       try {
         // Try to get CSRF token from backend auth check
+        console.log('Attempting to fetch CSRF token from:', `${this.baseURL}/auth/me`);
         const response = await fetch(`${this.baseURL}/auth/me`, {
           method: 'GET',
           credentials: 'include',
@@ -55,10 +134,13 @@ class ApiClient {
           },
         });
         
+        console.log('Auth check response:', response.status, response.ok);
+        
         if (response.ok) {
           // After this request, the CSRF token should be set in cookies
           csrfToken = this.getCSRFToken();
           console.log('Fetched CSRF token after auth check:', !!csrfToken);
+          console.log('Cookies after auth check:', typeof window !== 'undefined' ? document.cookie : 'server-side');
         }
       } catch (error) {
         console.log('Could not fetch CSRF token from backend:', error);

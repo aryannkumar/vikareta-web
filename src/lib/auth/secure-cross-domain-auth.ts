@@ -20,6 +20,7 @@ export interface User {
 const MAIN_HOST = process?.env?.NEXT_PUBLIC_MAIN_HOST || 'vikareta.com';
 const DASHBOARD_HOST = process?.env?.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com';
 const ADMIN_HOST = process?.env?.NEXT_PUBLIC_ADMIN_HOST || 'admin.vikareta.com';
+const API_HOST = process?.env?.NEXT_PUBLIC_API_HOST || 'api.vikareta.com';
 
 /**
  * Get current domain type
@@ -100,7 +101,7 @@ export async function syncSSOToSubdomains(targets?: string[]): Promise<void> {
     if (configured) {
       targets = configured.split(',').map(s => s.trim()).filter(Boolean);
     } else {
-      targets = [DASHBOARD_HOST];
+      targets = [DASHBOARD_HOST, API_HOST];
     }
 
     if (adminStandalone) {
