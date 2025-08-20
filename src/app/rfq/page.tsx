@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, Plus, AlertCircle, Loader2, CheckCircle, FileText } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useSSOAuth } from '../../lib/auth/use-sso-auth';
 import { rfqService } from '../../services/rfq.service';
 import MyRFQsSection from './MyRFQsSection';
-import RequireAuth from '@/components/auth/RequireAuth';
 
 // Types for My RFQ section
 // Types for RFQ list/details live in the respective components
@@ -33,6 +34,33 @@ interface RFQFormData {
 }
 
 export default function RFQPage() {
+  const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useSSOAuth();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/auth/login');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  // Show loading state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
+          <p className="text-amber-700 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
+
   const [activeTab, setActiveTab] = useState<'new' | 'my'>('new');
   const [formData, setFormData] = useState<RFQFormData>({
   rfqType: 'product',
@@ -303,13 +331,12 @@ export default function RFQPage() {
 
   if (submitted) {
     return (
-      <RequireAuth>
-        <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
-          <div className="container mx-auto px-4 py-8">
-            <div className="max-w-2xl mx-auto text-center">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-8 shadow-lg">
-                <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-green-800 mb-2">RFQ Submitted Successfully!</h2>
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-8 shadow-lg">
+              <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-green-800 mb-2">RFQ Submitted Successfully!</h2>
                 <p className="text-green-700 mb-6">
                   Your Request for Quotation has been submitted and distributed to relevant sellers. 
                   You will receive responses via email and WhatsApp.
@@ -332,16 +359,14 @@ export default function RFQPage() {
             </div>
           </div>
         </div>
-      </RequireAuth>
     );
   }
 
   return (
-    <RequireAuth>
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">Request for Quotation (RFQ)</h1>
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">Request for Quotation (RFQ)</h1>
             <p className="text-sm text-muted-foreground mb-4">Create new RFQ or manage your existing ones. Browse public RFQs at <a href="/rfqs" className="text-amber-600 hover:underline">/rfqs</a>.</p>
 
             {/* Tab Navigation */}
@@ -377,7 +402,6 @@ export default function RFQPage() {
           </div>
         </div>
       </div>
-    </RequireAuth>
   );
 
   // Component for New RFQ Form

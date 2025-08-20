@@ -27,11 +27,37 @@ import {
 } from 'lucide-react';
 import { rfqService, RfqWithResponses } from '../../../services/rfq.service';
 import { orderService, CreateOrderFromQuoteData } from '../../../services/order.service';
-import RequireAuth from '@/components/auth/RequireAuth';
+import { useSSOAuth } from '../../../lib/auth/use-sso-auth';
 
 export default function RFQDetailsPage() {
   const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useSSOAuth();
   const params = useParams();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/auth/login');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  // Show loading state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
+          <p className="text-amber-700 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
+
   const rfqId = useMemo(() => (params?.id ? String(params.id) : ''), [params]);
   const [rfq, setRfq] = useState<RfqWithResponses | null>(null);
   const [loading, setLoading] = useState(true);
@@ -162,11 +188,10 @@ export default function RFQDetailsPage() {
   };
 
   return (
-    <RequireAuth>
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
-        <div className="container mx-auto px-4 py-8">
-          {loading && (
-            <div className="flex items-center justify-center py-12 text-amber-700">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+      <div className="container mx-auto px-4 py-8">
+        {loading && (
+          <div className="flex items-center justify-center py-12 text-amber-700">
               <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading RFQ...
             </div>
           )}
@@ -788,6 +813,5 @@ export default function RFQDetailsPage() {
     )}
       </div>
     </div>
-    </RequireAuth>
   );
 }
