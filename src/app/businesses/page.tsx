@@ -5,7 +5,80 @@ import { motion } from 'framer-motion';
 import { marketplaceApi, type NearbyBusiness } from '@/lib/api/marketplace';
 import BusinessCard from '@/components/business/BusinessCard';
 import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
-import { Search, Filter, TrendingUp, Award, MapPin, Building2, Sparkles, ArrowRight } from 'lucide-react';
+import { Search, Filter, TrendingUp, Award, MapPin, Building2, Sparkles, ArrowRight, Users, BarChart, Package } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+
+// Enhanced animated hero section for Businesses
+const BusinessesHero = () => {
+  return (
+    <motion.section 
+      className="relative bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+    >
+      {/* Animated background elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-orange-400/20 to-amber-400/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-orange-300/10 to-amber-300/10 rounded-full blur-3xl animate-pulse delay-500" />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center">
+          <motion.h1 
+            className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-6"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+          >
+            Verified Businesses
+          </motion.h1>
+          
+          <motion.p 
+            className="text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+          >
+            Connect with trusted businesses in your area. Discover established companies, 
+            growing startups, and reliable service providers for all your B2B needs.
+          </motion.p>
+
+          {/* Business stats */}
+          <motion.div 
+            className="flex flex-wrap justify-center gap-8 mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+          >
+            {[
+              { icon: Building2, label: 'Verified Businesses', value: '10K+', color: 'from-blue-500 to-cyan-500' },
+              { icon: Award, label: 'Featured Companies', value: '500+', color: 'from-orange-500 to-amber-500' },
+              { icon: Users, label: 'Business Network', value: '25K+', color: 'from-green-500 to-emerald-500' },
+              { icon: BarChart, label: 'Success Rate', value: '94%', color: 'from-purple-500 to-pink-500' }
+            ].map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                className="flex flex-col items-center"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8 + index * 0.1, duration: 0.5 }}
+              >
+                <div className={`w-16 h-16 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mb-3 shadow-lg`}>
+                  <stat.icon className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                <div className="text-sm text-gray-600">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    </motion.section>
+  );
+};
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -158,10 +231,11 @@ export default function BusinessesPage() {
       initial="initial"
       animate="animate"
       variants={pageVariants}
-    className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    className="min-h-screen bg-white"
     >
-      {/* Hero Section */}
-    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700">
+      <BusinessesHero />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Background Pattern */}
         <div className="absolute inset-0">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-transparent"></div>

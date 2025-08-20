@@ -20,21 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CategoryIcon } from '@/components/ui/dynamic-icon';
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  icon?: string;
-  iconName?: string; // Dynamic icon name for Lucide React
-  featured: boolean;
-  productCount: number;
-  isActive: boolean;
-  sortOrder: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { categoriesApi, type Category } from '@/lib/api/categories';
 
 // Enhanced animated hero section
 const CategoriesHero = () => {
@@ -115,95 +101,26 @@ export default function CategoriesPage() {
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Mock data - replace with actual API call
+  // Fetch categories from API
   useEffect(() => {
-    const mockCategories: Category[] = [
-      {
-        id: '1',
-        name: 'Industrial Equipment',
-        slug: 'industrial-equipment',
-        description: 'Heavy machinery, tools, and industrial equipment for manufacturing',
-        iconName: 'Settings',
-        featured: true,
-        productCount: 15420,
-        isActive: true,
-        sortOrder: 1,
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01'
-      },
-      {
-        id: '2',
-        name: 'Office Supplies',
-        slug: 'office-supplies',
-        description: 'Complete range of office equipment, furniture, and supplies',
-        iconName: 'FileText',
-        featured: true,
-        productCount: 8930,
-        isActive: true,
-        sortOrder: 2,
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01'
-      },
-      {
-        id: '3',
-        name: 'Technology & Electronics',
-        slug: 'technology-electronics',
-        description: 'Latest technology products, computers, and electronic components',
-        iconName: 'Laptop',
-        featured: true,
-        productCount: 12750,
-        isActive: true,
-        sortOrder: 3,
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01'
-      },
-      {
-        id: '4',
-        name: 'Construction Materials',
-        slug: 'construction-materials',
-        description: 'Building materials, tools, and construction equipment',
-        iconName: 'Hammer',
-        featured: false,
-        productCount: 6840,
-        isActive: true,
-        sortOrder: 4,
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01'
-      },
-      {
-        id: '5',
-        name: 'Medical & Healthcare',
-        slug: 'medical-healthcare',
-        description: 'Medical equipment, supplies, and healthcare products',
-        iconName: 'Heart',
-        featured: true,
-        productCount: 9650,
-        isActive: true,
-        sortOrder: 5,
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01'
-      },
-      {
-        id: '6',
-        name: 'Food & Beverage',
-        slug: 'food-beverage',
-        description: 'Food products, beverages, and food service equipment',
-        iconName: 'Coffee',
-        featured: false,
-        productCount: 4320,
-        isActive: true,
-        sortOrder: 6,
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01'
+    async function fetchCategories() {
+      try {
+        setLoading(true);
+        const response = await categoriesApi.getCategories();
+        if (response.success) {
+          setCategories(response.data);
+          setFilteredCategories(response.data);
+        } else {
+          console.error('Failed to fetch categories');
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoading(false);
       }
-    ];
+    }
 
-    // Simulate API call
-    setTimeout(() => {
-      setCategories(mockCategories);
-      setFilteredCategories(mockCategories);
-      setLoading(false);
-    }, 800);
+    fetchCategories();
   }, []);
 
   // Filter categories

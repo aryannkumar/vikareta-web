@@ -19,28 +19,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-
-// Simple types for Services
-interface Service {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  currency: string;
-  rating: number;
-  reviewCount: number;
-  supplier: {
-    id: string;
-    name: string;
-    logo?: string;
-    verified: boolean;
-    rating: number;
-  };
-  category: string;
-  deliveryTime: string;
-  featured: boolean;
-  image?: string;
-}
+import { servicesApi, type ServicesFilters } from '@/lib/api/services';
 
 // Enhanced animated hero section for Services
 const ServicesHero = () => {
@@ -126,101 +105,80 @@ const ServicesHero = () => {
 };
 
 export default function ServicesPage() {
-  const [services, setServices] = useState<Service[]>([]);
-  const [filteredServices, setFilteredServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+  const [filteredServices, setFilteredServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [categories, setCategories] = useState<string[]>(['all']);
 
-  // Mock data
+  // Fetch categories for filter dropdown
   useEffect(() => {
-    const mockServices: Service[] = [
-      {
-        id: '1',
-        title: 'IT Consulting & Implementation',
-        description: 'Complete IT consulting services including system design, implementation, and ongoing support for enterprise solutions.',
-        price: 150,
-        currency: 'USD',
-        rating: 4.8,
-        reviewCount: 124,
-        supplier: {
-          id: 'sup-1',
-          name: 'TechSolutions Pro',
-          verified: true,
-          rating: 4.7
-        },
-        category: 'Technology',
-        deliveryTime: '2-4 weeks',
-        featured: true,
-        image: '/images/services/it-consulting.jpg'
-      },
-      {
-        id: '2',
-        title: 'Digital Marketing Strategy',
-        description: 'Comprehensive digital marketing strategies including SEO, social media, content marketing, and PPC campaigns.',
-        price: 200,
-        currency: 'USD',
-        rating: 4.9,
-        reviewCount: 89,
-        supplier: {
-          id: 'sup-2',
-          name: 'Growth Marketing Agency',
-          verified: true,
-          rating: 4.8
-        },
-        category: 'Marketing',
-        deliveryTime: '1-2 weeks',
-        featured: true,
-        image: '/images/services/digital-marketing.jpg'
-      },
-      {
-        id: '3',
-        title: 'Financial Consulting',
-        description: 'Expert financial consulting services including business planning, investment strategy, and financial analysis.',
-        price: 180,
-        currency: 'USD',
-        rating: 4.7,
-        reviewCount: 156,
-        supplier: {
-          id: 'sup-3',
-          name: 'Financial Experts Ltd',
-          verified: true,
-          rating: 4.6
-        },
-        category: 'Finance',
-        deliveryTime: '1-3 weeks',
-        featured: false,
-        image: '/images/services/financial-consulting.jpg'
-      },
-      {
-        id: '4',
-        title: 'Legal Advisory Services',
-        description: 'Professional legal advisory services covering corporate law, contracts, compliance, and legal documentation.',
-        price: 250,
-        currency: 'USD',
-        rating: 4.6,
-        reviewCount: 78,
-        supplier: {
-          id: 'sup-4',
-          name: 'Legal Partners Group',
-          verified: true,
-          rating: 4.5
-        },
-        category: 'Legal',
-        deliveryTime: '3-5 days',
-        featured: false,
-        image: '/images/services/legal-advisory.jpg'
+    async function fetchCategories() {
+      try {
+        const response = await servicesApi.getCategories();
+        if (response.success) {
+          setCategories(['all', ...response.data]);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
       }
-    ];
+    }
 
-    setTimeout(() => {
-      setServices(mockServices);
-      setFilteredServices(mockServices);
-      setLoading(false);
-    }, 800);
+    fetchCategories();
   }, []);
+
+  // Fetch services from API
+  useEffect(() => {
+    async function fetchServices() {
+      try {
+        setLoading(true);
+        const filters: ServicesFilters = {
+          page: 1,
+          limit: 50,
+          sortBy: sortBy as any,
+          ...(selectedCategory !== 'all' && { categoryId: selectedCategory })
+        };
+
+        const response = await servicesApi.getServices(filters);
+        if (response.success) {
+          // Map API service structure to our component structure
+          const mappedServices = response.data.services.map(service => ({
+            id: service.id,
+            title: service.name,
+            description: service.description,
+            price: service.basePrice,
+            currency: 'INR',
+            rating: service.rating,
+            reviewCount: service.reviewCount,
+            supplier: {
+              id: service.provider.id,
+              name: service.provider.name,
+              verified: service.provider.verified,
+              rating: 0 // Provider rating not available in API structure
+            },
+            category: service.category,
+            deliveryTime: service.deliveryTime,
+            featured: service.packages.some(pkg => pkg.name.toLowerCase().includes('featured')),
+            image: service.images[0] || undefined
+          }));
+
+          setServices(mappedServices);
+          setFilteredServices(mappedServices);
+        } else {
+          console.error('Failed to fetch services');
+        }
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchServices();
+  }, [sortBy, selectedCategory]);
 
   // Filter and sort services
   useEffect(() => {
@@ -259,7 +217,6 @@ export default function ServicesPage() {
     setFilteredServices(filtered);
   }, [services, searchQuery, selectedCategory, sortBy]);
 
-  const categories = ['all', 'Technology', 'Marketing', 'Finance', 'Legal'];
   const sortOptions = [
     { value: 'featured', label: 'Featured First' },
     { value: 'price-low', label: 'Price: Low to High' },
@@ -447,7 +404,7 @@ export default function ServicesPage() {
                         {/* Price and Delivery */}
                         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                           <div className="text-lg font-bold text-gray-900">
-                            ${service.price}/{service.currency === 'USD' ? 'hour' : 'project'}
+                            ₹{service.price?.toLocaleString()}/hour
                           </div>
                           <div className="flex items-center text-sm text-gray-500">
                             <Clock className="w-4 h-4 mr-1" />
@@ -516,7 +473,7 @@ export default function ServicesPage() {
                             </div>
                             <div className="text-right">
                               <div className="text-lg font-bold text-gray-900">
-                                ${service.price}/{service.currency === 'USD' ? 'hour' : 'project'}
+                                ₹{service.price?.toLocaleString()}/hour
                               </div>
                               <div className="text-sm text-gray-500">{service.deliveryTime}</div>
                             </div>
