@@ -104,7 +104,7 @@ export const APP_CONFIG = {
   DESCRIPTION: 'B2B Marketplace for Indian Businesses',
   VERSION: '1.0.0',
   SUPPORT_EMAIL: 'support@vikareta.com',
-  SUPPORT_PHONE: '+91-1234567890',
+  SUPPORT_PHONE: '+91-9934109996',
 } as const;
 
 // Verification Tiers

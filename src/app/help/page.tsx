@@ -44,7 +44,7 @@ export default function HelpPage() {
             <p className="mb-4">Need more help? Our support team is here to assist you.</p>
             <div className="space-y-2">
               <p><strong>Email:</strong> support@vikareta.com</p>
-              <p><strong>Phone:</strong> +91 98765 43210</p>
+              <p><strong>Phone:</strong> +91-9934109996</p>
               <p><strong>Hours:</strong> Mon-Fri 9AM-6PM IST</p>
             </div>
           </div>

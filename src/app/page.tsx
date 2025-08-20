@@ -11,7 +11,6 @@ import {
   Package, 
   Store,
   CheckCircle,
-  Users,
   Globe,
   Zap,
   Clock,
@@ -322,361 +321,436 @@ export default function HomePage() {
               </motion.ul>
             </div>
 
-            {/* Animated Business Dashboard Visual */}
+            {/* B2B Marketplace Animation Visual */}
             <div className="relative">
-              <div className="relative z-10 rounded-3xl p-8 bg-white/80 dark:bg-gray-800/80 border border-orange-200/40 dark:border-orange-900/30 shadow-2xl backdrop-blur-md">
-                <motion.div 
-                  className="grid grid-cols-2 gap-6"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                >
-                  {[
-                    { label: "RFQ Management", progress: 85, icon: Search, color: "from-orange-500 to-amber-500" },
-                    { label: "Supplier Network", progress: 92, icon: Users, color: "from-amber-500 to-orange-600" },
-                    { label: "Order Processing", progress: 78, icon: Package, color: "from-orange-600 to-amber-600" },
-                    { label: "Compliance Track", progress: 95, icon: Award, color: "from-amber-600 to-orange-500" }
-                  ].map((item, i) => (
-                    <motion.div
-                      key={item.label}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.1 * i, duration: 0.5 }}
-                      className="rounded-2xl p-4 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/10 border border-orange-200/60 dark:border-orange-800/40 shadow-sm hover:shadow-md transition-all group cursor-pointer"
-                      whileHover={{ scale: 1.02, y: -2 }}
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <item.icon className="h-5 w-5 text-orange-600 group-hover:scale-110 transition-transform" />
-                        <span className="text-xs font-bold text-orange-700 dark:text-orange-300">{item.progress}%</span>
-                      </div>
-                      <div className="text-sm font-semibold text-orange-700 dark:text-orange-300 mb-3">{item.label}</div>
-                      <motion.div className="h-2 w-full bg-orange-100/70 dark:bg-orange-900/40 rounded-full overflow-hidden">
-                        <motion.div
-                          className={`h-2 bg-gradient-to-r ${item.color} rounded-full`}
-                          initial={{ width: '0%' }}
-                          whileInView={{ width: `${item.progress}%` }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 1.5, ease: 'easeInOut', delay: 0.2 * i }}
-                        />
-                      </motion.div>
-                    </motion.div>
-                  ))}
-                  
-                  {/* B2B Logistics Animation Box - Enhanced with Truck, Ship & Coins */}
-                  <motion.div
+              <div className="relative z-10 rounded-3xl p-12 bg-gradient-to-br from-blue-50/80 via-indigo-50/70 to-cyan-50/80 dark:from-blue-900/20 dark:via-indigo-900/15 dark:to-cyan-900/20 border border-blue-200/50 dark:border-blue-800/30 shadow-2xl backdrop-blur-md overflow-hidden">
+                
+                {/* Animated Background Waves */}
+                <motion.div
+                  className="absolute inset-0 opacity-20"
+                  animate={{
+                    background: [
+                      'linear-gradient(45deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.15) 50%, rgba(6, 182, 212, 0.1) 100%)',
+                      'linear-gradient(45deg, rgba(99, 102, 241, 0.15) 0%, rgba(6, 182, 212, 0.1) 50%, rgba(59, 130, 246, 0.1) 100%)',
+                      'linear-gradient(45deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.1) 50%, rgba(99, 102, 241, 0.15) 100%)'
+                    ]
+                  }}
+                  transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+                />
+
+                <div className="relative z-10">
+                  {/* Header */}
+                  <motion.div 
+                    className="text-center mb-12"
                     initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.4, duration: 0.5 }}
-                    className="col-span-2 rounded-2xl p-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-cyan-50 dark:from-blue-900/20 dark:via-indigo-900/10 dark:to-cyan-900/10 border border-blue-200/60 dark:border-blue-800/40 shadow-sm hover:shadow-md transition-all group cursor-pointer relative overflow-hidden"
-                    whileHover={{ scale: 1.02, y: -2 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5, duration: 0.8 }}
                   >
-                    {/* Background Wave Animation */}
+                    <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-700 to-indigo-600 bg-clip-text text-transparent mb-4">
+                      Global B2B Trade Network
+                    </h3>
+                    <p className="text-blue-600/80 dark:text-blue-400/80 text-lg">
+                      Connecting suppliers, manufacturers, and businesses worldwide
+                    </p>
+                  </motion.div>
+
+                  {/* Main Animation Container */}
+                  <div className="relative h-96 overflow-hidden rounded-2xl bg-gradient-to-br from-white/60 to-blue-50/40 dark:from-gray-800/60 dark:to-blue-900/20 border border-blue-200/30 dark:border-blue-700/30">
+                    
+                    {/* Ocean/Sea Base */}
                     <motion.div
-                      className="absolute inset-0 opacity-10"
-                      animate={{
+                      className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-blue-400/30 to-blue-300/20"
+                      animate={{ 
                         background: [
-                          'linear-gradient(45deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%)',
-                          'linear-gradient(45deg, rgba(99, 102, 241, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)',
-                          'linear-gradient(45deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)'
+                          'linear-gradient(to top, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.2) 100%)',
+                          'linear-gradient(to top, rgba(99, 102, 241, 0.3) 0%, rgba(99, 102, 241, 0.2) 100%)',
+                          'linear-gradient(to top, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.2) 100%)'
                         ]
                       }}
                       transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
                     />
 
-                    <div className="relative z-10">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          {/* Animated Truck */}
-                          <motion.div
-                            className="relative"
-                            animate={{ x: [0, 8, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                          >
-                            <svg width="24" height="18" viewBox="0 0 32 20" className="text-orange-600 fill-current">
-                              <path d="M24 10h3.5l2 2.5v5H28c0 1.4-1.1 2.5-2.5 2.5S23 18.9 23 17.5H11c0 1.4-1.1 2.5-2.5 2.5S6 18.9 6 17.5H3V5h21v5z"/>
-                              <circle cx="8.5" cy="17" r="2" fill="currentColor"/>
-                              <circle cx="25.5" cy="17" r="2" fill="currentColor"/>
-                              <rect x="3" y="7" width="19" height="8" fill="currentColor" opacity="0.8"/>
-                            </svg>
-                            {/* Truck exhaust particles */}
-                            <motion.div
-                              className="absolute -left-2 top-1 w-1.5 h-1.5 bg-gray-400 rounded-full"
-                              animate={{ 
-                                x: [-6, -12, -18],
-                                opacity: [0.8, 0.4, 0],
-                                scale: [0.5, 1, 1.5]
-                              }}
-                              transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
-                            />
-                          </motion.div>
-
-                          {/* Animated Ship */}
-                          <motion.div
-                            className="relative ml-4"
-                            animate={{ 
-                              y: [0, -2, 0],
-                              rotate: [0, 1, -1, 0]
-                            }}
-                            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                          >
-                            <svg width="24" height="18" viewBox="0 0 32 20" className="text-blue-600 fill-current">
-                              <path d="M4 14h24l-2 4H6l-2-4z"/>
-                              <path d="M8 14V8h4v6M14 14V6h4v8M20 14V10h4v4"/>
-                              <rect x="26" y="12" width="4" height="2" fill="currentColor"/>
-                              <circle cx="28" cy="11" r="1" fill="currentColor"/>
-                            </svg>
-                            {/* Water waves */}
-                            <motion.div
-                              className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-300 rounded-full"
-                              animate={{ 
-                                scaleX: [1, 1.2, 1],
-                                opacity: [0.6, 0.8, 0.6]
-                              }}
-                              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                            />
-                          </motion.div>
-
-                          {/* Flying Coins Animation */}
-                          <div className="relative ml-4">
-                            {[0, 1, 2, 3].map((i) => (
-                              <motion.div
-                                key={i}
-                                className="absolute w-2 h-2 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full shadow-lg"
-                                style={{ 
-                                  left: i * 4,
-                                  top: -2
-                                }}
-                                animate={{ 
-                                  y: [0, -8, 0],
-                                  rotate: [0, 360],
-                                  scale: [1, 1.3, 1],
-                                  x: [0, 6, 0]
-                                }}
-                                transition={{ 
-                                  duration: 2.5, 
-                                  repeat: Infinity, 
-                                  delay: i * 0.3,
-                                  ease: 'easeInOut'
-                                }}
-                              >
-                                <div className="w-full h-full bg-gradient-to-br from-yellow-300 to-amber-600 rounded-full flex items-center justify-center">
-                                  <span className="text-[4px] font-bold text-yellow-900">₹</span>
-                                </div>
-                              </motion.div>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        <motion.div 
-                          className="text-right"
-                          animate={{ 
-                            scale: [1, 1.05, 1],
-                            color: ['#059669', '#10b981', '#059669']
-                          }}
-                          transition={{ duration: 3, repeat: Infinity }}
-                        >
-                          <div className="text-lg font-bold text-green-600 dark:text-green-400">30% ↑</div>
-                          <div className="text-xs text-green-600/80 dark:text-green-400/80">Cost Savings</div>
-                        </motion.div>
-                      </div>
-                      
-                      <div className="text-base font-semibold text-blue-700 dark:text-blue-300 mb-4">
-                        Global Logistics Network
-                      </div>
-                      
-                      {/* Multi-layered Progress Animation */}
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-xs text-blue-600/80 dark:text-blue-400/80">
-                          <span>Supply Chain Efficiency</span>
-                          <span>92%</span>
-                        </div>
-                        <motion.div className="h-2 w-full bg-blue-100/70 dark:bg-blue-900/40 rounded-full overflow-hidden">
-                          <motion.div
-                            className="h-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 rounded-full"
-                            initial={{ width: '0%' }}
-                            whileInView={{ width: '92%' }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 2, ease: 'easeInOut', delay: 0.5 }}
-                          />
-                        </motion.div>
-                      </div>
-                      
-                      {/* Real-time Tracking Indicators */}
-                      <div className="mt-3 flex items-center justify-between">
-                        <motion.div 
-                          className="flex items-center gap-2 text-[10px] text-orange-600 font-medium"
-                          animate={{ opacity: [0.7, 1, 0.7] }}
-                          transition={{ duration: 4, repeat: Infinity }}
-                        >
-                          <motion.div
-                            className="w-1.5 h-1.5 bg-orange-500 rounded-full"
-                            animate={{ scale: [1, 1.5, 1] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                          />
-                          Live Tracking Active
-                        </motion.div>
-                        
-                        <motion.div 
-                          className="text-[10px] text-blue-600 font-medium flex items-center gap-1"
-                          animate={{ opacity: [0.6, 1, 0.6] }}
-                          transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-                        >
-                          <motion.div
-                            className="w-1 h-1 bg-blue-500 rounded-full"
-                            animate={{ scale: [1, 2, 1] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                          />
-                          Multi-Modal Transport
-                        </motion.div>
-                      </div>
-                      
-                      {/* Floating Delivery Stats */}
-                      <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-                        <div className="text-[10px]">
-                          <motion.div 
-                            className="font-bold text-green-600"
-                            animate={{ scale: [1, 1.1, 1] }}
-                            transition={{ duration: 4, repeat: Infinity }}
-                          >
-                            2.4hrs
-                          </motion.div>
-                          <div className="text-green-600/70">Avg Delivery</div>
-                        </div>
-                        <div className="text-[10px]">
-                          <motion.div 
-                            className="font-bold text-blue-600"
-                            animate={{ scale: [1, 1.1, 1] }}
-                            transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-                          >
-                            500+
-                          </motion.div>
-                          <div className="text-blue-600/70">Routes Active</div>
-                        </div>
-                        <div className="text-[10px]">
-                          <motion.div 
-                            className="font-bold text-orange-600"
-                            animate={{ scale: [1, 1.1, 1] }}
-                            transition={{ duration: 2, repeat: Infinity, delay: 2 }}
-                          >
-                            99.8%
-                          </motion.div>
-                          <div className="text-orange-600/70">Success Rate</div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                  
-                  {/* B2B Logistics Animation Box */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.5, duration: 0.5 }}
-                    className="rounded-2xl p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/10 border border-green-200/60 dark:border-green-800/40 shadow-sm hover:shadow-md transition-all group cursor-pointer"
-                    whileHover={{ scale: 1.02, y: -2 }}
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        {/* Animated Truck */}
-                        <motion.div
-                          className="relative"
-                          animate={{ x: [0, 4, 0] }}
-                          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                        >
-                          <svg width="16" height="12" viewBox="0 0 24 16" className="text-orange-600 fill-current">
-                            <path d="M18 8h2.5l1.5 2v4h-1.5c0 1.1-.9 2-2 2s-2-.9-2-2H8c0 1.1-.9 2-2 2s-2-.9-2-2H2V4h16v4z"/>
-                            <circle cx="6" cy="13" r="1.5" fill="currentColor"/>
-                            <circle cx="18" cy="13" r="1.5" fill="currentColor"/>
-                            <rect x="2" y="6" width="14" height="6" fill="currentColor" opacity="0.7"/>
-                          </svg>
-                          {/* Moving exhaust */}
-                          <motion.div
-                            className="absolute -left-1 top-1 w-1 h-1 bg-gray-400 rounded-full"
-                            animate={{ 
-                              x: [-4, -8, -12],
-                              opacity: [0.8, 0.4, 0],
-                              scale: [0.5, 1, 1.5]
-                            }}
-                            transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
-                          />
-                        </motion.div>
-
-                        {/* Animated Coins */}
-                        <div className="relative">
-                          {[0, 1, 2].map((i) => (
-                            <motion.div
-                              key={i}
-                              className="absolute w-1.5 h-1.5 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full shadow-sm"
-                              style={{ 
-                                left: i * 3,
-                                top: -1
-                              }}
-                              animate={{ 
-                                y: [0, -6, 0],
-                                rotate: [0, 360],
-                                scale: [1, 1.2, 1]
-                              }}
-                              transition={{ 
-                                duration: 1.5, 
-                                repeat: Infinity, 
-                                delay: i * 0.2,
-                                ease: 'easeInOut'
-                              }}
-                            >
-                              <div className="w-full h-full bg-gradient-to-br from-yellow-300 to-amber-600 rounded-full flex items-center justify-center">
-                                <span className="text-[3px] font-bold text-yellow-900">₹</span>
-                              </div>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <motion.span 
-                        className="text-xs font-bold text-green-700 dark:text-green-300"
-                        animate={{ 
-                          scale: [1, 1.1, 1],
-                          color: ['#15803d', '#16a34a', '#15803d']
-                        }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      >
-                        30% ↑
-                      </motion.span>
-                    </div>
-                    
-                    <div className="text-sm font-semibold text-green-700 dark:text-green-300 mb-3">Cost Savings</div>
-                    
-                    <motion.div className="h-2 w-full bg-green-100/70 dark:bg-green-900/40 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"
-                        initial={{ width: '0%' }}
-                        whileInView={{ width: '88%' }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1.5, ease: 'easeInOut', delay: 1 }}
-                      />
-                    </motion.div>
-                    
-                    {/* Fast Delivery Indicator */}
-                    <motion.div 
-                      className="mt-2 text-[10px] text-orange-600 font-medium flex items-center gap-1"
-                      animate={{ opacity: [0.6, 1, 0.6] }}
-                      transition={{ duration: 3, repeat: Infinity }}
+                    {/* Ships Animation - Enhanced with Multiple Ships */}
+                    <motion.div
+                      className="absolute bottom-16 left-8"
+                      animate={{ 
+                        x: [0, 50, 0],
+                        y: [0, -4, 0],
+                        rotate: [0, 2, -1, 0]
+                      }}
+                      transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
                     >
+                      <svg width="90" height="60" viewBox="0 0 110 70" className="text-blue-700 fill-current">
+                        {/* Ship Hull */}
+                        <path d="M10 40h90l-10 18H20l-10-18z" fill="currentColor" opacity="0.9"/>
+                        {/* Containers - Large Ship */}
+                        <rect x="20" y="22" width="14" height="18" fill="#ff6b35" opacity="0.9"/>
+                        <rect x="36" y="18" width="14" height="22" fill="#f7931e" opacity="0.9"/>
+                        <rect x="52" y="20" width="14" height="20" fill="#3b82f6" opacity="0.9"/>
+                        <rect x="68" y="24" width="14" height="16" fill="#10b981" opacity="0.9"/>
+                        <rect x="84" y="26" width="12" height="14" fill="#8b5cf6" opacity="0.9"/>
+                        {/* Ship Bridge */}
+                        <rect x="90" y="28" width="12" height="12" fill="currentColor"/>
+                        <circle cx="96" cy="25" r="3" fill="#fbbf24"/>
+                        {/* Ship Details */}
+                        <rect x="15" y="35" width="4" height="5" fill="#fff" opacity="0.8"/>
+                        <rect x="25" y="35" width="4" height="5" fill="#fff" opacity="0.8"/>
+                      </svg>
+                      
+                      {/* Water Ripples */}
                       <motion.div
-                        className="w-1 h-1 bg-orange-500 rounded-full"
-                        animate={{ scale: [1, 1.5, 1] }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                      />
-                      Fast Delivery
+                        className="absolute -bottom-2 left-1/2 transform -translate-x-1/2"
+                        animate={{ 
+                          scaleX: [1, 1.4, 1],
+                          opacity: [0.4, 0.7, 0.4]
+                        }}
+                        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                      >
+                        <div className="w-24 h-3 bg-blue-300/60 rounded-full blur-sm" />
+                      </motion.div>
                     </motion.div>
+
+                    {/* Second Ship - Medium Size */}
+                    <motion.div
+                      className="absolute bottom-20 right-12"
+                      animate={{ 
+                        x: [0, -40, 0],
+                        y: [0, -3, 0],
+                        rotate: [0, -1.5, 1, 0]
+                      }}
+                      transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+                    >
+                      <svg width="70" height="45" viewBox="0 0 85 55" className="text-indigo-700 fill-current">
+                        <path d="M8 30h70l-8 15H16l-8-15z" fill="currentColor" opacity="0.9"/>
+                        <rect x="15" y="18" width="12" height="12" fill="#ef4444" opacity="0.9"/>
+                        <rect x="29" y="15" width="12" height="15" fill="#8b5cf6" opacity="0.9"/>
+                        <rect x="43" y="19" width="12" height="11" fill="#06b6d4" opacity="0.9"/>
+                        <rect x="57" y="21" width="12" height="9" fill="#84cc16" opacity="0.9"/>
+                        {/* Bridge */}
+                        <rect x="72" y="23" width="10" height="7" fill="currentColor"/>
+                        <circle cx="77" cy="20" r="2" fill="#fbbf24"/>
+                      </svg>
+                      
+                      <motion.div
+                        className="absolute -bottom-1 left-1/2 transform -translate-x-1/2"
+                        animate={{ 
+                          scaleX: [1, 1.3, 1],
+                          opacity: [0.3, 0.6, 0.3]
+                        }}
+                        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                      >
+                        <div className="w-18 h-2 bg-indigo-300/50 rounded-full blur-sm" />
+                      </motion.div>
+                    </motion.div>
+
+                    {/* Third Ship - Small Fast Ship */}
+                    <motion.div
+                      className="absolute bottom-14 left-1/2 transform -translate-x-1/2"
+                      animate={{ 
+                        x: [0, 80, 0],
+                        y: [0, -2, 0],
+                        rotate: [0, 1, -0.5, 0]
+                      }}
+                      transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
+                    >
+                      <svg width="50" height="30" viewBox="0 0 60 35" className="text-cyan-600 fill-current">
+                        <path d="M5 20h50l-5 10H10l-5-10z" fill="currentColor" opacity="0.9"/>
+                        <rect x="10" y="12" width="8" height="8" fill="#f59e0b" opacity="0.9"/>
+                        <rect x="20" y="10" width="8" height="10" fill="#ec4899" opacity="0.9"/>
+                        <rect x="30" y="13" width="8" height="7" fill="#14b8a6" opacity="0.9"/>
+                        <rect x="40" y="15" width="8" height="5" fill="#a855f7" opacity="0.9"/>
+                        {/* Small Bridge */}
+                        <rect x="50" y="16" width="6" height="4" fill="currentColor"/>
+                        <circle cx="53" cy="14" r="1.5" fill="#fbbf24"/>
+                      </svg>
+                      
+                      <motion.div
+                        className="absolute -bottom-1 left-1/2 transform -translate-x-1/2"
+                        animate={{ 
+                          scaleX: [1, 1.2, 1],
+                          opacity: [0.4, 0.6, 0.4]
+                        }}
+                        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                      >
+                        <div className="w-12 h-1.5 bg-cyan-300/50 rounded-full blur-sm" />
+                      </motion.div>
+                    </motion.div>
+
+                    {/* Fourth Ship - Submarine Style */}
+                    <motion.div
+                      className="absolute bottom-8 right-1/4"
+                      animate={{ 
+                        x: [0, -25, 0],
+                        y: [0, -1, 0]
+                      }}
+                      transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 6 }}
+                    >
+                      <svg width="60" height="25" viewBox="0 0 70 30" className="text-slate-600 fill-current">
+                        <ellipse cx="35" cy="15" rx="32" ry="8" fill="currentColor" opacity="0.8"/>
+                        <rect x="15" y="8" width="8" height="6" fill="#64748b" opacity="0.9"/>
+                        <rect x="25" y="6" width="8" height="8" fill="#475569" opacity="0.9"/>
+                        <rect x="35" y="7" width="8" height="7" fill="#334155" opacity="0.9"/>
+                        <rect x="45" y="9" width="8" height="5" fill="#1e293b" opacity="0.9"/>
+                        {/* Periscope */}
+                        <rect x="60" y="10" width="2" height="8" fill="#94a3b8"/>
+                        <circle cx="61" cy="8" r="1" fill="#fbbf24"/>
+                      </svg>
+                      
+                      <motion.div
+                        className="absolute -bottom-0.5 left-1/2 transform -translate-x-1/2"
+                        animate={{ 
+                          scaleX: [1, 1.1, 1],
+                          opacity: [0.2, 0.4, 0.2]
+                        }}
+                        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                      >
+                        <div className="w-16 h-1 bg-slate-300/40 rounded-full blur-sm" />
+                      </motion.div>
+                    </motion.div>
+
+                    {/* Trucks on Land */}
+                    <motion.div
+                      className="absolute bottom-32 left-4"
+                      animate={{ x: [0, 200, 400], rotate: [0, 1, 0] }}
+                      transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+                    >
+                      <svg width="60" height="35" viewBox="0 0 80 40" className="text-orange-600 fill-current">
+                        {/* Truck Body */}
+                        <rect x="10" y="15" width="45" height="15" fill="currentColor" opacity="0.9"/>
+                        <rect x="55" y="18" width="20" height="12" fill="currentColor" opacity="0.8"/>
+                        {/* Wheels */}
+                        <circle cx="20" cy="32" r="4" fill="#374151"/>
+                        <circle cx="35" cy="32" r="4" fill="#374151"/>
+                        <circle cx="65" cy="32" r="4" fill="#374151"/>
+                        {/* Cargo */}
+                        <rect x="12" y="8" width="8" height="7" fill="#fbbf24" opacity="0.8"/>
+                        <rect x="22" y="10" width="8" height="5" fill="#ef4444" opacity="0.8"/>
+                        <rect x="32" y="9" width="8" height="6" fill="#10b981" opacity="0.8"/>
+                        <rect x="42" y="11" width="8" height="4" fill="#3b82f6" opacity="0.8"/>
+                      </svg>
+                      
+                      {/* Truck Exhaust */}
+                      <motion.div
+                        className="absolute -left-3 top-2"
+                        animate={{ 
+                          x: [-8, -16, -24],
+                          opacity: [0.6, 0.3, 0],
+                          scale: [0.5, 1, 1.5]
+                        }}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
+                      >
+                        <div className="w-2 h-2 bg-gray-400 rounded-full" />
+                      </motion.div>
+                    </motion.div>
+
+                    {/* Flying Coins Animation */}
+                    <div className="absolute top-8 left-1/2 transform -translate-x-1/2">
+                      {[0, 1, 2, 3, 4, 5].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="absolute"
+                          style={{ 
+                            left: (i % 3) * 40 - 40,
+                            top: Math.floor(i / 3) * 25
+                          }}
+                          animate={{ 
+                            y: [0, -20, 0],
+                            rotate: [0, 360],
+                            scale: [1, 1.4, 1],
+                            x: [0, Math.sin(i) * 10, 0]
+                          }}
+                          transition={{ 
+                            duration: 3 + i * 0.2, 
+                            repeat: Infinity, 
+                            delay: i * 0.4,
+                            ease: 'easeInOut'
+                          }}
+                        >
+                          <div className="w-6 h-6 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full shadow-lg flex items-center justify-center">
+                            <span className="text-xs font-bold text-yellow-900">₹</span>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Containers Stacking Animation */}
+                    <motion.div
+                      className="absolute top-12 right-8"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1 }}
+                    >
+                      {[0, 1, 2].map((i) => (
+                        <motion.div
+                          key={i}
+                          className={`w-12 h-8 rounded-sm shadow-md mb-1 ${
+                            i === 0 ? 'bg-red-500' : i === 1 ? 'bg-blue-500' : 'bg-green-500'
+                          }`}
+                          style={{ opacity: 0.8 }}
+                          animate={{ 
+                            y: [0, -2, 0],
+                            rotateY: [0, 5, 0]
+                          }}
+                          transition={{ 
+                            duration: 2 + i * 0.5, 
+                            repeat: Infinity, 
+                            delay: i * 0.3,
+                            ease: 'easeInOut'
+                          }}
+                        />
+                      ))}
+                    </motion.div>
+
+                    {/* Factory/Port Buildings */}
+                    <div className="absolute bottom-32 right-4">
+                      <motion.div
+                        animate={{ 
+                          y: [0, -1, 0]
+                        }}
+                        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                      >
+                        <svg width="80" height="60" viewBox="0 0 100 75" className="text-gray-600 fill-current">
+                          {/* Buildings */}
+                          <rect x="10" y="30" width="20" height="45" fill="currentColor" opacity="0.7"/>
+                          <rect x="35" y="35" width="25" height="40" fill="currentColor" opacity="0.8"/>
+                          <rect x="65" y="25" width="20" height="50" fill="currentColor" opacity="0.6"/>
+                          {/* Cranes */}
+                          <line x1="15" y1="30" x2="15" y2="10" stroke="#f59e0b" strokeWidth="2"/>
+                          <line x1="15" y1="15" x2="25" y2="15" stroke="#f59e0b" strokeWidth="2"/>
+                          <line x1="75" y1="25" x2="75" y2="8" stroke="#f59e0b" strokeWidth="2"/>
+                          <line x1="75" y1="12" x2="85" y2="12" stroke="#f59e0b" strokeWidth="2"/>
+                          {/* Windows */}
+                          <rect x="13" y="35" width="3" height="3" fill="#fbbf24" opacity="0.9"/>
+                          <rect x="18" y="35" width="3" height="3" fill="#fbbf24" opacity="0.9"/>
+                          <rect x="40" y="40" width="4" height="4" fill="#fbbf24" opacity="0.9"/>
+                          <rect x="50" y="40" width="4" height="4" fill="#fbbf24" opacity="0.9"/>
+                        </svg>
+                      </motion.div>
+                    </div>
+
+                    {/* Trade Route Lines */}
+                    <motion.svg
+                      className="absolute inset-0 w-full h-full pointer-events-none"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.6 }}
+                      transition={{ delay: 2 }}
+                    >
+                      <motion.path
+                        d="M50 50 Q150 80 250 60 Q350 40 450 70"
+                        stroke="#3b82f6"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeDasharray="5,5"
+                        opacity="0.4"
+                        animate={{ 
+                          strokeDashoffset: [0, 20, 0]
+                        }}
+                        transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                      />
+                      <motion.path
+                        d="M100 200 Q200 150 300 180 Q400 210 500 170"
+                        stroke="#f59e0b"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeDasharray="5,5"
+                        opacity="0.4"
+                        animate={{ 
+                          strokeDashoffset: [20, 0, 20]
+                        }}
+                        transition={{ duration: 5, repeat: Infinity, ease: 'linear', delay: 1 }}
+                      />
+                    </motion.svg>
+
+                    {/* Floating Statistics */}
+                    <div className="absolute top-4 left-4">
+                      <motion.div
+                        className="bg-white/80 dark:bg-gray-800/80 rounded-lg p-3 shadow-lg backdrop-blur-sm"
+                        animate={{ 
+                          y: [0, -5, 0],
+                          scale: [1, 1.02, 1]
+                        }}
+                        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                      >
+                        <div className="text-xs font-medium text-blue-600 dark:text-blue-400">Live Trading</div>
+                        <div className="text-lg font-bold text-gray-900 dark:text-white">$2.4M</div>
+                      </motion.div>
+                    </div>
+
+                    <div className="absolute top-4 right-4">
+                      <motion.div
+                        className="bg-white/80 dark:bg-gray-800/80 rounded-lg p-3 shadow-lg backdrop-blur-sm"
+                        animate={{ 
+                          y: [0, -3, 0],
+                          scale: [1, 1.02, 1]
+                        }}
+                        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                      >
+                        <div className="text-xs font-medium text-green-600 dark:text-green-400">Active Routes</div>
+                        <div className="text-lg font-bold text-gray-900 dark:text-white">847</div>
+                      </motion.div>
+                    </div>
+
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                      <motion.div
+                        className="bg-white/80 dark:bg-gray-800/80 rounded-lg p-3 shadow-lg backdrop-blur-sm"
+                        animate={{ 
+                          y: [0, -4, 0],
+                          scale: [1, 1.02, 1]
+                        }}
+                        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+                      >
+                        <div className="text-xs font-medium text-orange-600 dark:text-orange-400">Global Reach</div>
+                        <div className="text-lg font-bold text-gray-900 dark:text-white">150+ Countries</div>
+                      </motion.div>
+                    </div>
+                  </div>
+
+                  {/* Key Benefits */}
+                  <motion.div 
+                    className="mt-8 grid grid-cols-3 gap-4 text-center"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 3, duration: 0.8 }}
+                  >
+                    <div className="space-y-2">
+                      <motion.div 
+                        className="text-2xl font-bold text-blue-600 dark:text-blue-400"
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 3, repeat: Infinity, delay: 0 }}
+                      >
+                        24/7
+                      </motion.div>
+                      <div className="text-sm text-blue-600/80 dark:text-blue-400/80">Global Operations</div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <motion.div 
+                        className="text-2xl font-bold text-green-600 dark:text-green-400"
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+                      >
+                        99.9%
+                      </motion.div>
+                      <div className="text-sm text-green-600/80 dark:text-green-400/80">Delivery Success</div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <motion.div 
+                        className="text-2xl font-bold text-orange-600 dark:text-orange-400"
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 3, repeat: Infinity, delay: 2 }}
+                      >
+                        50K+
+                      </motion.div>
+                      <div className="text-sm text-orange-600/80 dark:text-orange-400/80">Active Traders</div>
+                    </div>
                   </motion.div>
-                </motion.div>
+                </div>
               </div>
 
               {/* Floating business metrics */}
-              <FloatingElement className="absolute -top-8 -left-8 w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500/40 to-amber-500/40 blur-sm" />
-              <FloatingElement className="absolute -bottom-8 -right-8 w-24 h-24 rounded-full bg-gradient-to-br from-amber-400/30 to-orange-600/30 blur-lg" delay={1.5} />
+              <FloatingElement className="absolute -top-8 -left-8 w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/40 to-indigo-500/40 blur-sm" />
+              <FloatingElement className="absolute -bottom-8 -right-8 w-24 h-24 rounded-full bg-gradient-to-br from-cyan-400/30 to-blue-600/30 blur-lg" delay={1.5} />
             </div>
           </div>
         </div>
@@ -915,7 +989,7 @@ export default function HomePage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push('/products')}
             >
-              Explore All Products
+              Explore Products
             </motion.button>
           </div>
         </section>
@@ -1027,7 +1101,7 @@ export default function HomePage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push('/services')}
             >
-              Explore All Services
+              Explore Services
             </motion.button>
           </div>
         </section>

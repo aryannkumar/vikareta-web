@@ -68,7 +68,7 @@ export default function ReturnsPage() {
               <a href="mailto:returns@vikareta.com" className="text-blue-600 hover:underline">
                 returns@vikareta.com
               </a>{' '}
-              or call +91 98765 43210.
+              or call +91-9934109996.
             </p>
           </section>
         </div>

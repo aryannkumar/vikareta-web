@@ -164,9 +164,9 @@ export function Header() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="mx-auto px-4 sm:px-6 max-w-none w-full">
         <div className="flex h-16 sm:h-20 items-center justify-between">
-          {/* Premium Logo Section */}
+          {/* Premium Logo Section - Enlarged */}
           <motion.div variants={itemVariants}>
             <Link href="/" className="flex items-center group">
               <motion.div 
@@ -174,7 +174,7 @@ export function Header() {
                 transition={{ type: 'spring', stiffness: 400, damping: 10 }}
                 className="relative"
               >
-                <Logo className="h-10 w-10 sm:h-12 sm:w-12" />
+                <Logo className="h-14 w-14 sm:h-16 sm:w-16 md:h-18 md:w-18" />
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-600/15 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </motion.div>
             </Link>

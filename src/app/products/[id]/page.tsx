@@ -112,7 +112,7 @@ export default function ProductDetailPage() {
         contactInfo: {
           name: 'User Name', // In real app, get from auth
           email: 'user@example.com',
-          phone: '+91 9876543210'
+          phone: '+91-9934109996'
         }
       });
       
@@ -135,7 +135,7 @@ export default function ProductDetailPage() {
         contactInfo: {
           name: 'User Name',
           email: 'user@example.com',
-          phone: '+91 9876543210'
+          phone: '+91-9934109996'
         }
       });
       

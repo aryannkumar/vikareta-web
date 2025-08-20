@@ -78,7 +78,7 @@ export default function FAQPage() {
             <h3 className="text-lg font-semibold mb-3">How can I contact support?</h3>
             <p className="text-gray-600">
               You can reach our support team via email at support@vikareta.com, 
-              call us at +91 98765 43210, or use the contact form on our website. 
+              call us at +91-9934109996, or use the contact form on our website. 
               We're available Monday to Friday, 9 AM to 6 PM IST.
             </p>
           </div>

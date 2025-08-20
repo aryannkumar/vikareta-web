@@ -317,8 +317,8 @@ export function Footer() {
                 <h4 className="font-semibold text-gray-900 dark:text-white">Contact</h4>
               </div>
               <p className="text-gray-600 dark:text-gray-400">
-                <a href="tel:+919876543210" className="hover:text-blue-600 transition-colors">
-                  +91 98765 43210
+                <a href="tel:+919934109996" className="hover:text-blue-600 transition-colors">
+                  +91-9934109996
                 </a>
               </p>
             </motion.div>
