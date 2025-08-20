@@ -591,17 +591,17 @@ export default function RegisterPage() {
   function renderCurrentStep() {
     switch (currentStep) {
       case 'userType':
-        return <UserTypeStep />;
+        return UserTypeStep();
       case 'personal':
-        return <PersonalInfoStep />;
+        return PersonalInfoStep();
       case 'business':
-        return <BusinessInfoStep />;
+        return BusinessInfoStep();
       case 'verification':
-        return <VerificationStep />;
+        return VerificationStep();
       case 'complete':
-        return <CompleteStep />;
+        return CompleteStep();
       default:
-        return <UserTypeStep />;
+        return UserTypeStep();
     }
   }
 

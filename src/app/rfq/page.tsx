@@ -347,7 +347,7 @@ export default function RFQPage() {
 
           {/* Tab Content */}
           {activeTab === 'new' ? (
-            <NewRFQForm />
+            NewRFQForm()
           ) : (
             <MyRFQsSection />
           )}
