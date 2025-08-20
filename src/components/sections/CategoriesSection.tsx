@@ -218,8 +218,7 @@ export function CategoriesSection() {
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
-              View All Categories
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              View Categories
             </motion.button>
           </Link>
         </motion.div>

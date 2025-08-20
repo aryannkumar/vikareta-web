@@ -851,7 +851,7 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.5 }}
             >
               <motion.button
-                onClick={() => router.push('/rfq')}
+                onClick={() => router.push('/rfqs')}
                 className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}

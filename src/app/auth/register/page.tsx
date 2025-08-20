@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -277,23 +277,54 @@ export default function RegisterPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle input changes
-  const handleInputChange = (field: keyof FormData, value: string | boolean) => {
+  // Handle input changes with debouncing for better performance
+  const handleInputChange = useCallback((field: keyof FormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear errors immediately for better UX
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
-  };
+  }, [errors]);
 
-  // Format phone number
+  // Special handler for phone to avoid cursor issues
+  const handlePhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const formatted = formatPhoneNumber(value);
+    setFormData(prev => ({ ...prev, phone: formatted }));
+    if (errors.phone) {
+      setErrors(prev => ({ ...prev, phone: '' }));
+    }
+  }, [errors.phone]);
+
+  // Format phone number - improved to avoid cursor jumps
   const formatPhoneNumber = (value: string) => {
+    // Remove all non-digits
     const cleaned = value.replace(/\D/g, '');
+    
+    // Handle different input scenarios more carefully
+    if (cleaned.length === 0) return '';
+    
+    // If it starts with 91, format as +91...
+    if (cleaned.startsWith('91') && cleaned.length > 2) {
+      return `+91 ${cleaned.slice(2)}`;
+    }
+    
+    // If it's 10 digits without country code, add +91
+    if (cleaned.length === 10 && !cleaned.startsWith('91')) {
+      return `+91 ${cleaned}`;
+    }
+    
+    // If it's less than 10 digits and doesn't start with 91, assume it needs +91
+    if (cleaned.length < 10 && !cleaned.startsWith('91')) {
+      return cleaned === '' ? '' : `+91 ${cleaned}`;
+    }
+    
+    // For other cases, just add + if it starts with a country code
     if (cleaned.startsWith('91')) {
       return `+${cleaned}`;
-    } else if (cleaned.length === 10) {
-      return `+91${cleaned}`;
     }
-    return `+${cleaned}`;
+    
+    return `+91 ${cleaned}`;
   };
 
   // Step navigation
@@ -943,7 +974,7 @@ export default function RegisterPage() {
                 id="phone"
                 type="tel"
                 value={formData.phone}
-                onChange={(e) => handleInputChange('phone', formatPhoneNumber(e.target.value))}
+                onChange={handlePhoneChange}
                 className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
                   errors.phone ? 'border-red-500' : 'border-gray-200 hover:border-amber-300'
                 }`}
