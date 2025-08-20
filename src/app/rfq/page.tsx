@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Plus, AlertCircle, Loader2, CheckCircle, FileText } from 'lucide-react';
 import { rfqService } from '../../services/rfq.service';
 import MyRFQsSection from './MyRFQsSection';
+import RequireAuth from '@/components/auth/RequireAuth';
 
 // Types for My RFQ section
 // Types for RFQ list/details live in the respective components
@@ -213,26 +214,45 @@ export default function RFQPage() {
         attachmentUrls.push(url);
       }
 
-      // Prepare RFQ data by type
+      // Prepare RFQ data based on type
       const budgetMax = parseFloat(formData.budget.replace(/[^0-9.-]+/g, ''));
       const baseDesc = `${formData.description}\n\nContact Information:\nName: ${formData.contactInfo.name}\nEmail: ${formData.contactInfo.email}\nPhone: ${formData.contactInfo.phone}${formData.contactInfo.company ? `\nCompany: ${formData.contactInfo.company}` : ''}`;
 
-      const common = {
-        title: formData.title,
-        description: baseDesc,
-        categoryId: formData.category,
-        subcategoryId: formData.subcategory || undefined,
-        budgetMax,
-        deliveryTimeline: formData.timeline,
-        deliveryLocation: formData.rfqType === 'product' ? formData.location : undefined,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      } as const;
+      let result;
+      if (formData.rfqType === 'product') {
+        const productData = {
+          title: formData.title,
+          description: baseDesc,
+          categoryId: formData.category,
+          subcategoryId: formData.subcategory || undefined,
+          quantity: parseInt(formData.quantity),
+          budgetMax,
+          deliveryLocation: formData.location,
+          deliveryTimeline: formData.timeline,
+          specifications: formData.specifications.filter(s => s.trim()),
+          attachments: attachmentUrls,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        };
+        result = await rfqService.createProductRfq(productData);
+      } else {
+        const serviceData = {
+          title: formData.title,
+          description: baseDesc,
+          categoryId: formData.category,
+          subcategoryId: formData.subcategory || undefined,
+          serviceType: 'one_time' as const,
+          budgetMax,
+          preferredLocation: 'both' as const,
+          serviceLocation: formData.location,
+          preferredTimeline: formData.timeline,
+          urgency: 'medium' as const,
+          requirements: formData.specifications.filter(s => s.trim()),
+          attachments: attachmentUrls,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        };
+        result = await rfqService.createServiceRfq(serviceData);
+      }
 
-      const createPayload = formData.rfqType === 'product'
-        ? { ...common, quantity: parseInt(formData.quantity) }
-        : { ...common };
-
-      const result = await rfqService.createRfq(createPayload as any);
       setSubmitted(true);
       console.log('RFQ created successfully:', result);
     } catch (error) {
@@ -283,77 +303,81 @@ export default function RFQPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-8">
-              <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-green-800 mb-2">RFQ Submitted Successfully!</h2>
-              <p className="text-green-700 mb-6">
-                Your Request for Quotation has been submitted and distributed to relevant sellers. 
-                You will receive responses via email and WhatsApp.
-              </p>
-              <div className="space-x-4">
-                <button
-                  onClick={() => setActiveTab('my')}
-                  className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
-                >
-                  View My RFQs
-                </button>
-                <button
-                  onClick={resetForm}
-                  className="border border-green-600 text-green-600 px-6 py-2 rounded-lg hover:bg-green-50"
-                >
-                  Create New RFQ
-                </button>
+      <RequireAuth>
+        <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+          <div className="container mx-auto px-4 py-8">
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-8 shadow-lg">
+                <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-green-800 mb-2">RFQ Submitted Successfully!</h2>
+                <p className="text-green-700 mb-6">
+                  Your Request for Quotation has been submitted and distributed to relevant sellers. 
+                  You will receive responses via email and WhatsApp.
+                </p>
+                <div className="space-x-4">
+                  <button
+                    onClick={() => setActiveTab('my')}
+                    className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    View My RFQs
+                  </button>
+                  <button
+                    onClick={resetForm}
+                    className="border border-green-600 text-green-600 px-6 py-2 rounded-lg hover:bg-green-50 transition-colors"
+                  >
+                    Create New RFQ
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </RequireAuth>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2">Request for Quotation (RFQ)</h1>
-          <p className="text-sm text-muted-foreground mb-4">Create new RFQ or manage your existing ones. Browse public RFQs at <a href="/rfqs" className="text-blue-600 hover:underline">/rfqs</a>.</p>
+    <RequireAuth>
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">Request for Quotation (RFQ)</h1>
+            <p className="text-sm text-muted-foreground mb-4">Create new RFQ or manage your existing ones. Browse public RFQs at <a href="/rfqs" className="text-amber-600 hover:underline">/rfqs</a>.</p>
 
-          {/* Tab Navigation */}
-          <div className="flex space-x-1 mb-8 bg-muted p-1 rounded-lg">
-            <button 
-              onClick={() => setActiveTab('new')}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                activeTab === 'new' 
-                  ? 'bg-background text-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              New RFQ
-            </button>
-            <button 
-              onClick={() => setActiveTab('my')}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                activeTab === 'my' 
-                  ? 'bg-background text-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              My RFQs
-            </button>
+            {/* Tab Navigation */}
+            <div className="flex space-x-1 mb-8 bg-amber-100/50 p-1 rounded-lg">
+              <button 
+                onClick={() => setActiveTab('new')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === 'new' 
+                    ? 'bg-white text-amber-800 shadow-sm border border-amber-200' 
+                    : 'text-amber-700 hover:text-amber-800 hover:bg-amber-50'
+                }`}
+              >
+                New RFQ
+              </button>
+              <button 
+                onClick={() => setActiveTab('my')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === 'my' 
+                    ? 'bg-white text-amber-800 shadow-sm border border-amber-200' 
+                    : 'text-amber-700 hover:text-amber-800 hover:bg-amber-50'
+                }`}
+              >
+                My RFQs
+              </button>
+            </div>
+
+            {/* Tab Content */}
+            {activeTab === 'new' ? (
+              NewRFQForm()
+            ) : (
+              <MyRFQsSection />
+            )}
           </div>
-
-          {/* Tab Content */}
-          {activeTab === 'new' ? (
-            NewRFQForm()
-          ) : (
-            <MyRFQsSection />
-          )}
         </div>
       </div>
-    </div>
+    </RequireAuth>
   );
 
   // Component for New RFQ Form
@@ -361,8 +385,8 @@ export default function RFQPage() {
     return (
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Basic Information */}
-        <div className="bg-card rounded-lg border p-6">
-          <h2 className="text-xl font-semibold mb-6">Basic Information</h2>
+        <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-amber-200 p-6 shadow-sm">
+          <h2 className="text-xl font-semibold mb-6 text-amber-800">Basic Information</h2>
           
           <div className="space-y-6">
             <div>
@@ -408,7 +432,7 @@ export default function RFQPage() {
                     });
                   }
                 }}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white ${
                   errors.title ? 'border-red-500' : ''
                 }`}
                 placeholder="Enter a clear title for your RFQ"
@@ -814,12 +838,12 @@ export default function RFQPage() {
         <div className="text-center">
           <button
             type="submit"
-            className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-8 py-3 rounded-lg hover:from-amber-600 hover:to-orange-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
             disabled={loading}
           >
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="h-4 w-4 mr-2 animate-spin inline" />
                 Submitting RFQ...
               </>
             ) : (
@@ -827,7 +851,7 @@ export default function RFQPage() {
             )}
           </button>
           
-          <p className="text-xs text-muted-foreground mt-4">
+          <p className="text-xs text-gray-600 mt-4">
             By submitting this RFQ, you agree to our Terms of Service and Privacy Policy
           </p>
         </div>

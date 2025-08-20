@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { rfqService, RfqWithResponses } from '../../../services/rfq.service';
 import { orderService, CreateOrderFromQuoteData } from '../../../services/order.service';
+import RequireAuth from '@/components/auth/RequireAuth';
 
 export default function RFQDetailsPage() {
   const router = useRouter();
@@ -161,22 +162,23 @@ export default function RFQDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        {loading && (
-          <div className="flex items-center justify-center py-12 text-gray-600">
-            <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading RFQ...
-          </div>
-        )}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded mb-4">{error}</div>
-        )}
-        {!rfq && !loading && (
-          <div className="text-center text-gray-600">RFQ not found</div>
-        )}
-  {rfq && (
-  <>
-  {/* Header */}
+    <RequireAuth>
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+        <div className="container mx-auto px-4 py-8">
+          {loading && (
+            <div className="flex items-center justify-center py-12 text-amber-700">
+              <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading RFQ...
+            </div>
+          )}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded mb-4">{error}</div>
+          )}
+          {!rfq && !loading && (
+            <div className="text-center text-gray-600">RFQ not found</div>
+          )}
+    {rfq && (
+    <>
+    {/* Header */}
         <div className="mb-6">
           <button
             onClick={() => router.back()}
@@ -786,5 +788,6 @@ export default function RFQDetailsPage() {
     )}
       </div>
     </div>
+    </RequireAuth>
   );
 }
