@@ -128,11 +128,11 @@ export const productsApi = {
         brands: Array<{ name: string; count: number }>;
         priceRange: { min: number; max: number };
       };
-    }>('/products', filters);
+  }>('/api/products', filters);
   },
 
   async getProduct(id: string) {
-    return apiClient.get<Product>(`/products/${id}`);
+  return apiClient.get<Product>(`/api/products/${id}`);
   },
 
   async getProductReviews(productId: string, page: number = 1, limit: number = 10) {
@@ -141,7 +141,7 @@ export const productsApi = {
       total: number;
       page: number;
       totalPages: number;
-    }>(`/products/${productId}/reviews`, { page, limit });
+  }>(`/api/products/${productId}/reviews`, { page, limit });
   },
 
   async addProductReview(productId: string, review: {
@@ -150,11 +150,11 @@ export const productsApi = {
     comment: string;
     images?: string[];
   }) {
-    return apiClient.post<ProductReview>(`/products/${productId}/reviews`, review);
+  return apiClient.post<ProductReview>(`/api/products/${productId}/reviews`, review);
   },
 
   async getRelatedProducts(productId: string, limit: number = 8) {
-    return apiClient.get<Product[]>(`/products/${productId}/related`, { limit });
+  return apiClient.get<Product[]>(`/api/products/${productId}/related`, { limit });
   },
 
   async searchProducts(query: string, filters?: Omit<ProductFilters, 'search'>) {
@@ -162,11 +162,11 @@ export const productsApi = {
       products: Product[];
       total: number;
       suggestions: string[];
-    }>('/products/search', { q: query, ...filters });
+  }>('/api/products/search', { q: query, ...filters });
   },
 
   async getFeaturedProducts(limit: number = 12) {
-    return apiClient.get<Product[]>('/products', { featured: true, limit });
+  return apiClient.get<Product[]>('/api/products', { featured: true, limit });
   },
 
   async getProductsByCategory(categoryId: string, filters?: Omit<ProductFilters, 'category'>) {
@@ -181,19 +181,19 @@ export const productsApi = {
         description: string;
         image?: string;
       };
-    }>(`/categories/${categoryId}/products`, filters);
+  }>(`/api/categories/${categoryId}/products`, filters);
   },
 
   async addToWishlist(productId: string) {
-    return apiClient.post(`/products/${productId}/wishlist`);
+  return apiClient.post(`/api/products/${productId}/wishlist`);
   },
 
   async removeFromWishlist(productId: string) {
-    return apiClient.delete(`/products/${productId}/wishlist`);
+  return apiClient.delete(`/api/products/${productId}/wishlist`);
   },
 
   async reportProduct(productId: string, reason: string, description?: string) {
-    return apiClient.post(`/products/${productId}/report`, { reason, description });
+  return apiClient.post(`/api/products/${productId}/report`, { reason, description });
   },
 
   async contactSupplier(productId: string, data: {

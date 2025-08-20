@@ -333,22 +333,22 @@ export const marketplaceApi = {
     };
   },
 
-  // Get a single business by id
+  // Get a single business by id (maps to provider details)
   getBusinessById: async (id: string): Promise<{ success: boolean; data: any | null }> => {
     if (!id) return { success: false, data: null };
     
     try {
-      const response = await apiClient.get(`/api/marketplace/businesses/${encodeURIComponent(id)}`);
+      // Backend exposes provider details at /api/providers/:id
+      const response = await apiClient.get(`/api/providers/${encodeURIComponent(id)}`);
       if (!response.success) {
         return { success: false, data: null };
       }
 
       const payload = response.data as any;
-      // backend may return { data: { business: {...} } } or { business: {...} } or direct object
       if (payload == null) return { success: true, data: null };
-      if (payload.business) return { success: true, data: payload.business };
-      if (payload.data && (payload.data.business || payload.data.provider)) return { success: true, data: payload.data.business || payload.data };
-      return { success: true, data: payload };
+      // Normalize to business-like structure expected by UI
+      const data = payload.data || payload;
+      return { success: true, data };
     } catch (error) {
       console.error('getBusinessById failed for id', id, error);
       return { success: false, data: null };

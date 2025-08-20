@@ -154,7 +154,8 @@ class ApiClient {
     let finalEndpoint = endpoint;
     
     if (params) {
-      const url = new URL(`${this.baseURL}${endpoint}`);
+  // Build a temporary absolute URL safely, regardless of leading slash
+  const url = new URL(endpoint, this.baseURL.endsWith('/') ? this.baseURL : this.baseURL + '/');
       Object.keys(params).forEach(key => {
         const value = params[key];
         // Skip undefined or null
@@ -166,7 +167,8 @@ class ApiClient {
 
         url.searchParams.append(key, String(value));
       });
-      finalEndpoint = url.pathname.replace(new URL(this.baseURL).pathname, '') + url.search;
+  // Preserve leading slash and only pass path + query to request()
+  finalEndpoint = url.pathname + url.search;
     }
 
     return this.request<T>(finalEndpoint, { method: 'GET' });
