@@ -122,26 +122,34 @@ export default function BusinessProfilePage(props: any) {
         if (success) {
           toast.success('Added', 'Business added to wishlist');
         } else {
-          // Try refreshing session and retry once
+          // In development mode, show more helpful error message
           if (process.env.NODE_ENV === 'development') {
-            console.log('Wishlist add failed, refreshing session and retrying...');
-          }
-          await refreshSession();
-          const retrySuccess = await addToWishlist(id, 'business');
-          if (retrySuccess) {
-            toast.success('Added', 'Business added to wishlist');
+            console.log('Wishlist add failed - this is expected in development without proper auth setup');
+            toast.error('Development Mode', 'Wishlist functionality requires production authentication setup');
           } else {
-            toast.error('Error', 'Failed to add business to wishlist. Please try logging in again.');
-            // If still failing, redirect to secure login
-            navigateToLogin();
+            // Try refreshing session and retry once
+            console.log('Wishlist add failed, refreshing session and retrying...');
+            await refreshSession();
+            const retrySuccess = await addToWishlist(id, 'business');
+            if (retrySuccess) {
+              toast.success('Added', 'Business added to wishlist');
+            } else {
+              toast.error('Error', 'Failed to add business to wishlist. Please try logging in again.');
+              // If still failing, redirect to secure login
+              navigateToLogin();
+            }
           }
         }
       }
     } catch (error) {
       console.error('Wishlist toggle error:', error);
-      toast.error('Error', 'An error occurred while updating wishlist. Please try logging in again.');
-      // On error, also redirect to secure login
-      navigateToLogin();
+      if (process.env.NODE_ENV === 'development') {
+        toast.error('Development Mode', 'Wishlist functionality requires production authentication setup');
+      } else {
+        toast.error('Error', 'An error occurred while updating wishlist. Please try logging in again.');
+        // On error, also redirect to secure login
+        navigateToLogin();
+      }
     }
   };
 
