@@ -214,10 +214,9 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         try {
-          // Secure logout using HttpOnly cookies
-          await apiCall('/auth/logout', {
-            method: 'POST',
-          });
+          // Import and use cross-domain logout
+          const { performSecureLogout } = await import('../auth/cross-domain-logout');
+          await performSecureLogout();
         } catch {
           // Silent fail for logout
         }

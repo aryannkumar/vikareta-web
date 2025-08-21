@@ -154,10 +154,9 @@ export function useAuth(): UseAuthReturn {
     try {
       setLoading(true);
       
-      // Backend will clear HttpOnly cookies across all domains
-      await secureRequest('/api/auth/logout', {
-        method: 'POST',
-      });
+      // Import and use cross-domain logout
+      const { performSecureLogout } = await import('../lib/auth/cross-domain-logout');
+      await performSecureLogout();
       
       setUser(null);
       setError(null);

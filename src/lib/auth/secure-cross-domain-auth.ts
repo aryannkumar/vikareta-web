@@ -223,17 +223,25 @@ export async function logoutFromAllDomains(): Promise<void> {
   if (typeof window === 'undefined') return;
 
   try {
-    // Call backend logout endpoint which clears HttpOnly cookies
-  await fetch(`/api/auth/logout`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(getCSRFToken() && { 'X-XSRF-TOKEN': getCSRFToken()! })
-      },
-    });
-  } catch {
-    // Silent fail
+    // Import and use the comprehensive cross-domain logout
+    const { performSecureLogout } = await import('./cross-domain-logout');
+    await performSecureLogout();
+  } catch (error) {
+    console.error('Cross-domain logout failed:', error);
+    
+    // Fallback: try basic logout
+    try {
+      await fetch(`/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(getCSRFToken() && { 'X-XSRF-TOKEN': getCSRFToken()! })
+        },
+      });
+    } catch {
+      // Silent fail
+    }
   }
 
   // Redirect to login

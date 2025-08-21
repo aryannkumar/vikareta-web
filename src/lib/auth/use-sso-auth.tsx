@@ -120,10 +120,11 @@ export function SSOAuthProvider({ children }: { children: React.ReactNode }) {
   // Secure logout function
   const logout = useCallback(async () => {
     try {
-      // Call backend logout to clear HttpOnly cookies
-      await secureRequest('/api/auth/logout', {
-        method: 'POST',
-      });
+      // Import cross-domain logout utility
+      const { performSecureLogout } = await import('../auth/cross-domain-logout');
+      
+      // Perform comprehensive cross-domain logout
+      await performSecureLogout();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -136,7 +137,7 @@ export function SSOAuthProvider({ children }: { children: React.ReactNode }) {
         window.location.href = '/auth/login';
       }
     }
-  }, [secureRequest]);
+  }, []);
 
   // Check session on mount
   useEffect(() => {
