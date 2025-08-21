@@ -374,24 +374,16 @@ function LoginPageContent() {
   const sendOtp = async () => {
     setOtpLoading(true);
     try {
-      // TODO: Replace with actual OTP API call
-      // const response = await fetch('/api/auth/send-otp', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     type: authMethod,
-      //     identifier: authMethod === 'email' ? formData.email : formData.phone
-      //   })
-      // });
-
-      // Simulate OTP sending
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      const identifier = authMethod === 'email' ? formData.email : formData.phone;
+      const resp = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ type: authMethod, identifier })
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       setOtpTimer(30);
-      toast.success(
-        'OTP Sent!', 
-        `Verification code sent to your ${authMethod === 'email' ? 'email' : 'phone number'}`
-      );
+      toast.success('OTP Sent!', `Verification code sent to your ${authMethod === 'email' ? 'email' : 'phone number'}`);
     } catch (error) {
       console.error('Failed to send OTP:', error);
       toast.error('Error', 'Failed to send OTP. Please try again.');
@@ -413,17 +405,12 @@ function LoginPageContent() {
           ? { email: formData.email, password: formData.password }
           : { phone: formData.phone, password: formData.password };
 
-        const success = await login(loginData);
+        const result = await login(loginData);
 
-        if (success) {
-          // If phone login, send OTP for verification
-          if (authMethod === 'phone') {
-            setStep('otp');
-            await sendOtp();
-          } else {
-            // Email login successful
-            handleLoginSuccess();
-          }
+        if (result && (result as any).success) {
+          // Always require OTP verification for login (email or phone)
+          setStep('otp');
+          await sendOtp();
         } else {
           toast.error('Login Failed', 'Please check your credentials and try again.');
         }
@@ -436,24 +423,18 @@ function LoginPageContent() {
     } else if (step === 'otp') {
       setLoading(true);
       try {
-        // TODO: Replace with actual OTP verification
-        // const response = await fetch('/api/auth/verify-otp', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({
-        //     type: authMethod,
-        //     identifier: authMethod === 'email' ? formData.email : formData.phone,
-        //     otp: formData.otp
-        //   })
-        // });
-
-        // Simulate OTP verification
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        if (formData.otp === '123456') { // Demo OTP
+        const identifier = authMethod === 'email' ? formData.email : formData.phone;
+        const resp = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ type: authMethod, identifier, otp: formData.otp })
+        });
+        if (resp.ok) {
           handleLoginSuccess();
         } else {
-          setErrors({ otp: 'Invalid OTP. Please try again.' });
+          const data = await resp.json().catch(() => ({} as any));
+          setErrors({ otp: data?.error?.message || 'Invalid OTP. Please try again.' });
         }
       } catch (error) {
         console.error('OTP verification error:', error);
@@ -465,7 +446,7 @@ function LoginPageContent() {
   };
 
   // Handle successful login
-  const handleLoginSuccess = async () => {
+  const handleLoginSuccess = async (loggedInUser?: any) => {
     toast.success('Login Successful!', 'Redirecting...');
 
     setTimeout(async () => {
@@ -479,15 +460,17 @@ function LoginPageContent() {
       // Return URL now handled via URL parameters for security
       // No localStorage usage for enhanced security
 
-      if (!targetUrl && user) {
-        targetUrl = getPostLoginRedirectUrl(user);
+      const effectiveUser = loggedInUser || user;
+
+      if (!targetUrl && effectiveUser) {
+        targetUrl = getPostLoginRedirectUrl(effectiveUser);
         console.log('SSO Login: Using role-based redirect:', targetUrl);
       }
 
       if (!targetUrl) targetUrl = '/';
 
       try {
-        if (user && hasDashboardAccess(user)) {
+        if (effectiveUser && hasDashboardAccess(effectiveUser)) {
           await syncSSOToSubdomainsFn();
         }
       } catch (err) {

@@ -264,11 +264,9 @@ export default function RegisterPage() {
         break;
 
       case 'verification':
-        if (!formData.emailVerified) {
-          newErrors.emailVerified = 'Please verify your email address';
-        }
-        if (!formData.phoneVerified) {
-          newErrors.phoneVerified = 'Please verify your phone number';
+        if (!formData.emailVerified && !formData.phoneVerified) {
+          newErrors.emailVerified = 'Verify at least email or phone';
+          newErrors.phoneVerified = 'Verify at least email or phone';
         }
         break;
     }
@@ -311,16 +309,17 @@ export default function RegisterPage() {
   const sendOTP = async (type: 'email' | 'phone') => {
     setOtpLoading(true);
     setCurrentOtpType(type);
-    
     try {
-      // Mock OTP sending
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      const identifier = type === 'email' ? formData.email : formData.phone;
+      const resp = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ type, identifier })
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       setOtpTimer(30);
-      toast.success(
-        'OTP Sent!', 
-        `Verification code sent to your ${type}`
-      );
+      toast.success('OTP Sent!', `Verification code sent to your ${type}`);
     } catch (error) {
       console.error('Send OTP error:', error);
       toast.error('Error', `Failed to send OTP to ${type}`);
@@ -331,22 +330,28 @@ export default function RegisterPage() {
 
   const verifyOTP = async (code: string, type: 'email' | 'phone') => {
     setLoading(true);
-    
     try {
-      // Mock OTP verification
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const identifier = type === 'email' ? formData.email : formData.phone;
+      const resp = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ type, identifier, otp: code })
+      });
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({} as any));
+        throw new Error(data?.error?.message || 'Invalid OTP');
+      }
       if (type === 'email') {
         setFormData(prev => ({ ...prev, emailVerified: true }));
       } else {
         setFormData(prev => ({ ...prev, phoneVerified: true }));
       }
-      
       setCurrentOtpType(null);
       toast.success('Verified!', `${type.charAt(0).toUpperCase() + type.slice(1)} verified successfully`);
     } catch (error) {
       console.error('Verify OTP error:', error);
-      toast.error('Error', 'Invalid verification code');
+      toast.error('Error', (error as any)?.message || 'Invalid verification code');
     } finally {
       setLoading(false);
     }
@@ -1746,14 +1751,14 @@ export default function RegisterPage() {
           <motion.button
             type="button"
             onClick={handleFinalSubmit}
-            disabled={loading || !formData.emailVerified || !formData.phoneVerified}
+            disabled={loading || (!formData.emailVerified && !formData.phoneVerified)}
             className={`flex-1 py-4 rounded-2xl font-semibold text-white transition-all duration-300 flex items-center justify-center space-x-2 ${
-              loading || !formData.emailVerified || !formData.phoneVerified
+              loading || (!formData.emailVerified && !formData.phoneVerified)
                 ? 'bg-gray-300 cursor-not-allowed'
                 : 'bg-gradient-to-r from-amber-500 to-orange-600 hover:shadow-lg transform hover:scale-105 active:scale-95'
             }`}
-            whileHover={loading || !formData.emailVerified || !formData.phoneVerified ? {} : { scale: 1.02 }}
-            whileTap={loading || !formData.emailVerified || !formData.phoneVerified ? {} : { scale: 0.98 }}
+            whileHover={loading || (!formData.emailVerified && !formData.phoneVerified) ? {} : { scale: 1.02 }}
+            whileTap={loading || (!formData.emailVerified && !formData.phoneVerified) ? {} : { scale: 0.98 }}
           >
             {loading ? (
               <>
