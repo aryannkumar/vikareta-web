@@ -5,7 +5,8 @@ export async function POST(req: NextRequest) {
     const apiBase = process.env.NEXT_PUBLIC_API_BASE || (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
 
     const body = await req.json();
-    const cookieHeader = req.headers.get('cookie') || '';
+  const cookieHeader = req.headers.get('cookie') || '';
+  const csrfHeader = req.headers.get('x-xsrf-token') || req.headers.get('X-XSRF-TOKEN') || req.headers.get('x-csrf-token') || undefined;
 
     const resp = await fetch(`${apiBase}/api/auth/send-otp`, {
       method: 'POST',
@@ -13,6 +14,7 @@ export async function POST(req: NextRequest) {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         ...(cookieHeader ? { cookie: cookieHeader } : {}),
+    ...(csrfHeader ? { 'X-XSRF-TOKEN': csrfHeader } : {}),
       },
       body: JSON.stringify(body || {}),
     });
