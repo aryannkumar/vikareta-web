@@ -38,7 +38,8 @@ const Badge = ({ children, className }: { children: React.ReactNode; className?:
   <span className={`bg-red-500 text-white text-xs rounded-full px-1 ${className || ''}`}>{children}</span>;
 const notificationsApi = { getNotifications: async () => ({ data: { notifications: [] } }) };
 
-const hasDashboardAccess = (user: any) => user?.userType === 'seller' || user?.userType === 'admin';
+const hasSellerAccess = (user: any) => user?.userType === 'seller' || user?.role === 'seller' || user?.role === 'both' || user?.userType === 'both';
+const hasAdminAccess = (user: any) => user?.userType === 'admin' || user?.role === 'admin' || user?.role === 'super_admin';
 
 // Secure SSO sync function
 const syncSSOToSubdomains = async (targets: string[]) => {
@@ -305,8 +306,8 @@ export function Header() {
               </Link>
             </motion.div>
 
-            {/* Dashboard Button for Sellers */}
-            {isAuthenticated && ((user && hasDashboardAccess(user)) || (user?.role === 'admin' && process.env.NEXT_PUBLIC_ADMIN_STANDALONE !== 'true')) && (
+            {/* Quick Access Buttons: Dashboard for sellers, Admin for admins */}
+            {isAuthenticated && hasSellerAccess(user) && (
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button 
                   size="sm" 
@@ -330,6 +331,33 @@ export function Header() {
                 >
                   <Store className="h-4 w-4" />
                   <span>Dashboard</span>
+                </Button>
+              </motion.div>
+            )}
+            {isAuthenticated && hasAdminAccess(user) && (
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  className="hidden sm:flex items-center space-x-2 border-2 border-purple-600 text-purple-600 hover:bg-purple-50 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-900/20"
+                  onClick={async () => {
+                    try {
+                      // SSO sync to admin
+                      const targets = [process.env.NEXT_PUBLIC_ADMIN_HOST || 'admin.vikareta.com'];
+                      await syncSSOToSubdomains(targets);
+                      const adminUrl = process.env.NODE_ENV === 'development' 
+                        ? 'http://localhost:3002' 
+                        : `https://${process.env.NEXT_PUBLIC_ADMIN_HOST || 'admin.vikareta.com'}`;
+                      window.open(adminUrl, '_blank', 'noopener,noreferrer');
+                    } catch (err) {
+                      console.error('Failed to open admin via SSO:', err);
+                      const fallback = process.env.NODE_ENV === 'development' ? 'http://localhost:3002' : `https://${process.env.NEXT_PUBLIC_ADMIN_HOST || 'admin.vikareta.com'}`;
+                      window.open(fallback, '_blank', 'noopener,noreferrer');
+                    }
+                  }}
+                >
+                  <Settings className="h-4 w-4" />
+                  <span>Admin</span>
                 </Button>
               </motion.div>
             )}
@@ -386,7 +414,7 @@ export function Header() {
                         My RFQs
                       </Link>
                     </DropdownMenuItem>
-                    { ((user && hasDashboardAccess(user)) || (user?.role === 'admin' && process.env.NEXT_PUBLIC_ADMIN_STANDALONE !== 'true')) && (
+                    { (user && hasSellerAccess(user)) && (
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={async () => {
@@ -406,6 +434,28 @@ export function Header() {
                         }}>
                           <Store className="mr-2 h-4 w-4" />
                           Supplier Dashboard
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    { hasAdminAccess(user) && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={async () => {
+                          try {
+                            const targets = [process.env.NEXT_PUBLIC_ADMIN_HOST || 'admin.vikareta.com'];
+                            await syncSSOToSubdomains(targets);
+                            const adminUrl = process.env.NODE_ENV === 'development' 
+                              ? 'http://localhost:3002' 
+                              : `https://${process.env.NEXT_PUBLIC_ADMIN_HOST || 'admin.vikareta.com'}`;
+                            window.open(adminUrl, '_blank', 'noopener,noreferrer');
+                          } catch (err) {
+                            console.error('Failed to open admin via SSO:', err);
+                            const fallback = process.env.NODE_ENV === 'development' ? 'http://localhost:3002' : `https://${process.env.NEXT_PUBLIC_ADMIN_HOST || 'admin.vikareta.com'}`;
+                            window.open(fallback, '_blank', 'noopener,noreferrer');
+                          }
+                        }}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          Admin Panel
                         </DropdownMenuItem>
                       </>
                     )}

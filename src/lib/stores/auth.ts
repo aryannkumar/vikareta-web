@@ -128,7 +128,10 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
   const csrfToken = typeof window !== 'undefined' ? 
     document.cookie.split(';').find(cookie => cookie.trim().startsWith('XSRF-TOKEN='))?.split('=')[1] : null;
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  // Use same-origin proxies for auth endpoints to avoid cross-domain cookie issues
+  const isAuthProxy = endpoint.startsWith('/auth/');
+  const url = isAuthProxy ? `/api${endpoint}` : `${API_BASE_URL}${endpoint}`;
+  const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
     ...(csrfToken ? { 'X-XSRF-TOKEN': csrfToken } : {}),

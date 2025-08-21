@@ -222,12 +222,9 @@ export function getPostLoginRedirectUrl(user: User): string {
 export async function logoutFromAllDomains(): Promise<void> {
   if (typeof window === 'undefined') return;
 
-  const backend = process.env.NEXT_PUBLIC_API_BASE || 
-    (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
-
   try {
     // Call backend logout endpoint which clears HttpOnly cookies
-    await fetch(`${backend}/api/auth/logout`, {
+  await fetch(`/api/auth/logout`, {
       method: 'POST',
       credentials: 'include',
       headers: {

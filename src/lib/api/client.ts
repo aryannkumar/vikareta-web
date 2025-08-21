@@ -55,7 +55,7 @@ class ApiClient {
       
       // Try to get CSRF token by calling the auth/me endpoint
       // This should set the necessary cookies if the user is authenticated
-      const response = await fetch(`${this.baseURL}/auth/me`, {
+  const response = await fetch(`/api/auth/me`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -139,7 +139,7 @@ class ApiClient {
         console.log('No CSRF token found, attempting to get one from backend...');
         
         // Try to get session status - this should set necessary cookies
-        const sessionResponse = await fetch(`${this.baseURL}/auth/session`, {
+  const sessionResponse = await fetch(`/api/auth/session`, {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -155,7 +155,7 @@ class ApiClient {
         
         // If still no CSRF token, try auth/me endpoint
         if (!csrfToken) {
-          const meResponse = await fetch(`${this.baseURL}/auth/me`, {
+          const meResponse = await fetch(`/api/auth/me`, {
             method: 'GET',
             credentials: 'include',
             headers: {
