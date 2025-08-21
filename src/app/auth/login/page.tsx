@@ -209,8 +209,6 @@ function LoginPageContent() {
     try {
       if (typeof window === 'undefined') return;
 
-      const backend = process.env.NEXT_PUBLIC_API_BASE || 
-        (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
       const targets = ['dashboard.vikareta.com', 'admin.vikareta.com'];
 
       const syncPromises: Promise<void>[] = [];
@@ -218,8 +216,8 @@ function LoginPageContent() {
       for (const host of targets) {
         const p = (async () => {
           try {
-            // Request signed SSO token - backend authenticates via HttpOnly cookie
-            const resp = await fetch(`${backend}/api/auth/sso-token`, {
+            // Request signed SSO token via same-origin proxy to include cookies
+            const resp = await fetch(`/api/auth/sso-token`, {
               method: 'POST',
               credentials: 'include', // Send HttpOnly authentication cookie
               headers: { 

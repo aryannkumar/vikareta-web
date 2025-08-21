@@ -37,7 +37,8 @@ class ApiClient {
     
     // Only log in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('API Client initialized with baseURL:', this.baseURL);
+      console.log('API Client v2.0 initialized with baseURL:', this.baseURL);
+      console.log('Development mode: simplified authentication flow enabled');
     }
   }
 
@@ -125,12 +126,17 @@ class ApiClient {
       });
     }
     
-    // If no CSRF token, try to get one by making a simple auth request
+    // In development, skip all complex auth flows and just return null
+    // This will trigger the development bypass in the request method
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Development mode: skipping CSRF token acquisition');
+      return null;
+    }
+    
+    // Production code for getting CSRF token
     if (!csrfToken) {
       try {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('No CSRF token found, attempting to get one from backend...');
-        }
+        console.log('No CSRF token found, attempting to get one from backend...');
         
         // Try to get session status - this should set necessary cookies
         const sessionResponse = await fetch(`${this.baseURL}/auth/session`, {
@@ -142,9 +148,7 @@ class ApiClient {
           },
         });
         
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Session response:', sessionResponse.status);
-        }
+        console.log('Session response:', sessionResponse.status);
         
         // Check if CSRF token is now available
         csrfToken = this.getCSRFToken();
@@ -160,22 +164,16 @@ class ApiClient {
             },
           });
           
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Auth me response:', meResponse.status);
-          }
+          console.log('Auth me response:', meResponse.status);
           
           // Check again for CSRF token
           csrfToken = this.getCSRFToken();
         }
         
-        if (process.env.NODE_ENV === 'development') {
-          console.log('CSRF token after session attempts:', !!csrfToken);
-        }
+        console.log('CSRF token after session attempts:', !!csrfToken);
         
       } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Could not establish session with backend:', error);
-        }
+        console.log('Could not establish session with backend:', error);
       }
     }
     
@@ -242,10 +240,11 @@ class ApiClient {
       } else if (process.env.NODE_ENV === 'development') {
         // In development, if we can't get CSRF token, add a development header
         // This allows testing when the full auth flow isn't working
-        console.log('Using development auth bypass (no CSRF token available)');
+        console.log('Development mode: Using auth bypass (no CSRF token available)');
         config.headers = {
           ...config.headers,
-          'X-Development-Auth': 'true',
+          'X-Development-Auth': 'bypass-v2',
+          'X-Development-Mode': 'true',
         };
       }
     }

@@ -11,11 +11,21 @@ const syncSSOToSubdomains = async (targets: string[]) => {
     for (const host of targets) {
       const p = (async () => {
         try {
-          const data = await apiCall('/auth/sso-token', {
+          // Use same-origin proxy to obtain SSO token with current cookies
+          const csrfToken = typeof window !== 'undefined' ? 
+            document.cookie.split(';').find(cookie => cookie.trim().startsWith('XSRF-TOKEN='))?.split('=')[1] : null;
+          const resp = await fetch('/api/auth/sso-token', {
             method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(csrfToken ? { 'X-XSRF-TOKEN': decodeURIComponent(csrfToken) } : {}),
+            },
             body: JSON.stringify({ target: host }),
           });
 
+          if (!resp.ok) return;
+          const data = await resp.json();
           const token = data?.token;
           if (!token) return;
 
@@ -40,7 +50,7 @@ const syncSSOToSubdomains = async (targets: string[]) => {
             document.body.appendChild(iframe);
             setTimeout(() => cleanup(), 5000);
           });
-        } catch {}
+  } catch {}
       })();
 
       syncPromises.push(p);

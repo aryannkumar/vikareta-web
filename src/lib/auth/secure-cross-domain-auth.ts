@@ -90,8 +90,7 @@ export function handlePostLoginRedirect(searchParams?: URLSearchParams): void {
 export async function syncSSOToSubdomains(targets?: string[]): Promise<void> {
   if (typeof window === 'undefined') return;
 
-  const backend = process.env.NEXT_PUBLIC_API_BASE || 
-    (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
+  const originSSOEndpoint = '/api/auth/sso-token';
 
   // Determine targets
   if (!targets || targets.length === 0) {
@@ -115,7 +114,7 @@ export async function syncSSOToSubdomains(targets?: string[]): Promise<void> {
     const p = (async () => {
       try {
         // Request signed SSO token from backend
-        const resp = await fetch(`${backend}/api/auth/sso-token`, {
+  const resp = await fetch(originSSOEndpoint, {
           method: 'POST',
           credentials: 'include', // Send HttpOnly cookies for authentication
           headers: { 
