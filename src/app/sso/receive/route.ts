@@ -5,7 +5,7 @@ export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const token = url.searchParams.get('token');
-    if (!token) return NextResponse.redirect('/login');
+  if (!token) return NextResponse.redirect('/auth/login');
 
     const SSO_SECRET = process.env.SSO_SECRET || process.env.JWT_SECRET || 'sso-secret';
 
@@ -13,13 +13,13 @@ export async function GET(req: Request) {
     try {
       payload = jwt.verify(token, SSO_SECRET) as any;
     } catch {
-      return NextResponse.redirect('/login');
+  return NextResponse.redirect('/auth/login');
     }
 
     // Validate audience claim (optional)
     const expectedHost = process.env.NEXT_PUBLIC_MAIN_HOST || 'vikareta.com';
     if (payload.aud && !payload.aud.includes(expectedHost)) {
-      return NextResponse.redirect('/login');
+      return NextResponse.redirect('/auth/login');
     }
 
     // Validate token with backend before trusting it
@@ -33,11 +33,11 @@ export async function GET(req: Request) {
 
       const validateJson = await validateRes.json();
       if (!validateJson?.success) {
-        return NextResponse.redirect('/login');
+        return NextResponse.redirect('/auth/login');
       }
     } catch (err) {
       console.error('SSO validation call failed', err);
-      return NextResponse.redirect('/login');
+  return NextResponse.redirect('/auth/login');
     }
 
     // Set HttpOnly cookie on this domain
@@ -64,6 +64,6 @@ export async function GET(req: Request) {
       } 
     });
   } catch {
-    return NextResponse.redirect('/login');
+    return NextResponse.redirect('/auth/login');
   }
 }

@@ -193,8 +193,8 @@ export class VikaretaSessionManager {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(VIKARETA_AUTH_CONSTANTS.STORAGE_KEYS.AUTH_STATE);
       
-      // Redirect to login
-      window.location.href = '/login?reason=timeout';
+  // Redirect to login
+  window.location.href = '/auth/login?reason=timeout';
     }
   }
 

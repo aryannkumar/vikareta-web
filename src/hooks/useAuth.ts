@@ -163,7 +163,7 @@ export function useAuth(): UseAuthReturn {
       
       // Redirect to login
       if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        window.location.href = '/auth/login';
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Logout failed');
@@ -204,25 +204,17 @@ export function useAuth(): UseAuthReturn {
             if (!token) return;
 
             await new Promise<void>((resolve) => {
-              const iframe = document.createElement('iframe');
-              iframe.style.display = 'none';
-              iframe.src = `https://${host}/sso/receive?token=${encodeURIComponent(token)}`;
-
-              const cleanup = () => {
-                try { window.removeEventListener('message', onMessage); } catch {}
-                try { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch {}
+              try {
+                const img = new Image();
+                const url = `https://${host}/sso/receive?token=${encodeURIComponent(token)}&t=${Date.now()}`;
+                const done = () => resolve();
+                img.onload = done;
+                img.onerror = done;
+                img.src = url;
+                setTimeout(done, 5000);
+              } catch {
                 resolve();
-              };
-
-              const onMessage = (e: MessageEvent) => {
-                if (e.origin === `https://${host}` && e.data?.sso === 'ok') {
-                  cleanup();
-                }
-              };
-
-              window.addEventListener('message', onMessage);
-              document.body.appendChild(iframe);
-              setTimeout(() => cleanup(), 5000);
+              }
             });
           } catch {}
         })();

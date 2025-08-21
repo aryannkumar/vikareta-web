@@ -377,6 +377,12 @@ export function Footer() {
                   Terms of Service
                 </Link>
                 <Link 
+                  href="/legal/google-oauth" 
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  Google OAuth Data Use
+                </Link>
+                <Link 
                   href="/cookies" 
                   className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
