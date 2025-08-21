@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(req: NextRequest) {
   try {
     const apiBase = process.env.NEXT_PUBLIC_API_BASE || (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
+    console.log('Main Site Login API: Forwarding to', `${apiBase}/api/auth/login`);
 
     let body: any = {};
     try { body = await req.json(); } catch { body = {}; }
@@ -20,6 +21,12 @@ export async function POST(req: NextRequest) {
     });
 
     const text = await resp.text();
+    console.log('Main Site Login API: Backend response', {
+      status: resp.status,
+      ok: resp.ok,
+      contentLength: text.length
+    });
+
     let data: any = {};
     try { data = text ? JSON.parse(text) : {}; } catch { data = { message: text }; }
 
@@ -35,6 +42,11 @@ export async function POST(req: NextRequest) {
 
     return res;
   } catch (err: any) {
-    return NextResponse.json({ message: err?.message || 'Login failed' }, { status: 500 });
+    console.error('Main Site Login API: Error occurred', err);
+    return NextResponse.json({ 
+      success: false,
+      message: err?.message || 'Login failed',
+      error: { message: err?.message || 'Login request failed' }
+    }, { status: 500 });
   }
 }

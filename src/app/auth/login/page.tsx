@@ -27,7 +27,12 @@ const useSecureSSOAuth = () => {
   const login = async (loginData: any) => {
     setIsLoading(true);
     try {
-        const response = await fetch(`/api/auth/login`, {
+      console.log('Main Site Login: Attempting login with data:', { 
+        email: loginData.email?.substring(0, 5) + '***',
+        hasPassword: !!loginData.password 
+      });
+
+      const response = await fetch(`/api/auth/login`, {
         method: 'POST',
         credentials: 'include', // Critical: Include HttpOnly cookies
         headers: {
@@ -36,16 +41,34 @@ const useSecureSSOAuth = () => {
         body: JSON.stringify(loginData),
       });
 
+      console.log('Main Site Login: API response status:', response.status, response.ok);
+
+      if (!response.ok) {
+        let errorText = 'Login failed';
+        try {
+          const errorData = await response.json();
+          errorText = errorData.message || errorData.error?.message || `HTTP ${response.status}`;
+        } catch {
+          errorText = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        throw new Error(errorText);
+      }
+
       const result = await response.json();
+      console.log('Main Site Login: API response data:', { 
+        success: result.success, 
+        hasUser: !!result.user,
+        userType: result.user?.userType 
+      });
       
       if (result.success && result.user) {
         setUser(result.user);
         return result;
       } else {
-        throw new Error(result.error?.message || 'Login failed');
+        throw new Error(result.error?.message || result.message || 'Login failed');
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Main Site Login: Error occurred:', error);
       return {
         success: false,
         error: { message: error instanceof Error ? error.message : 'Login failed' }
@@ -192,7 +215,11 @@ function LoginPageContent() {
 
   // Simple cross-domain auth helpers
   const getPostLoginRedirectUrl = (user: any) => {
-    if (user?.userType === 'seller') return '/dashboard';
+    // Redirect sellers to dashboard subdomain, others to home page
+    if (user?.userType === 'seller' || user?.userType === 'both') {
+      return 'https://dashboard.vikareta.com/dashboard';
+    }
+    // All other users go to home page (root)
     return '/';
   };
 
