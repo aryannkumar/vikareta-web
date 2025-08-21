@@ -113,70 +113,50 @@ class ApiClient {
    * Get CSRF token from backend if not available in cookies
    */
   private async ensureCSRFToken(): Promise<string | null> {
+    // Do not attempt CSRF acquisition during SSR; there is no browser cookie jar
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
     let csrfToken = this.getCSRFToken();
-    
+
     // Only log debug information in development
     if (process.env.NODE_ENV === 'development') {
       console.log('Cookie Debug:', {
-        currentDomain: typeof window !== 'undefined' ? window.location.hostname : 'server',
+        currentDomain: window.location.hostname,
         apiDomain: this.baseURL,
-        cookieCount: typeof window !== 'undefined' ? document.cookie.split(';').filter(c => c.trim()).length : 0,
-        hasXSRF: typeof window !== 'undefined' ? document.cookie.includes('XSRF-TOKEN') : false,
-        hasSession: typeof window !== 'undefined' ? document.cookie.includes('vikareta.sid') : false
+        cookieCount: document.cookie.split(';').filter(c => c.trim()).length,
+        hasXSRF: document.cookie.includes('XSRF-TOKEN'),
       });
     }
-    
-    // In development, skip all complex auth flows and just return null
-    // This will trigger the development bypass in the request method
+
+    // In development, skip CSRF mechanics entirely
     if (process.env.NODE_ENV === 'development') {
-      console.log('Development mode: skipping CSRF token acquisition');
       return null;
     }
-    
-    // Production code for getting CSRF token
+
+    // In production, acquire CSRF by calling our proxy that sets XSRF-TOKEN
     if (!csrfToken) {
       try {
-        console.log('No CSRF token found, attempting to get one from backend...');
-        
-        // Try to get session status - this should set necessary cookies
-  const sessionResponse = await fetch(`/api/auth/session`, {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        console.log('Session response:', sessionResponse.status);
-        
-        // Check if CSRF token is now available
+        await fetch('/api/csrf-token', { credentials: 'include' });
         csrfToken = this.getCSRFToken();
-        
-        // If still no CSRF token, try auth/me endpoint
+
+        // Fallback: touch auth/me only in the browser to encourage cookie sync
         if (!csrfToken) {
-          const meResponse = await fetch(`/api/auth/me`, {
+          const meResp = await fetch('/api/auth/me', {
             method: 'GET',
             credentials: 'include',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Accept': 'application/json' },
           });
-          
-          console.log('Auth me response:', meResponse.status);
-          
-          // Check again for CSRF token
+          // Even if unauthorized, cookies like XSRF-TOKEN may be set by the proxy
+          void meResp;
           csrfToken = this.getCSRFToken();
         }
-        
-        console.log('CSRF token after session attempts:', !!csrfToken);
-        
       } catch (error) {
-        console.log('Could not establish session with backend:', error);
+        console.log('CSRF acquisition failed:', error);
       }
     }
-    
+
     return csrfToken;
   }
 

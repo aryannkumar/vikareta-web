@@ -17,18 +17,19 @@ export async function GET(req: NextRequest) {
   const data = dataText ? (() => { try { return JSON.parse(dataText); } catch { return { message: dataText }; } })() : {};
   const res = NextResponse.json(data, { status: resp.status });
 
-  // Forward Set-Cookie headers from backend if present
-  const cookies: string[] = [];
-  // Node fetch may combine or present multiple Set-Cookie headers—collect them robustly
-  const single = resp.headers.get('set-cookie');
-  if (single) cookies.push(single);
-  // Some runtimes expose headers via for..of iteration
-  for (const [key, value] of (resp.headers as any)) {
-    if (key.toLowerCase() === 'set-cookie') {
-      cookies.push(value);
-    }
+  // Forward Set-Cookie headers from backend if present (handle combined header values)
+  const rawSetCookie = resp.headers.get('set-cookie');
+  if (rawSetCookie) {
+    const parts = rawSetCookie.split(/,(?=\s*[A-Za-z0-9_-]+=)/g);
+    parts.forEach((c) => res.headers.append('Set-Cookie', c.trim()));
   }
-  cookies.forEach((c) => res.headers.append('Set-Cookie', c));
+  try {
+    for (const [key, value] of (resp.headers as any)) {
+      if (String(key).toLowerCase() === 'set-cookie') {
+        res.headers.append('Set-Cookie', value);
+      }
+    }
+  } catch {}
 
   return res;
 }
