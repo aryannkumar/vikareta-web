@@ -211,7 +211,7 @@ function LoginPageContent() {
   
   const searchParams = useSearchParams();
   const redirectUrl = searchParams?.get('redirect');
-  const { login, user } = useSecureSSOAuth();
+  const { login, user, checkSession } = useSecureSSOAuth();
 
   // Simple cross-domain auth helpers
   const getPostLoginRedirectUrl = (user: any) => {
@@ -471,7 +471,26 @@ function LoginPageContent() {
       // Return URL now handled via URL parameters for security
       // No localStorage usage for enhanced security
 
-      const effectiveUser = loggedInUser || user;
+      // Ensure session is established before deciding redirects
+      let effectiveUser = loggedInUser || user;
+      try {
+        if (!effectiveUser) {
+          const sessionUser = await checkSession();
+          if (sessionUser) effectiveUser = sessionUser;
+        }
+        // If still no user, try a refresh (requires CSRF in header)
+        if (!effectiveUser) {
+          const csrf = await ensureCsrfToken();
+          await fetch('/api/auth/refresh', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
+            body: JSON.stringify({})
+          }).catch(() => {});
+          const sessionUser2 = await checkSession();
+          if (sessionUser2) effectiveUser = sessionUser2;
+        }
+      } catch {}
 
       if (!targetUrl && effectiveUser) {
         targetUrl = getPostLoginRedirectUrl(effectiveUser);
