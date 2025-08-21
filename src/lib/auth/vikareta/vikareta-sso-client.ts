@@ -46,6 +46,36 @@ export class VikaretaSSOClient {
         return storedState;
       }
 
+      // No stored auth: attempt to bootstrap from backend cookies
+      try {
+        const resp = await fetch('/api/auth/me', {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.success && data.user && isVikaretaUser(data.user)) {
+            // Build auth data from response and persist for unified flow
+            const authData: VikaretaAuthData = {
+              user: data.user,
+              tokens: {
+                accessToken: data.accessToken || '',
+                refreshToken: data.refreshToken || '',
+                tokenType: 'Bearer'
+              },
+              sessionId: data.sessionId || null,
+              domain: vikaretaCrossDomainAuth.getCurrentDomain()
+            };
+            try { vikaretaCrossDomainAuth.storeAuthData(authData); } catch {}
+
+            return { user: data.user, isAuthenticated: true, isLoading: false, error: null, sessionId: data.sessionId || null };
+          }
+        }
+  } catch {
+        // Ignore bootstrap failures; fall through to unauthenticated state
+      }
+
       return { user: null, isAuthenticated: false, isLoading: false, error: null, sessionId: null };
     } catch (error) {
       console.error('Failed to initialize SSO client:', error);

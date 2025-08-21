@@ -343,6 +343,18 @@ function LoginPageContent() {
     return `+${cleaned}`;
   };
 
+  // Normalize identifier to ensure consistency between send-otp and verify-otp
+  const normalizeIdentifier = (method: 'email' | 'phone', value: string): string => {
+    if (method === 'email') {
+      return value.trim().toLowerCase();
+    }
+    // Phone: normalize to E.164 without spaces
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.startsWith('91')) return `+${cleaned}`;
+    if (cleaned.length === 10) return `+91${cleaned}`;
+    return `+${cleaned}`;
+  };
+
   // Validate form based on current step and auth method
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -383,7 +395,7 @@ function LoginPageContent() {
   const sendOtp = async () => {
     setOtpLoading(true);
     try {
-      const identifier = authMethod === 'email' ? formData.email : formData.phone;
+  const identifier = normalizeIdentifier(authMethod, authMethod === 'email' ? formData.email : formData.phone);
       const csrf = await ensureCsrfToken();
       const resp = await fetch('/api/auth/send-otp', {
         method: 'POST',
@@ -433,7 +445,7 @@ function LoginPageContent() {
     } else if (step === 'otp') {
       setLoading(true);
       try {
-        const identifier = authMethod === 'email' ? formData.email : formData.phone;
+        const identifier = normalizeIdentifier(authMethod, authMethod === 'email' ? formData.email : formData.phone);
         const csrf = await ensureCsrfToken();
         const resp = await fetch('/api/auth/verify-otp', {
           method: 'POST',
@@ -444,7 +456,10 @@ function LoginPageContent() {
         if (resp.ok) {
           handleLoginSuccess();
         } else {
-          const data = await resp.json().catch(() => ({} as any));
+          const text = await resp.text().catch(() => '');
+          let data: any = {};
+          try { data = text ? JSON.parse(text) : {}; } catch { data = { message: text }; }
+          console.warn('OTP verify failed', { status: resp.status, body: data });
           setErrors({ otp: data?.error?.message || 'Invalid OTP. Please try again.' });
         }
       } catch (error) {

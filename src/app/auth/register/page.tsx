@@ -310,7 +310,12 @@ export default function RegisterPage() {
     setOtpLoading(true);
     setCurrentOtpType(type);
     try {
-      const identifier = type === 'email' ? formData.email : formData.phone;
+      const identifier = type === 'email' ? formData.email.trim().toLowerCase() : (() => {
+        const cleaned = formData.phone.replace(/\D/g, '');
+        if (cleaned.startsWith('91')) return `+${cleaned}`;
+        if (cleaned.length === 10) return `+91${cleaned}`;
+        return `+${cleaned}`;
+      })();
       // ensure CSRF cookie is set
       try { await fetch('/api/csrf-token', { credentials: 'include' }); } catch {}
       const csrf = (typeof document !== 'undefined') ? (document.cookie.split(';').find(c => c.trim().startsWith('XSRF-TOKEN='))?.split('=')[1] ? decodeURIComponent(document.cookie.split(';').find(c => c.trim().startsWith('XSRF-TOKEN='))!.split('=')[1]) : null) : null;
@@ -334,7 +339,12 @@ export default function RegisterPage() {
   const verifyOTP = async (code: string, type: 'email' | 'phone') => {
     setLoading(true);
     try {
-      const identifier = type === 'email' ? formData.email : formData.phone;
+      const identifier = type === 'email' ? formData.email.trim().toLowerCase() : (() => {
+        const cleaned = formData.phone.replace(/\D/g, '');
+        if (cleaned.startsWith('91')) return `+${cleaned}`;
+        if (cleaned.length === 10) return `+91${cleaned}`;
+        return `+${cleaned}`;
+      })();
       // ensure CSRF cookie is set
       try { await fetch('/api/csrf-token', { credentials: 'include' }); } catch {}
       const csrf = (typeof document !== 'undefined') ? (document.cookie.split(';').find(c => c.trim().startsWith('XSRF-TOKEN='))?.split('=')[1] ? decodeURIComponent(document.cookie.split(';').find(c => c.trim().startsWith('XSRF-TOKEN='))!.split('=')[1]) : null) : null;
@@ -345,7 +355,10 @@ export default function RegisterPage() {
         body: JSON.stringify({ type, identifier, otp: code })
       });
       if (!resp.ok) {
-        const data = await resp.json().catch(() => ({} as any));
+        const text = await resp.text().catch(() => '');
+        let data: any = {};
+        try { data = text ? JSON.parse(text) : {}; } catch { data = { message: text }; }
+        console.warn('Register verify OTP failed', { status: resp.status, body: data });
         throw new Error(data?.error?.message || 'Invalid OTP');
       }
       if (type === 'email') {
