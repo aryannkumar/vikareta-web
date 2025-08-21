@@ -154,9 +154,9 @@ export function useAuth(): UseAuthReturn {
     try {
       setLoading(true);
       
-      // Import and use cross-domain logout
-      const { performSecureLogout } = await import('../lib/auth/cross-domain-logout');
-      await performSecureLogout();
+      // Use unified cross-domain logout
+      const { vikaretaCrossDomainAuth } = await import('../lib/auth/vikareta');
+      await vikaretaCrossDomainAuth.logoutFromAllDomains();
       
       setUser(null);
       setError(null);

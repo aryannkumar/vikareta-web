@@ -1,18 +1,20 @@
 /**
- * Secure SSO Authentication Hook - HttpOnly Cookie Based
- * No localStorage for enhanced security
+ * Web Auth Provider - Using Unified Vikareta Auth System
+ * Simplified provider that uses the unified authentication
  */
 
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext } from 'react';
+import { useVikaretaAuth, VikaretaAuthProvider, VikaretaUser } from '@/lib/auth/vikareta';
 
+// Web User type for backward compatibility
 export interface User {
   id: string;
   email: string;
   firstName?: string;
   lastName?: string;
-  name: string;
+  name: string; // Computed from firstName + lastName
   userType: 'buyer' | 'seller' | 'admin' | 'both';
   role?: 'buyer' | 'seller' | 'admin' | 'both'; // For backwards compatibility
   verified: boolean;
@@ -30,146 +32,74 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function SSOAuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  // Helper function to get CSRF token
-  const getCSRFToken = useCallback((): string | null => {
-    if (typeof window === 'undefined') return null;
+// Convert VikaretaUser to legacy User format for backward compatibility
+function convertUser(vikaretaUser: VikaretaUser | null): User | null {
+  if (!vikaretaUser) return null;
+  
+  const fullName = [vikaretaUser.firstName, vikaretaUser.lastName]
+    .filter(Boolean)
+    .join(' ') || 'User';
     
-    const cookies = document.cookie.split(';');
-    const csrfCookie = cookies.find(cookie => 
-      cookie.trim().startsWith('XSRF-TOKEN=')
-    );
-    
-    if (csrfCookie) {
-      return decodeURIComponent(csrfCookie.split('=')[1]);
-    }
-    
-    return null;
-  }, []);
-
-  // Secure API request helper
-  const secureRequest = useCallback(async (endpoint: string, options: RequestInit = {}) => {
-    // Use the same API base as the main API client for consistency
-    const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://api.vikareta.com';
-    
-    // Build full URL for backend API
-    const fullUrl = endpoint.startsWith('http') ? endpoint : `${apiBase}${endpoint}`;
-    
-    const config: RequestInit = {
-      credentials: 'include', // Critical: Always include HttpOnly cookies
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      ...options,
-    };
-
-    // Add CSRF token for state-changing requests
-    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method || 'GET')) {
-      const csrfToken = getCSRFToken();
-      if (csrfToken) {
-        config.headers = {
-          ...config.headers,
-          'X-XSRF-TOKEN': csrfToken,
-        };
-      }
-    }
-
-    const response = await fetch(fullUrl, config);
-    
-    if (!response.ok) {
-      if (response.status === 401) {
-        // Unauthorized - clear auth state
-        setUser(null);
-        setIsAuthenticated(false);
-      }
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP ${response.status}`);
-    }
-
-    return response.json();
-  }, [getCSRFToken]);
-
-  // Check current session using HttpOnly cookies
-  const checkSession = useCallback(async () => {
-    try {
-      setLoading(true);
-      
-      const response = await secureRequest('/api/auth/me');
-      
-      if (response.success && response.user) {
-        setUser(response.user);
-        setIsAuthenticated(true);
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-      }
-    } catch {
-      // 401 is expected when not logged in
-      setUser(null);
-      setIsAuthenticated(false);
-    } finally {
-      setLoading(false);
-    }
-  }, [secureRequest]);
-
-  // Secure logout function
-  const logout = useCallback(async () => {
-    try {
-      // Import cross-domain logout utility
-      const { performSecureLogout } = await import('../auth/cross-domain-logout');
-      
-      // Perform comprehensive cross-domain logout
-      await performSecureLogout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      // Always clear local state
-      setUser(null);
-      setIsAuthenticated(false);
-      
-      // Redirect to login page
-      if (typeof window !== 'undefined') {
-        window.location.href = '/auth/login';
-      }
-    }
-  }, []);
-
-  // Check session on mount
-  useEffect(() => {
-    checkSession();
-  }, [checkSession]);
-
-  // Periodic session refresh (every 5 minutes)
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const interval = setInterval(() => {
-      checkSession();
-    }, 5 * 60 * 1000); // 5 minutes
-
-    return () => clearInterval(interval);
-  }, [isAuthenticated, checkSession]);
-
-  const value: AuthContextType = {
-    user,
-    isAuthenticated,
-    loading,
-    logout,
-    refreshSession: checkSession,
+  // Handle super_admin by mapping to admin for backward compatibility
+  const userType = vikaretaUser.userType === 'super_admin' ? 'admin' : (vikaretaUser.userType || 'buyer');
+  
+  return {
+    id: vikaretaUser.id,
+    email: vikaretaUser.email || '',
+    firstName: vikaretaUser.firstName,
+    lastName: vikaretaUser.lastName,
+    name: fullName,
+    userType: userType as 'buyer' | 'seller' | 'admin' | 'both',
+    role: userType as 'buyer' | 'seller' | 'admin' | 'both', // Backward compatibility
+    verified: vikaretaUser.isVerified || false,
+    avatar: undefined, // Not available in VikaretaUser
+    createdAt: vikaretaUser.createdAt || new Date().toISOString(),
   };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useSSOAuth() {
+export function WebAuthProvider({ children }: { children: React.ReactNode }) {
+  // Use the unified Vikareta auth system underneath
+  return (
+    <VikaretaAuthProvider>
+      <WebAuthBridge>
+        {children}
+      </WebAuthBridge>
+    </VikaretaAuthProvider>
+  );
+}
+
+function WebAuthBridge({ children }: { children: React.ReactNode }) {
+  const vikaretaAuth = useVikaretaAuth();
+  
+  // Convert to legacy format
+  const user = convertUser(vikaretaAuth.user);
+  
+  const authContextValue: AuthContextType = {
+    user,
+    isAuthenticated: vikaretaAuth.isAuthenticated,
+    loading: vikaretaAuth.isLoading,
+    logout: vikaretaAuth.logout,
+    refreshSession: async () => {
+      // The unified system handles session refresh automatically
+      await vikaretaAuth.refreshToken();
+    },
+  };
+
+  return (
+    <AuthContext.Provider value={authContextValue}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useWebAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useSSOAuth must be used within a SSOAuthProvider');
+    throw new Error('useWebAuth must be used within a WebAuthProvider');
   }
   return context;
 }
+
+// Backward compatibility exports
+export const useSSOAuth = useWebAuth;
+export const SSOAuthProvider = WebAuthProvider;

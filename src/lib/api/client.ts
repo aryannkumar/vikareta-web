@@ -91,7 +91,7 @@ class ApiClient {
     }
     
     try {
-      const { syncSSOToSubdomains } = await import('../auth/secure-cross-domain-auth');
+      const { vikaretaCrossDomainAuth } = await import('../auth/vikareta');
       
       // Extract API domain from base URL
       const apiUrl = new URL(this.baseURL);
@@ -100,7 +100,7 @@ class ApiClient {
       console.log('Attempting SSO sync to API domain:', apiDomain);
       
       // Try SSO sync - this will fail if user is not authenticated on main domain
-      await syncSSOToSubdomains([apiDomain]);
+      await vikaretaCrossDomainAuth.syncSSOAcrossDomains();
       
       console.log('SSO sync completed');
     } catch (error) {

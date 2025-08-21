@@ -369,9 +369,9 @@ export function Header() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="relative flex items-center space-x-2 p-3">
                       <User className="h-5 w-5" />
-                      {user?.name && (
+                      {user?.firstName && (
                         <span className="hidden sm:inline font-medium">
-                          {user.name.split(' ')[0]}
+                          {user.firstName}
                         </span>
                       )}
                     </Button>
@@ -379,8 +379,8 @@ export function Header() {
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex flex-col space-y-1 leading-none">
-                        {user?.name && (
-                          <p className="font-medium">{user.name}</p>
+                        {(user?.firstName || user?.lastName) && (
+                          <p className="font-medium">{user.firstName} {user.lastName}</p>
                         )}
                         {user?.email && (
                           <p className="w-[200px] truncate text-sm text-muted-foreground">

@@ -214,9 +214,9 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         try {
-          // Import and use cross-domain logout
-          const { performSecureLogout } = await import('../auth/cross-domain-logout');
-          await performSecureLogout();
+          // Use unified cross-domain logout
+          const { vikaretaCrossDomainAuth } = await import('../auth/vikareta');
+          await vikaretaCrossDomainAuth.logoutFromAllDomains();
         } catch {
           // Silent fail for logout
         }

@@ -221,7 +221,7 @@ export class RFQService {
   private constructor() {
     // Initialize auth token from localStorage or cookies
     if (typeof window !== 'undefined') {
-      this.authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+      this.authToken = localStorage.getItem('vikareta_access_token') || sessionStorage.getItem('vikareta_access_token');
     }
   }
 
@@ -247,7 +247,7 @@ export class RFQService {
   setAuthToken(token: string) {
     this.authToken = token;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('authToken', token);
+      localStorage.setItem('vikareta_access_token', token);
     }
   }
 

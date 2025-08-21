@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { marketplaceApi } from '@/lib/api/marketplace';
 import { useSSOAuth } from '@/lib/auth/use-sso-auth';
-import { navigateToLogin } from '@/lib/auth/secure-cross-domain-auth';
+import { vikaretaCrossDomainAuth } from '@/lib/auth/vikareta';
 import { useWishlistStore } from '@/lib/stores/wishlist';
 import { useToast } from '@/components/ui/toast-provider';
 import { 
@@ -92,7 +92,7 @@ export default function BusinessProfilePage(props: any) {
     if (!isAuthenticated) {
       toast.error('Authentication Required', 'Please login to add businesses to your wishlist');
       // Use secure navigation instead of direct redirect
-      navigateToLogin();
+      vikaretaCrossDomainAuth.navigateToLogin();
       return;
     }
 
@@ -136,7 +136,7 @@ export default function BusinessProfilePage(props: any) {
             } else {
               toast.error('Error', 'Failed to add business to wishlist. Please try logging in again.');
               // If still failing, redirect to secure login
-              navigateToLogin();
+              vikaretaCrossDomainAuth.navigateToLogin();
             }
           }
         }
@@ -148,7 +148,7 @@ export default function BusinessProfilePage(props: any) {
       } else {
         toast.error('Error', 'An error occurred while updating wishlist. Please try logging in again.');
         // On error, also redirect to secure login
-        navigateToLogin();
+        vikaretaCrossDomainAuth.navigateToLogin();
       }
     }
   };
