@@ -20,12 +20,8 @@ export default function DashboardPage() {
 
   const checkAuthStatus = async () => {
     try {
-      // Get backend API base URL
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE || 
-        (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
-      
-      // Check authentication using secure HttpOnly cookies
-      const response = await fetch(`${apiBase}/api/auth/me`, {
+      // Check authentication using secure HttpOnly cookies via same-origin proxy
+      const response = await fetch(`/api/auth/me`, {
         credentials: 'include', // Include HttpOnly cookies
       });
       
