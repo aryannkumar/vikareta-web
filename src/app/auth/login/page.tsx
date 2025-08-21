@@ -308,6 +308,15 @@ function LoginPageContent() {
     return null;
   };
 
+  const ensureCsrfToken = async () => {
+    if (!getCSRFToken()) {
+      try {
+        await fetch('/api/csrf-token', { credentials: 'include' });
+      } catch {}
+    }
+    return getCSRFToken();
+  };
+
   const hasDashboardAccess = (user: any) => {
     return user?.userType === 'seller' || user?.userType === 'admin';
   };
@@ -375,9 +384,10 @@ function LoginPageContent() {
     setOtpLoading(true);
     try {
       const identifier = authMethod === 'email' ? formData.email : formData.phone;
+      const csrf = await ensureCsrfToken();
       const resp = await fetch('/api/auth/send-otp', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
         credentials: 'include',
         body: JSON.stringify({ type: authMethod, identifier })
       });
@@ -424,9 +434,10 @@ function LoginPageContent() {
       setLoading(true);
       try {
         const identifier = authMethod === 'email' ? formData.email : formData.phone;
+        const csrf = await ensureCsrfToken();
         const resp = await fetch('/api/auth/verify-otp', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
           credentials: 'include',
           body: JSON.stringify({ type: authMethod, identifier, otp: formData.otp })
         });

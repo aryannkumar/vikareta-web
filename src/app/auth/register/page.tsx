@@ -311,9 +311,12 @@ export default function RegisterPage() {
     setCurrentOtpType(type);
     try {
       const identifier = type === 'email' ? formData.email : formData.phone;
+      // ensure CSRF cookie is set
+      try { await fetch('/api/csrf-token', { credentials: 'include' }); } catch {}
+      const csrf = (typeof document !== 'undefined') ? (document.cookie.split(';').find(c => c.trim().startsWith('XSRF-TOKEN='))?.split('=')[1] ? decodeURIComponent(document.cookie.split(';').find(c => c.trim().startsWith('XSRF-TOKEN='))!.split('=')[1]) : null) : null;
       const resp = await fetch('/api/auth/send-otp', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
         credentials: 'include',
         body: JSON.stringify({ type, identifier })
       });
@@ -332,9 +335,12 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const identifier = type === 'email' ? formData.email : formData.phone;
+      // ensure CSRF cookie is set
+      try { await fetch('/api/csrf-token', { credentials: 'include' }); } catch {}
+      const csrf = (typeof document !== 'undefined') ? (document.cookie.split(';').find(c => c.trim().startsWith('XSRF-TOKEN='))?.split('=')[1] ? decodeURIComponent(document.cookie.split(';').find(c => c.trim().startsWith('XSRF-TOKEN='))!.split('=')[1]) : null) : null;
       const resp = await fetch('/api/auth/verify-otp', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
         credentials: 'include',
         body: JSON.stringify({ type, identifier, otp: code })
       });
