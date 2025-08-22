@@ -214,12 +214,8 @@ function LoginPageContent() {
   const { login, user, checkSession } = useSecureSSOAuth();
 
   // Simple cross-domain auth helpers
-  const getPostLoginRedirectUrl = (user: any) => {
-    // Redirect sellers to dashboard subdomain, others to home page
-    if (user?.userType === 'seller' || user?.userType === 'both') {
-      return 'https://dashboard.vikareta.com/dashboard';
-    }
-    // All other users go to home page (root)
+  const getPostLoginRedirectUrl = (_user: any) => {
+    // Always land on homepage after login; let users navigate via header
     return '/';
   };
 
