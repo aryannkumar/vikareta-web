@@ -5,15 +5,20 @@ import { persist } from 'zustand/middleware';
 
 // Secure SSO sync function
 const syncSSOToSubdomains = async (targets: string[]) => {
+  console.log('SSO Sync: Starting sync to targets:', targets);
   try {
     const syncPromises: Promise<void>[] = [];
 
     for (const host of targets) {
       const p = (async () => {
         try {
+          console.log('SSO Sync: Processing host:', host);
+          
           // Use same-origin proxy to obtain SSO token with current cookies
           const csrfToken = typeof window !== 'undefined' ? 
             document.cookie.split(';').find(cookie => cookie.trim().startsWith('XSRF-TOKEN='))?.split('=')[1] : null;
+          
+          console.log('SSO Sync: Making request for SSO token for host:', host);
           const resp = await fetch('/api/auth/sso-token', {
             method: 'POST',
             credentials: 'include',
@@ -24,10 +29,20 @@ const syncSSOToSubdomains = async (targets: string[]) => {
             body: JSON.stringify({ target: host }),
           });
 
-          if (!resp.ok) return;
+          console.log('SSO Sync: Token request response for', host, ':', resp.status);
+          if (!resp.ok) {
+            console.warn('SSO Sync: Failed to get token for', host, '- status:', resp.status);
+            return;
+          }
+          
           const data = await resp.json();
           const token = data?.token;
-          if (!token) return;
+          if (!token) {
+            console.warn('SSO Sync: No token received for', host);
+            return;
+          }
+          
+          console.log('SSO Sync: Got token for', host, ', creating iframe...');
 
           await new Promise<void>((resolve) => {
             const iframe = document.createElement('iframe');
@@ -41,23 +56,35 @@ const syncSSOToSubdomains = async (targets: string[]) => {
             };
 
             const onMessage = (e: MessageEvent) => {
+              console.log('SSO Sync: Received message from', e.origin, ':', e.data);
               if (e.origin === `https://${host}` && e.data?.sso === 'ok') {
+                console.log('SSO Sync: Successfully synced to', host);
                 cleanup();
               }
             };
 
             window.addEventListener('message', onMessage);
             document.body.appendChild(iframe);
-            setTimeout(() => cleanup(), 5000);
+            
+            // Longer timeout for slower connections
+            setTimeout(() => {
+              console.log('SSO Sync: Timeout for', host);
+              cleanup();
+            }, 10000);
           });
-  } catch {}
+        } catch (error) {
+          console.error('SSO Sync: Error syncing to', host, ':', error);
+        }
       })();
 
       syncPromises.push(p);
     }
 
     await Promise.all(syncPromises);
-  } catch {}
+    console.log('SSO Sync: All sync operations completed');
+  } catch (error) {
+    console.error('SSO Sync: Critical error:', error);
+  }
 };
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api').replace(/\/api\/api$/, '/api');
