@@ -185,8 +185,8 @@ export function HeroSection() {
                       className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all"
                       onClick={() => {
                         const dashboardUrl = process.env.NODE_ENV === 'development'
-                          ? 'http://localhost:3001/dashboard'
-                          : 'https://dashboard.vikareta.com/dashboard';
+                          ? 'http://localhost:3001'
+                          : 'https://dashboard.vikareta.com';
 
                         const token = localStorage.getItem('auth_token');
                         if (token) {

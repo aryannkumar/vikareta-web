@@ -18,8 +18,8 @@ export const ROUTES = {
   LOGIN: '/auth/login',
   REGISTER: '/auth/register',
   DASHBOARD: process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:3001/dashboard' 
-    : 'https://dashboard.vikareta.com/dashboard',
+    ? 'http://localhost:3001' 
+    : 'https://dashboard.vikareta.com',
   PRODUCTS: '/products',
   CART: '/cart',
   CHECKOUT: '/checkout',

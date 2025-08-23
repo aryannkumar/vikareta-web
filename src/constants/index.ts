@@ -309,8 +309,8 @@ export const NAVIGATION = {
   ],
   USER: [
     { name: 'Dashboard', href: process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:3001/dashboard' 
-        : 'https://dashboard.vikareta.com/dashboard' },
+        ? 'http://localhost:3001' 
+        : 'https://dashboard.vikareta.com' },
     { name: 'Profile', href: '/profile' },
     { name: 'Orders', href: '/orders' },
     { name: 'Wallet', href: '/wallet' },
