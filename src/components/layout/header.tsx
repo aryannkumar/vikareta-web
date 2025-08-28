@@ -312,20 +312,12 @@ export function Header() {
                   size="sm" 
                   variant="outline"
                   className="hidden sm:flex items-center space-x-2 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
-                  onClick={async () => {
-                    try {
-                      // SSO sync to dashboard (returnUrl handled by SSO)
-                      const targets = [process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'];
-                      await syncSSOToSubdomains(targets);
-                      const dashboardUrl = process.env.NODE_ENV === 'development' 
-                        ? 'http://localhost:3001' 
-                        : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
-                      window.open(dashboardUrl, '_blank', 'noopener,noreferrer');
-                    } catch (err) {
-                      console.error('Failed to open dashboard via SSO:', err);
-                      const fallback = process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
-                      window.open(fallback, '_blank', 'noopener,noreferrer');
-                    }
+                  onClick={() => {
+                    // Open dashboard directly in new tab - SSO will handle authentication
+                    const dashboardUrl = process.env.NODE_ENV === 'development' 
+                      ? 'http://localhost:3001' 
+                      : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
+                    window.open(dashboardUrl, '_blank', 'noopener,noreferrer');
                   }}
                 >
                   <Store className="h-4 w-4" />
@@ -416,20 +408,12 @@ export function Header() {
                     { (user && hasSellerAccess(user)) && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={async () => {
-                          try {
-                            // Navigate with returnUrl parameter for security (no localStorage)
-                            const targets = [process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'];
-                            await syncSSOToSubdomains(targets);
-                            const dashboardUrl = process.env.NODE_ENV === 'development' 
-                              ? 'http://localhost:3001' 
-                              : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
-                            window.open(dashboardUrl, '_blank', 'noopener,noreferrer');
-                          } catch (err) {
-                            console.error('Failed to open dashboard via SSO:', err);
-                            const fallback = process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
-                            window.open(fallback, '_blank', 'noopener,noreferrer');
-                          }
+                        <DropdownMenuItem onClick={() => {
+                          // Open dashboard directly in new tab - SSO will handle authentication
+                          const dashboardUrl = process.env.NODE_ENV === 'development' 
+                            ? 'http://localhost:3001' 
+                            : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
+                          window.open(dashboardUrl, '_blank', 'noopener,noreferrer');
                         }}>
                           <Store className="mr-2 h-4 w-4" />
                           Supplier Dashboard
