@@ -49,40 +49,38 @@ const syncSSOToSubdomains = async (targets: string[]) => {
     for (const host of targets) {
       const p = (async () => {
         try {
-          const resp = await fetch('/api/auth/sso-token', {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ target: host }),
-          });
-
-          if (!resp.ok) return;
-          const data = await resp.json();
-          const token = data?.token;
-          if (!token) return;
+          // Open the central OAuth authorize endpoint which will redirect
+          // to the target domain's /sso/receive with a one-time code.
+          const state = encodeURIComponent(`${Date.now()}-${Math.random().toString(36).slice(2)}`);
+          const redirectUri = encodeURIComponent(`https://${host}/sso/receive`);
+          const authorizeUrl = `/api/auth/oauth/authorize?client_id=web&redirect_uri=${redirectUri}&state=${state}`;
 
           await new Promise<void>((resolve) => {
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = `https://${host}/sso/receive?token=${encodeURIComponent(token)}`;
+            try {
+              const popup = window.open(authorizeUrl, '_blank', 'width=600,height=700');
+              if (!popup) return resolve();
 
-            const cleanup = () => {
-              try { window.removeEventListener('message', onMessage); } catch {}
-              try { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch {}
+              const cleanup = () => {
+                try { window.removeEventListener('message', onMessage); } catch {}
+                try { popup.close(); } catch {}
+                resolve();
+              };
+
+              const onMessage = (e: MessageEvent) => {
+                if (e.origin === `https://${host}` && e.data?.type === 'SSO_USER' && e.data?.state === state) {
+                  cleanup();
+                }
+              };
+
+              window.addEventListener('message', onMessage);
+              setTimeout(() => cleanup(), 10000);
+            } catch {
               resolve();
-            };
-
-            const onMessage = (e: MessageEvent) => {
-              if (e.origin === `https://${host}` && e.data?.sso === 'ok') {
-                cleanup();
-              }
-            };
-
-            window.addEventListener('message', onMessage);
-            document.body.appendChild(iframe);
-            setTimeout(() => cleanup(), 5000);
+            }
           });
-        } catch {}
+    } catch {
+      // continue on error
+    }
       })();
 
       syncPromises.push(p);

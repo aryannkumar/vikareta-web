@@ -42,35 +42,35 @@ const syncSSOToSubdomains = async (targets: string[]) => {
             return;
           }
           
-          console.log('SSO Sync: Got token for', host, ', creating iframe...');
+          console.log('SSO Sync: Opening authorize popup for', host);
 
           await new Promise<void>((resolve) => {
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = `https://${host}/sso/receive?token=${encodeURIComponent(token)}`;
+            try {
+              const state = encodeURIComponent(`${Date.now()}-${Math.random().toString(36).slice(2)}`);
+              const redirectUri = encodeURIComponent(`https://${host}/sso/receive`);
+              const authorizeUrl = `/api/auth/oauth/authorize?client_id=web&redirect_uri=${redirectUri}&state=${state}`;
+              const popup = window.open(authorizeUrl, '_blank', 'width=600,height=700');
 
-            const cleanup = () => {
-              try { window.removeEventListener('message', onMessage); } catch {}
-              try { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch {}
+              if (!popup) return resolve();
+
+              const cleanup = () => {
+                try { window.removeEventListener('message', onMessage); } catch {}
+                try { popup.close(); } catch {}
+                resolve();
+              };
+
+              const onMessage = (e: MessageEvent) => {
+                if (e.origin === `https://${host}` && e.data?.type === 'SSO_USER' && e.data?.state === state) {
+                  console.log('SSO Sync: Successfully synced to', host);
+                  cleanup();
+                }
+              };
+
+              window.addEventListener('message', onMessage);
+              setTimeout(() => cleanup(), 10000);
+            } catch {
               resolve();
-            };
-
-            const onMessage = (e: MessageEvent) => {
-              console.log('SSO Sync: Received message from', e.origin, ':', e.data);
-              if (e.origin === `https://${host}` && e.data?.sso === 'ok') {
-                console.log('SSO Sync: Successfully synced to', host);
-                cleanup();
-              }
-            };
-
-            window.addEventListener('message', onMessage);
-            document.body.appendChild(iframe);
-            
-            // Longer timeout for slower connections
-            setTimeout(() => {
-              console.log('SSO Sync: Timeout for', host);
-              cleanup();
-            }, 10000);
+            }
           });
         } catch (error) {
           console.error('SSO Sync: Error syncing to', host, ':', error);
