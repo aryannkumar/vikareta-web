@@ -27,40 +27,32 @@
             timestamp: Date.now(),
           };
 
-          // Helper: persist tokens by calling backend /auth/me (returns tokens in body)
-          const persistTokens = async () => {
+          // Helper: notify opener about authenticated user state.
+          // Do NOT persist tokens to localStorage here. Backend sets HttpOnly cookies.
+          const notifyOpenerWithUser = async () => {
             try {
               const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
               const backend = isLocal ? 'http://localhost:5001' : 'https://api.vikareta.com';
-              
+
               let res = await fetch(`${backend}/api/auth/me`, { credentials: 'include' });
               if (res.status === 401) {
-                // Try a refresh using refresh cookie, then retry /me
-                // First get CSRF token for the refresh request
+                // Attempt a token refresh using refresh cookie and retry
                 try {
                   await fetch(`${backend}/csrf-token`, { credentials: 'include' });
-                } catch (e) {
-                  // CSRF fetch failed, try refresh without CSRF header
-                }
-                
-                // Try refresh with credentials
-                await fetch(`${backend}/api/auth/refresh`, { 
-                  method: 'POST', 
-                  credentials: 'include',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  }
-                });
+                } catch (e) {}
+                await fetch(`${backend}/api/auth/refresh`, { method: 'POST', credentials: 'include' });
                 res = await fetch(`${backend}/api/auth/me`, { credentials: 'include' });
               }
+
               const data = await res.json().catch(() => null);
-              if (data && data.success && data.user) {
-                if (data.accessToken) localStorage.setItem('vikareta_access_token', data.accessToken);
-                if (data.refreshToken) localStorage.setItem('vikareta_refresh_token', data.refreshToken);
-                try { localStorage.setItem('vikareta_user', JSON.stringify(data.user)); } catch {}
+              // Post the user object (or null) to the opener so it can initialize the SSO client
+              if (window.opener && !window.opener.closed) {
+                window.opener.postMessage({ type: 'SSO_USER', data: data || null }, window.location.origin);
               }
             } catch (e) {
-              // ignore token persist errors; cookies are still set HttpOnly
+              if (window.opener && !window.opener.closed) {
+                window.opener.postMessage({ type: 'SSO_USER', data: null }, window.location.origin);
+              }
             }
           };
 
@@ -78,9 +70,9 @@
             window.opener.postMessage(message, allowedOrigin);
             setTimeout(() => { try { window.close(); } catch (e) {} }, 200);
           } else {
-            // Full-page redirect flow: persist tokens then navigate back
+            // Full-page redirect flow: inform opener (or handle client) then navigate back
             (async () => {
-              await persistTokens();
+              await notifyOpenerWithUser();
               const target = getReturnUrl();
               try { localStorage.removeItem('auth_return_url'); } catch {}
               window.location.replace(target);

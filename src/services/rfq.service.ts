@@ -1,4 +1,5 @@
 import { RFQRequest, RFQResponse } from '../types/payment';
+import { vikaretaSSOClient } from '../lib/auth/vikareta';
 
 // Normalize API host: remove trailing /api if present; always prefix endpoints with /api
 const API_HOST = (
@@ -219,10 +220,8 @@ export class RFQService {
   private authToken: string | null = null;
 
   private constructor() {
-    // Initialize auth token from localStorage or cookies
-    if (typeof window !== 'undefined') {
-      this.authToken = localStorage.getItem('vikareta_access_token') || sessionStorage.getItem('vikareta_access_token');
-    }
+    // Do not cache a stored token here; use SSO client at request time
+    this.authToken = null;
   }
 
   public static getInstance(): RFQService {
@@ -237,18 +236,16 @@ export class RFQService {
       'Content-Type': 'application/json',
     };
     
-    if (this.authToken) {
-      headers['Authorization'] = `Bearer ${this.authToken}`;
-    }
+    const token = (typeof window !== 'undefined') ? vikaretaSSOClient.getAccessToken() : null;
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     
     return headers;
   }
 
   setAuthToken(token: string) {
     this.authToken = token;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('vikareta_access_token', token);
-    }
+    // Intentionally do NOT persist tokens to localStorage.
+    // Use the unified SSO client to obtain tokens when needed.
   }
 
   async createServiceRfq(data: ServiceRfqData): Promise<RfqDetails> {

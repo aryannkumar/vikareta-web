@@ -1,4 +1,5 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+import { vikaretaSSOClient } from '../lib/auth/vikareta';
 
 export interface OrderItem {
   id: string;
@@ -155,11 +156,7 @@ export class OrderService {
   private static instance: OrderService;
   private authToken: string | null = null;
 
-  private constructor() {
-    if (typeof window !== 'undefined') {
-      this.authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-    }
-  }
+  private constructor() {}
 
   public static getInstance(): OrderService {
     if (!OrderService.instance) {
@@ -173,18 +170,17 @@ export class OrderService {
       'Content-Type': 'application/json',
     };
     
-    if (this.authToken) {
-      headers['Authorization'] = `Bearer ${this.authToken}`;
+    const token = (typeof window !== 'undefined') ? vikaretaSSOClient.getAccessToken() : null;
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
     
     return headers;
   }
 
   setAuthToken(token: string) {
+    // Deprecated: token persistence is handled by unified SSO client and backend cookies.
     this.authToken = token;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('authToken', token);
-    }
   }
 
   // Convert accepted quote to order

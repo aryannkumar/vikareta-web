@@ -1,4 +1,5 @@
 import { PaymentGateway, PaymentRequest, PaymentResponse } from '../types/payment';
+import { vikaretaSSOClient } from '../lib/auth/vikareta';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -7,10 +8,8 @@ export class PaymentService {
   private authToken: string | null = null;
 
   private constructor() {
-    // Initialize auth token from localStorage or cookies
-    if (typeof window !== 'undefined') {
-      this.authToken = localStorage.getItem('vikareta_access_token') || sessionStorage.getItem('vikareta_access_token');
-    }
+    // Do not cache stored token here; use SSO client on demand
+    this.authToken = null;
   }
 
   public static getInstance(): PaymentService {
@@ -25,18 +24,15 @@ export class PaymentService {
       'Content-Type': 'application/json',
     };
     
-    if (this.authToken) {
-      headers['Authorization'] = `Bearer ${this.authToken}`;
-    }
+    const token = (typeof window !== 'undefined') ? vikaretaSSOClient.getAccessToken() : null;
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     
     return headers;
   }
 
   setAuthToken(token: string) {
     this.authToken = token;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('vikareta_access_token', token);
-    }
+    // Do not persist tokens in localStorage. The unified SSO client manages tokens.
   }
 
   async getAvailableGateways(): Promise<PaymentGateway[]> {

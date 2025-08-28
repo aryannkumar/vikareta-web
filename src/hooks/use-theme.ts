@@ -26,9 +26,16 @@ export function useThemeState() {
 
   useEffect(() => {
     // Get theme from localStorage or default to system
-    const savedTheme = localStorage.getItem('theme') as Theme;
-    if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
-      setThemeState(savedTheme);
+    let savedTheme: Theme | null = null;
+    try {
+      savedTheme = sessionStorage.getItem('theme') as Theme;
+    } catch {
+      savedTheme = null;
+    }
+    const saved = savedTheme || (localStorage.getItem ? (localStorage.getItem('theme') as Theme) : null);
+    const finalSaved = saved as Theme | null;
+    if (finalSaved && ['light', 'dark', 'system'].includes(finalSaved)) {
+      setThemeState(finalSaved);
     }
   }, []);
 
@@ -72,7 +79,7 @@ export function useThemeState() {
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem('theme', newTheme);
+    try { sessionStorage.setItem('theme', newTheme); } catch {}
   };
 
   return {

@@ -67,7 +67,7 @@ export class VikaretaSSOClient {
               sessionId: data.sessionId || null,
               domain: vikaretaCrossDomainAuth.getCurrentDomain()
             };
-            try { vikaretaCrossDomainAuth.storeAuthData(authData); } catch {}
+            try { await vikaretaCrossDomainAuth.storeAuthData(authData); } catch {}
 
             return { user: data.user, isAuthenticated: true, isLoading: false, error: null, sessionId: data.sessionId || null };
           }
@@ -116,7 +116,7 @@ export class VikaretaSSOClient {
       }
 
       // Store auth data securely
-      vikaretaCrossDomainAuth.storeAuthData(data);
+  await vikaretaCrossDomainAuth.storeAuthData(data);
 
       // Sync across domains
       await vikaretaCrossDomainAuth.syncSSOAcrossDomains(data);
@@ -274,7 +274,7 @@ export class VikaretaSSOClient {
         domain: vikaretaCrossDomainAuth.getCurrentDomain()
       };
 
-      vikaretaCrossDomainAuth.storeAuthData(authData);
+  await vikaretaCrossDomainAuth.storeAuthData(authData);
       return true;
     } catch (error) {
       console.error('Token refresh failed:', error);
