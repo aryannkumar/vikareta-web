@@ -8,25 +8,18 @@ interface AppProviderProps {
 }
 
 export function AppProvider({ children }: AppProviderProps) {
-  const { checkAuth, isAuthenticated } = useAuthStore();
+  const { isLoading } = useAuthStore();
   const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    const initializeApp = async () => {
-      try {
-        // Check if user is authenticated
-        await checkAuth();
-      } catch (error) {
-        console.error('App initialization error:', error);
-      } finally {
-        setInitializing(false);
-      }
-    };
+    // The unified Vikareta auth handles authentication automatically
+    // Just wait for initial auth check to complete
+    if (!isLoading) {
+      setInitializing(false);
+    }
+  }, [isLoading]);
 
-    initializeApp();
-  }, [checkAuth]);
-
-  if (initializing) {
+  if (initializing || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>

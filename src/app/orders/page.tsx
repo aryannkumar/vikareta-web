@@ -26,11 +26,11 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
 import { ordersApi, type Order } from '@/lib/api/orders';
-import { useSSOAuth } from '@/lib/auth/use-sso-auth';
+import { useVikaretaAuthContext } from '@/lib/auth/vikareta';
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { isAuthenticated, loading: authLoading } = useSSOAuth();
+  const { isAuthenticated, isLoading: authLoading } = useVikaretaAuthContext();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

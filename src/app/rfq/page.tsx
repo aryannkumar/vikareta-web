@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, AlertCircle, Loader2, CheckCircle, FileText } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useSSOAuth } from '../../lib/auth/use-sso-auth';
+import { useVikaretaAuthContext } from '../../lib/auth/vikareta';
 import { rfqService } from '../../services/rfq.service';
 import MyRFQsSection from './MyRFQsSection';
 
@@ -35,7 +35,7 @@ interface RFQFormData {
 
 export default function RFQPage() {
   const router = useRouter();
-  const { isAuthenticated, loading: authLoading } = useSSOAuth();
+  const { isAuthenticated, isLoading: authLoading } = useVikaretaAuthContext();
 
   // Redirect to login if not authenticated
   useEffect(() => {

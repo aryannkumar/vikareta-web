@@ -21,7 +21,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
-import { useSSOAuth } from '@/lib/auth/use-sso-auth';
+import { useVikaretaAuthContext } from '@/lib/auth/vikareta';
 
 interface UserProfile {
   id: string;
@@ -54,7 +54,7 @@ export default function ProfilePage() {
   const [editData, setEditData] = useState<Partial<UserProfile>>({});
 
   const toast = useToast();
-  const { user, refreshSession } = useSSOAuth();
+  const { user, refreshToken } = useVikaretaAuthContext();
 
   useEffect(() => {
     loadProfile();
@@ -172,8 +172,8 @@ export default function ProfilePage() {
         toast.success('Success', 'Profile updated successfully');
         
         // Refresh user data in auth context
-        if (refreshSession) {
-          await refreshSession();
+        if (refreshToken) {
+          await refreshToken();
         }
       } else {
         throw new Error('Failed to update profile');

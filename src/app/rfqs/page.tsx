@@ -16,7 +16,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { rfqService } from '../../services/rfq.service';
-import { useSSOAuth } from '../../lib/auth/use-sso-auth';
+import { useVikaretaAuthContext } from '../../lib/auth/vikareta';
 
 type PublicRFQ = {
   id: string;
@@ -29,7 +29,7 @@ type PublicRFQ = {
 
 export default function PublicRFQsPage() {
   const prefersReducedMotion = useReducedMotion();
-  const { isAuthenticated } = useSSOAuth();
+  const { isAuthenticated } = useVikaretaAuthContext();
   const [rfqs, setRfqs] = useState<PublicRFQ[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

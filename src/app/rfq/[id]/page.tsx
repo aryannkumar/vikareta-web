@@ -27,11 +27,11 @@ import {
 } from 'lucide-react';
 import { rfqService, RfqWithResponses } from '../../../services/rfq.service';
 import { orderService, CreateOrderFromQuoteData } from '../../../services/order.service';
-import { useSSOAuth } from '../../../lib/auth/use-sso-auth';
+import { useVikaretaAuthContext } from '../../../lib/auth/vikareta';
 
 export default function RFQDetailsPage() {
   const router = useRouter();
-  const { isAuthenticated, loading: authLoading } = useSSOAuth();
+  const { isAuthenticated, isLoading: authLoading } = useVikaretaAuthContext();
   const params = useParams();
 
   // Redirect to login if not authenticated

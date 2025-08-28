@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
 import { useTheme } from '@/components/theme-provider';
-import { useSSOAuth } from '@/lib/auth/use-sso-auth';
+import { useVikaretaAuthContext } from '@/lib/auth/vikareta';
 import { settingsApi } from '@/lib/api/settings';
 
 interface UserSettings {
@@ -76,7 +76,7 @@ export default function SettingsPage() {
 
   const toast = useToast();
   const { theme, setTheme } = useTheme();
-  const { user } = useSSOAuth();
+  const { user } = useVikaretaAuthContext();
 
   useEffect(() => {
     loadSettings();

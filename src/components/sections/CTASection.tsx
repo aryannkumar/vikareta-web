@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Users, Store, Zap, CheckCircle, TrendingUp, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useSSOAuth } from '@/lib/auth/use-sso-auth';
+import { useVikaretaAuthContext } from '@/lib/auth/vikareta';
 
 export function CTASection() {
-    const { isAuthenticated, user } = useSSOAuth();
+    const { isAuthenticated, user } = useVikaretaAuthContext();
 
     return (
         <section className="py-24 relative overflow-hidden bg-gradient-to-br from-orange-600 via-amber-600 to-orange-700">
@@ -118,7 +118,7 @@ export function CTASection() {
                                     <ArrowRight className="ml-2 h-5 w-5 inline group-hover:translate-x-1 transition-transform" />
                                 </motion.button>
                             </Link>
-                        ) : user?.role === 'buyer' ? (
+                        ) : user?.userType === 'buyer' ? (
                             <Link href="/products">
                                 <motion.button
                                     className="w-full bg-white text-orange-600 hover:bg-orange-50 font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
@@ -189,7 +189,7 @@ export function CTASection() {
                                     <ArrowRight className="ml-2 h-5 w-5 inline group-hover:translate-x-1 transition-transform" />
                                 </motion.button>
                             </Link>
-                        ) : user?.role === 'seller' ? (
+                        ) : user?.userType === 'seller' ? (
                             <Link href="/dashboard">
                                 <motion.button
                                     className="w-full bg-white text-orange-600 hover:bg-orange-50 font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"

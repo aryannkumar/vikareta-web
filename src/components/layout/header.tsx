@@ -29,7 +29,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useSSOAuth } from '@/lib/auth/use-sso-auth';
+import { useVikaretaAuthContext } from '@/lib/auth/vikareta';
 
 // Local implementations for missing imports
 const useCartStore = () => ({ totalItems: 0 });
@@ -38,8 +38,8 @@ const Badge = ({ children, className }: { children: React.ReactNode; className?:
   <span className={`bg-red-500 text-white text-xs rounded-full px-1 ${className || ''}`}>{children}</span>;
 const notificationsApi = { getNotifications: async () => ({ data: { notifications: [] } }) };
 
-const hasSellerAccess = (user: any) => user?.userType === 'seller' || user?.role === 'seller' || user?.role === 'both' || user?.userType === 'both';
-const hasAdminAccess = (user: any) => user?.userType === 'admin' || user?.role === 'admin' || user?.role === 'super_admin';
+const hasSellerAccess = (user: any) => user?.userType === 'seller' || user?.userType === 'both';
+const hasAdminAccess = (user: any) => user?.userType === 'admin' || user?.userType === 'super_admin';
 
 // Secure SSO sync function
 const syncSSOToSubdomains = async (targets: string[]) => {
@@ -143,7 +143,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { user, isAuthenticated, logout } = useSSOAuth();
+  const { user, isAuthenticated, logout } = useVikaretaAuthContext();
   const { totalItems } = useCartStore();
   const { count: wishlistCount, fetchWishlist } = useWishlistStore();
 

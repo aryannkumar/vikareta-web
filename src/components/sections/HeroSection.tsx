@@ -9,12 +9,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search, TrendingUp, Users, Shield, ArrowRight, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useSSOAuth } from '@/lib/auth/use-sso-auth';
+import { useVikaretaAuthContext } from '@/lib/auth/vikareta';
 
 export function HeroSection() {
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
-  const { isAuthenticated, user } = useSSOAuth();
+  const { isAuthenticated, user } = useVikaretaAuthContext();
 
   const motionEnabled = useMotionEnabled();
 
@@ -178,7 +178,7 @@ export function HeroSection() {
                       <ArrowRight className="ml-3 h-5 w-5" />
                     </Button>
                   </Link>
-                  {user?.role === 'seller' ? (
+                  {user?.userType === 'seller' ? (
                     <Button
                       variant="outline"
                       size="lg"

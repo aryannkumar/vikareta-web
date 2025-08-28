@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { marketplaceApi } from '@/lib/api/marketplace';
-import { useSSOAuth } from '@/lib/auth/use-sso-auth';
+import { useVikaretaAuthContext } from '@/lib/auth/vikareta';
 import { vikaretaCrossDomainAuth } from '@/lib/auth/vikareta';
 import { useWishlistStore } from '@/lib/stores/wishlist';
 import { useToast } from '@/components/ui/toast-provider';
@@ -80,7 +80,7 @@ export default function BusinessProfilePage(props: any) {
   const [business, setBusiness] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'services' | 'reviews'>('overview');
-  const { isAuthenticated, refreshSession } = useSSOAuth();
+  const { isAuthenticated, refreshToken } = useVikaretaAuthContext();
   const { isInWishlist, addToWishlist, removeItemFromWishlist } = useWishlistStore();
   const toast = useToast();
   const id = props?.params?.id as string;
@@ -129,7 +129,7 @@ export default function BusinessProfilePage(props: any) {
           } else {
             // Try refreshing session and retry once
             console.log('Wishlist add failed, refreshing session and retrying...');
-            await refreshSession();
+            await refreshToken();
             const retrySuccess = await addToWishlist(id, 'business');
             if (retrySuccess) {
               toast.success('Added', 'Business added to wishlist');

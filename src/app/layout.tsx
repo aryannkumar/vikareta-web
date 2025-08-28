@@ -3,7 +3,7 @@ import { Inter, Lexend, Poppins } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import { ThemeProvider } from '@/components/providers/theme-provider';
-import { SSOAuthProvider } from '@/lib/auth/use-sso-auth';
+import { VikaretaAuthProvider } from '@/lib/auth/vikareta';
 import { ToastProvider } from '@/components/ui/toast-provider';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
@@ -100,7 +100,7 @@ export default function RootLayout({
           storageKey="vikareta-theme"
         >
           <ToastProvider>
-            <SSOAuthProvider>
+            <VikaretaAuthProvider>
               <div className="min-h-screen flex flex-col relative overflow-hidden">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
@@ -115,7 +115,7 @@ export default function RootLayout({
                 </main>
                 <Footer />
               </div>
-            </SSOAuthProvider>
+            </VikaretaAuthProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

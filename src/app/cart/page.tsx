@@ -21,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast-provider';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/lib/stores/cart';
-import { useSSOAuth } from '@/lib/auth/use-sso-auth';
+import { useVikaretaAuthContext } from '@/lib/auth/vikareta';
 
 export default function CartPage() {
   const [promoCode, setPromoCode] = useState('');
@@ -29,7 +29,7 @@ export default function CartPage() {
   const [discount, setDiscount] = useState(0);
 
   const toast = useToast();
-  const { user } = useSSOAuth();
+  const { user } = useVikaretaAuthContext();
   const { 
     items, 
     totalItems, 
