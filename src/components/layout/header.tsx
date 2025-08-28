@@ -53,7 +53,8 @@ const syncSSOToSubdomains = async (targets: string[]) => {
           // to the target domain's /sso/receive with a one-time code.
           const state = encodeURIComponent(`${Date.now()}-${Math.random().toString(36).slice(2)}`);
           const redirectUri = encodeURIComponent(`https://${host}/sso/receive`);
-          const authorizeUrl = `/api/auth/oauth/authorize?client_id=web&redirect_uri=${redirectUri}&state=${state}`;
+          const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api').replace(/\/api\/api$/, '/api');
+          const authorizeUrl = `${API_BASE}/auth/oauth/authorize?client_id=web&redirect_uri=${redirectUri}&state=${state}`;
 
           await new Promise<void>((resolve) => {
             try {
