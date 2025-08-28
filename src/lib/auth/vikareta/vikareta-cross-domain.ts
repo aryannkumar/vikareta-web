@@ -55,22 +55,8 @@ export class VikaretaCrossDomainAuth {
       sessionId: authData.sessionId || null
     };
 
-    // Exchange tokens with backend so server can set HttpOnly cookies
-    try {
-      await fetch('/api/auth/exchange-sso', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          accessToken: authData.tokens.accessToken,
-          refreshToken: authData.tokens.refreshToken,
-          sessionId: authData.sessionId || null,
-          domain: authData.domain || this.getCurrentDomain()
-        })
-      });
-    } catch (err) {
-      console.error('Failed to exchange SSO tokens with backend:', err);
-    }
+    // Tokens are already set as HttpOnly cookies by the SSO receive route
+    // No additional exchange needed for OAuth 2.0 code flow
   }
 
   /**
@@ -258,25 +244,9 @@ export class VikaretaCrossDomainAuth {
     try {
       // Skip API domain for SSO sync
       if (domain === this.domains.API) return;
-      // Get SSO token for target domain
-      const response = await fetch('/api/auth/sso-token', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(this.getCSRFToken() && { 'X-XSRF-TOKEN': this.getCSRFToken()! })
-        },
-        body: JSON.stringify({ target: domain })
-      });
-
-      if (!response.ok) return;
-
-  const data = await response.json();
-  const token = data?.token;
-  if (!token) return;
-
-  // Use OAuth authorize popup flow to perform SSO (preferred)
-  await this.createSSOPopup(domain);
+      
+      // Use OAuth authorize popup flow to perform SSO
+      await this.createSSOPopup(domain);
     } catch (error) {
       console.error(`Failed to sync domain ${domain}:`, error);
     }
@@ -287,7 +257,7 @@ export class VikaretaCrossDomainAuth {
       try {
   const API_BASE = (window as any)?.VIKARETA_API_BASE || (process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api').replace(/\/api\/api$/, '/api');
         const authBase = `${API_BASE}/auth/oauth/authorize`;
-        const clientId = (window as any)?.VIKARETA_CLIENT_ID || 'dashboard';
+        const clientId = (window as any)?.VIKARETA_CLIENT_ID || 'web';
         const redirectUri = `https://${domain}/sso/receive`;
         const state = Math.random().toString(36).substring(2, 15);
         const url = `${authBase}?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(state)}`;
