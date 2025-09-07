@@ -16,7 +16,8 @@ import {
   Shield,
   Smartphone,
   CheckCircle,
-  ArrowLeft
+  ArrowLeft,
+  Check
 } from 'lucide-react';
 
   // Secure SSO auth implementation using HttpOnly cookies
@@ -354,35 +355,57 @@ function LoginPageContent() {
     return `+${cleaned}`;
   };
 
-  // Validate form based on current step and auth method
+  // Password strength checker
+  const getPasswordStrength = (password: string) => {
+    let strength = 0;
+    const checks = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+
+    strength = Object.values(checks).filter(Boolean).length;
+
+    return {
+      score: strength,
+      checks,
+      label: strength <= 2 ? 'Weak' : strength <= 3 ? 'Fair' : strength <= 4 ? 'Good' : 'Strong',
+      color: strength <= 2 ? 'text-red-500' : strength <= 3 ? 'text-yellow-500' : strength <= 4 ? 'text-blue-500' : 'text-green-500',
+      bgColor: strength <= 2 ? 'bg-red-500' : strength <= 3 ? 'bg-yellow-500' : strength <= 4 ? 'bg-blue-500' : 'bg-green-500'
+    };
+  };
+
+  // Enhanced form validation with better feedback
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
     if (step === 'credentials') {
       if (authMethod === 'email') {
         if (!formData.email) {
-          newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+          newErrors.email = 'Email address is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
           newErrors.email = 'Please enter a valid email address';
         }
       } else {
         if (!formData.phone) {
           newErrors.phone = 'Phone number is required';
         } else if (!/^\+91[6-9]\d{9}$/.test(formData.phone.replace(/\s/g, ''))) {
-          newErrors.phone = 'Please enter a valid Indian phone number';
+          newErrors.phone = 'Please enter a valid Indian phone number (+91XXXXXXXXXX)';
         }
       }
 
       if (!formData.password) {
         newErrors.password = 'Password is required';
       } else if (formData.password.length < 6) {
-        newErrors.password = 'Password must be at least 6 characters';
+        newErrors.password = 'Password must be at least 6 characters long';
       }
     } else if (step === 'otp') {
       if (!formData.otp) {
-        newErrors.otp = 'OTP is required';
+        newErrors.otp = 'Verification code is required';
       } else if (!/^\d{6}$/.test(formData.otp)) {
-        newErrors.otp = 'Please enter a valid 6-digit OTP';
+        newErrors.otp = 'Please enter a valid 6-digit verification code';
       }
     }
 
@@ -788,8 +811,56 @@ function LoginPageContent() {
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
                     </div>
+
+                    {/* Password Strength Indicator */}
+                    {formData.password && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-3 space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Password strength:</span>
+                          <span className={`text-sm font-medium ${getPasswordStrength(formData.password).color}`}>
+                            {getPasswordStrength(formData.password).label}
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <motion.div
+                            className={`h-2 rounded-full ${getPasswordStrength(formData.password).bgColor}`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${(getPasswordStrength(formData.password).score / 5) * 100}%` }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-1 text-xs text-gray-600">
+                          <div className={`flex items-center ${getPasswordStrength(formData.password).checks.length ? 'text-green-600' : 'text-gray-400'}`}>
+                            <Check className="w-3 h-3 mr-1" />
+                            8+ characters
+                          </div>
+                          <div className={`flex items-center ${getPasswordStrength(formData.password).checks.uppercase ? 'text-green-600' : 'text-gray-400'}`}>
+                            <Check className="w-3 h-3 mr-1" />
+                            Uppercase
+                          </div>
+                          <div className={`flex items-center ${getPasswordStrength(formData.password).checks.lowercase ? 'text-green-600' : 'text-gray-400'}`}>
+                            <Check className="w-3 h-3 mr-1" />
+                            Lowercase
+                          </div>
+                          <div className={`flex items-center ${getPasswordStrength(formData.password).checks.number ? 'text-green-600' : 'text-gray-400'}`}>
+                            <Check className="w-3 h-3 mr-1" />
+                            Number
+                          </div>
+                          <div className={`flex items-center ${getPasswordStrength(formData.password).checks.special ? 'text-green-600' : 'text-gray-400'}`}>
+                            <Check className="w-3 h-3 mr-1" />
+                            Special char
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
                     {errors.password && (
-                      <motion.div 
+                      <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="flex items-center gap-2 mt-2 text-red-500 text-sm"

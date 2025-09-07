@@ -26,7 +26,8 @@ import {
   FileText,
   Camera,
   Upload,
-  X
+  X,
+  Check
 } from 'lucide-react';
 
 // Import services and types
@@ -132,16 +133,27 @@ export default function RegisterPage() {
   const [currentOtpType, setCurrentOtpType] = useState<'email' | 'phone' | null>(null);
   const [onboardingFlow, setOnboardingFlow] = useState<OnboardingFlow | null>(null);
 
-  // OTP Timer countdown
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (otpTimer > 0) {
-      interval = setInterval(() => {
-        setOtpTimer((prev) => prev - 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [otpTimer]);
+  // Password strength checker
+  const getPasswordStrength = (password: string) => {
+    let strength = 0;
+    const checks = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+
+    strength = Object.values(checks).filter(Boolean).length;
+
+    return {
+      score: strength,
+      checks,
+      label: strength <= 2 ? 'Weak' : strength <= 3 ? 'Fair' : strength <= 4 ? 'Good' : 'Strong',
+      color: strength <= 2 ? 'text-red-500' : strength <= 3 ? 'text-yellow-500' : strength <= 4 ? 'text-blue-500' : 'text-green-500',
+      bgColor: strength <= 2 ? 'bg-red-500' : strength <= 3 ? 'bg-yellow-500' : strength <= 4 ? 'bg-blue-500' : 'bg-green-500'
+    };
+  };
 
   // Validation functions
   const validateStep = (step: RegistrationStep): boolean => {
@@ -174,9 +186,11 @@ export default function RegisterPage() {
         if (!formData.password) {
           newErrors.password = 'Password is required';
         } else if (formData.password.length < 8) {
-          newErrors.password = 'Password must be at least 8 characters';
+          newErrors.password = 'Password must be at least 8 characters long';
         } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-          newErrors.password = 'Password must contain uppercase, lowercase, and number';
+          newErrors.password = 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+        } else if (!/(?=.*[!@#$%^&*(),.?":{}|<>])/.test(formData.password)) {
+          newErrors.password = 'Password must contain at least one special character';
         }
         if (!formData.confirmPassword) {
           newErrors.confirmPassword = 'Please confirm your password';
@@ -534,6 +548,133 @@ export default function RegisterPage() {
           placeholder="Enter your phone number"
           className="w-full"
         />
+      </div>
+
+      {/* Password Field */}
+      <div>
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+          Password
+        </label>
+        <div className="relative">
+          <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <Input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            value={formData.password}
+            onChange={(e) => updateField('password', e.target.value)}
+            placeholder="Create a strong password"
+            className={`w-full pl-12 pr-14 ${errors.password ? 'border-red-500 focus:ring-red-500' : ''}`}
+            aria-describedby={errors.password ? 'password-error' : undefined}
+            aria-invalid={!!errors.password}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-amber-600 transition-colors"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
+        </div>
+
+        {/* Password Strength Indicator */}
+        {formData.password && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-3 space-y-2"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Password strength:</span>
+              <span className={`text-sm font-medium ${getPasswordStrength(formData.password).color}`}>
+                {getPasswordStrength(formData.password).label}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <motion.div
+                className={`h-2 rounded-full ${getPasswordStrength(formData.password).bgColor}`}
+                initial={{ width: 0 }}
+                animate={{ width: `${(getPasswordStrength(formData.password).score / 5) * 100}%` }}
+                transition={{ duration: 0.3 }}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-1 text-xs text-gray-600">
+              <div className={`flex items-center ${getPasswordStrength(formData.password).checks.length ? 'text-green-600' : 'text-gray-400'}`}>
+                <Check className="w-3 h-3 mr-1" />
+                8+ characters
+              </div>
+              <div className={`flex items-center ${getPasswordStrength(formData.password).checks.uppercase ? 'text-green-600' : 'text-gray-400'}`}>
+                <Check className="w-3 h-3 mr-1" />
+                Uppercase
+              </div>
+              <div className={`flex items-center ${getPasswordStrength(formData.password).checks.lowercase ? 'text-green-600' : 'text-gray-400'}`}>
+                <Check className="w-3 h-3 mr-1" />
+                Lowercase
+              </div>
+              <div className={`flex items-center ${getPasswordStrength(formData.password).checks.number ? 'text-green-600' : 'text-gray-400'}`}>
+                <Check className="w-3 h-3 mr-1" />
+                Number
+              </div>
+              <div className={`flex items-center ${getPasswordStrength(formData.password).checks.special ? 'text-green-600' : 'text-gray-400'}`}>
+                <Check className="w-3 h-3 mr-1" />
+                Special char
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {errors.password && (
+          <motion.div
+            id="password-error"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 mt-2 text-red-500 text-sm"
+          >
+            <AlertCircle className="h-4 w-4" />
+            {errors.password}
+          </motion.div>
+        )}
+      </div>
+
+      {/* Confirm Password Field */}
+      <div>
+        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+          Confirm Password
+        </label>
+        <div className="relative">
+          <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <Input
+            id="confirmPassword"
+            type={showConfirmPassword ? 'text' : 'password'}
+            value={formData.confirmPassword}
+            onChange={(e) => updateField('confirmPassword', e.target.value)}
+            placeholder="Confirm your password"
+            className={`w-full pl-12 pr-14 ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500' : ''}`}
+            aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
+            aria-invalid={!!errors.confirmPassword}
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-amber-600 transition-colors"
+            aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+          >
+            {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
+        </div>
+
+        {errors.confirmPassword && (
+          <motion.div
+            id="confirm-password-error"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 mt-2 text-red-500 text-sm"
+          >
+            <AlertCircle className="h-4 w-4" />
+            {errors.confirmPassword}
+          </motion.div>
+        )}
       </div>
 
       <div className="flex justify-between">
