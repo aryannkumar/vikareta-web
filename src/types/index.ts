@@ -1,3 +1,184 @@
+// Onboarding Types
+export interface OnboardingStep {
+  key: string;
+  label: string;
+  completed: boolean;
+  required: boolean;
+  meta?: any;
+}
+
+export interface OnboardingFlow {
+  userType: 'normal' | 'business';
+  steps: OnboardingStep[];
+  progress: number;
+  completed: boolean;
+}
+
+export interface OnboardingStatus {
+  userId: string;
+  progress: number;
+  steps: OnboardingStep[];
+}
+
+// Business Profile Types
+export interface BusinessProfile {
+  id: string;
+  userId: string;
+  companyName: string;
+  businessType: string;
+  industry: string;
+  description: string;
+  logo?: string;
+  website?: string;
+  email: string;
+  phone: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+  };
+  taxInfo?: {
+    gstin?: string;
+    panNumber?: string;
+    taxId?: string;
+    taxExempt?: boolean;
+    taxExemptionReason?: string;
+  };
+  bankDetails?: {
+    accountName: string;
+    accountNumber: string;
+    bankName: string;
+    ifscCode: string;
+    branchName?: string;
+    swiftCode?: string;
+  };
+  verification?: {
+    isVerified: boolean;
+    verificationLevel: string;
+    documents?: any[];
+  };
+  settings?: {
+    allowPublicProfile: boolean;
+    showContactInfo: boolean;
+    autoAcceptOrders: boolean;
+    notificationPreferences: {
+      orderUpdates: boolean;
+      paymentUpdates: boolean;
+      reviewUpdates: boolean;
+      marketingEmails: boolean;
+    };
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Document Types
+export interface UserDocument {
+  id: string;
+  userId: string;
+  documentType: 'gst_certificate' | 'pan_card' | 'aadhar_card' | 'business_license' | 'address_proof' | 'bank_statement' | 'other';
+  documentUrl: string;
+  documentNumber?: string;
+  digilockerUri?: string;
+  verificationStatus: 'pending' | 'verified' | 'rejected';
+  verifiedAt?: string;
+  expiryDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// DigiLocker Types
+export interface DigiLockerDocument {
+  id: string;
+  userId: string;
+  docId: string;
+  docType: string;
+  docName: string;
+  issuer: string;
+  issueDate?: string;
+  expiryDate?: string;
+  documentData?: any;
+  verificationStatus: 'pending' | 'verified' | 'rejected';
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Onboarding Form Types
+export interface BasicProfileForm {
+  userType: 'buyer' | 'seller' | 'business' | 'both';
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+  businessName?: string;
+  website?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  bio?: string;
+  avatar?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface BusinessBasicForm {
+  companyName: string;
+  businessType: 'sole_proprietorship' | 'partnership' | 'private_limited' | 'public_limited' | 'llp' | 'other';
+  industry: string;
+  description: string;
+  website?: string;
+  email: string;
+  phone: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+}
+
+export interface BusinessTaxForm {
+  gstin?: string;
+  panNumber?: string;
+  taxId?: string;
+  taxExempt?: boolean;
+  taxExemptionReason?: string;
+}
+
+export interface BusinessBankForm {
+  accountName: string;
+  accountNumber: string;
+  bankName: string;
+  ifscCode: string;
+  branchName?: string;
+  swiftCode?: string;
+}
+
+export interface BusinessDocumentForm {
+  documentType: 'gst_certificate' | 'pan_card' | 'aadhar_card' | 'business_license' | 'address_proof' | 'bank_statement' | 'other';
+  documentUrl: string;
+  documentNumber?: string;
+  expiryDate?: string;
+  digilockerUri?: string;
+}
+
+export interface BusinessSettingsForm {
+  allowPublicProfile: boolean;
+  showContactInfo: boolean;
+  autoAcceptOrders: boolean;
+  notificationPreferences: {
+    orderUpdates: boolean;
+    paymentUpdates: boolean;
+    reviewUpdates: boolean;
+    marketingEmails: boolean;
+  };
+}
+
 // User and Authentication Types
 export interface User {
   id: string;
