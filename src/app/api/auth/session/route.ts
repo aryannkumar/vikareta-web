@@ -4,7 +4,7 @@ export async function GET(req: NextRequest) {
   const apiBase = process.env.NEXT_PUBLIC_API_BASE || (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
   const cookieHeader = req.headers.get('cookie') || '';
 
-  const resp = await fetch(`${apiBase}/api/auth/session`, {
+  const resp = await fetch(`${apiBase}/api/v1/auth/session`, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',

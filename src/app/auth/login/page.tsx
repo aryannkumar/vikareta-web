@@ -396,11 +396,11 @@ function LoginPageContent() {
     try {
   const identifier = normalizeIdentifier(authMethod, authMethod === 'email' ? formData.email : formData.phone);
       const csrf = await ensureCsrfToken();
-      const resp = await fetch('/api/auth/send-otp', {
+      const resp = await fetch('/api/v1/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
         credentials: 'include',
-        body: JSON.stringify({ type: authMethod, identifier })
+        body: JSON.stringify({ phone: identifier })
       });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       setOtpTimer(30);
@@ -446,11 +446,11 @@ function LoginPageContent() {
       try {
         const identifier = normalizeIdentifier(authMethod, authMethod === 'email' ? formData.email : formData.phone);
         const csrf = await ensureCsrfToken();
-        const resp = await fetch('/api/auth/verify-otp', {
+        const resp = await fetch('/api/v1/auth/verify-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
           credentials: 'include',
-          body: JSON.stringify({ type: authMethod, identifier, otp: formData.otp })
+          body: JSON.stringify({ phone: identifier, otp: formData.otp })
         });
         if (resp.ok) {
           handleLoginSuccess();

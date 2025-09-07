@@ -47,7 +47,7 @@ const useSecureSSOAuth = () => {
       const apiBase = process.env.NEXT_PUBLIC_API_BASE || 
         (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
       
-      const response = await fetch(`${apiBase}/api/auth/register`, {
+      const response = await fetch(`${apiBase}/api/v1/auth/register`, {
         method: 'POST',
         credentials: 'include', // Critical: Include HttpOnly cookies
         headers: {
@@ -319,11 +319,11 @@ export default function RegisterPage() {
       // ensure CSRF cookie is set
       try { await fetch('/api/csrf-token', { credentials: 'include' }); } catch {}
       const csrf = (typeof document !== 'undefined') ? (document.cookie.split(';').find(c => c.trim().startsWith('XSRF-TOKEN='))?.split('=')[1] ? decodeURIComponent(document.cookie.split(';').find(c => c.trim().startsWith('XSRF-TOKEN='))!.split('=')[1]) : null) : null;
-      const resp = await fetch('/api/auth/send-otp', {
+      const resp = await fetch('/api/v1/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
         credentials: 'include',
-        body: JSON.stringify({ type, identifier })
+        body: JSON.stringify({ phone: identifier })
       });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       setOtpTimer(30);
@@ -348,11 +348,11 @@ export default function RegisterPage() {
       // ensure CSRF cookie is set
       try { await fetch('/api/csrf-token', { credentials: 'include' }); } catch {}
       const csrf = (typeof document !== 'undefined') ? (document.cookie.split(';').find(c => c.trim().startsWith('XSRF-TOKEN='))?.split('=')[1] ? decodeURIComponent(document.cookie.split(';').find(c => c.trim().startsWith('XSRF-TOKEN='))!.split('=')[1]) : null) : null;
-      const resp = await fetch('/api/auth/verify-otp', {
+      const resp = await fetch('/api/v1/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
         credentials: 'include',
-        body: JSON.stringify({ type, identifier, otp: code })
+        body: JSON.stringify({ phone: identifier, otp: code })
       });
       if (!resp.ok) {
         const text = await resp.text().catch(() => '');
@@ -389,15 +389,8 @@ export default function RegisterPage() {
         phone: formData.phone,
         password: formData.password,
         userType: formData.userType,
-        businessName: formData.businessName,
-        businessType: formData.businessType,
-        gstin: formData.gstin,
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        pincode: formData.pincode,
-        country: formData.country,
-        agreeToMarketing: formData.agreeToMarketing
+        businessName: formData.businessName || undefined,
+        gstin: formData.gstin || undefined,
       };
       
       const success = await registerUser(registrationData);

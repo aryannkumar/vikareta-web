@@ -1,12 +1,12 @@
 import { RFQRequest, RFQResponse } from '../types/payment';
 import { vikaretaSSOClient } from '../lib/auth/vikareta';
 
-// Normalize API host: remove trailing /api if present; always prefix endpoints with /api
+// Normalize API host: remove trailing /api if present; always prefix endpoints with /api/v1
 const API_HOST = (
   process.env.NEXT_PUBLIC_API_URL ||
   (process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://api.vikareta.com')
-).replace(/\/api$/, '');
-const apiUrl = (path: string) => `${API_HOST}/api${path}`;
+).replace(/\/api$/, '').replace(/\/api\/v1$/, '');
+const apiUrl = (path: string) => `${API_HOST}/api/v1${path}`;
 
 export interface CreateRfqData {
   title: string;

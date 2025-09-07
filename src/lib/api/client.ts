@@ -28,11 +28,13 @@ class ApiClient {
 
   constructor(baseURL: string = process.env.NEXT_PUBLIC_API_BASE || 'https://api.vikareta.com') {
     // Ensure consistent base URL with secure auth system
-    // The baseURL should include /api if not already present
-    if (baseURL.endsWith('/api')) {
+    // The baseURL should include /api/v1 if not already present
+    if (baseURL.endsWith('/api/v1')) {
       this.baseURL = baseURL;
+    } else if (baseURL.endsWith('/api')) {
+      this.baseURL = baseURL + '/v1';
     } else {
-      this.baseURL = baseURL + '/api';
+      this.baseURL = baseURL + '/api/v1';
     }
     
     // Only log in development

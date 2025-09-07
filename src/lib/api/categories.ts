@@ -1,4 +1,4 @@
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api').replace(/\/api\/api$/, '/api');
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api/v1').replace(/\/api\/api$/, '/api').replace(/\/api$/, '/api/v1');
 
 export interface Category {
   id: string;

@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
     const cookieHeader = req.headers.get('cookie') || '';
 
-    const resp = await fetch(`${apiBase}/api/auth/login`, {
+    const resp = await fetch(`${apiBase}/api/v1/auth/login`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

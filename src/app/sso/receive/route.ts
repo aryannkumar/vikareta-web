@@ -29,7 +29,7 @@ export async function GET(req: Request) {
         headers['X-XSRF-TOKEN'] = csrfToken;
       }
       
-      const tokenRes = await fetch(`${backend}/api/auth/oauth/token`, {
+      const tokenRes = await fetch(`${backend}/api/v1/auth/oauth/token`, {
         method: 'POST',
         headers,
         body: JSON.stringify({ 

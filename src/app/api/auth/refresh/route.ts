@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const cookieHeader = req.headers.get('cookie') || '';
     const csrfHeader = req.headers.get('x-xsrf-token');
 
-    const resp = await fetch(`${apiBase}/api/auth/refresh`, {
+    const resp = await fetch(`${apiBase}/api/v1/auth/refresh`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
