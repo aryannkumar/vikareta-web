@@ -158,9 +158,9 @@ export function HeroSection() {
                       <ArrowRight className="ml-3 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href="/auth/register?type=seller">
+                  <Link href="/auth/register?type=business">
                     <Button size="lg" className="btn-outline px-10 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                      Become a Seller
+                      Become a Business
                     </Button>
                   </Link>
                 </>
@@ -178,7 +178,7 @@ export function HeroSection() {
                       <ArrowRight className="ml-3 h-5 w-5" />
                     </Button>
                   </Link>
-                  {user?.userType === 'seller' ? (
+                  {user?.userType === 'business' ? (
                     <Button
                       variant="outline"
                       size="lg"

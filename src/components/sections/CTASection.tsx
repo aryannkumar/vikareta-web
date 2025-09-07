@@ -179,7 +179,7 @@ export function CTASection() {
                             </li>
                         </ul>
                         {!isAuthenticated ? (
-                            <Link href="/auth/register?type=seller">
+                            <Link href="/auth/register?type=business">
                                 <motion.button
                                     className="w-full bg-white text-orange-600 hover:bg-orange-50 font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
                                     whileHover={{ scale: 1.02 }}
@@ -189,19 +189,19 @@ export function CTASection() {
                                     <ArrowRight className="ml-2 h-5 w-5 inline group-hover:translate-x-1 transition-transform" />
                                 </motion.button>
                             </Link>
-                        ) : user?.userType === 'seller' ? (
-                            <Link href="/dashboard">
+                        ) : user?.userType === 'business' ? (
+                            <Link href="https://dashboard.vikareta.com">
                                 <motion.button
                                     className="w-full bg-white text-orange-600 hover:bg-orange-50 font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                 >
-                                    Go to Supplier Dashboard
+                                    Go to Business Dashboard
                                     <ArrowRight className="ml-2 h-5 w-5 inline group-hover:translate-x-1 transition-transform" />
                                 </motion.button>
                             </Link>
                         ) : (
-                            <Link href="/auth/register?type=seller">
+                            <Link href="/auth/register?type=business">
                                 <motion.button
                                     className="w-full bg-white text-orange-600 hover:bg-orange-50 font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
                                     whileHover={{ scale: 1.02 }}

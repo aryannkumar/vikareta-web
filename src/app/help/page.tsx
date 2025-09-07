@@ -31,11 +31,11 @@ export default function HelpPage() {
           </div>
 
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">For Sellers</h2>
+            <h2 className="text-xl font-semibold mb-4">For Businesses</h2>
             <ul className="space-y-2">
               <li><a href="#" className="text-blue-600 hover:underline">Adding products</a></li>
               <li><a href="#" className="text-blue-600 hover:underline">Managing orders</a></li>
-              <li><a href="#" className="text-blue-600 hover:underline">Seller dashboard guide</a></li>
+              <li><a href="#" className="text-blue-600 hover:underline">Business dashboard guide</a></li>
             </ul>
           </div>
 

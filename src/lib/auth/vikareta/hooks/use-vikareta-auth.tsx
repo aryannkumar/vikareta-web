@@ -181,7 +181,7 @@ export function useVikaretaAuth(): UseVikaretaAuthReturn {
       case 'main':
         return true; // All authenticated users can access main
       case 'dashboard':
-        return ['seller', 'both', 'admin', 'super_admin'].includes(userType || '');
+        return ['business', 'admin', 'super_admin'].includes(userType || '');
       case 'admin':
         return ['admin', 'super_admin'].includes(userType || '');
       default:

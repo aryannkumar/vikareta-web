@@ -57,7 +57,7 @@ const pageVariants = {
 
 // Multi-step registration interface
 type RegistrationStep = 'userType' | 'personal' | 'business' | 'verification' | 'complete';
-type UserType = 'buyer' | 'seller' | 'business' | '';
+type UserType = 'buyer' | 'business' | '';
 
 interface FormData {
   // User type
@@ -186,7 +186,7 @@ export default function RegisterPage() {
         break;
 
       case 'business':
-        if (formData.userType === 'seller' || formData.userType === 'business') {
+        if (formData.userType === 'business') {
           if (!formData.businessName.trim()) {
             newErrors.businessName = 'Business name is required';
           }
@@ -332,7 +332,7 @@ export default function RegisterPage() {
     try {
       // Prepare registration data based on user type
       const registrationData: BasicProfileForm = {
-        userType: formData.userType as 'buyer' | 'seller' | 'business' | 'both',
+        userType: formData.userType as 'buyer' | 'business',
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -342,7 +342,7 @@ export default function RegisterPage() {
       };
 
       // Add business data if applicable
-      if (formData.userType === 'seller' || formData.userType === 'business') {
+      if (formData.userType === 'business') {
         const businessData: BusinessBasicForm = {
           companyName: formData.businessName,
           businessType: formData.businessType as any,
@@ -442,25 +442,24 @@ export default function RegisterPage() {
         <p className="text-gray-600">Select the type of account that best describes you</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {[
-          { type: 'buyer', title: 'Buyer', description: 'Purchase products and services', icon: '🛒' },
-          { type: 'seller', title: 'Seller', description: 'Sell your products and services', icon: '🏪' },
-          { type: 'business', title: 'Business', description: 'Manage your business operations', icon: '🏢' }
+          { type: 'buyer', title: 'Normal User', description: 'Browse and purchase products and services', icon: '👤' },
+          { type: 'business', title: 'Business User', description: 'Access dashboard at dashboard.vikareta.com', icon: '🏢' }
         ].map((option) => (
           <motion.button
             key={option.type}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setFormData({ ...formData, userType: option.type as UserType })}
-            className={`p-6 rounded-xl border-2 transition-all duration-200 text-left ${
+            className={`p-8 rounded-xl border-2 transition-all duration-200 text-left ${
               formData.userType === option.type
                 ? 'border-amber-500 bg-amber-50 shadow-lg'
                 : 'border-gray-200 hover:border-amber-300 hover:bg-gray-50'
             }`}
           >
-            <div className="text-3xl mb-3">{option.icon}</div>
-            <h3 className="font-semibold text-gray-800 mb-1">{option.title}</h3>
+            <div className="text-4xl mb-4">{option.icon}</div>
+            <h3 className="font-semibold text-gray-800 mb-2">{option.title}</h3>
             <p className="text-sm text-gray-600">{option.description}</p>
           </motion.button>
         ))}
@@ -565,8 +564,8 @@ export default function RegisterPage() {
       className="space-y-6"
     >
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Business Information</h2>
-        <p className="text-gray-600">Tell us about your business</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Business Setup</h2>
+        <p className="text-gray-600">Set up your business profile for dashboard access</p>
       </div>
 
       <div>
@@ -734,24 +733,46 @@ export default function RegisterPage() {
       <h2 className="text-3xl font-bold text-gray-800 mb-2">Registration Complete!</h2>
       <p className="text-gray-600 mb-6">
         Welcome to Vikareta! Your account has been successfully created.
-        You can now start exploring our marketplace and connecting with businesses.
+        {formData.userType === 'business'
+          ? ' You can now access your dashboard at dashboard.vikareta.com'
+          : ' You can now start exploring our marketplace and connecting with businesses.'
+        }
       </p>
 
       <div className="space-y-3">
-        <Button
-          onClick={() => router.push('/dashboard')}
-          className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
-        >
-          Go to Dashboard
-        </Button>
-
-        <Button
-          onClick={() => router.push('/marketplace')}
-          variant="outline"
-          className="w-full py-3"
-        >
-          Explore Marketplace
-        </Button>
+        {formData.userType === 'business' ? (
+          <>
+            <Button
+              onClick={() => window.location.href = 'https://dashboard.vikareta.com'}
+              className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              Go to Dashboard
+            </Button>
+            <Button
+              onClick={() => router.push('/marketplace')}
+              variant="outline"
+              className="w-full py-3"
+            >
+              Explore Marketplace
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              onClick={() => router.push('/marketplace')}
+              className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              Explore Marketplace
+            </Button>
+            <Button
+              onClick={() => router.push('/dashboard')}
+              variant="outline"
+              className="w-full py-3"
+            >
+              View Dashboard
+            </Button>
+          </>
+        )}
       </div>
     </motion.div>
   );
@@ -869,7 +890,7 @@ export default function RegisterPage() {
             <div className="flex justify-between text-sm text-gray-500 mb-2">
               <span className={currentStep === 'userType' ? 'text-amber-600 font-semibold' : ''}>User Type</span>
               <span className={currentStep === 'personal' ? 'text-amber-600 font-semibold' : ''}>Personal Info</span>
-              <span className={currentStep === 'business' ? 'text-amber-600 font-semibold' : ''}>Business Details</span>
+              <span className={currentStep === 'business' ? 'text-amber-600 font-semibold' : ''}>Business Setup</span>
               <span className={currentStep === 'verification' ? 'text-amber-600 font-semibold' : ''}>Verification</span>
               <span className={currentStep === 'complete' ? 'text-amber-600 font-semibold' : ''}>Complete</span>
             </div>

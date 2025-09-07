@@ -10,7 +10,7 @@ export interface VikaretaUser {
   firstName?: string;
   lastName?: string;
   businessName?: string;
-  userType?: 'buyer' | 'seller' | 'both' | 'admin' | 'super_admin';
+  userType?: 'buyer' | 'business' | 'admin' | 'super_admin';
   verificationTier?: 'unverified' | 'basic' | 'verified' | 'premium';
   isVerified?: boolean;
   phone?: string;

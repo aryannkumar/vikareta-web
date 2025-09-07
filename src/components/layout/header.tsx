@@ -38,7 +38,7 @@ const Badge = ({ children, className }: { children: React.ReactNode; className?:
   <span className={`bg-red-500 text-white text-xs rounded-full px-1 ${className || ''}`}>{children}</span>;
 const notificationsApi = { getNotifications: async () => ({ data: { notifications: [] } }) };
 
-const hasSellerAccess = (user: any) => user?.userType === 'seller' || user?.userType === 'both';
+const hasBusinessAccess = (user: any) => user?.userType === 'business';
 const hasAdminAccess = (user: any) => user?.userType === 'admin' || user?.userType === 'super_admin';
 
 // Secure SSO sync function
@@ -305,8 +305,8 @@ export function Header() {
               </Link>
             </motion.div>
 
-            {/* Quick Access Buttons: Dashboard for sellers, Admin for admins */}
-            {isAuthenticated && hasSellerAccess(user) && (
+            {/* Quick Access Buttons: Dashboard for business users, Admin for admins */}
+            {isAuthenticated && hasBusinessAccess(user) && (
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button 
                   size="sm" 
@@ -405,7 +405,7 @@ export function Header() {
                         My RFQs
                       </Link>
                     </DropdownMenuItem>
-                    { (user && hasSellerAccess(user)) && (
+                    { (user && hasBusinessAccess(user)) && (
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => {

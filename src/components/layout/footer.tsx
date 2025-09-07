@@ -246,13 +246,12 @@ export function Footer() {
               ]
             },
             {
-              title: "For Sellers",
+              title: "For Businesses",
               links: [
-                { href: "/auth/register?type=supplier", label: "Become a Seller" },
-                { href: "/dashboard", label: "Seller Dashboard" },
-                { href: "/seller-guide", label: "Seller Guide" },
-                { href: "/advertising", label: "Advertising" },
-                { href: "/seller-support", label: "Support" }
+                { href: "/auth/register?type=business", label: "Become a Business" },
+                { href: "https://dashboard.vikareta.com", label: "Business Dashboard" },
+                { href: "/business-guide", label: "Business Guide" },
+                { href: "/business-support", label: "Support" }
               ]
             },
             {

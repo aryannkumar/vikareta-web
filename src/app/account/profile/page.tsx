@@ -34,7 +34,7 @@ interface UserProfile {
   location?: string;
   bio?: string;
   website?: string;
-  userType: 'buyer' | 'seller';
+  userType: 'buyer' | 'business';
   verified: boolean;
   joinedDate: string;
   stats: {
@@ -79,7 +79,7 @@ export default function ProfilePage() {
           location: response.data.location || '',
           bio: response.data.bio || '',
           website: response.data.website || '',
-          userType: response.data.userType === 'seller' ? 'seller' : 'buyer',
+          userType: response.data.userType === 'business' ? 'business' : 'buyer',
           verified: response.data.isVerified || false,
           joinedDate: response.data.createdAt || new Date().toISOString(),
           stats: response.data.stats || {
@@ -352,8 +352,8 @@ export default function ProfilePage() {
 
                 <div className="text-center mt-4">
                   <div className="flex items-center gap-2 justify-center">
-                    <Badge variant={profile.userType === 'seller' ? 'default' : 'secondary'}>
-                      {profile.userType === 'seller' ? 'Seller' : 'Buyer'}
+                    <Badge variant={profile.userType === 'business' ? 'default' : 'secondary'}>
+                      {profile.userType === 'business' ? 'Business' : 'Buyer'}
                     </Badge>
                     {profile.verified && (
                       <Badge className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300">

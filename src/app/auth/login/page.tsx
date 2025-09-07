@@ -317,7 +317,7 @@ function LoginPageContent() {
   };
 
   const hasDashboardAccess = (user: any) => {
-    return user?.userType === 'seller' || user?.userType === 'admin';
+    return user?.userType === 'business' || user?.userType === 'admin';
   };
 
   // OTP Timer countdown
