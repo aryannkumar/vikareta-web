@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ChevronLeft, ChevronRight, Quote, Award, Building2, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface Testimonial {
   id: string;
@@ -243,7 +242,7 @@ export function TestimonialsSection() {
           </div>
         </div>
 
-        {/* Enhanced testimonials grid with stagger animation */}
+          {/* Enhanced testimonials grid with stagger animation */}
         <motion.div 
           className="grid md:grid-cols-3 gap-8 mt-20"
           initial={{ opacity: 0, y: 30 }}
@@ -253,31 +252,126 @@ export function TestimonialsSection() {
           {testimonials.slice(0, 3).map((testimonial, index) => (
             <motion.div
               key={testimonial.id}
-              className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border border-orange-100 dark:border-orange-800/50"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -8, scale: 1.02 }}
+              className="group relative"
+              initial={{ opacity: 0, y: 20, rotateX: 15 }}
+              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+              transition={{ duration: 0.8, delay: index * 0.2, type: 'spring', stiffness: 100 }}
+              whileHover={{ y: -15, rotateX: -5, scale: 1.02 }}
+              style={{ perspective: '1000px' }}
             >
-              <div className="flex items-center mb-4">
-                {renderStars(testimonial.rating)}
-              </div>
-              <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed line-clamp-4">
-                "{testimonial.content.substring(0, 150)}..."
-              </p>
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center text-white font-bold text-sm mr-3">
-                  {testimonial.name.charAt(0)}
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900 dark:text-white group-hover:text-orange-600 transition-colors">
-                    {testimonial.name}
+              <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-gray-600 h-full relative overflow-hidden">
+                {/* Animated background pattern */}
+                <motion.div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"
+                  animate={{
+                    background: [
+                      `radial-gradient(circle at 20% 80%, rgba(249, 115, 22, 0.1) 0%, transparent 50%)`,
+                      `radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 50%)`,
+                      `radial-gradient(circle at 20% 80%, rgba(249, 115, 22, 0.1) 0%, transparent 50%)`
+                    ]
+                  }}
+                  transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                />
+
+                {/* Quote icon */}
+                <motion.div
+                  className="absolute top-6 right-6 text-orange-400 opacity-20"
+                  initial={{ scale: 0, rotate: -45 }}
+                  whileInView={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: index * 0.2 + 0.3, type: 'spring', stiffness: 300 }}
+                >
+                  <Quote className="h-8 w-8" />
+                </motion.div>
+
+                {/* Rating stars */}
+                <motion.div
+                  className="flex items-center mb-6"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.2 + 0.1 }}
+                >
+                  {renderStars(testimonial.rating)}
+                </motion.div>
+
+                <motion.p
+                  className="text-gray-700 dark:text-gray-300 leading-relaxed mb-8 text-lg italic relative z-10"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.2 + 0.4 }}
+                >
+                  "{testimonial.content.substring(0, 150)}..."
+                </motion.p>
+
+                <motion.div
+                  className="flex items-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.2 + 0.6 }}
+                >
+                  <motion.div
+                    className="w-12 h-12 bg-gradient-to-r from-orange-500 to-amber-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4 shadow-lg"
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    transition={{ type: 'spring', stiffness: 400 }}
+                  >
+                    {testimonial.name.charAt(0)}
+                  </motion.div>
+                  <div>
+                    <motion.h4
+                      className="font-bold text-gray-900 dark:text-white group-hover:text-orange-600 transition-colors"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.2 + 0.7 }}
+                    >
+                      {testimonial.name}
+                    </motion.h4>
+                    <motion.p
+                      className="text-sm text-gray-600 dark:text-gray-400"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.2 + 0.7 }}
+                    >
+                      {testimonial.role}
+                    </motion.p>
+                    <motion.p
+                      className="text-sm font-medium text-orange-600"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.2 + 0.8 }}
+                    >
+                      {testimonial.company}
+                    </motion.p>
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {testimonial.role} • {testimonial.company}
-                  </div>
-                </div>
+                </motion.div>
+
+                {/* Animated border */}
+                <motion.div
+                  className="absolute inset-0 rounded-3xl border-2 border-transparent"
+                  animate={{
+                    borderImageSource: [
+                      `linear-gradient(45deg, rgba(249, 115, 22, 0.3), rgba(251, 191, 36, 0.3))`,
+                      `linear-gradient(45deg, rgba(251, 191, 36, 0.3), rgba(249, 115, 22, 0.3))`,
+                      `linear-gradient(45deg, rgba(249, 115, 22, 0.3), rgba(251, 191, 36, 0.3))`
+                    ]
+                  }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  style={{
+                    borderImageSlice: 1,
+                    borderImageWidth: '2px'
+                  }}
+                />
               </div>
+
+              {/* Floating elements */}
+              <motion.div
+                className="absolute -top-3 -right-3 w-4 h-4 bg-orange-400 rounded-full opacity-0 group-hover:opacity-60"
+                animate={{ y: [0, -12, 0], scale: [1, 1.3, 1] }}
+                transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.3 }}
+              />
+              <motion.div
+                className="absolute -bottom-3 -left-3 w-3 h-3 bg-amber-400 rounded-full opacity-0 group-hover:opacity-40"
+                animate={{ y: [0, -10, 0], scale: [1, 1.4, 1] }}
+                transition={{ duration: 3, repeat: Infinity, delay: index * 0.5 }}
+              />
             </motion.div>
           ))}
         </motion.div>

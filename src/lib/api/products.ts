@@ -166,7 +166,7 @@ export const productsApi = {
   },
 
   async getFeaturedProducts(limit: number = 12) {
-  return apiClient.get<Product[]>('/products', { featured: true, limit });
+  return apiClient.get<Product[]>('/products/featured', { limit });
   },
 
   async getProductsByCategory(categoryId: string, filters?: Omit<ProductFilters, 'category'>) {

@@ -197,14 +197,55 @@ export const servicesApi = {
     return { success: false, data: [] };
   },
 
-  // Get service subcategories
-  getSubcategories: async (categoryId: string): Promise<{ success: boolean; data: string[] }> => {
-    const response = await apiClient.get(`/categories/${categoryId}/subcategories`);
-    const raw: any = response as any;
+  // Get featured services - using dedicated endpoint
+  getFeaturedServices: async (limit: number = 12): Promise<ServicesResponse> => {
+    const response = await apiClient.get<any>(`/services/featured?limit=${limit}`);
+
+    // Normalize various possible response shapes from backend
+    const raw = response as any;
+
+    let services: Service[] = [];
+    let total = 0;
+    let page = 1;
+    let limit_num = limit;
+    let hasMore = false;
+
+    if (raw && raw.data) {
+      const d = raw.data;
+      if (Array.isArray(d)) {
+        services = d;
+        total = d.length;
+      } else if (Array.isArray(d.services)) {
+        services = d.services;
+        total = d.total || services.length;
+        page = d.page || page;
+        limit_num = d.limit || limit_num;
+        hasMore = Boolean(d.hasMore);
+      } else if (Array.isArray(d.data)) {
+        services = d.data;
+        total = services.length;
+      }
+    } else if (raw && Array.isArray(raw)) {
+      services = raw;
+      total = raw.length;
+    } else if (raw && raw.services && Array.isArray(raw.services)) {
+      services = raw.services;
+      total = raw.total || services.length;
+      page = raw.page || page;
+      limit_num = raw.limit || limit_num;
+      hasMore = Boolean(raw.hasMore);
+    }
+
     return {
-      success: raw.success,
-      data: Array.isArray(raw.data) ? raw.data : (raw.data?.data || []),
-    } as { success: boolean; data: string[] };
+      success: response.success,
+      data: {
+        services,
+        total,
+        page,
+        limit: limit_num,
+        hasMore,
+      },
+    } as ServicesResponse;
   },
 
   // Add service review

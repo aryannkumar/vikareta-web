@@ -444,8 +444,8 @@ export default function RegisterPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {[
-          { type: 'buyer', title: 'Normal User', description: 'Browse and purchase products and services', icon: '👤' },
-          { type: 'business', title: 'Business User', description: 'Access dashboard at dashboard.vikareta.com', icon: '🏢' }
+          { type: 'buyer', title: 'User', description: 'Browse and purchase products and services', icon: '👤' },
+          { type: 'business', title: 'Business', description: 'Access dashboard at dashboard.vikareta.com', icon: '🏢' }
         ].map((option) => (
           <motion.button
             key={option.type}

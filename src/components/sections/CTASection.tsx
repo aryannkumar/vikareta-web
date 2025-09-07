@@ -30,6 +30,38 @@ export function CTASection() {
                 animate={{ x: [0, -25, 0], y: [0, 15, 0], scale: [1, 0.9, 1] }}
                 transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
             />
+            <motion.div 
+                className="absolute top-1/2 left-1/4 w-24 h-24 bg-amber-200/10 rounded-full blur-xl"
+                animate={{ x: [0, 20, 0], y: [0, -15, 0], scale: [1, 1.2, 1] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            />
+            <motion.div 
+                className="absolute bottom-1/3 right-1/3 w-20 h-20 bg-orange-300/10 rounded-full blur-lg"
+                animate={{ x: [0, -18, 0], y: [0, 12, 0], scale: [1, 0.8, 1] }}
+                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            />
+
+            {/* Floating particles */}
+            <motion.div
+                className="absolute top-32 left-32 w-2 h-2 bg-white/30 rounded-full"
+                animate={{ y: [0, -20, 0], opacity: [0.3, 0.8, 0.3] }}
+                transition={{ duration: 4, repeat: Infinity, delay: 0 }}
+            />
+            <motion.div
+                className="absolute top-40 right-40 w-3 h-3 bg-amber-200/40 rounded-full"
+                animate={{ y: [0, -25, 0], opacity: [0.4, 0.9, 0.4] }}
+                transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+            />
+            <motion.div
+                className="absolute bottom-32 left-40 w-2 h-2 bg-orange-200/30 rounded-full"
+                animate={{ y: [0, -18, 0], opacity: [0.3, 0.7, 0.3] }}
+                transition={{ duration: 4.5, repeat: Infinity, delay: 2 }}
+            />
+            <motion.div
+                className="absolute bottom-40 right-32 w-3 h-3 bg-white/25 rounded-full"
+                animate={{ y: [0, -22, 0], opacity: [0.25, 0.6, 0.25] }}
+                transition={{ duration: 5.5, repeat: Infinity, delay: 3 }}
+            />
 
             <div className="container mx-auto px-6 relative z-10">
                 <motion.div 
@@ -74,16 +106,46 @@ export function CTASection() {
                 <div className="grid md:grid-cols-2 gap-10 max-w-6xl mx-auto mb-16">
                     {/* For Buyers - Enhanced */}
                     <motion.div 
-                        className="group bg-white/10 backdrop-blur-md rounded-3xl p-10 border border-white/20 hover:bg-white/15 transition-all duration-500 shadow-2xl hover:shadow-3xl"
+                        className="group bg-white/10 backdrop-blur-md rounded-3xl p-10 border border-white/20 hover:bg-white/15 transition-all duration-500 shadow-2xl hover:shadow-3xl relative overflow-hidden"
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: 0.1 }}
                         whileHover={{ y: -8, scale: 1.02 }}
                     >
-                        <div className="flex items-center mb-8">
-                            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mr-6 group-hover:scale-110 transition-transform duration-300">
+                        {/* Animated background gradient */}
+                        <motion.div
+                            className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500"
+                            animate={{
+                                background: [
+                                    `linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%)`,
+                                    `linear-gradient(45deg, rgba(251, 191, 36, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%)`,
+                                    `linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%)`
+                                ]
+                            }}
+                            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                        />
+
+                        {/* Pulse effect */}
+                        <motion.div
+                            className="absolute inset-0 rounded-3xl border-2 border-white/20"
+                            animate={{ scale: [1, 1.02, 1], opacity: [0.5, 0, 0.5] }}
+                            transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+                        />
+
+                        <div className="flex items-center mb-8 relative z-10">
+                            <motion.div 
+                                className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mr-6 group-hover:scale-110 transition-transform duration-300"
+                                whileHover={{ rotate: [0, -5, 5, 0] }}
+                                transition={{ duration: 0.5 }}
+                            >
                                 <Users className="h-8 w-8 text-white" />
-                            </div>
+                                {/* Icon pulse */}
+                                <motion.div
+                                    className="absolute inset-0 rounded-2xl bg-white/10"
+                                    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0, 0.3] }}
+                                    transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                                />
+                            </motion.div>
                             <h3 className="text-3xl font-bold text-white">For Enterprise Buyers</h3>
                         </div>
                         <p className="text-white/90 mb-6 leading-relaxed text-lg">
@@ -145,16 +207,46 @@ export function CTASection() {
 
                     {/* For Sellers - Enhanced */}
                     <motion.div 
-                        className="group bg-white/10 backdrop-blur-md rounded-3xl p-10 border border-white/20 hover:bg-white/15 transition-all duration-500 shadow-2xl hover:shadow-3xl"
+                        className="group bg-white/10 backdrop-blur-md rounded-3xl p-10 border border-white/20 hover:bg-white/15 transition-all duration-500 shadow-2xl hover:shadow-3xl relative overflow-hidden"
                         initial={{ opacity: 0, x: 30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
                         whileHover={{ y: -8, scale: 1.02 }}
                     >
-                        <div className="flex items-center mb-8">
-                            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mr-6 group-hover:scale-110 transition-transform duration-300">
+                        {/* Animated background gradient */}
+                        <motion.div
+                            className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500"
+                            animate={{
+                                background: [
+                                    `linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%)`,
+                                    `linear-gradient(45deg, rgba(249, 115, 22, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%)`,
+                                    `linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%)`
+                                ]
+                            }}
+                            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                        />
+
+                        {/* Pulse effect */}
+                        <motion.div
+                            className="absolute inset-0 rounded-3xl border-2 border-white/20"
+                            animate={{ scale: [1, 1.02, 1], opacity: [0.5, 0, 0.5] }}
+                            transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+                        />
+
+                        <div className="flex items-center mb-8 relative z-10">
+                            <motion.div 
+                                className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mr-6 group-hover:scale-110 transition-transform duration-300"
+                                whileHover={{ rotate: [0, -5, 5, 0] }}
+                                transition={{ duration: 0.5 }}
+                            >
                                 <Store className="h-8 w-8 text-white" />
-                            </div>
+                                {/* Icon pulse */}
+                                <motion.div
+                                    className="absolute inset-0 rounded-2xl bg-white/10"
+                                    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0, 0.3] }}
+                                    transition={{ duration: 2, repeat: Infinity, delay: 1.5 }}
+                                />
+                            </motion.div>
                             <h3 className="text-3xl font-bold text-white">For Enterprise Suppliers</h3>
                         </div>
                         <p className="text-white/90 mb-6 leading-relaxed text-lg">
