@@ -393,6 +393,56 @@ class ApiClient {
       body: formData,
     });
   }
+
+  // ===== ADMIN ROUTES =====
+  async getAdminDashboard() {
+    return this.get('/admin/dashboard');
+  }
+
+  async getAdminUsers(filters?: any) {
+    return this.get('/admin/users', filters);
+  }
+
+  async updateAdminUserStatus(userId: string, status: string) {
+    return this.put(`/admin/users/${userId}/status`, { status });
+  }
+
+  async deleteAdminUser(userId: string) {
+    return this.delete(`/admin/users/${userId}`);
+  }
+
+  async getAdminOrders(filters?: any) {
+    return this.get('/admin/orders', filters);
+  }
+
+  async getAdminOrder(orderId: string) {
+    return this.get(`/admin/orders/${orderId}`);
+  }
+
+  async getAdminAnalytics() {
+    return this.get('/admin/system/analytics/overview');
+  }
+
+  async getAdminHealth() {
+    return this.get('/admin/system/health');
+  }
+
+  // ===== ADMIN ACTIONS =====
+  async getAdminActions(filters?: any) {
+    return this.get('/admin-actions', filters);
+  }
+
+  async createAdminAction(data: any) {
+    return this.post('/admin-actions', data);
+  }
+
+  async updateAdminAction(actionId: string, data: any) {
+    return this.put(`/admin-actions/${actionId}`, data);
+  }
+
+  async deleteAdminAction(actionId: string) {
+    return this.delete(`/admin-actions/${actionId}`);
+  }
 }
 
 export const apiClient = new ApiClient();

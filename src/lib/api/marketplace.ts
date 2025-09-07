@@ -88,6 +88,532 @@ export interface MarketplaceStatsResponse {
   };
 }
 
+// ===== MARKETPLACE LISTINGS INTERFACES =====
+export interface MarketplaceListing {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  price: number;
+  currency: string;
+  images: string[];
+  location: {
+    city: string;
+    state: string;
+    country: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
+  seller: {
+    id: string;
+    name: string;
+    rating: number;
+    verified: boolean;
+  };
+  condition: 'new' | 'used' | 'refurbished';
+  tags: string[];
+  featured: boolean;
+  promoted: boolean;
+  status: 'active' | 'inactive' | 'sold' | 'expired';
+  views: number;
+  favorites: number;
+  createdAt: string;
+  updatedAt: string;
+  expiresAt: string;
+}
+
+export interface MarketplaceSearchFilters {
+  query?: string;
+  category?: string;
+  subcategory?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  condition?: 'new' | 'used' | 'refurbished';
+  location?: {
+    city?: string;
+    state?: string;
+    country?: string;
+    radius?: number; // in km
+  };
+  sellerRating?: number;
+  verifiedSeller?: boolean;
+  featured?: boolean;
+  promoted?: boolean;
+  sortBy?: 'relevance' | 'price_asc' | 'price_desc' | 'date_desc' | 'date_asc' | 'rating_desc';
+  page?: number;
+  limit?: number;
+}
+
+export interface MarketplaceCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  icon?: string;
+  subcategories: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    description?: string;
+  }>;
+  totalListings: number;
+  featured: boolean;
+}
+
+export interface CreateListingData {
+  title: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  price: number;
+  currency: string;
+  images: string[];
+  location: {
+    city: string;
+    state: string;
+    country: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
+  condition: 'new' | 'used' | 'refurbished';
+  tags?: string[];
+  featured?: boolean;
+  promoted?: boolean;
+}
+
+export interface UpdateListingData extends Partial<CreateListingData> {
+  status?: 'active' | 'inactive' | 'sold';
+}
+
+export interface MarketplaceStats {
+  totalListings: number;
+  activeListings: number;
+  totalViews: number;
+  totalFavorites: number;
+  averagePrice: number;
+  listingsByCategory: Record<string, number>;
+  listingsByCondition: Record<string, number>;
+  topCategories: Array<{
+    category: string;
+    count: number;
+    percentage: number;
+  }>;
+  recentActivity: Array<{
+    type: 'listing_created' | 'listing_sold' | 'listing_expired';
+    count: number;
+    date: string;
+  }>;
+}
+
+export class MarketplaceService {
+  // ===== MARKETPLACE LISTINGS METHODS =====
+
+  // Search marketplace listings
+  static async searchListings(filters?: MarketplaceSearchFilters): Promise<{
+    listings: MarketplaceListing[];
+    total: number;
+    page: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+    searchTime: number;
+    filters: MarketplaceSearchFilters;
+  }> {
+    const response = await apiClient.get<{
+      listings: MarketplaceListing[];
+      total: number;
+      page: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+      searchTime: number;
+      filters: MarketplaceSearchFilters;
+    }>('/marketplace/listings/search', filters);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to search marketplace listings');
+    }
+    return response.data;
+  }
+
+  // Get marketplace listing by ID
+  static async getListing(listingId: string): Promise<MarketplaceListing> {
+    const response = await apiClient.get<MarketplaceListing>(`/marketplace/listings/${listingId}`);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch marketplace listing');
+    }
+    return response.data;
+  }
+
+  // Get user's marketplace listings
+  static async getUserListings(userId?: string, filters?: {
+    status?: 'active' | 'inactive' | 'sold' | 'expired';
+    category?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{
+    listings: MarketplaceListing[];
+    total: number;
+    page: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  }> {
+    const endpoint = userId ? `/marketplace/users/${userId}/listings` : '/marketplace/my-listings';
+    const response = await apiClient.get<{
+      listings: MarketplaceListing[];
+      total: number;
+      page: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    }>(endpoint, filters);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch user listings');
+    }
+    return response.data;
+  }
+
+  // Create new marketplace listing
+  static async createListing(data: CreateListingData): Promise<MarketplaceListing> {
+    const response = await apiClient.post<MarketplaceListing>('/marketplace/listings', data);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to create marketplace listing');
+    }
+    return response.data;
+  }
+
+  // Update marketplace listing
+  static async updateListing(listingId: string, data: UpdateListingData): Promise<MarketplaceListing> {
+    const response = await apiClient.put<MarketplaceListing>(`/marketplace/listings/${listingId}`, data);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to update marketplace listing');
+    }
+    return response.data;
+  }
+
+  // Delete marketplace listing
+  static async deleteListing(listingId: string): Promise<void> {
+    const response = await apiClient.delete(`/marketplace/listings/${listingId}`);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to delete marketplace listing');
+    }
+  }
+
+  // Get marketplace categories
+  static async getCategories(): Promise<MarketplaceCategory[]> {
+    const response = await apiClient.get<MarketplaceCategory[]>('/marketplace/categories');
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch marketplace categories');
+    }
+    return response.data;
+  }
+
+  // Get marketplace category by slug
+  static async getCategoryBySlug(slug: string): Promise<MarketplaceCategory> {
+    const response = await apiClient.get<MarketplaceCategory>(`/marketplace/categories/${slug}`);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch marketplace category');
+    }
+    return response.data;
+  }
+
+  // Get featured marketplace listings
+  static async getFeaturedListings(limit?: number): Promise<MarketplaceListing[]> {
+    const response = await apiClient.get<MarketplaceListing[]>('/marketplace/listings/featured', { limit });
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch featured listings');
+    }
+    return response.data;
+  }
+
+  // Get promoted marketplace listings
+  static async getPromotedListings(limit?: number): Promise<MarketplaceListing[]> {
+    const response = await apiClient.get<MarketplaceListing[]>('/marketplace/listings/promoted', { limit });
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch promoted listings');
+    }
+    return response.data;
+  }
+
+  // Add listing to favorites
+  static async addToFavorites(listingId: string): Promise<void> {
+    const response = await apiClient.post('/marketplace/favorites', { listingId });
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to add listing to favorites');
+    }
+  }
+
+  // Remove listing from favorites
+  static async removeFromFavorites(listingId: string): Promise<void> {
+    const response = await apiClient.delete(`/marketplace/favorites/${listingId}`);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to remove listing from favorites');
+    }
+  }
+
+  // Get user's favorite listings
+  static async getFavoriteListings(filters?: {
+    page?: number;
+    limit?: number;
+  }): Promise<{
+    listings: MarketplaceListing[];
+    total: number;
+    page: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  }> {
+    const response = await apiClient.get<{
+      listings: MarketplaceListing[];
+      total: number;
+      page: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    }>('/marketplace/favorites', filters);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch favorite listings');
+    }
+    return response.data;
+  }
+
+  // Check if listing is favorited by user
+  static async isFavorited(listingId: string): Promise<boolean> {
+    const response = await apiClient.get<{ favorited: boolean }>(`/marketplace/favorites/${listingId}/check`);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to check favorite status');
+    }
+    return response.data.favorited;
+  }
+
+  // Report marketplace listing
+  static async reportListing(listingId: string, reason: string, description?: string): Promise<void> {
+    const response = await apiClient.post('/marketplace/reports', {
+      listingId,
+      reason,
+      description
+    });
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to report listing');
+    }
+  }
+
+  // Contact seller
+  static async contactSeller(listingId: string, message: string): Promise<void> {
+    const response = await apiClient.post('/marketplace/contact', {
+      listingId,
+      message
+    });
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to contact seller');
+    }
+  }
+
+  // Get marketplace statistics
+  static async getMarketplaceStats(): Promise<MarketplaceStats> {
+    const response = await apiClient.get<MarketplaceStats>('/marketplace/stats');
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch marketplace statistics');
+    }
+    return response.data;
+  }
+
+  // Get similar listings
+  static async getSimilarListings(listingId: string, limit?: number): Promise<MarketplaceListing[]> {
+    const response = await apiClient.get<MarketplaceListing[]>(`/marketplace/listings/${listingId}/similar`, { limit });
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch similar listings');
+    }
+    return response.data;
+  }
+
+  // Get trending searches
+  static async getTrendingSearches(): Promise<Array<{
+    query: string;
+    count: number;
+    trend: 'up' | 'down' | 'stable';
+  }>> {
+    const response = await apiClient.get<Array<{
+      query: string;
+      count: number;
+      trend: 'up' | 'down' | 'stable';
+    }>>('/marketplace/trending-searches');
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch trending searches');
+    }
+    return response.data;
+  }
+
+  // Get location suggestions
+  static async getLocationSuggestions(query: string): Promise<Array<{
+    city: string;
+    state: string;
+    country: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  }>> {
+    const response = await apiClient.get<Array<{
+      city: string;
+      state: string;
+      country: string;
+      coordinates?: {
+        lat: number;
+        lng: number;
+      };
+    }>>('/marketplace/locations/suggestions', { query });
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch location suggestions');
+    }
+    return response.data;
+  }
+
+  // Bulk update listings
+  static async bulkUpdateListings(listingIds: string[], updates: UpdateListingData): Promise<{
+    updated: number;
+    failed: number;
+    results: Array<{
+      listingId: string;
+      success: boolean;
+      error?: string;
+    }>;
+  }> {
+    const response = await apiClient.post<{
+      updated: number;
+      failed: number;
+      results: Array<{
+        listingId: string;
+        success: boolean;
+        error?: string;
+      }>;
+    }>('/marketplace/bulk-update', {
+      listingIds,
+      updates
+    });
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to bulk update listings');
+    }
+    return response.data;
+  }
+
+  // Get marketplace alerts/notifications
+  static async getMarketplaceAlerts(): Promise<Array<{
+    id: string;
+    type: 'price_drop' | 'similar_listing' | 'outbid' | 'listing_expired';
+    title: string;
+    message: string;
+    listingId?: string;
+    read: boolean;
+    createdAt: string;
+  }>> {
+    const response = await apiClient.get<Array<{
+      id: string;
+      type: 'price_drop' | 'similar_listing' | 'outbid' | 'listing_expired';
+      title: string;
+      message: string;
+      listingId?: string;
+      read: boolean;
+      createdAt: string;
+    }>>('/marketplace/alerts');
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch marketplace alerts');
+    }
+    return response.data;
+  }
+
+  // Mark alert as read
+  static async markAlertAsRead(alertId: string): Promise<void> {
+    const response = await apiClient.put(`/marketplace/alerts/${alertId}/read`);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to mark alert as read');
+    }
+  }
+
+  // Create marketplace alert subscription
+  static async createAlertSubscription(data: {
+    query?: string;
+    category?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    location?: {
+      city?: string;
+      state?: string;
+      country?: string;
+      radius?: number;
+    };
+    frequency: 'immediate' | 'daily' | 'weekly';
+  }): Promise<{
+    id: string;
+    active: boolean;
+    createdAt: string;
+  }> {
+    const response = await apiClient.post<{
+      id: string;
+      active: boolean;
+      createdAt: string;
+    }>('/marketplace/alert-subscriptions', data);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to create alert subscription');
+    }
+    return response.data;
+  }
+
+  // Get user's alert subscriptions
+  static async getAlertSubscriptions(): Promise<Array<{
+    id: string;
+    query?: string;
+    category?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    location?: {
+      city?: string;
+      state?: string;
+      country?: string;
+      radius?: number;
+    };
+    frequency: 'immediate' | 'daily' | 'weekly';
+    active: boolean;
+    createdAt: string;
+    lastTriggered?: string;
+  }>> {
+    const response = await apiClient.get<Array<{
+      id: string;
+      query?: string;
+      category?: string;
+      minPrice?: number;
+      maxPrice?: number;
+      location?: {
+        city?: string;
+        state?: string;
+        country?: string;
+        radius?: number;
+      };
+      frequency: 'immediate' | 'daily' | 'weekly';
+      active: boolean;
+      createdAt: string;
+      lastTriggered?: string;
+    }>>('/marketplace/alert-subscriptions');
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch alert subscriptions');
+    }
+    return response.data;
+  }
+
+  // Delete alert subscription
+  static async deleteAlertSubscription(subscriptionId: string): Promise<void> {
+    const response = await apiClient.delete(`/marketplace/alert-subscriptions/${subscriptionId}`);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to delete alert subscription');
+    }
+  }
+}
+
 export const marketplaceApi = {
   // Get trending products (using popular endpoint)
   getTrendingProducts: async (filters?: MarketplaceFilters): Promise<TrendingResponse> => {
