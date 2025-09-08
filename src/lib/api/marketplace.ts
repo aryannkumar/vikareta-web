@@ -56,6 +56,8 @@ export interface MarketplaceFilters {
   radius?: number;
   sortBy?: 'trending' | 'rating' | 'distance' | 'price';
   type?: 'all' | 'businesses' | 'products' | 'services';
+  lat?: number;
+  lng?: number;
 }
 
 export interface TrendingResponse {
@@ -718,6 +720,10 @@ export const marketplaceApi = {
       if (filters?.category) searchParams.append('category', filters.category);
       if (filters?.radius) searchParams.append('radius', filters.radius.toString());
       if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy);
+
+      // Add user coordinates if available
+      if (filters?.lat) searchParams.append('lat', filters.lat.toString());
+      if (filters?.lng) searchParams.append('lng', filters.lng.toString());
 
       const response = await apiClient.get(`/marketplace/businesses?${searchParams.toString()}`);
       if (!response.success) {

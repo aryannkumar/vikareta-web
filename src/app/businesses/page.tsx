@@ -23,6 +23,65 @@ import {
   SlidersHorizontal
 } from 'lucide-react';
 
+// Inline geolocation utilities
+interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+interface GeolocationResult {
+  success: boolean;
+  coordinates?: Coordinates;
+  error?: string;
+}
+
+const getCurrentLocation = (): Promise<GeolocationResult> => {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      resolve({
+        success: false,
+        error: 'Geolocation is not supported by this browser'
+      });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          success: true,
+          coordinates: {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          }
+        });
+      },
+      (error) => {
+        let errorMessage = 'Unable to retrieve your location';
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location access denied by user';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information is unavailable';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out';
+            break;
+        }
+        resolve({
+          success: false,
+          error: errorMessage
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes
+      }
+    );
+  });
+};
+
 // Modern hero section with better design
 const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
   const defaultStats = {
@@ -184,14 +243,24 @@ export default function BusinessesPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [homepageStats, setHomepageStats] = useState<HomepageStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   const loadBusinesses = async (tab: typeof activeTab = activeTab) => {
     try {
       setLoading(true);
       setError(null);
       let res;
+      
       if (tab === 'nearby') {
-        res = await marketplaceApi.getNearbyBusinesses();
+        // Pass user coordinates for nearby businesses
+        const filters: any = {};
+        if (userLocation) {
+          filters.lat = userLocation.lat;
+          filters.lng = userLocation.lng;
+          filters.sortBy = 'distance';
+        }
+        res = await marketplaceApi.getNearbyBusinesses(filters);
       } else if (tab === 'popular') {
         res = await marketplaceApi.getPopularBusinesses();
       } else {
@@ -224,9 +293,29 @@ export default function BusinessesPage() {
     }
   };
 
+  // Get user location on component mount
+  useEffect(() => {
+    const getLocation = async () => {
+      try {
+        const locationResult = await getCurrentLocation();
+        if (locationResult.success && locationResult.coordinates) {
+          setUserLocation(locationResult.coordinates);
+          setLocationError(null);
+        } else {
+          setLocationError(locationResult.error || 'Unable to get location');
+        }
+      } catch (error) {
+        console.error('Error getting location:', error);
+        setLocationError('Failed to get your location');
+      }
+    };
+
+    getLocation();
+  }, []);
+
   useEffect(() => {
     loadBusinesses(activeTab);
-  }, [activeTab]);
+  }, [activeTab, userLocation]);
 
   // Load homepage stats
   useEffect(() => {
