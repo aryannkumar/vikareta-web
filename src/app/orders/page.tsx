@@ -193,12 +193,16 @@ export default function OrdersPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-4">Error Loading Orders</h2>
-            <p className="text-muted-foreground mb-8">{error}</p>
-            <Button onClick={fetchOrders}>
+        <div className="container mx-auto px-4 py-8 sm:py-16">
+          <div className="text-center max-w-md mx-auto">
+            <div className="mb-6">
+              <AlertCircle className="h-12 w-12 sm:h-16 sm:w-16 text-red-500 mx-auto" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4">Error Loading Orders</h2>
+            <p className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">
+              {error}
+            </p>
+            <Button onClick={fetchOrders} className="h-11 sm:h-12 px-6">
               Try Again
             </Button>
           </div>
@@ -211,89 +215,123 @@ export default function OrdersPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-4">My Orders</h1>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-4">My Orders</h1>
           <p className="text-muted-foreground text-sm sm:text-base">
             Track and manage your orders
           </p>
         </div>
 
         {/* Filters */}
-        <div className="mb-8 space-y-4">
-          {/* Search */}
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <input
-              type="text"
-              placeholder="Search orders..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-sm sm:text-base"
-            />
+        <div className="mb-6 sm:mb-8 bg-card rounded-lg border p-4 sm:p-6 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <Filter className="h-5 w-5 text-muted-foreground" />
+            <h2 className="font-semibold text-base sm:text-lg">Filters</h2>
           </div>
 
-          {/* Filter Controls */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-sm sm:text-base"
-            >
-              {statusOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+          <div className="space-y-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <input
+                type="text"
+                placeholder="Search orders by ID, business, or customer..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-sm sm:text-base h-11"
+              />
+            </div>
 
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-sm sm:text-base"
-            >
-              {typeOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            {/* Filter Controls */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-2 text-muted-foreground">Status</label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-sm sm:text-base h-10"
+                >
+                  {statusOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2 text-muted-foreground">Type</label>
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-sm sm:text-base h-10"
+                >
+                  {typeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Orders List */}
         {loading ? (
           <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="animate-pulse bg-card rounded-lg border p-6">
-                <div className="flex items-center gap-4">
-                  <div className="bg-muted rounded-lg w-20 h-16"></div>
-                  <div className="flex-1 space-y-2">
-                    <div className="bg-muted rounded h-4 w-1/3"></div>
-                    <div className="bg-muted rounded h-3 w-1/2"></div>
-                    <div className="bg-muted rounded h-3 w-1/4"></div>
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="animate-pulse bg-card rounded-lg border p-4 sm:p-6 shadow-sm">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="bg-muted rounded-lg w-full sm:w-20 h-32 sm:h-16 flex-shrink-0"></div>
+                  <div className="flex-1 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                      <div className="space-y-2 flex-1">
+                        <div className="bg-muted rounded h-5 w-2/3"></div>
+                        <div className="bg-muted rounded h-4 w-1/2"></div>
+                      </div>
+                      <div className="space-y-2 sm:text-right">
+                        <div className="bg-muted rounded h-6 w-20"></div>
+                        <div className="bg-muted rounded h-5 w-16"></div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="bg-muted rounded h-4 w-3/4"></div>
+                      <div className="bg-muted rounded h-4 w-2/3"></div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <div className="bg-muted rounded h-8 w-20"></div>
+                      <div className="bg-muted rounded h-8 w-24"></div>
+                      <div className="bg-muted rounded h-8 w-16"></div>
+                    </div>
                   </div>
-                  <div className="bg-muted rounded h-8 w-20"></div>
                 </div>
               </div>
             ))}
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="text-center py-16">
-            <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No orders found</h3>
-            <p className="text-muted-foreground mb-8">
+          <div className="text-center py-12 sm:py-16">
+            <div className="mb-6">
+              <Package className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto" />
+            </div>
+            <h3 className="text-xl sm:text-2xl font-semibold mb-2">No orders found</h3>
+            <p className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base max-w-md mx-auto">
               {searchQuery || statusFilter || typeFilter
-                ? 'Try adjusting your search or filters'
-                : 'You haven\'t placed any orders yet'
+                ? 'Try adjusting your search or filters to find what you\'re looking for'
+                : 'You haven\'t placed any orders yet. Start exploring our marketplace!'
               }
             </p>
             {!searchQuery && !statusFilter && !typeFilter && (
-              <div className="flex gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                 <Link href="/products">
-                  <Button className="btn-primary">Shop Products</Button>
+                  <Button className="btn-primary w-full sm:w-auto h-11 sm:h-12 px-6">
+                    Shop Products
+                  </Button>
                 </Link>
                 <Link href="/services">
-                  <Button variant="outline">Browse Services</Button>
+                  <Button variant="outline" className="w-full sm:w-auto h-11 sm:h-12 px-6">
+                    Browse Services
+                  </Button>
                 </Link>
               </div>
             )}
@@ -301,118 +339,132 @@ export default function OrdersPage() {
         ) : (
           <div className="space-y-4">
             {filteredOrders.map((order) => (
-              <div key={order.id} className="bg-card rounded-lg border p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-start gap-4">
-                  {/* Order Image */}
-                  <div className="flex-shrink-0">
-                    <Image
-                      src={order.items[0]?.productImage || '/api/placeholder/80/64'}
-                      alt={order.items[0]?.productName || 'Order item'}
-                      width={80}
-                      height={64}
-                      className="w-20 h-16 object-cover rounded-lg"
-                    />
+              <div key={order.id} className="bg-card rounded-lg border p-4 sm:p-6 hover:shadow-md transition-shadow shadow-sm">
+                <div className="flex flex-col gap-4">
+                  {/* Order Header */}
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    {/* Order Image */}
+                    <div className="flex-shrink-0 mx-auto sm:mx-0">
+                      <Image
+                        src={order.items[0]?.productImage || '/api/placeholder/80/64'}
+                        alt={order.items[0]?.productName || 'Order item'}
+                        width={80}
+                        height={64}
+                        className="w-20 h-16 sm:w-24 sm:h-20 object-cover rounded-lg shadow-sm"
+                      />
+                    </div>
+
+                    {/* Order Details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-3">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-lg sm:text-xl mb-1 line-clamp-2">
+                            {order.items.length === 1 
+                              ? order.items[0].productName 
+                              : `${order.items.length} items`}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            by {order.supplierName}
+                          </p>
+                        </div>
+                        
+                        <div className="text-left sm:text-right flex-shrink-0">
+                          <div className="font-bold text-xl sm:text-2xl mb-1">{formatPrice(order.totalAmount)}</div>
+                          <Badge className={`${getStatusColor(order.status)} flex items-center gap-1 w-fit`}>
+                            {getStatusIcon(order.status)}
+                            <span className="text-xs font-medium">
+                              {order.status.replace('-', ' ').toUpperCase()}
+                            </span>
+                          </Badge>
+                        </div>
+                      </div>
+
+                      {/* Order Info Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-muted-foreground mb-4">
+                        <div className="flex items-center gap-2">
+                          <Package className="h-4 w-4 flex-shrink-0" />
+                          <span className="truncate font-medium">Order #{order.id}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 flex-shrink-0" />
+                          <span className="truncate">
+                            Ordered: {new Date(order.orderDate).toLocaleDateString()}
+                          </span>
+                        </div>
+                        {order.deliveredDate && (
+                          <div className="flex items-center gap-2">
+                            <Truck className="h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">
+                              Delivered: {new Date(order.deliveredDate).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                        {order.expectedDeliveryDate && !order.deliveredDate && (
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">
+                              Est. Delivery: {new Date(order.expectedDeliveryDate).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                        {order.trackingNumber && (
+                          <div className="flex items-center gap-2 sm:col-span-2">
+                            <Truck className="h-4 w-4 flex-shrink-0" />
+                            <span className="truncate font-medium">
+                              Tracking: {order.trackingNumber}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Order Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="font-semibold text-lg mb-1">
-                          {order.items.length === 1 
-                            ? order.items[0].productName 
-                            : `${order.items.length} items`}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          by {order.supplierName}
-                        </p>
-                      </div>
-                      
-                      <div className="text-right">
-                        <div className="font-bold text-lg">{formatPrice(order.totalAmount)}</div>
-                        <Badge className={`${getStatusColor(order.status)} flex items-center gap-1`}>
-                          {getStatusIcon(order.status)}
-                          {order.status.replace('-', ' ').toUpperCase()}
-                        </Badge>
-                      </div>
-                    </div>
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-2 pt-3 border-t">
+                    <Link href={`/orders/${order.id}`}>
+                      <Button variant="outline" size="sm" className="h-9 px-3 sm:px-4 text-xs sm:text-sm">
+                        <Eye className="h-4 w-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">View Details</span>
+                        <span className="sm:hidden">View</span>
+                      </Button>
+                    </Link>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-sm text-muted-foreground mb-4">
-                      <div className="flex items-center gap-2">
-                        <Package className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">Order #{order.id}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">Ordered: {new Date(order.orderDate).toLocaleDateString()}</span>
-                      </div>
-                      {order.deliveredDate && (
-                        <div className="flex items-center gap-2">
-                          <Truck className="h-4 w-4 flex-shrink-0" />
-                          <span className="truncate">Delivered: {new Date(order.deliveredDate).toLocaleDateString()}</span>
-                        </div>
-                      )}
-                      {order.expectedDeliveryDate && !order.deliveredDate && (
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 flex-shrink-0" />
-                          <span className="truncate">Est. Delivery: {new Date(order.expectedDeliveryDate).toLocaleDateString()}</span>
-                        </div>
-                      )}
-                      {order.trackingNumber && (
-                        <div className="flex items-center gap-2 sm:col-span-3">
-                          <Truck className="h-4 w-4 flex-shrink-0" />
-                          <span className="truncate">Tracking: {order.trackingNumber}</span>
-                        </div>
-                      )}
-                    </div>
+                    <Link href={`/businesses/${order.supplierId}`}>
+                      <Button variant="outline" size="sm" className="h-9 px-3 sm:px-4 text-xs sm:text-sm">
+                        <MessageCircle className="h-4 w-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">Contact Business</span>
+                        <span className="sm:hidden">Contact</span>
+                      </Button>
+                    </Link>
 
-                    {/* Action Buttons */}
-                    <div className="flex flex-wrap gap-2">
-                      <Link href={`/orders/${order.id}`}>
-                        <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                          <Eye className="h-4 w-4 mr-1 sm:mr-2" />
-                          <span className="hidden sm:inline">View Details</span>
-                          <span className="sm:hidden">View</span>
-                        </Button>
-                      </Link>
+                    {order.status === 'delivered' && (
+                      <Button variant="outline" size="sm" className="h-9 px-3 sm:px-4 text-xs sm:text-sm">
+                        <Star className="h-4 w-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">Write Review</span>
+                        <span className="sm:hidden">Review</span>
+                      </Button>
+                    )}
 
-                      <Link href={`/businesses/${order.supplierId}`}>
-                        <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                          <MessageCircle className="h-4 w-4 mr-1 sm:mr-2" />
-                          <span className="hidden sm:inline">Contact Business</span>
-                          <span className="sm:hidden">Contact</span>
-                        </Button>
-                      </Link>
+                    {order.status === 'delivered' && (
+                      <Button variant="outline" size="sm" className="h-9 px-3 sm:px-4 text-xs sm:text-sm">
+                        <Download className="h-4 w-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">Download Invoice</span>
+                        <span className="sm:hidden">Invoice</span>
+                      </Button>
+                    )}
 
-                      {order.status === 'delivered' && (
-                        <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                          <Star className="h-4 w-4 mr-1 sm:mr-2" />
-                          <span className="hidden sm:inline">Write Review</span>
-                          <span className="sm:hidden">Review</span>
-                        </Button>
-                      )}
-
-                      {order.status === 'delivered' && (
-                        <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                          <Download className="h-4 w-4 mr-1 sm:mr-2" />
-                          <span className="hidden sm:inline">Download Invoice</span>
-                          <span className="sm:hidden">Invoice</span>
-                        </Button>
-                      )}
-
-                      {(order.status === 'pending' || order.status === 'confirmed') && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleCancelOrder(order.id)}
-                          className="text-red-600 hover:text-red-700 hover:border-red-300 text-xs sm:text-sm"
-                        >
-                          <XCircle className="h-4 w-4 mr-1 sm:mr-2" />
-                          <span className="hidden sm:inline">Cancel Order</span>
-                          <span className="sm:hidden">Cancel</span>
-                        </Button>
-                      )}
-                    </div>
+                    {(order.status === 'pending' || order.status === 'confirmed') && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCancelOrder(order.id)}
+                        className="text-red-600 hover:text-red-700 hover:border-red-300 h-9 px-3 sm:px-4 text-xs sm:text-sm"
+                      >
+                        <XCircle className="h-4 w-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">Cancel Order</span>
+                        <span className="sm:hidden">Cancel</span>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -422,39 +474,49 @@ export default function OrdersPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-8">
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1 || loading}
-            >
-              Previous
-            </Button>
-            
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                const page = i + 1;
-                return (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    disabled={loading}
-                  >
-                    {page}
-                  </Button>
-                );
-              })}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-2 mt-8 pt-6 border-t">
+            <div className="flex items-center gap-2 order-2 sm:order-1">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1 || loading}
+                className="h-10 px-4 text-sm"
+              >
+                Previous
+              </Button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const page = Math.max(1, currentPage - 2) + i;
+                  if (page > totalPages) return null;
+                  return (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      disabled={loading}
+                      className="h-10 w-10 p-0 text-sm"
+                    >
+                      {page}
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages || loading}
+                className="h-10 px-4 text-sm"
+              >
+                Next
+              </Button>
             </div>
 
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages || loading}
-            >
-              Next
-            </Button>
+            <div className="text-sm text-muted-foreground order-1 sm:order-2">
+              Page {currentPage} of {totalPages}
+            </div>
           </div>
         )}
       </div>

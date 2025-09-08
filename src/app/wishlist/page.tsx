@@ -64,21 +64,23 @@ export default function WishlistPage() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-4">Sign in to view your wishlist</h2>
-            <p className="text-muted-foreground mb-8">
+        <div className="container mx-auto px-4 py-8 sm:py-16">
+          <div className="text-center max-w-md mx-auto">
+            <div className="mb-6">
+              <Heart className="h-12 w-12 sm:h-16 sm:h-16 text-muted-foreground mx-auto" />
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold mb-4">Sign in to view your wishlist</h2>
+            <p className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">
               Save your favorite products and services for later
             </p>
-            <div className="flex gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <Link href="/auth/login">
-                <Button className="btn-primary">
+                <Button className="btn-primary w-full sm:w-auto h-11 sm:h-12 px-6">
                   Sign In
                 </Button>
               </Link>
               <Link href="/auth/register">
-                <Button variant="outline">
+                <Button variant="outline" className="w-full sm:w-auto h-11 sm:h-12 px-6">
                   Create Account
                 </Button>
               </Link>
@@ -93,13 +95,27 @@ export default function WishlistPage() {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="bg-muted rounded h-8 w-48 mb-8"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-muted rounded-lg h-80"></div>
-              ))}
-            </div>
+          <div className="animate-pulse mb-6 sm:mb-8">
+            <div className="bg-muted rounded h-6 sm:h-8 w-32 sm:w-48 mb-2"></div>
+            <div className="bg-muted rounded h-4 w-24 sm:w-32"></div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-card rounded-lg border overflow-hidden shadow-sm">
+                <div className="bg-muted h-40 sm:h-48"></div>
+                <div className="p-4 space-y-3">
+                  <div className="bg-muted rounded h-4 w-16"></div>
+                  <div className="bg-muted rounded h-5 w-3/4"></div>
+                  <div className="bg-muted rounded h-4 w-1/2"></div>
+                  <div className="bg-muted rounded h-4 w-2/3"></div>
+                  <div className="bg-muted rounded h-6 w-20"></div>
+                  <div className="flex gap-2">
+                    <div className="bg-muted rounded h-9 flex-1"></div>
+                    <div className="bg-muted rounded h-9 w-16"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -109,15 +125,19 @@ export default function WishlistPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <Package className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-4">Error Loading Wishlist</h2>
-            <p className="text-muted-foreground mb-8">{error}</p>
+        <div className="container mx-auto px-4 py-8 sm:py-16">
+          <div className="text-center max-w-md mx-auto">
+            <div className="mb-6">
+              <Package className="h-12 w-12 sm:h-16 sm:w-16 text-red-500 mx-auto" />
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold mb-4">Error Loading Wishlist</h2>
+            <p className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">
+              {error}
+            </p>
             <Button onClick={() => {
               clearError();
               fetchWishlist();
-            }}>
+            }} className="h-11 sm:h-12 px-6">
               Try Again
             </Button>
           </div>
@@ -130,56 +150,58 @@ export default function WishlistPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">My Wishlist</h1>
-          <p className="text-muted-foreground">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">My Wishlist</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'} saved for later
           </p>
         </div>
 
         {wishlistItems.length === 0 ? (
-          <div className="text-center py-16">
-            <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-4">Your wishlist is empty</h2>
-            <p className="text-muted-foreground mb-8">
+          <div className="text-center py-12 sm:py-16 lg:py-20 px-4">
+            <div className="mb-6">
+              <Heart className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto" />
+            </div>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4">Your wishlist is empty</h2>
+            <p className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base lg:text-lg max-w-md mx-auto">
               Start adding products, services, and businesses you love to your wishlist
             </p>
-            <div className="flex gap-4 justify-center flex-wrap">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <Link href="/products">
-                <Button className="btn-primary">
+                <Button className="btn-primary w-full sm:w-auto h-11 sm:h-12 px-6">
                   <Package className="h-4 w-4 mr-2" />
                   Browse Products
                 </Button>
               </Link>
               <Link href="/services">
-                <Button variant="outline">
+                <Button variant="outline" className="w-full sm:w-auto h-11 sm:h-12 px-6">
                   Browse Services
                 </Button>
               </Link>
               <Link href="/businesses">
-                <Button variant="outline">
+                <Button variant="outline" className="w-full sm:w-auto h-11 sm:h-12 px-6">
                   Browse Businesses
                 </Button>
               </Link>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {wishlistItems.map((item) => (
-              <div key={item.id} className="bg-card rounded-lg border overflow-hidden hover:shadow-lg transition-shadow">
+              <div key={item.id} className="bg-card rounded-lg border overflow-hidden hover:shadow-lg transition-shadow shadow-sm">
                 <div className="relative">
                   <Image
                     src={item.image}
                     alt={item.name}
                     width={300}
                     height={200}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-40 sm:h-48 object-cover"
                   />
-                  <div className="absolute top-3 right-3">
+                  <div className="absolute top-2 right-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="bg-white/90 hover:bg-white"
+                      className="bg-white/90 hover:bg-white w-8 h-8 sm:w-9 sm:h-9 p-0"
                       onClick={() => handleRemoveFromWishlist(item.id)}
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
@@ -187,24 +209,24 @@ export default function WishlistPage() {
                   </div>
                   {!item.available && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <Badge variant="destructive">Out of Stock</Badge>
+                      <Badge variant="destructive" className="text-sm px-3 py-1">Out of Stock</Badge>
                     </div>
                   )}
                 </div>
 
-                <div className="p-4">
-                  <div className="mb-2">
-                    <Badge variant="outline" className="text-xs">
+                <div className="p-4 sm:p-6">
+                  <div className="mb-3">
+                    <Badge variant="outline" className="text-xs px-2 py-1">
                       {item.type === 'product' ? 'Product' : 
                        item.type === 'service' ? 'Service' : 'Business'}
                     </Badge>
                   </div>
 
-                  <h3 className="font-semibold text-lg mb-2 line-clamp-2">
+                  <h3 className="font-semibold text-base sm:text-lg mb-2 line-clamp-2 leading-tight">
                     {item.name}
                   </h3>
 
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <div className="flex items-center">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                       <span className="text-sm font-medium ml-1">{item.rating}</span>
@@ -221,7 +243,7 @@ export default function WishlistPage() {
                   <div className="flex items-center justify-between mb-4">
                     {item.type !== 'business' ? (
                       <div className="flex items-center gap-2">
-                        <span className="text-xl font-bold text-primary">
+                        <span className="text-lg sm:text-xl font-bold text-primary">
                           {formatPrice(item.price)}
                         </span>
                         {item.originalPrice && (
@@ -236,7 +258,7 @@ export default function WishlistPage() {
                           Business Profile
                         </span>
                         {item.isVerified && (
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="secondary" className="text-xs px-2 py-1">
                             Verified
                           </Badge>
                         )}
@@ -244,10 +266,10 @@ export default function WishlistPage() {
                     )}
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     {item.type !== 'business' ? (
                       <Button
-                        className="flex-1 btn-primary"
+                        className="flex-1 btn-primary h-10 sm:h-11 text-sm sm:text-base"
                         disabled={!item.available}
                         onClick={() => addToCart(item)}
                       >
@@ -256,7 +278,7 @@ export default function WishlistPage() {
                       </Button>
                     ) : (
                       <Button
-                        className="flex-1 btn-primary"
+                        className="flex-1 btn-primary h-10 sm:h-11 text-sm sm:text-base"
                         asChild
                       >
                         <Link href={`/businesses/${item.itemId}`}>
@@ -265,7 +287,7 @@ export default function WishlistPage() {
                       </Button>
                     )}
                     <Link href={`/${item.type === 'business' ? 'businesses' : `${item.type}s`}/${item.itemId}`}>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="w-full sm:w-auto h-10 sm:h-11 px-4 text-sm sm:text-base">
                         View
                       </Button>
                     </Link>

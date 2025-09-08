@@ -43,45 +43,45 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
       {/* Animated background elements */}
       <div className="absolute inset-0">
         <motion.div
-          className="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl"
-          animate={{ 
-            x: [0, 100, 0], 
+          className="absolute top-4 sm:top-20 left-4 sm:left-20 w-32 h-32 sm:w-72 sm:h-72 bg-white/10 rounded-full blur-3xl"
+          animate={{
+            x: [0, 100, 0],
             y: [0, -50, 0],
             scale: [1, 1.2, 1]
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl"
-          animate={{ 
-            x: [0, -80, 0], 
+          className="absolute bottom-4 sm:bottom-20 right-4 sm:right-20 w-40 h-40 sm:w-96 sm:h-96 bg-cyan-400/20 rounded-full blur-3xl"
+          animate={{
+            x: [0, -80, 0],
             y: [0, 40, 0],
             scale: [1, 0.8, 1]
           }}
           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-purple-400/20 rounded-full blur-3xl"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 sm:w-80 sm:h-80 bg-purple-400/20 rounded-full blur-3xl"
           animate={{ rotate: [0, 360] }}
           transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
         />
       </div>
 
       {/* Content */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
         <div className="text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 mb-8"
+            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 lg:mb-8"
           >
-            <Building2 className="w-5 h-5 text-cyan-300" />
-            <span className="text-white font-medium">Verified Business Directory</span>
+            <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-cyan-300" />
+            <span className="text-xs sm:text-sm font-medium text-white">Verified Business Directory</span>
           </motion.div>
-          
-          <motion.h1 
-            className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
+
+          <motion.h1
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -92,20 +92,20 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
               Trusted Partners
             </span>
           </motion.h1>
-          
-          <motion.p 
-            className="text-xl text-indigo-100 max-w-3xl mx-auto mb-12 leading-relaxed"
+
+          <motion.p
+            className="text-base sm:text-lg lg:text-xl text-indigo-100 max-w-2xl mx-auto mb-8 sm:mb-10 lg:mb-12 leading-relaxed px-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            Discover verified manufacturers, suppliers, and service providers across India. 
+            Discover verified manufacturers, suppliers, and service providers across India.
             Build meaningful business relationships with confidence and transparency.
           </motion.p>
 
           {/* Enhanced stats with animations */}
-          <motion.div 
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+          <motion.div
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
@@ -124,11 +124,11 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
                 transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
                 whileHover={{ scale: 1.05 }}
               >
-                <div className={`w-16 h-16 mx-auto mb-4 bg-gradient-to-r ${stat.color} rounded-2xl flex items-center justify-center shadow-lg`}>
-                  <stat.icon className="w-8 h-8 text-white" />
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-2 sm:mb-3 lg:mb-4 bg-gradient-to-r ${stat.color} rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg`}>
+                  <stat.icon className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-white" />
                 </div>
-                <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                <div className="text-sm text-indigo-200">{stat.label}</div>
+                <div className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-white mb-1">{stat.value}</div>
+                <div className="text-xs sm:text-sm text-indigo-200 leading-tight">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -320,16 +320,16 @@ export default function BusinessesPage() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
           {/* Search and Filters Card */}
-        <motion.div 
+        <motion.div
           variants={itemVariants}
           initial="hidden"
           animate="show"
-          className="bg-white rounded-3xl shadow-2xl p-8 mb-12 border border-amber-200"
+          className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-6 lg:p-8 mb-8 sm:mb-12 border border-amber-200"
         >
           {/* Search Bar */}
-          <div className="relative mb-8">
-            <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-              <Search className="w-6 h-6 text-gray-500" />
+          <div className="relative mb-6 sm:mb-8">
+            <div className="absolute inset-y-0 left-4 sm:left-6 flex items-center pointer-events-none">
+              <Search className="w-4 h-4 sm:w-5 sm:w-6 text-gray-500" />
             </div>
             <input
               type="text"
@@ -340,12 +340,12 @@ export default function BusinessesPage() {
                 setQuery(value);
                 handleSearch(value);
               }}
-              className="w-full pl-16 pr-6 py-5 text-lg border-2 border-amber-200 rounded-2xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-300 font-medium"
+              className="w-full pl-10 sm:pl-14 lg:pl-16 pr-4 sm:pr-6 py-3 sm:py-4 lg:py-5 text-sm sm:text-base lg:text-lg border-2 border-amber-200 rounded-xl sm:rounded-2xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-300 font-medium min-h-[48px]"
             />
           </div>
 
           {/* Category Tabs */}
-          <div className="flex flex-wrap gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -353,7 +353,7 @@ export default function BusinessesPage() {
                 <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`relative flex items-center gap-4 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 min-w-[200px] ${
+                  className={`relative flex items-center gap-3 sm:gap-4 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold transition-all duration-300 min-h-[48px] ${
                     isActive
                       ? 'text-white shadow-xl transform scale-105'
                       : 'bg-gray-100 text-gray-700 hover:bg-amber-50 hover:scale-102'
@@ -364,15 +364,15 @@ export default function BusinessesPage() {
                   {isActive && (
                     <motion.div
                       layoutId="activeTabBg"
-                      className={`absolute inset-0 bg-gradient-to-r ${tab.color} rounded-2xl`}
+                      className={`absolute inset-0 bg-gradient-to-r ${tab.color} rounded-xl sm:rounded-2xl`}
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
-                  <div className="relative flex items-center gap-4">
-                    <Icon className="w-6 h-6" />
+                  <div className="relative flex items-center gap-3 sm:gap-4">
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
                     <div className="text-left">
-                      <div className="font-bold text-lg">{tab.label}</div>
-                      <div className={`text-sm ${isActive ? 'text-white/80' : 'text-gray-500'}`}>
+                      <div className="font-bold text-sm sm:text-base lg:text-lg">{tab.label}</div>
+                      <div className={`text-xs sm:text-sm ${isActive ? 'text-white/80' : 'text-gray-500'}`}>
                         {tab.description}
                       </div>
                     </div>
@@ -383,41 +383,41 @@ export default function BusinessesPage() {
           </div>
 
           {/* Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-6 py-3 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-xl transition-colors duration-300 font-medium"
+                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-xl transition-colors duration-300 font-medium min-h-[48px] w-full sm:w-auto"
               >
-                <SlidersHorizontal className="w-5 h-5" />
-                Filters
+                <SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base">Filters</span>
               </button>
-              
-              <div className="text-sm text-gray-700 font-medium">
+
+              <div className="text-xs sm:text-sm text-gray-700 font-medium text-center sm:text-left">
                 {filtered.length} {filtered.length === 1 ? 'business' : 'businesses'} found
               </div>
             </div>
 
-            <div className="flex items-center gap-2 bg-amber-100 rounded-xl p-1">
+            <div className="flex items-center gap-2 bg-amber-100 rounded-xl p-1 min-h-[48px]">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-lg transition-colors duration-300 ${
-                  viewMode === 'grid' 
-                    ? 'bg-white shadow-sm text-amber-600' 
+                className={`p-2 sm:p-3 rounded-lg transition-colors duration-300 ${
+                  viewMode === 'grid'
+                    ? 'bg-white shadow-sm text-amber-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <Grid className="w-5 h-5" />
+                <Grid className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded-lg transition-colors duration-300 ${
-                  viewMode === 'list' 
-                    ? 'bg-white shadow-sm text-amber-600' 
+                className={`p-2 sm:p-3 rounded-lg transition-colors duration-300 ${
+                  viewMode === 'list'
+                    ? 'bg-white shadow-sm text-amber-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <List className="w-5 h-5" />
+                <List className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
           </div>
@@ -425,75 +425,90 @@ export default function BusinessesPage() {
 
         {/* Results */}
         {loading || statsLoading ? (
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className={`grid gap-8 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}
+            className={`grid gap-4 sm:gap-6 lg:gap-8 ${
+              viewMode === 'grid'
+                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                : 'grid-cols-1 max-w-4xl mx-auto'
+            }`}
           >
             {Array.from({ length: 6 }).map((_, i) => (
               <motion.div key={i} variants={itemVariants}>
-                <LoadingSkeleton type="card" count={1} />
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse" />
+                  <div className="p-4 sm:p-6 space-y-3">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-3 bg-gray-100 rounded w-2/3 animate-pulse" />
+                    <div className="h-3 bg-gray-100 rounded w-1/2 animate-pulse" />
+                    <div className="flex gap-2">
+                      <div className="h-8 bg-gray-200 rounded animate-pulse flex-1" />
+                      <div className="h-8 bg-gray-200 rounded animate-pulse flex-1" />
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </motion.div>
         ) : error ? (
-          <motion.div 
+          <motion.div
             variants={itemVariants}
             initial="hidden"
             animate="show"
-            className="bg-white border border-red-200 rounded-3xl p-12 text-center shadow-lg"
+            className="bg-white/80 backdrop-blur-sm border border-red-200 rounded-xl sm:rounded-2xl lg:rounded-3xl p-6 sm:p-8 lg:p-12 text-center shadow-lg"
           >
-            <div className="w-16 h-16 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
-              <ExternalLink className="w-8 h-8 text-red-600" />
+            <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-4 sm:mb-6 bg-red-100 rounded-full flex items-center justify-center">
+              <ExternalLink className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-red-600" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Unable to load businesses</h3>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto">{error}</p>
-            <button 
+            <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-2 sm:mb-4">Unable to load businesses</h3>
+            <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 max-w-md mx-auto">{error}</p>
+            <button
               onClick={() => loadBusinesses(activeTab)}
-              className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl min-h-[48px] text-sm sm:text-base"
             >
               Try Again
             </button>
           </motion.div>
         ) : filtered.length === 0 ? (
-          <motion.div 
+          <motion.div
             variants={itemVariants}
             initial="hidden"
             animate="show"
-            className="bg-white rounded-3xl p-16 text-center shadow-lg"
+            className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl lg:rounded-3xl p-6 sm:p-8 lg:p-12 lg:p-16 text-center shadow-lg"
           >
-            <div className="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
-              <Sparkles className="w-12 h-12 text-indigo-600" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-4 sm:mb-6 lg:mb-8 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
+              <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-indigo-600" />
             </div>
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">No businesses found</h3>
-            <p className="text-gray-600 mb-10 max-w-lg mx-auto text-lg">
+            <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 sm:mb-4">No businesses found</h3>
+            <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 lg:mb-10 max-w-lg mx-auto">
               We couldn't find any businesses matching your criteria. Try adjusting your search or explore different categories.
             </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <button 
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <button
                 onClick={() => { setQuery(''); setFiltered(businesses); }}
-                className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-3"
+                className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 sm:gap-3 min-h-[48px] text-sm sm:text-base"
               >
                 Show All Businesses
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
-              <button 
+              <button
                 onClick={() => { setActiveTab('featured'); loadBusinesses('featured'); }}
-                className="bg-white hover:bg-amber-50 border-2 border-amber-500 text-amber-600 px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="bg-white hover:bg-amber-50 border-2 border-amber-500 text-amber-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl min-h-[48px] text-sm sm:text-base"
               >
                 Browse Featured
               </button>
             </div>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className={`grid gap-8 pb-20 ${
-              viewMode === 'grid' 
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+            className={`grid gap-4 sm:gap-6 lg:gap-8 pb-12 sm:pb-16 lg:pb-20 ${
+              viewMode === 'grid'
+                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
                 : 'grid-cols-1 max-w-4xl mx-auto'
             }`}
           >
