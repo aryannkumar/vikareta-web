@@ -98,31 +98,63 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
     businessSuccessRate: stats.businessSuccessRate || defaultStats.businessSuccessRate
   } : defaultStats;
   return (
-    <section className="relative min-h-[60vh] bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 overflow-hidden">
-      {/* Animated background elements */}
+    <section className="relative min-h-[60vh] bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 overflow-hidden">
+      {/* Animated background elements - responsive and optimized */}
       <div className="absolute inset-0">
         <motion.div
-          className="absolute top-4 sm:top-20 left-4 sm:left-20 w-32 h-32 sm:w-72 sm:h-72 bg-white/10 rounded-full blur-3xl"
+          className="absolute top-4 sm:top-20 left-4 sm:left-20 w-24 h-24 sm:w-48 sm:h-48 md:w-72 md:h-72 bg-blue-400/20 rounded-full blur-2xl sm:blur-3xl"
           animate={{
-            x: [0, 100, 0],
-            y: [0, -50, 0],
-            scale: [1, 1.2, 1]
+            x: [0, 60, 0],
+            y: [0, -30, 0],
+            scale: [1, 1.1, 1]
+          }}
+          transition={{ 
+            duration: typeof window !== 'undefined' && window.innerWidth < 768 ? 30 : 20,
+            repeat: Infinity, 
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute bottom-4 sm:bottom-20 right-4 sm:right-20 w-32 h-32 sm:w-64 sm:h-64 md:w-96 md:h-96 bg-cyan-400/15 rounded-full blur-2xl sm:blur-3xl"
+          animate={{
+            x: [0, -50, 0],
+            y: [0, 25, 0],
+            scale: [1, 0.9, 1]
+          }}
+          transition={{ 
+            duration: typeof window !== 'undefined' && window.innerWidth < 768 ? 40 : 25,
+            repeat: Infinity, 
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 sm:w-48 sm:h-48 md:w-80 md:h-80 bg-indigo-400/10 rounded-full blur-2xl sm:blur-3xl"
+          animate={{ 
+            rotate: [0, 360],
+            scale: [1, 1.05, 1]
+          }}
+          transition={{ 
+            duration: typeof window !== 'undefined' && window.innerWidth < 768 ? 50 : 30,
+            repeat: Infinity, 
+            ease: "linear"
+          }}
+        />
+        {/* Additional responsive floating elements */}
+        <motion.div
+          className="hidden sm:block absolute top-1/4 right-1/4 w-16 h-16 bg-blue-300/10 rounded-full blur-xl"
+          animate={{
+            y: [0, -20, 0],
+            opacity: [0.3, 0.6, 0.3]
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="hidden md:block absolute bottom-1/4 left-1/4 w-12 h-12 bg-cyan-300/10 rounded-full blur-xl"
+          animate={{
+            x: [0, 15, 0],
+            opacity: [0.2, 0.5, 0.2]
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-4 sm:bottom-20 right-4 sm:right-20 w-40 h-40 sm:w-96 sm:h-96 bg-cyan-400/20 rounded-full blur-3xl"
-          animate={{
-            x: [0, -80, 0],
-            y: [0, 40, 0],
-            scale: [1, 0.8, 1]
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 sm:w-80 sm:h-80 bg-purple-400/20 rounded-full blur-3xl"
-          animate={{ rotate: [0, 360] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
         />
       </div>
 
@@ -135,7 +167,7 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 lg:mb-8"
           >
-            <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-cyan-300" />
+            <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-blue-300" />
             <span className="text-xs sm:text-sm font-medium text-white">Verified Business Directory</span>
           </motion.div>
 
@@ -147,13 +179,13 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
           >
             <span className="text-white">Connect with</span>
             <br />
-            <span className="bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent">
               Trusted Partners
             </span>
           </motion.h1>
 
           <motion.p
-            className="text-base sm:text-lg lg:text-xl text-indigo-100 max-w-2xl mx-auto mb-8 sm:mb-10 lg:mb-12 leading-relaxed px-4"
+            className="text-base sm:text-lg lg:text-xl text-blue-100 max-w-2xl mx-auto mb-8 sm:mb-10 lg:mb-12 leading-relaxed px-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
@@ -187,7 +219,7 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
                   <stat.icon className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-white" />
                 </div>
                 <div className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-white mb-1">{stat.value}</div>
-                <div className="text-xs sm:text-sm text-indigo-200 leading-tight">{stat.label}</div>
+                <div className="text-xs sm:text-sm text-blue-200 leading-tight">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -213,7 +245,7 @@ const containerVariants = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: typeof window !== 'undefined' && window.innerWidth < 768 ? 0.05 : 0.1,
       delayChildren: 0.2
     }
   }
@@ -225,7 +257,7 @@ const itemVariants = {
     opacity: 1, 
     y: 0,
     transition: {
-      duration: 0.5,
+      duration: typeof window !== 'undefined' && window.innerWidth < 768 ? 0.3 : 0.5,
       ease: "easeOut"
     }
   }
@@ -380,21 +412,21 @@ export default function BusinessesPage() {
       label: 'Nearby', 
       icon: MapPin, 
       description: 'Businesses in your area',
-      color: 'from-amber-600 to-orange-600'
+      color: 'from-blue-600 to-indigo-600'
     },
     { 
       id: 'popular', 
       label: 'Popular', 
       icon: TrendingUp, 
       description: 'Most trusted suppliers',
-      color: 'from-orange-600 to-red-600'
+      color: 'from-indigo-600 to-purple-600'
     },
     { 
       id: 'featured', 
       label: 'Featured', 
       icon: Award, 
       description: 'Premium verified suppliers',
-      color: 'from-red-600 to-pink-600'
+      color: 'from-purple-600 to-blue-600'
     }
   ];
 
@@ -413,7 +445,7 @@ export default function BusinessesPage() {
           variants={itemVariants}
           initial="hidden"
           animate="show"
-          className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-6 lg:p-8 mb-8 sm:mb-12 border border-amber-200"
+          className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-6 lg:p-8 mb-8 sm:mb-12 border border-blue-200"
         >
           {/* Search Bar */}
           <div className="relative mb-6 sm:mb-8">
@@ -429,7 +461,7 @@ export default function BusinessesPage() {
                 setQuery(value);
                 handleSearch(value);
               }}
-              className="w-full pl-10 sm:pl-14 lg:pl-16 pr-4 sm:pr-6 py-3 sm:py-4 lg:py-5 text-sm sm:text-base lg:text-lg border-2 border-amber-200 rounded-xl sm:rounded-2xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-300 font-medium min-h-[48px]"
+              className="w-full pl-10 sm:pl-14 lg:pl-16 pr-4 sm:pr-6 py-3 sm:py-4 lg:py-5 text-sm sm:text-base lg:text-lg border-2 border-blue-200 rounded-xl sm:rounded-2xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 font-medium min-h-[48px]"
             />
           </div>
 
@@ -445,7 +477,7 @@ export default function BusinessesPage() {
                   className={`relative flex items-center gap-3 sm:gap-4 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold transition-all duration-300 min-h-[48px] ${
                     isActive
                       ? 'text-white shadow-xl transform scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-amber-50 hover:scale-102'
+                      : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:scale-102'
                   }`}
                   whileHover={{ scale: isActive ? 1.05 : 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -476,7 +508,7 @@ export default function BusinessesPage() {
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-xl transition-colors duration-300 font-medium min-h-[48px] w-full sm:w-auto"
+                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl transition-colors duration-300 font-medium min-h-[48px] w-full sm:w-auto"
               >
                 <SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="text-sm sm:text-base">Filters</span>
@@ -487,12 +519,12 @@ export default function BusinessesPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 bg-amber-100 rounded-xl p-1 min-h-[48px]">
+            <div className="flex items-center gap-2 bg-blue-100 rounded-xl p-1 min-h-[48px]">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 sm:p-3 rounded-lg transition-colors duration-300 ${
                   viewMode === 'grid'
-                    ? 'bg-white shadow-sm text-amber-600'
+                    ? 'bg-white shadow-sm text-blue-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -502,7 +534,7 @@ export default function BusinessesPage() {
                 onClick={() => setViewMode('list')}
                 className={`p-2 sm:p-3 rounded-lg transition-colors duration-300 ${
                   viewMode === 'list'
-                    ? 'bg-white shadow-sm text-amber-600'
+                    ? 'bg-white shadow-sm text-blue-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -555,7 +587,7 @@ export default function BusinessesPage() {
             <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 max-w-md mx-auto">{error}</p>
             <button
               onClick={() => loadBusinesses(activeTab)}
-              className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl min-h-[48px] text-sm sm:text-base"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl min-h-[48px] text-sm sm:text-base"
             >
               Try Again
             </button>
@@ -577,14 +609,14 @@ export default function BusinessesPage() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <button
                 onClick={() => { setQuery(''); setFiltered(businesses); }}
-                className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 sm:gap-3 min-h-[48px] text-sm sm:text-base"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 sm:gap-3 min-h-[48px] text-sm sm:text-base"
               >
                 Show All Businesses
                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               <button
                 onClick={() => { setActiveTab('featured'); loadBusinesses('featured'); }}
-                className="bg-white hover:bg-amber-50 border-2 border-amber-500 text-amber-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl min-h-[48px] text-sm sm:text-base"
+                className="bg-white hover:bg-blue-50 border-2 border-blue-500 text-blue-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl min-h-[48px] text-sm sm:text-base"
               >
                 Browse Featured
               </button>
