@@ -21,9 +21,24 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CategoryIcon } from '@/components/ui/dynamic-icon';
 import { categoriesApi, type Category } from '@/lib/api/categories';
+import { AnalyticsService, HomepageStats } from '../../lib/api/analytics';
 
 // Enhanced animated hero section
-const CategoriesHero = () => {
+const CategoriesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
+  const defaultStats = {
+    productCategories: 85,
+    featuredCategories: 25,
+    activeSuppliersCount: 420,
+    categorySuccessRate: 96
+  };
+
+  const displayStats = stats ? {
+    productCategories: stats.productCategories || defaultStats.productCategories,
+    featuredCategories: stats.featuredCategories || defaultStats.featuredCategories,
+    activeSuppliersCount: stats.activeSuppliersCount || defaultStats.activeSuppliersCount,
+    categorySuccessRate: stats.categorySuccessRate || defaultStats.categorySuccessRate
+  } : defaultStats;
+
   return (
     <motion.section 
       className="relative bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 overflow-hidden"
@@ -67,10 +82,10 @@ const CategoriesHero = () => {
             transition={{ delay: 0.6, duration: 0.8 }}
           >
             {[
-              { icon: Package, label: 'Product Categories', value: '200+', color: 'from-blue-500 to-cyan-500' },
-              { icon: Award, label: 'Featured Categories', value: '50+', color: 'from-orange-500 to-amber-500' },
-              { icon: Users, label: 'Active Suppliers', value: '10K+', color: 'from-green-500 to-emerald-500' },
-              { icon: BarChart, label: 'Success Rate', value: '98%', color: 'from-purple-500 to-pink-500' }
+              { icon: Package, label: 'Product Categories', value: `${displayStats.productCategories}+`, color: 'from-blue-500 to-cyan-500' },
+              { icon: Award, label: 'Featured Categories', value: `${displayStats.featuredCategories}+`, color: 'from-orange-500 to-amber-500' },
+              { icon: Users, label: 'Active Suppliers', value: `${displayStats.activeSuppliersCount.toLocaleString()}+`, color: 'from-green-500 to-emerald-500' },
+              { icon: BarChart, label: 'Success Rate', value: `${displayStats.categorySuccessRate}%`, color: 'from-purple-500 to-pink-500' }
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -100,6 +115,26 @@ export default function CategoriesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [homepageStats, setHomepageStats] = useState<HomepageStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  // Load homepage stats
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        setStatsLoading(true);
+        const stats = await AnalyticsService.getHomepageStats();
+        setHomepageStats(stats);
+      } catch (error) {
+        console.error('Error loading homepage stats:', error);
+        // Keep null so component uses default values
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    loadStats();
+  }, []);
 
   // Fetch categories from API
   useEffect(() => {
@@ -141,7 +176,7 @@ export default function CategoriesPage() {
     setFilteredCategories(filtered);
   }, [categories, searchQuery, showFeaturedOnly]);
 
-  if (loading) {
+  if (loading || statsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -154,7 +189,7 @@ export default function CategoriesPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <CategoriesHero />
+      <CategoriesHero stats={homepageStats || undefined} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Enhanced Search and Filter Controls */}

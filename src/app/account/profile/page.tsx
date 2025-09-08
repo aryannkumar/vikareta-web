@@ -232,22 +232,28 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-purple-500/20 rounded-full blur-3xl"></div>
+        </div>
+        <div className="relative min-h-screen px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
           <div className="max-w-4xl mx-auto">
             <div className="animate-pulse">
-              <div className="bg-muted rounded-lg h-64 mb-8"></div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <div className="bg-muted rounded h-4"></div>
-                  <div className="bg-muted rounded h-4 w-2/3"></div>
-                  <div className="bg-muted rounded h-4 w-1/2"></div>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg h-32 sm:h-40 lg:h-48 mb-6 sm:mb-8 border"></div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                <div className="lg:col-span-1">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-lg h-64 sm:h-80 border"></div>
                 </div>
-                <div className="space-y-4">
-                  <div className="bg-muted rounded h-4"></div>
-                  <div className="bg-muted rounded h-4 w-3/4"></div>
-                  <div className="bg-muted rounded h-4 w-1/3"></div>
+                <div className="lg:col-span-2">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-lg h-64 sm:h-80 border"></div>
                 </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 mt-4 sm:mt-6">
+                <div className="bg-white/80 backdrop-blur-sm rounded-lg h-20 sm:h-24 border"></div>
+                <div className="bg-white/80 backdrop-blur-sm rounded-lg h-20 sm:h-24 border"></div>
+                <div className="bg-white/80 backdrop-blur-sm rounded-lg h-20 sm:h-24 border"></div>
+                <div className="bg-white/80 backdrop-blur-sm rounded-lg h-20 sm:h-24 border"></div>
               </div>
             </div>
           </div>
@@ -258,55 +264,74 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-4">Profile Not Found</h2>
-          <p className="text-muted-foreground">Unable to load your profile information.</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden flex items-center justify-center px-4">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-purple-500/20 rounded-full blur-3xl"></div>
+        </div>
+        <div className="relative text-center bg-white/80 backdrop-blur-sm rounded-lg border p-6 sm:p-8 lg:p-12 max-w-md mx-auto">
+          <AlertCircle className="h-12 w-12 sm:h-16 sm:w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">Profile Not Found</h2>
+          <p className="text-muted-foreground text-sm sm:text-base mb-4 sm:mb-6">Unable to load your profile information.</p>
+          <Button onClick={loadProfile} className="w-full sm:w-auto text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 min-h-[44px]">
+            Try Again
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-purple-500/20 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative min-h-screen px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold">My Profile</h1>
-              <p className="text-muted-foreground">Manage your account information</p>
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-start sm:justify-between sm:space-y-0 gap-4 mb-6 sm:mb-8">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 text-gray-900 leading-tight">
+                My Profile
+              </h1>
+              <p className="text-muted-foreground text-sm sm:text-base lg:text-lg leading-relaxed">
+                Manage your account information and preferences
+              </p>
             </div>
             
             {!editing ? (
-              <Button onClick={() => setEditing(true)} className="flex items-center gap-2">
-                <Edit className="h-4 w-4" />
-                Edit Profile
+              <Button onClick={() => setEditing(true)} className="flex items-center justify-center gap-2 w-full sm:w-auto btn-primary text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-3 min-h-[44px] shadow-sm">
+                <Edit className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden xs:inline">Edit Profile</span>
+                <span className="xs:hidden">Edit</span>
               </Button>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
                 <Button
                   variant="outline"
                   onClick={handleCancel}
                   disabled={saving}
+                  className="flex items-center justify-center gap-2 w-full sm:w-auto text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-3 min-h-[44px] border-2"
                 >
-                  <X className="h-4 w-4 mr-2" />
+                  <X className="h-4 w-4 sm:h-5 sm:w-5" />
                   Cancel
                 </Button>
                 <Button
                   onClick={handleSave}
                   disabled={saving}
-                  className="btn-primary"
+                  className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-3 min-h-[44px] shadow-sm"
                 >
                   {saving ? (
                     <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
                       Saving...
                     </>
                   ) : (
                     <>
-                      <Save className="h-4 w-4 mr-2" />
+                      <Save className="h-4 w-4 sm:h-5 sm:w-5" />
                       Save Changes
                     </>
                   )}
@@ -316,12 +341,12 @@ export default function ProfilePage() {
           </div>
 
           {/* Profile Card */}
-          <div className="bg-card rounded-lg border p-8 mb-8">
-            <div className="flex flex-col md:flex-row gap-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-white/20 shadow-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
+            <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 xl:gap-12">
               {/* Avatar Section */}
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center lg:items-start lg:flex-shrink-0">
                 <div className="relative">
-                  <div className="w-32 h-32 rounded-full overflow-hidden bg-muted">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 border-4 border-white shadow-lg">
                     {(editing ? editData.avatar : profile.avatar) ? (
                       <Image
                         src={(editing ? editData.avatar : profile.avatar) || ''}
@@ -332,14 +357,14 @@ export default function ProfilePage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <User className="h-12 w-12 text-muted-foreground" />
+                        <User className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-gray-400" />
                       </div>
                     )}
                   </div>
                   
                   {editing && (
-                    <label className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-2 cursor-pointer hover:bg-primary/90">
-                      <Camera className="h-4 w-4" />
+                    <label className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1.5 sm:p-2 lg:p-2.5 cursor-pointer hover:bg-primary/90 shadow-lg border-2 border-white">
+                      <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
                       <input
                         type="file"
                         accept="image/*"
@@ -350,190 +375,222 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                <div className="text-center mt-4">
-                  <div className="flex items-center gap-2 justify-center">
-                    <Badge variant={profile.userType === 'business' ? 'default' : 'secondary'}>
+                <div className="text-center lg:text-left mt-4 space-y-2">
+                  <div className="flex flex-wrap items-center gap-2 justify-center lg:justify-start">
+                    <Badge variant={profile.userType === 'business' ? 'default' : 'secondary'} className="text-xs px-2 py-1 font-medium">
                       {profile.userType === 'business' ? 'Business' : 'Buyer'}
                     </Badge>
                     {profile.verified && (
-                      <Badge className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300">
+                      <Badge className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300 text-xs px-2 py-1">
                         <Shield className="h-3 w-3 mr-1" />
                         Verified
                       </Badge>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Member since {new Date(profile.joinedDate).toLocaleDateString()}
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    <Calendar className="h-3 w-3 inline mr-1" />
+                    Member since {new Date(profile.joinedDate).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long' 
+                    })}
                   </p>
                 </div>
               </div>
 
               {/* Profile Information */}
-              <div className="flex-1 space-y-6">
+              <div className="flex-1 space-y-4 sm:space-y-6">
                 {/* Basic Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <label className="block text-sm font-medium mb-2">First Name</label>
+                    <label className="block text-sm sm:text-base font-medium mb-2 text-gray-700">First Name</label>
                     {editing ? (
                       <div>
                         <input
                           type="text"
                           value={editData.firstName || ''}
                           onChange={(e) => handleInputChange('firstName', e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
-                            errors.firstName ? 'border-red-500' : ''
+                          className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white text-sm sm:text-base min-h-[44px] shadow-sm ${
+                            errors.firstName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
                           }`}
                           disabled={saving}
+                          placeholder="Enter first name"
                         />
                         {errors.firstName && (
-                          <div className="flex items-center gap-1 mt-1 text-red-500 text-xs">
-                            <AlertCircle className="h-3 w-3" />
+                          <div className="flex items-center gap-1 mt-1 text-red-500 text-xs sm:text-sm">
+                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                             {errors.firstName}
                           </div>
                         )}
                       </div>
                     ) : (
-                      <p className="text-foreground">{profile.firstName}</p>
+                      <p className="text-gray-900 text-sm sm:text-base lg:text-lg font-medium leading-relaxed">{profile.firstName}</p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Last Name</label>
+                    <label className="block text-sm sm:text-base font-medium mb-2 text-gray-700">Last Name</label>
                     {editing ? (
                       <div>
                         <input
                           type="text"
                           value={editData.lastName || ''}
                           onChange={(e) => handleInputChange('lastName', e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
-                            errors.lastName ? 'border-red-500' : ''
+                          className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white text-sm sm:text-base min-h-[44px] shadow-sm ${
+                            errors.lastName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
                           }`}
                           disabled={saving}
+                          placeholder="Enter last name"
                         />
                         {errors.lastName && (
-                          <div className="flex items-center gap-1 mt-1 text-red-500 text-xs">
-                            <AlertCircle className="h-3 w-3" />
+                          <div className="flex items-center gap-1 mt-1 text-red-500 text-xs sm:text-sm">
+                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                             {errors.lastName}
                           </div>
                         )}
                       </div>
                     ) : (
-                      <p className="text-foreground">{profile.lastName}</p>
+                      <p className="text-gray-900 text-sm sm:text-base lg:text-lg font-medium leading-relaxed">{profile.lastName}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Email</label>
+                    <label className="block text-sm sm:text-base font-medium mb-2 text-gray-700">
+                      <Mail className="h-4 w-4 inline mr-2 text-gray-500" />
+                      Email
+                    </label>
                     {editing ? (
                       <div>
                         <input
                           type="email"
                           value={editData.email || ''}
                           onChange={(e) => handleInputChange('email', e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
-                            errors.email ? 'border-red-500' : ''
+                          className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white text-sm sm:text-base min-h-[44px] shadow-sm ${
+                            errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
                           }`}
                           disabled={saving}
+                          placeholder="Enter email address"
                         />
                         {errors.email && (
-                          <div className="flex items-center gap-1 mt-1 text-red-500 text-xs">
-                            <AlertCircle className="h-3 w-3" />
+                          <div className="flex items-center gap-1 mt-1 text-red-500 text-xs sm:text-sm">
+                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                             {errors.email}
                           </div>
                         )}
                       </div>
                     ) : (
-                      <p className="text-foreground">{profile.email}</p>
+                      <p className="text-gray-900 text-sm sm:text-base lg:text-lg font-medium leading-relaxed flex items-center">
+                        <Mail className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
+                        {profile.email}
+                      </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Phone</label>
+                    <label className="block text-sm sm:text-base font-medium mb-2 text-gray-700">
+                      <Phone className="h-4 w-4 inline mr-2 text-gray-500" />
+                      Phone
+                    </label>
                     {editing ? (
                       <div>
                         <input
                           type="tel"
                           value={editData.phone || ''}
                           onChange={(e) => handleInputChange('phone', e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
-                            errors.phone ? 'border-red-500' : ''
+                          className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white text-sm sm:text-base min-h-[44px] shadow-sm ${
+                            errors.phone ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
                           }`}
                           disabled={saving}
+                          placeholder="Enter phone number"
                         />
                         {errors.phone && (
-                          <div className="flex items-center gap-1 mt-1 text-red-500 text-xs">
-                            <AlertCircle className="h-3 w-3" />
+                          <div className="flex items-center gap-1 mt-1 text-red-500 text-xs sm:text-sm">
+                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                             {errors.phone}
                           </div>
                         )}
                       </div>
                     ) : (
-                      <p className="text-foreground">{profile.phone}</p>
+                      <p className="text-gray-900 text-sm sm:text-base lg:text-lg font-medium leading-relaxed flex items-center">
+                        <Phone className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
+                        {profile.phone}
+                      </p>
                     )}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Company</label>
+                    <label className="block text-sm sm:text-base font-medium mb-2 text-gray-700">
+                      <Building className="h-4 w-4 inline mr-2 text-gray-500" />
+                      Company
+                    </label>
                     {editing ? (
                       <input
                         type="text"
                         value={editData.company || ''}
                         onChange={(e) => handleInputChange('company', e.target.value)}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white text-sm sm:text-base min-h-[44px] shadow-sm"
                         placeholder="Your company name"
                         disabled={saving}
                       />
                     ) : (
-                      <p className="text-foreground">{profile.company || 'Not specified'}</p>
+                      <p className="text-gray-900 text-sm sm:text-base lg:text-lg font-medium leading-relaxed flex items-center">
+                        <Building className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
+                        {profile.company || 'Not specified'}
+                      </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Location</label>
+                    <label className="block text-sm sm:text-base font-medium mb-2 text-gray-700">
+                      <MapPin className="h-4 w-4 inline mr-2 text-gray-500" />
+                      Location
+                    </label>
                     {editing ? (
                       <input
                         type="text"
                         value={editData.location || ''}
                         onChange={(e) => handleInputChange('location', e.target.value)}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white text-sm sm:text-base min-h-[44px] shadow-sm"
                         placeholder="Your location"
                         disabled={saving}
                       />
                     ) : (
-                      <p className="text-foreground">{profile.location || 'Not specified'}</p>
+                      <p className="text-gray-900 text-sm sm:text-base lg:text-lg font-medium leading-relaxed flex items-center">
+                        <MapPin className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
+                        {profile.location || 'Not specified'}
+                      </p>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Website</label>
+                  <label className="block text-sm sm:text-base font-medium mb-2 text-gray-700">Website</label>
                   {editing ? (
                     <div>
                       <input
                         type="url"
                         value={editData.website || ''}
                         onChange={(e) => handleInputChange('website', e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background ${
-                          errors.website ? 'border-red-500' : ''
+                        className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white text-sm sm:text-base min-h-[44px] shadow-sm ${
+                          errors.website ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
                         }`}
                         placeholder="https://your-website.com"
                         disabled={saving}
                       />
                       {errors.website && (
-                        <div className="flex items-center gap-1 mt-1 text-red-500 text-xs">
-                          <AlertCircle className="h-3 w-3" />
+                        <div className="flex items-center gap-1 mt-1 text-red-500 text-xs sm:text-sm">
+                          <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                           {errors.website}
                         </div>
                       )}
                     </div>
                   ) : (
-                    <p className="text-foreground">
+                    <p className="text-gray-900 text-sm sm:text-base lg:text-lg font-medium leading-relaxed">
                       {profile.website ? (
-                        <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center">
                           {profile.website}
                         </a>
                       ) : (
@@ -544,18 +601,20 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Bio</label>
+                  <label className="block text-sm sm:text-base font-medium mb-2 text-gray-700">Bio</label>
                   {editing ? (
                     <textarea
                       value={editData.bio || ''}
                       onChange={(e) => handleInputChange('bio', e.target.value)}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white text-sm sm:text-base shadow-sm resize-vertical"
                       rows={3}
                       placeholder="Tell us about yourself..."
                       disabled={saving}
                     />
                   ) : (
-                    <p className="text-foreground">{profile.bio || 'No bio provided'}</p>
+                    <p className="text-gray-700 text-sm sm:text-base lg:text-lg leading-relaxed">
+                      {profile.bio || 'No bio provided'}
+                    </p>
                   )}
                 </div>
               </div>
@@ -563,34 +622,34 @@ export default function ProfilePage() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-card rounded-lg border p-6 text-center">
-              <div className="text-2xl font-bold text-primary mb-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-white/20 shadow-lg p-3 sm:p-4 lg:p-6 text-center hover:shadow-xl transition-all duration-200">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-primary mb-1 sm:mb-2">
                 {profile.stats.totalOrders}
               </div>
-              <div className="text-sm text-muted-foreground">Total Orders</div>
+              <div className="text-xs sm:text-sm text-muted-foreground font-medium">Total Orders</div>
             </div>
 
-            <div className="bg-card rounded-lg border p-6 text-center">
-              <div className="text-2xl font-bold text-primary mb-2">
+            <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-white/20 shadow-lg p-3 sm:p-4 lg:p-6 text-center hover:shadow-xl transition-all duration-200">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-primary mb-1 sm:mb-2">
                 ₹{(profile.stats.totalSpent || 0).toLocaleString()}
               </div>
-              <div className="text-sm text-muted-foreground">Total Spent</div>
+              <div className="text-xs sm:text-sm text-muted-foreground font-medium">Total Spent</div>
             </div>
 
-            <div className="bg-card rounded-lg border p-6 text-center">
-              <div className="text-2xl font-bold text-primary mb-2">
+            <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-white/20 shadow-lg p-3 sm:p-4 lg:p-6 text-center hover:shadow-xl transition-all duration-200">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-primary mb-1 sm:mb-2">
                 {profile.stats.reviewsGiven}
               </div>
-              <div className="text-sm text-muted-foreground">Reviews Given</div>
+              <div className="text-xs sm:text-sm text-muted-foreground font-medium">Reviews Given</div>
             </div>
 
-            <div className="bg-card rounded-lg border p-6 text-center">
-              <div className="flex items-center justify-center gap-1 text-2xl font-bold text-primary mb-2">
-                <Star className="h-6 w-6 text-yellow-400 fill-current" />
-                {profile.stats.averageRating}
+            <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-white/20 shadow-lg p-3 sm:p-4 lg:p-6 text-center hover:shadow-xl transition-all duration-200">
+              <div className="flex items-center justify-center gap-1 text-xl sm:text-2xl lg:text-3xl font-bold text-primary mb-1 sm:mb-2">
+                <Star className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-yellow-400 fill-current" />
+                {profile.stats.averageRating.toFixed(1)}
               </div>
-              <div className="text-sm text-muted-foreground">Average Rating</div>
+              <div className="text-xs sm:text-sm text-muted-foreground font-medium">Average Rating</div>
             </div>
           </div>
         </div>

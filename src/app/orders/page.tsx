@@ -212,8 +212,8 @@ export default function OrdersPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-4">My Orders</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4">My Orders</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Track and manage your orders
           </p>
         </div>
@@ -228,16 +228,16 @@ export default function OrdersPage() {
               placeholder="Search orders..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-sm sm:text-base"
             />
           </div>
 
           {/* Filter Controls */}
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+              className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-sm sm:text-base"
             >
               {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -249,7 +249,7 @@ export default function OrdersPage() {
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+              className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-sm sm:text-base"
             >
               {typeOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -337,31 +337,31 @@ export default function OrdersPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground mb-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-sm text-muted-foreground mb-4">
                       <div className="flex items-center gap-2">
-                        <Package className="h-4 w-4" />
-                        Order #{order.id}
+                        <Package className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">Order #{order.id}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        Ordered: {new Date(order.orderDate).toLocaleDateString()}
+                        <Calendar className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">Ordered: {new Date(order.orderDate).toLocaleDateString()}</span>
                       </div>
                       {order.deliveredDate && (
                         <div className="flex items-center gap-2">
-                          <Truck className="h-4 w-4" />
-                          Delivered: {new Date(order.deliveredDate).toLocaleDateString()}
+                          <Truck className="h-4 w-4 flex-shrink-0" />
+                          <span className="truncate">Delivered: {new Date(order.deliveredDate).toLocaleDateString()}</span>
                         </div>
                       )}
                       {order.expectedDeliveryDate && !order.deliveredDate && (
                         <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          Est. Delivery: {new Date(order.expectedDeliveryDate).toLocaleDateString()}
+                          <Clock className="h-4 w-4 flex-shrink-0" />
+                          <span className="truncate">Est. Delivery: {new Date(order.expectedDeliveryDate).toLocaleDateString()}</span>
                         </div>
                       )}
                       {order.trackingNumber && (
-                        <div className="flex items-center gap-2">
-                          <Truck className="h-4 w-4" />
-                          Tracking: {order.trackingNumber}
+                        <div className="flex items-center gap-2 sm:col-span-3">
+                          <Truck className="h-4 w-4 flex-shrink-0" />
+                          <span className="truncate">Tracking: {order.trackingNumber}</span>
                         </div>
                       )}
                     </div>
@@ -369,30 +369,34 @@ export default function OrdersPage() {
                     {/* Action Buttons */}
                     <div className="flex flex-wrap gap-2">
                       <Link href={`/orders/${order.id}`}>
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
+                        <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                          <Eye className="h-4 w-4 mr-1 sm:mr-2" />
+                          <span className="hidden sm:inline">View Details</span>
+                          <span className="sm:hidden">View</span>
                         </Button>
                       </Link>
 
                       <Link href={`/businesses/${order.supplierId}`}>
-                        <Button variant="outline" size="sm">
-                          <MessageCircle className="h-4 w-4 mr-2" />
-                          Contact Business
+                        <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                          <MessageCircle className="h-4 w-4 mr-1 sm:mr-2" />
+                          <span className="hidden sm:inline">Contact Business</span>
+                          <span className="sm:hidden">Contact</span>
                         </Button>
                       </Link>
 
                       {order.status === 'delivered' && (
-                        <Button variant="outline" size="sm">
-                          <Star className="h-4 w-4 mr-2" />
-                          Write Review
+                        <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                          <Star className="h-4 w-4 mr-1 sm:mr-2" />
+                          <span className="hidden sm:inline">Write Review</span>
+                          <span className="sm:hidden">Review</span>
                         </Button>
                       )}
 
                       {order.status === 'delivered' && (
-                        <Button variant="outline" size="sm">
-                          <Download className="h-4 w-4 mr-2" />
-                          Download Invoice
+                        <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                          <Download className="h-4 w-4 mr-1 sm:mr-2" />
+                          <span className="hidden sm:inline">Download Invoice</span>
+                          <span className="sm:hidden">Invoice</span>
                         </Button>
                       )}
 
@@ -401,10 +405,11 @@ export default function OrdersPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleCancelOrder(order.id)}
-                          className="text-red-600 hover:text-red-700 hover:border-red-300"
+                          className="text-red-600 hover:text-red-700 hover:border-red-300 text-xs sm:text-sm"
                         >
-                          <XCircle className="h-4 w-4 mr-2" />
-                          Cancel Order
+                          <XCircle className="h-4 w-4 mr-1 sm:mr-2" />
+                          <span className="hidden sm:inline">Cancel Order</span>
+                          <span className="sm:hidden">Cancel</span>
                         </Button>
                       )}
                     </div>

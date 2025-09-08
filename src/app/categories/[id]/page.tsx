@@ -103,7 +103,7 @@ export default function CategoryDetailPage() {
         <nav className="flex items-center space-x-2 mb-8 text-sm">
           <Link 
             href="/categories" 
-            className="flex items-center text-amber-600 hover:text-amber-700 font-medium transition-colors duration-200 hover:underline"
+            className="flex items-center text-orange-600 hover:text-orange-700 font-medium transition-colors duration-200 hover:underline"
           >
             <Package className="w-4 h-4 mr-2" />
             Categories
@@ -113,33 +113,33 @@ export default function CategoryDetailPage() {
         </nav>
 
         {/* Enhanced Category Header */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 rounded-3xl border border-slate-200/60 shadow-2xl shadow-blue-500/10 mb-12">
+        <div className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 rounded-3xl border border-orange-200/60 shadow-2xl shadow-orange-500/10 mb-12">
           {/* Enhanced Background Pattern */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-100/50 via-transparent to-purple-100/30"></div>
-          <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-gradient-to-br from-blue-400/30 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-40 h-40 bg-gradient-to-tr from-indigo-400/20 to-cyan-400/15 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl opacity-60"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-100/50 via-transparent to-amber-100/30"></div>
+          <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-gradient-to-br from-orange-400/30 to-amber-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-40 h-40 bg-gradient-to-tr from-amber-400/20 to-orange-400/15 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-orange-400/10 to-amber-400/10 rounded-full blur-3xl opacity-60"></div>
           
           <div className="relative p-8">
             <div className="flex items-start gap-6">
               {/* Enhanced Icon */}
               <div className="relative group">
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/25 transform rotate-3 hover:rotate-0 hover:scale-110 transition-all duration-500 group-hover:shadow-3xl group-hover:shadow-purple-500/30">
+                <div className="w-24 h-24 bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-orange-500/25 transform rotate-3 hover:rotate-0 hover:scale-110 transition-all duration-500 group-hover:shadow-3xl group-hover:shadow-amber-500/30">
                   <CategoryIcon category={categoryData} size={48} className="text-white drop-shadow-lg" />
                 </div>
                 <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full border-3 border-white flex items-center justify-center shadow-lg animate-bounce">
                   <span className="text-white text-sm font-bold">✓</span>
                 </div>
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/20 to-purple-400/20 blur opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-orange-400/20 to-amber-400/20 blur opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
               
               <div className="flex-1">
                 <div className="flex items-center gap-4 mb-4">
-                  <h1 className="text-5xl font-black bg-gradient-to-r from-slate-900 via-blue-900 to-slate-800 bg-clip-text text-transparent leading-tight">
+                  <h1 className="text-5xl font-black bg-gradient-to-r from-slate-900 via-orange-900 to-amber-800 bg-clip-text text-transparent leading-tight">
                     {categoryData.name}
                   </h1>
                   {categoryData.featured && (
-                    <span className="px-4 py-2 bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 text-white text-sm font-bold rounded-2xl shadow-lg shadow-orange-500/30 animate-pulse">
+                    <span className="px-4 py-2 bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 text-white text-sm font-bold rounded-2xl shadow-lg shadow-orange-500/30 animate-pulse">
                       ⭐ Featured
                     </span>
                   )}
@@ -151,15 +151,15 @@ export default function CategoryDetailPage() {
                   </p>
                   <div className="flex items-center gap-4 text-sm text-slate-500">
                     <span className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
                       Live marketplace
                     </span>
                     <span className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
                       Verified suppliers
                     </span>
                     <span className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-orange-600 rounded-full animate-pulse"></div>
                       Instant quotes
                     </span>
                   </div>
@@ -167,19 +167,19 @@ export default function CategoryDetailPage() {
                 
                 {/* Enhanced Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <div className="group bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/50 shadow-lg shadow-blue-500/5 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-2 transition-all duration-500">
+                  <div className="group bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/50 shadow-lg shadow-orange-500/5 hover:shadow-2xl hover:shadow-orange-500/10 hover:-translate-y-2 transition-all duration-500">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                         <Package className="h-7 w-7 text-white" />
                       </div>
                       <div>
-                        <div className="text-3xl font-black text-slate-900 mb-1 group-hover:text-blue-600 transition-colors duration-300">{(categoryData.productCount || 0).toLocaleString()}</div>
+                        <div className="text-3xl font-black text-slate-900 mb-1 group-hover:text-orange-600 transition-colors duration-300">{(categoryData.productCount || 0).toLocaleString()}</div>
                         <div className="text-sm text-slate-500 font-medium">Products & Services</div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="group bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/50 shadow-lg shadow-green-500/5 hover:shadow-2xl hover:shadow-green-500/10 hover:-translate-y-2 transition-all duration-500">
+                  <div className="group bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/50 shadow-lg shadow-emerald-500/5 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-500">
                     <div className="flex items-center gap-4">
                       <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                         <Users className="h-7 w-7 text-white" />
@@ -191,13 +191,13 @@ export default function CategoryDetailPage() {
                     </div>
                   </div>
                   
-                  <div className="group bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/50 shadow-lg shadow-purple-500/5 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2 transition-all duration-500">
+                  <div className="group bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/50 shadow-lg shadow-amber-500/5 hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-2 transition-all duration-500">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                         <Building className="h-7 w-7 text-white" />
                       </div>
                       <div>
-                        <div className="text-3xl font-black text-slate-900 mb-1 group-hover:text-purple-600 transition-colors duration-300">50+</div>
+                        <div className="text-3xl font-black text-slate-900 mb-1 group-hover:text-amber-600 transition-colors duration-300">50+</div>
                         <div className="text-sm text-slate-500 font-medium">Cities Covered</div>
                       </div>
                     </div>
@@ -228,14 +228,14 @@ export default function CategoryDetailPage() {
                   href={`/categories/${categoryData.slug}/${subcategory.slug}`}
                   className="group block"
                 >
-                  <div className="h-full bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-xl shadow-slate-500/10 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-3 hover:rotate-1 transition-all duration-500 overflow-hidden relative">
+                  <div className="h-full bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-xl shadow-slate-500/10 hover:shadow-2xl hover:shadow-orange-500/20 hover:-translate-y-3 hover:rotate-1 transition-all duration-500 overflow-hidden relative">
                     {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 via-transparent to-amber-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     
                     <div className="relative p-8">
                       <div className="flex items-start gap-5">
                         <div className="relative">
-                          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/30 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+                          <div className="w-16 h-16 bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-xl shadow-orange-500/30 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
                             <Package className="h-8 w-8 text-white" />
                           </div>
                           <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center">
@@ -244,7 +244,7 @@ export default function CategoryDetailPage() {
                         </div>
                         
                         <div className="flex-1">
-                          <h3 className="font-black text-xl text-slate-900 mb-3 group-hover:text-blue-600 transition-colors duration-300 leading-tight">
+                          <h3 className="font-black text-xl text-slate-900 mb-3 group-hover:text-orange-600 transition-colors duration-300 leading-tight">
                             {subcategory.name}
                           </h3>
                           
@@ -253,7 +253,7 @@ export default function CategoryDetailPage() {
                           </p>
                           
                           <div className="flex items-center justify-between">
-                            <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 font-semibold px-3 py-1 rounded-xl shadow-lg">
+                            <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 font-semibold px-3 py-1 rounded-xl shadow-lg">
                               {subcategory.productCount || 0} items
                             </Badge>
                             
@@ -267,8 +267,8 @@ export default function CategoryDetailPage() {
                     </div>
                     
                     {/* Enhanced Hover Border */}
-                    <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all duration-500 pointer-events-none"></div>
-                    <div className="absolute inset-0 rounded-2xl ring-2 ring-transparent group-hover:ring-blue-200/50 transition-all duration-500 pointer-events-none"></div>
+                    <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-gradient-to-r group-hover:from-orange-400 group-hover:to-amber-400 transition-all duration-500 pointer-events-none"></div>
+                    <div className="absolute inset-0 rounded-2xl ring-2 ring-transparent group-hover:ring-orange-200/50 transition-all duration-500 pointer-events-none"></div>
                   </div>
                 </Link>
               ))}
@@ -288,7 +288,7 @@ export default function CategoryDetailPage() {
                 This category is being set up. Check back soon for specialized subcategories, or explore other categories in the meantime.
               </p>
               <Link href="/categories">
-                <Button className="bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 rounded-xl">
+                <Button className="bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:from-orange-700 hover:to-amber-700 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 rounded-xl">
                   Browse Other Categories
                 </Button>
               </Link>

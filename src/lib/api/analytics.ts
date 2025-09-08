@@ -1,5 +1,37 @@
 import { apiClient } from './client';
 
+export interface HomepageStats {
+  // Marketplace stats
+  trendingProducts: number;
+  activeSuppliers: number;
+  verifiedBusinesses: number;
+  dailyTransactions: number;
+
+  // Services stats
+  serviceCategories: number;
+  serviceProviders: number;
+  completedProjects: number;
+  successRate: number;
+
+  // Categories stats
+  productCategories: number;
+  featuredCategories: number;
+  activeSuppliersCount: number;
+  categorySuccessRate: number;
+
+  // Businesses stats
+  activeBusinesses: number;
+  verifiedPartners: number;
+  citiesCovered: number;
+  businessSuccessRate: number;
+
+  // RFQs stats
+  liveRfqs: number;
+  verifiedBuyers: number;
+  responseTime: string;
+  rfqSuccessRate: number;
+}
+
 export interface DashboardStats {
   totalUsers: number;
   activeUsers: number;
@@ -96,6 +128,15 @@ export interface AnalyticsFilters {
 }
 
 export class AnalyticsService {
+  // Get homepage statistics (public endpoint - no auth required)
+  static async getHomepageStats(): Promise<HomepageStats> {
+    const response = await apiClient.get('/stats/homepage');
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch homepage stats');
+    }
+    return response.data as HomepageStats;
+  }
+
   // Get dashboard statistics
   static async getDashboardStats(filters?: AnalyticsFilters): Promise<DashboardStats> {
     const response = await apiClient.get('/analytics/dashboard', filters);

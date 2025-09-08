@@ -588,14 +588,322 @@ export interface ExternalAd {
   revenue?: number;
 }
 
-// Utility Types
-export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
+// Analytics Types
+export interface PlatformAnalytics {
+  summary: {
+    totalUsers: number;
+    newUsers: number;
+    totalOrders: number;
+    totalRevenue: number;
+    totalProducts: number;
+    totalServices: number;
+    averageOrderValue: number;
+  };
+  usersByType: Array<{
+    type: string;
+    count: number;
+  }>;
+  ordersByStatus: Array<{
+    status: string;
+    count: number;
+    revenue: number;
+  }>;
+  revenueByCategory: Array<{
+    category: string;
+    revenue: number;
+    itemsSold: number;
+  }>;
+  topCategories: Array<{
+    id: string;
+    name: string;
+    productCount: number;
+  }>;
+  searchAnalytics: {
+    topSearches: Array<{
+      query: string;
+      searchCount: number;
+    }>;
+    searchTrends: any[];
+    totalSearches: number;
+  };
+  timeframe: string;
+  generatedAt: string;
+}
 
-export interface Location {
-  latitude: number;
-  longitude: number;
-  city?: string;
-  state?: string;
-  country?: string;
-  address?: string;
+export interface UserAnalytics {
+  summary: {
+    totalOrders: number;
+    totalSpent: number;
+    totalProducts: number;
+    totalServices: number;
+    averageOrderValue: number;
+  };
+  recentActivity: Array<{
+    id: string;
+    orderNumber: string;
+    totalAmount: number;
+    status: string;
+    createdAt: string;
+    items: Array<{
+      product?: { title: string };
+      service?: { title: string };
+      quantity: number;
+    }>;
+  }>;
+  ordersByStatus: Array<{
+    status: string;
+    count: number;
+  }>;
+  spendingTrend: Array<{
+    date: string;
+    amount: number;
+    orders: number;
+  }>;
+  timeframe: string;
+  generatedAt: string;
+}
+
+export interface BusinessAnalytics {
+  summary: {
+    totalRevenue: number;
+    totalOrders: number;
+    totalProducts: number;
+    totalServices: number;
+    averageOrderValue: number;
+  };
+  topProducts: Array<{
+    id: string;
+    title: string;
+    quantity: number;
+    revenue: number;
+    orders: number;
+  }>;
+  topServices: Array<{
+    id: string;
+    title: string;
+    quantity: number;
+    revenue: number;
+    orders: number;
+  }>;
+  revenueByMonth: Array<{
+    month: string;
+    revenue: number;
+    orders: number;
+  }>;
+  ordersByStatus: Array<{
+    status: string;
+    count: number;
+    revenue: number;
+  }>;
+  customerAnalytics: {
+    totalCustomers: number;
+    newCustomers: number;
+    repeatCustomers: number;
+    repeatRate: number;
+  };
+  timeframe: string;
+  generatedAt: string;
+}
+
+export interface ProductAnalytics {
+  summary: {
+    totalProducts: number;
+    activeProducts: number;
+    inactiveProducts: number;
+    totalViews: number;
+    totalInquiries: number;
+    averagePrice: number;
+  };
+  productsByCategory: Array<{
+    category: string;
+    count: number;
+    revenue: number;
+  }>;
+  topProducts: Array<{
+    id: string;
+    title: string;
+    views: number;
+    inquiries: number;
+    orders: number;
+    revenue: number;
+  }>;
+  priceDistribution: Array<{
+    range: string;
+    count: number;
+  }>;
+  performanceMetrics: {
+    conversionRate: number;
+    averageTimeToSell: number;
+    returnRate: number;
+  };
+}
+
+export interface ServiceAnalytics {
+  summary: {
+    totalServices: number;
+    activeServices: number;
+    inactiveServices: number;
+    totalBookings: number;
+    totalRevenue: number;
+    averagePrice: number;
+  };
+  servicesByCategory: Array<{
+    category: string;
+    count: number;
+    bookings: number;
+    revenue: number;
+  }>;
+  topServices: Array<{
+    id: string;
+    title: string;
+    bookings: number;
+    revenue: number;
+    rating: number;
+  }>;
+  bookingTrends: Array<{
+    date: string;
+    bookings: number;
+    revenue: number;
+  }>;
+  servicePerformance: {
+    completionRate: number;
+    averageRating: number;
+    customerSatisfaction: number;
+  };
+}
+
+export interface BusinessMetrics {
+  summary: {
+    totalBusinesses: number;
+    verifiedBusinesses: number;
+    activeBusinesses: number;
+    totalRevenue: number;
+  };
+  businessesByType: Array<{
+    type: string;
+    count: number;
+    revenue: number;
+  }>;
+  topBusinesses: Array<{
+    id: string;
+    name: string;
+    revenue: number;
+    orders: number;
+    rating: number;
+  }>;
+  businessGrowth: Array<{
+    date: string;
+    newBusinesses: number;
+    activeBusinesses: number;
+  }>;
+  verificationStats: {
+    verifiedPercentage: number;
+    pendingVerification: number;
+    rejectedVerification: number;
+  };
+}
+
+export interface RFQAnalytics {
+  summary: {
+    totalRFQs: number;
+    activeRFQs: number;
+    completedRFQs: number;
+    totalQuotes: number;
+    averageQuotesPerRFQ: number;
+  };
+  rfqsByCategory: Array<{
+    category: string;
+    count: number;
+    quotes: number;
+    conversionRate: number;
+  }>;
+  rfqTrends: Array<{
+    date: string;
+    created: number;
+    completed: number;
+  }>;
+  quoteAnalytics: {
+    averageResponseTime: number;
+    quoteAcceptanceRate: number;
+    averageQuoteValue: number;
+  };
+  buyerSellerMetrics: {
+    totalBuyers: number;
+    totalSellers: number;
+    averageRFQsPerBuyer: number;
+    averageQuotesPerSeller: number;
+  };
+}
+
+export interface RealTimeMetrics {
+  activeUsers: number;
+  recentOrders: number;
+  recentEvents: Array<{
+    type: string;
+    userId: string;
+    data: any;
+    timestamp: string;
+  }>;
+  timestamp: string;
+}
+
+// Stats Types
+export interface PlatformStats {
+  successfulDeals: number;
+  totalCategories: number;
+  totalProducts: number;
+  totalSuppliers: number;
+  totalBuyers?: number;
+  totalServices?: number;
+  totalRFQs?: number;
+  totalOrders?: number;
+  totalRevenue?: number;
+  activeUsers?: number;
+}
+
+export interface CategoryStats {
+  id: string;
+  name: string;
+  productCount: number;
+  serviceCount: number;
+  rfqCount: number;
+  orderCount: number;
+  revenue: number;
+  growth: number;
+}
+
+export interface MarketplaceStats {
+  overview: {
+    totalValue: number;
+    totalTransactions: number;
+    activeUsers: number;
+    growthRate: number;
+  };
+  categories: CategoryStats[];
+  trends: {
+    daily: Array<{ date: string; value: number; transactions: number }>;
+    weekly: Array<{ week: string; value: number; transactions: number }>;
+    monthly: Array<{ month: string; value: number; transactions: number }>;
+  };
+  topPerformers: {
+    categories: Array<{ name: string; revenue: number; growth: number }>;
+    products: Array<{ name: string; sales: number; revenue: number }>;
+    services: Array<{ name: string; bookings: number; revenue: number }>;
+  };
+}
+
+export interface DashboardStats {
+  platform: PlatformStats;
+  marketplace: MarketplaceStats;
+  recentActivity: Array<{
+    type: 'order' | 'rfq' | 'user' | 'product';
+    description: string;
+    amount?: number;
+    timestamp: string;
+  }>;
+  alerts: Array<{
+    type: 'warning' | 'info' | 'success';
+    message: string;
+    timestamp: string;
+  }>;
 }

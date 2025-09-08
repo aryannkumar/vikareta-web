@@ -209,7 +209,7 @@ export function Header() {
       animate="visible"
     >
       {/* Premium announcement bar */}
-  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white text-center py-2 text-sm font-medium">
+  <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-center py-2 text-sm font-medium">
         <div className="flex items-center justify-center space-x-2">
           <Zap className="w-4 h-4" />
           <span>🎉 Special Launch Offer: 2 Months Free Subscription! Use code: VIKARETANEW</span>
@@ -252,7 +252,7 @@ export function Header() {
               >
                 <Link 
                   href={item.href}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all duration-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 group"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-vikareta-orange-600 dark:hover:text-vikareta-orange-400 rounded-xl transition-all duration-300 hover:bg-vikareta-orange-50 dark:hover:bg-vikareta-orange-900/20 group"
                 >
                   <item.icon className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
                   <span>{item.label}</span>

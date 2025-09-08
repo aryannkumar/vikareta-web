@@ -20,9 +20,24 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { servicesApi, type ServicesFilters } from '@/lib/api/services';
+import { AnalyticsService, HomepageStats } from '../../lib/api/analytics';
 
 // Enhanced animated hero section for Services
-const ServicesHero = () => {
+const ServicesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
+  const defaultStats = {
+    serviceCategories: 45,
+    serviceProviders: 280,
+    completedProjects: 1200,
+    successRate: 94
+  };
+
+  const displayStats = stats ? {
+    serviceCategories: stats.serviceCategories || defaultStats.serviceCategories,
+    serviceProviders: stats.serviceProviders || defaultStats.serviceProviders,
+    completedProjects: stats.completedProjects || defaultStats.completedProjects,
+    successRate: stats.successRate || defaultStats.successRate
+  } : defaultStats;
+
   return (
     <motion.section 
       className="relative bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 overflow-hidden"
@@ -78,10 +93,10 @@ const ServicesHero = () => {
             transition={{ delay: 0.6, duration: 0.8 }}
           >
             {[
-              { icon: Settings, label: 'Service Categories', value: '150+', color: 'from-blue-500 to-cyan-500' },
-              { icon: Users, label: 'Service Providers', value: '5K+', color: 'from-orange-500 to-amber-500' },
-              { icon: CheckCircle, label: 'Completed Projects', value: '50K+', color: 'from-green-500 to-emerald-500' },
-              { icon: Award, label: 'Success Rate', value: '96%', color: 'from-purple-500 to-pink-500' }
+              { icon: Settings, label: 'Service Categories', value: `${displayStats.serviceCategories}+`, color: 'from-blue-500 to-cyan-500' },
+              { icon: Users, label: 'Service Providers', value: `${displayStats.serviceProviders}+`, color: 'from-orange-500 to-amber-500' },
+              { icon: CheckCircle, label: 'Completed Projects', value: `${displayStats.completedProjects.toLocaleString()}+`, color: 'from-green-500 to-emerald-500' },
+              { icon: Award, label: 'Success Rate', value: `${displayStats.successRate}%`, color: 'from-purple-500 to-pink-500' }
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -113,6 +128,26 @@ export default function ServicesPage() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [categories, setCategories] = useState<string[]>(['all']);
+  const [homepageStats, setHomepageStats] = useState<HomepageStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  // Load homepage stats
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        setStatsLoading(true);
+        const stats = await AnalyticsService.getHomepageStats();
+        setHomepageStats(stats);
+      } catch (error) {
+        console.error('Error loading homepage stats:', error);
+        // Keep null so component uses default values
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    loadStats();
+  }, []);
 
   // Fetch categories for filter dropdown
   useEffect(() => {
@@ -225,7 +260,7 @@ export default function ServicesPage() {
     { value: 'title', label: 'Title A-Z' }
   ];
 
-  if (loading) {
+  if (loading || statsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -238,7 +273,7 @@ export default function ServicesPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <ServicesHero />
+      <ServicesHero stats={homepageStats || undefined} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Enhanced Search and Filter Controls */}

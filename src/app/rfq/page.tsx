@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useVikaretaAuthContext } from '../../lib/auth/vikareta';
 import { rfqService } from '../../services/rfq.service';
 import MyRFQsSection from './MyRFQsSection';
+import { UsageLimitsService, UsageLimits } from '../../services/usage-limits.service';
 
 // Types for My RFQ section
 // Types for RFQ list/details live in the respective components
@@ -88,6 +89,8 @@ export default function RFQPage() {
   const [submitted, setSubmitted] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [subcategories, setSubcategories] = useState<any[]>([]);
+  const [usageLimits, setUsageLimits] = useState<UsageLimits | null>(null);
+  const [usageLimitsLoading, setUsageLimitsLoading] = useState(false);
 
   // Load categories on component mount
   useEffect(() => {
@@ -103,6 +106,26 @@ export default function RFQPage() {
 
     loadCategories();
   }, []);
+
+  // Load usage limits for authenticated users
+  useEffect(() => {
+    const loadUsageLimits = async () => {
+      if (!isAuthenticated) return;
+
+      try {
+        setUsageLimitsLoading(true);
+        const limits = await UsageLimitsService.getUsageSummary();
+        setUsageLimits(limits);
+      } catch (error) {
+        console.error('Error loading usage limits:', error);
+        // Keep null so component uses default values
+      } finally {
+        setUsageLimitsLoading(false);
+      }
+    };
+
+    loadUsageLimits();
+  }, [isAuthenticated]);
 
   const resetForm = () => {
     setFormData({
@@ -233,6 +256,12 @@ export default function RFQPage() {
       return;
     }
 
+    // Check usage limits before submitting
+    if (usageLimits && usageLimits.rfq.remaining <= 0) {
+      setErrors({ submit: `You've reached your monthly limit of ${usageLimits.rfq.limit} RFQ posts. Upgrade your plan or wait until next month.` });
+      return;
+    }
+
     setLoading(true);
     try {
       // Upload attachments first
@@ -283,6 +312,14 @@ export default function RFQPage() {
 
       setSubmitted(true);
       console.log('RFQ created successfully:', result);
+
+      // Refresh usage limits after successful submission
+      try {
+        const updatedLimits = await UsageLimitsService.getUsageSummary();
+        setUsageLimits(updatedLimits);
+      } catch (error) {
+        console.error('Error refreshing usage limits:', error);
+      }
     } catch (error) {
       console.error('Error submitting RFQ:', error);
       setErrors({ submit: error instanceof Error ? error.message : 'Failed to submit RFQ' });
@@ -408,6 +445,56 @@ export default function RFQPage() {
   function NewRFQForm() {
     return (
       <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Usage Limits Display */}
+        {usageLimits && (
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-blue-900 mb-4">Monthly Usage Limits</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">RFQ Posts</span>
+                  <span className={`text-sm font-bold ${usageLimits.rfq.remaining > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {usageLimits.rfq.used} / {usageLimits.rfq.limit}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className={`h-2 rounded-full ${usageLimits.rfq.remaining > 0 ? 'bg-green-500' : 'bg-red-500'}`}
+                    style={{ width: `${Math.min((usageLimits.rfq.used / usageLimits.rfq.limit) * 100, 100)}%` }}
+                  ></div>
+                </div>
+                <p className="text-xs text-gray-600 mt-2">
+                  {usageLimits.rfq.remaining > 0 
+                    ? `${usageLimits.rfq.remaining} posts remaining this month`
+                    : 'Monthly limit reached'
+                  }
+                </p>
+              </div>
+              
+              <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">Quote Responses</span>
+                  <span className={`text-sm font-bold ${usageLimits.quotes.remaining > 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                    {usageLimits.quotes.used} / {usageLimits.quotes.limit}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className={`h-2 rounded-full ${usageLimits.quotes.remaining > 0 ? 'bg-blue-500' : 'bg-red-500'}`}
+                    style={{ width: `${Math.min((usageLimits.quotes.used / usageLimits.quotes.limit) * 100, 100)}%` }}
+                  ></div>
+                </div>
+                <p className="text-xs text-gray-600 mt-2">
+                  {usageLimits.quotes.remaining > 0 
+                    ? `${usageLimits.quotes.remaining} responses remaining this month`
+                    : 'Monthly limit reached'
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Basic Information */}
         <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-amber-200 p-6 shadow-sm">
           <h2 className="text-xl font-semibold mb-6 text-amber-800">Basic Information</h2>

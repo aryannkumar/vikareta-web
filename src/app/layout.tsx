@@ -82,7 +82,26 @@ export default function RootLayout({
           />
         )}
       </head>
-      <body className={`${inter.className} bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-900 dark:text-white antialiased font-inter selection:bg-blue-200 selection:text-blue-900 dark:selection:bg-blue-800 dark:selection:text-blue-100`}>
+            <body className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 font-inter antialiased">
+        <MotionBoot />
+        <ThemeProvider
+          defaultTheme="light"
+          storageKey="vikareta-theme"
+        >
+          <VikaretaAuthProvider>
+            <ToastProvider>
+              <div className="flex flex-col min-h-screen">
+                <Header />
+                <main className="flex-1">
+                  <Entrance>
+                    {children}
+                  </Entrance>
+                </main>
+                <Footer />
+              </div>
+            </ToastProvider>
+          </VikaretaAuthProvider>
+        </ThemeProvider>
         {/* Google Identity Services */}
         <Script
           src="https://accounts.google.com/gsi/client"

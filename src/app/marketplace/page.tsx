@@ -21,9 +21,24 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { marketplaceApi } from '@/lib/api/marketplace';
+import { AnalyticsService, HomepageStats } from '../../lib/api/analytics';
 
 // Enhanced animated hero section for Marketplace
-const MarketplaceHero = () => {
+const MarketplaceHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
+  const defaultStats = {
+    trendingProducts: 2500,
+    activeSuppliers: 850,
+    verifiedBusinesses: 320,
+    dailyTransactions: 150
+  };
+
+  const displayStats = stats ? {
+    trendingProducts: stats.trendingProducts || defaultStats.trendingProducts,
+    activeSuppliers: stats.activeSuppliers || defaultStats.activeSuppliers,
+    verifiedBusinesses: stats.verifiedBusinesses || defaultStats.verifiedBusinesses,
+    dailyTransactions: stats.dailyTransactions || defaultStats.dailyTransactions
+  } : defaultStats;
+
   return (
     <motion.section 
       className="relative bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 overflow-hidden"
@@ -79,10 +94,10 @@ const MarketplaceHero = () => {
             transition={{ delay: 0.6, duration: 0.8 }}
           >
             {[
-              { icon: TrendingUp, label: 'Trending Products', value: '50K+', color: 'from-blue-500 to-cyan-500' },
-              { icon: Users, label: 'Active Suppliers', value: '15K+', color: 'from-orange-500 to-amber-500' },
-              { icon: Award, label: 'Verified Businesses', value: '5K+', color: 'from-green-500 to-emerald-500' },
-              { icon: BarChart, label: 'Daily Transactions', value: '1M+', color: 'from-purple-500 to-pink-500' }
+              { icon: TrendingUp, label: 'Trending Products', value: `${displayStats.trendingProducts.toLocaleString()}+`, color: 'from-blue-500 to-cyan-500' },
+              { icon: Users, label: 'Active Suppliers', value: `${displayStats.activeSuppliers.toLocaleString()}+`, color: 'from-orange-500 to-amber-500' },
+              { icon: Award, label: 'Verified Businesses', value: `${displayStats.verifiedBusinesses.toLocaleString()}+`, color: 'from-green-500 to-emerald-500' },
+              { icon: BarChart, label: 'Daily Transactions', value: `${displayStats.dailyTransactions.toLocaleString()}+`, color: 'from-purple-500 to-pink-500' }
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -113,9 +128,29 @@ export default function MarketplacePage() {
   const [trendingProducts, setTrendingProducts] = useState<any[]>([]);
   const [nearbyBusinesses, setNearbyBusinesses] = useState<any[]>([]);
   const [featuredServices, setFeaturedServices] = useState<any[]>([]);
+  const [homepageStats, setHomepageStats] = useState<HomepageStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   const locations = ['All Locations', 'Mumbai', 'Delhi NCR', 'Bangalore', 'Chennai', 'Pune', 'Hyderabad'];
   const categories = ['All Categories', 'Technology', 'Manufacturing', 'Healthcare', 'Office Supplies', 'Construction'];
+
+  // Load homepage stats
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        setStatsLoading(true);
+        const stats = await AnalyticsService.getHomepageStats();
+        setHomepageStats(stats);
+      } catch (error) {
+        console.error('Error loading homepage stats:', error);
+        // Keep null so component uses default values
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    loadStats();
+  }, []);
 
   // Load all data from APIs
   useEffect(() => {
@@ -160,7 +195,7 @@ export default function MarketplacePage() {
     loadData();
   }, []);
 
-  if (loading) {
+  if (loading || statsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
         <div className="text-center">
@@ -173,7 +208,7 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <MarketplaceHero />
+      <MarketplaceHero stats={homepageStats || undefined} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Enhanced Search and Filter Controls */}

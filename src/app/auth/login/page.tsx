@@ -661,24 +661,24 @@ function LoginPageContent() {
           className="max-w-md w-full"
         >
           {/* Header */}
-          <motion.div variants={itemVariants} className="text-center mb-8">
-            <Link href="/" className="inline-block mb-6">
+          <motion.div variants={itemVariants} className="text-center mb-6 sm:mb-8">
+            <Link href="/" className="inline-block mb-4 sm:mb-6">
               <motion.div 
                 className="flex items-center justify-center"
                 whileHover={{ scale: 1.05, rotate: 2 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <Logo 
-                  className="h-20 w-auto sm:h-24 md:h-28" 
+                  className="h-16 w-auto sm:h-20 md:h-24" 
                   showText={false}
                   priority={true}
                 />
               </motion.div>
             </Link>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-2">
               Welcome Back
             </h1>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 text-base sm:text-lg px-4">
               Sign in to continue your business journey
             </p>
           </motion.div>
@@ -686,16 +686,16 @@ function LoginPageContent() {
           {/* Main Auth Card */}
           <motion.div 
             variants={itemVariants}
-            className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20"
+            className="bg-white/70 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/20"
           >
             {step === 'credentials' ? (
               <>
                 {/* Auth Method Toggle */}
-                <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-gray-100 rounded-2xl">
+                <div className="grid grid-cols-2 gap-2 mb-4 sm:mb-6 p-1 bg-gray-100 rounded-xl sm:rounded-2xl">
                   <button
                     type="button"
                     onClick={() => setAuthMethod('email')}
-                    className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium transition-all duration-300 ${
+                    className={`flex items-center justify-center gap-2 py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl font-medium transition-all duration-300 text-sm sm:text-base ${
                       authMethod === 'email'
                         ? 'bg-white text-amber-600 shadow-lg'
                         : 'text-gray-600 hover:text-amber-600'
@@ -708,7 +708,7 @@ function LoginPageContent() {
                   <button
                     type="button"
                     onClick={() => setAuthMethod('phone')}
-                    className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium transition-all duration-300 ${
+                    className={`flex items-center justify-center gap-2 py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl font-medium transition-all duration-300 text-sm sm:text-base ${
                       authMethod === 'phone'
                         ? 'bg-white text-amber-600 shadow-lg'
                         : 'text-gray-600 hover:text-amber-600'
@@ -721,7 +721,7 @@ function LoginPageContent() {
                 </div>
 
                 {/* Login Form */}
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                   {/* Email/Phone Field */}
                   {authMethod === 'email' ? (
                     <div>
@@ -735,7 +735,7 @@ function LoginPageContent() {
                           type="email"
                           value={formData.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
-                          className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
+                          className={`w-full pl-12 pr-4 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-sm sm:text-base ${
                             errors.email ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-amber-300'
                           } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                           placeholder="Enter your email address"
@@ -767,7 +767,7 @@ function LoginPageContent() {
                           type="tel"
                           value={formData.phone}
                           onChange={(e) => handleInputChange('phone', e.target.value)}
-                          className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
+                          className={`w-full pl-12 pr-4 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-sm sm:text-base ${
                             errors.phone ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-amber-300'
                           } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                           placeholder="+91 98765 43210"
@@ -800,7 +800,7 @@ function LoginPageContent() {
                         type={showPassword ? 'text' : 'password'}
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
-                        className={`w-full pl-12 pr-14 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 ${
+                        className={`w-full pl-12 pr-14 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-sm sm:text-base ${
                           errors.password ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-amber-300'
                         } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         placeholder="Enter your password"
@@ -841,24 +841,24 @@ function LoginPageContent() {
                         </div>
                         <div className="grid grid-cols-2 gap-1 text-xs text-gray-600">
                           <div className={`flex items-center ${getPasswordStrength(formData.password).checks.length ? 'text-green-600' : 'text-gray-400'}`}>
-                            <Check className="w-3 h-3 mr-1" />
-                            8+ characters
+                            <Check className="w-3 h-3 mr-1 flex-shrink-0" />
+                            8+ chars
                           </div>
                           <div className={`flex items-center ${getPasswordStrength(formData.password).checks.uppercase ? 'text-green-600' : 'text-gray-400'}`}>
-                            <Check className="w-3 h-3 mr-1" />
+                            <Check className="w-3 h-3 mr-1 flex-shrink-0" />
                             Uppercase
                           </div>
                           <div className={`flex items-center ${getPasswordStrength(formData.password).checks.lowercase ? 'text-green-600' : 'text-gray-400'}`}>
-                            <Check className="w-3 h-3 mr-1" />
+                            <Check className="w-3 h-3 mr-1 flex-shrink-0" />
                             Lowercase
                           </div>
                           <div className={`flex items-center ${getPasswordStrength(formData.password).checks.number ? 'text-green-600' : 'text-gray-400'}`}>
-                            <Check className="w-3 h-3 mr-1" />
+                            <Check className="w-3 h-3 mr-1 flex-shrink-0" />
                             Number
                           </div>
                           <div className={`flex items-center ${getPasswordStrength(formData.password).checks.special ? 'text-green-600' : 'text-gray-400'}`}>
-                            <Check className="w-3 h-3 mr-1" />
-                            Special char
+                            <Check className="w-3 h-3 mr-1 flex-shrink-0" />
+                            Special
                           </div>
                         </div>
                       </motion.div>
@@ -939,31 +939,51 @@ function LoginPageContent() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* OTP Input */}
                   <div>
-                    <label htmlFor="otp" className="block text-sm font-semibold text-gray-700 mb-2">
-                      Verification Code
+                    <label htmlFor="otp" className="block text-sm font-semibold text-gray-700 mb-4 text-center">
+                      Enter 6-digit verification code
                     </label>
-                    <div className="relative">
-                      <Shield className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                      <input
-                        id="otp"
-                        type="text"
-                        value={formData.otp}
-                        onChange={(e) => handleInputChange('otp', e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-center text-xl tracking-widest ${
-                          errors.otp ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-amber-300'
-                        } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        placeholder="000000"
-                        maxLength={6}
-                        disabled={loading}
-                        autoComplete="one-time-code"
-                        inputMode="numeric"
-                      />
+                    <div className="flex justify-center gap-2 sm:gap-3 mb-4">
+                      {Array.from({ length: 6 }, (_, index) => (
+                        <input
+                          key={index}
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          maxLength={1}
+                          value={formData.otp[index] || ''}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, '');
+                            if (value) {
+                              const newOtp = formData.otp.split('');
+                              newOtp[index] = value;
+                              handleInputChange('otp', newOtp.join(''));
+                              // Auto-focus next input
+                              if (index < 5 && value) {
+                                const nextInput = e.target.nextElementSibling as HTMLInputElement;
+                                if (nextInput) nextInput.focus();
+                              }
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Backspace' && !formData.otp[index] && index > 0) {
+                              const target = e.target as HTMLInputElement;
+                              const prevInput = target.previousElementSibling as HTMLInputElement;
+                              if (prevInput) prevInput.focus();
+                            }
+                          }}
+                          className={`w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl font-semibold border-2 rounded-lg focus:border-amber-500 focus:outline-none transition-colors bg-white/50 backdrop-blur-sm ${
+                            errors.otp ? 'border-red-500' : 'border-gray-200'
+                          } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          disabled={loading}
+                          autoComplete="off"
+                        />
+                      ))}
                     </div>
                     {errors.otp && (
-                      <motion.div 
+                      <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-2 mt-2 text-red-500 text-sm"
+                        className="flex items-center justify-center gap-2 mt-2 text-red-500 text-sm"
                       >
                         <AlertCircle className="h-4 w-4" />
                         {errors.otp}
@@ -1041,14 +1061,14 @@ function LoginPageContent() {
                   <motion.button
                     onClick={handleGoogleLogin}
                     disabled={loading}
-                    className={`w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-gray-200 rounded-2xl hover:border-amber-300 hover:bg-amber-50 transition-all duration-300 bg-white shadow-sm group ${
+                    className={`w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-gray-200 rounded-xl sm:rounded-2xl hover:border-amber-300 hover:bg-amber-50 transition-all duration-300 bg-white shadow-sm group text-sm sm:text-base ${
                       loading ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'
                     }`}
                     whileHover={{ scale: loading ? 1 : 1.02 }}
                     whileTap={{ scale: loading ? 1 : 0.98 }}
                     aria-label="Sign in with Google"
                   >
-                    <svg className="h-5 w-5 text-gray-700 group-hover:text-amber-600 transition-colors" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-gray-700 group-hover:text-amber-600 transition-colors flex-shrink-0" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                       <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                       <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
@@ -1062,14 +1082,14 @@ function LoginPageContent() {
                   <motion.button
                     onClick={handleLinkedInLogin}
                     disabled={loading}
-                    className={`w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-gray-200 rounded-2xl hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 bg-white shadow-sm group ${
+                    className={`w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-gray-200 rounded-xl sm:rounded-2xl hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 bg-white shadow-sm group text-sm sm:text-base ${
                       loading ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'
                     }`}
                     whileHover={{ scale: loading ? 1 : 1.02 }}
                     whileTap={{ scale: loading ? 1 : 0.98 }}
                     aria-label="Continue with LinkedIn"
                   >
-                    <svg className="h-5 w-5 text-gray-700 group-hover:text-blue-600 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-gray-700 group-hover:text-blue-600 transition-colors flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                     </svg>
                     <span className="font-medium text-gray-700 group-hover:text-blue-700 transition-colors">
@@ -1080,14 +1100,14 @@ function LoginPageContent() {
                   <motion.button
                     onClick={handleDigiLockerLogin}
                     disabled={loading}
-                    className={`w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-gray-200 rounded-2xl hover:border-green-300 hover:bg-green-50 transition-all duration-300 bg-white shadow-sm group ${
+                    className={`w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-gray-200 rounded-xl sm:rounded-2xl hover:border-green-300 hover:bg-green-50 transition-all duration-300 bg-white shadow-sm group text-sm sm:text-base ${
                       loading ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'
                     }`}
                     whileHover={{ scale: loading ? 1 : 1.02 }}
                     whileTap={{ scale: loading ? 1 : 0.98 }}
                     aria-label="Continue with DigiLocker"
                   >
-                    <svg className="h-5 w-5 text-gray-700 group-hover:text-green-600 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-gray-700 group-hover:text-green-600 transition-colors flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
                       <path fill="white" d="M12 4.5L4.5 8v8.5c0 4.1 2.9 7.2 7.5 8.5 4.6-1.3 7.5-4.4 7.5-8.5V8L12 4.5z"/>
                       <circle cx="12" cy="11" r="2" fill="currentColor"/>

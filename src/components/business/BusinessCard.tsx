@@ -88,7 +88,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
         viewport={{ once: true, amount: 0.1 }}
         variants={cardVariants}
         onClick={handleCardClick}
-        className="group flex bg-gradient-to-r from-white to-amber-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-200 dark:border-gray-700 cursor-pointer"
+        className="group flex bg-gradient-to-r from-white to-orange-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-orange-200 dark:border-gray-700 cursor-pointer"
       >
         {/* Image Section */}
         <div className="relative w-48 h-32 flex-shrink-0 overflow-hidden">
@@ -136,9 +136,9 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
             {/* Header */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-amber-600 transition-colors duration-300">
-                  {businessData.name}
-                </h3>
+                              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-orange-600 transition-colors duration-300">
+                {businessData.name}
+              </h3>
                 <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
                   <MapPin className="w-4 h-4 flex-shrink-0" />
                   <span className="text-sm">{businessData.location}</span>
@@ -303,7 +303,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode =
               className="w-full h-full object-cover" 
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-full h-full bg-gradient-to-br from-orange-600 to-amber-600 flex items-center justify-center text-white font-bold text-lg">
               {businessData.name.charAt(0)}
             </div>
           )}

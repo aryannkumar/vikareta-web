@@ -118,19 +118,23 @@ export default function CartPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Link href="/products" className="inline-flex items-center gap-2 text-primary hover:underline">
-            <ArrowLeft className="h-4 w-4" />
-            Continue Shopping
-          </Link>
-          <div className="h-4 w-px bg-border"></div>
-          <h1 className="text-3xl font-bold">Shopping Cart</h1>
-          <Badge variant="secondary" className="ml-2">
-            {totalItems} {totalItems === 1 ? 'item' : 'items'}
-          </Badge>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div className="flex items-center gap-4">
+            <Link href="/products" className="inline-flex items-center gap-2 text-primary hover:underline text-sm sm:text-base">
+              <ArrowLeft className="h-4 w-4" />
+              Continue Shopping
+            </Link>
+            <div className="hidden sm:block h-4 w-px bg-border"></div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <h1 className="text-2xl sm:text-3xl font-bold">Shopping Cart</h1>
+            <Badge variant="secondary" className="w-fit">
+              {totalItems} {totalItems === 1 ? 'item' : 'items'}
+            </Badge>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2">
             <div className="bg-card rounded-lg border">
@@ -197,7 +201,7 @@ export default function CartPage() {
                         </div>
 
                         {/* Price and Quantity */}
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                           <div className="flex items-center gap-3">
                             <div className="flex items-center border rounded-lg">
                               <Button
@@ -228,7 +232,7 @@ export default function CartPage() {
                             )}
                           </div>
 
-                          <div className="text-right">
+                          <div className="text-left sm:text-right">
                             <div className="font-bold text-lg">
                               {formatPrice(item.price * item.quantity)}
                             </div>
@@ -332,7 +336,7 @@ export default function CartPage() {
               <div className="mt-6 space-y-3">
                 {user ? (
                   <Link href="/checkout">
-                    <Button className="w-full btn-primary">
+                    <Button className="w-full btn-primary text-sm sm:text-base">
                       <CreditCard className="h-4 w-4 mr-2" />
                       Proceed to Checkout
                     </Button>
@@ -340,11 +344,11 @@ export default function CartPage() {
                 ) : (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <AlertCircle className="h-4 w-4" />
+                      <AlertCircle className="h-4 w-4 flex-shrink-0" />
                       Please sign in to continue
                     </div>
                     <Link href="/auth/login">
-                      <Button className="w-full btn-primary">
+                      <Button className="w-full btn-primary text-sm sm:text-base">
                         Sign In to Checkout
                       </Button>
                     </Link>

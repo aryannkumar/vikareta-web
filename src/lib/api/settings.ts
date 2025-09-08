@@ -21,6 +21,12 @@ export interface UserSettings {
     timezone: string;
     autoSave: boolean;
   };
+  security: {
+    twoFactor: boolean;
+    loginAlerts: boolean;
+    profileVisibility: 'public' | 'private' | 'contacts';
+    dataSharing: boolean;
+  };
 }
 
 export const settingsApi = {

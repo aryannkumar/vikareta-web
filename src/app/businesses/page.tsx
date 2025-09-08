@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { marketplaceApi, type NearbyBusiness } from '@/lib/api/marketplace';
+import { AnalyticsService, HomepageStats } from '../../lib/api/analytics';
 import BusinessCard from '@/components/business/BusinessCard';
 import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
 import { 
@@ -23,7 +24,20 @@ import {
 } from 'lucide-react';
 
 // Modern hero section with better design
-const BusinessesHero = () => {
+const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
+  const defaultStats = {
+    activeBusinesses: 320,
+    verifiedPartners: 180,
+    citiesCovered: 45,
+    businessSuccessRate: 94
+  };
+
+  const displayStats = stats ? {
+    activeBusinesses: stats.activeBusinesses || defaultStats.activeBusinesses,
+    verifiedPartners: stats.verifiedPartners || defaultStats.verifiedPartners,
+    citiesCovered: stats.citiesCovered || defaultStats.citiesCovered,
+    businessSuccessRate: stats.businessSuccessRate || defaultStats.businessSuccessRate
+  } : defaultStats;
   return (
     <section className="relative min-h-[60vh] bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 overflow-hidden">
       {/* Animated background elements */}
@@ -97,10 +111,10 @@ const BusinessesHero = () => {
             transition={{ duration: 0.8, delay: 0.8 }}
           >
             {[
-              { icon: Building2, label: 'Active Businesses', value: '15K+', color: 'from-blue-400 to-cyan-400' },
-              { icon: ShieldCheck, label: 'Verified Partners', value: '8K+', color: 'from-green-400 to-emerald-400' },
-              { icon: Globe, label: 'Cities Covered', value: '200+', color: 'from-purple-400 to-pink-400' },
-              { icon: Users, label: 'Success Stories', value: '98%', color: 'from-orange-400 to-red-400' }
+              { icon: Building2, label: 'Active Businesses', value: `${displayStats.activeBusinesses.toLocaleString()}+`, color: 'from-blue-400 to-cyan-400' },
+              { icon: ShieldCheck, label: 'Verified Partners', value: `${displayStats.verifiedPartners.toLocaleString()}+`, color: 'from-green-400 to-emerald-400' },
+              { icon: Globe, label: 'Cities Covered', value: `${displayStats.citiesCovered}+`, color: 'from-purple-400 to-pink-400' },
+              { icon: Users, label: 'Success Stories', value: `${displayStats.businessSuccessRate}%`, color: 'from-orange-400 to-red-400' }
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -168,6 +182,8 @@ export default function BusinessesPage() {
   const [debounceTimeout, setDebounceTimeout] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+  const [homepageStats, setHomepageStats] = useState<HomepageStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   const loadBusinesses = async (tab: typeof activeTab = activeTab) => {
     try {
@@ -211,6 +227,24 @@ export default function BusinessesPage() {
   useEffect(() => {
     loadBusinesses(activeTab);
   }, [activeTab]);
+
+  // Load homepage stats
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        setStatsLoading(true);
+        const stats = await AnalyticsService.getHomepageStats();
+        setHomepageStats(stats);
+      } catch (error) {
+        console.error('Error loading homepage stats:', error);
+        // Keep null so component uses default values
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    loadStats();
+  }, []);
 
   const handleSearch = async (searchQuery: string) => {
     if (debounceTimeout) window.clearTimeout(debounceTimeout);
@@ -282,7 +316,7 @@ export default function BusinessesPage() {
       variants={pageVariants}
       className="min-h-screen bg-gray-50"
     >
-      <BusinessesHero />
+      <BusinessesHero stats={homepageStats || undefined} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
           {/* Search and Filters Card */}
@@ -390,7 +424,7 @@ export default function BusinessesPage() {
         </motion.div>
 
         {/* Results */}
-        {loading ? (
+        {loading || statsLoading ? (
           <motion.div 
             variants={containerVariants}
             initial="hidden"

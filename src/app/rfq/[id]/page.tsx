@@ -28,6 +28,7 @@ import {
 import { rfqService, RfqWithResponses } from '../../../services/rfq.service';
 import { orderService, CreateOrderFromQuoteData } from '../../../services/order.service';
 import { useVikaretaAuthContext } from '../../../lib/auth/vikareta';
+import { UsageLimitsService, UsageLimits } from '../../../services/usage-limits.service';
 
 export default function RFQDetailsPage() {
   const router = useRouter();
@@ -76,6 +77,8 @@ export default function RFQDetailsPage() {
     country: 'India',
   });
   const [paymentMethod, setPaymentMethod] = useState<'cashfree' | 'wallet'>('wallet');
+  const [usageLimits, setUsageLimits] = useState<UsageLimits | null>(null);
+  const [usageLimitsLoading, setUsageLimitsLoading] = useState(false);
 
   const formatCurrency = (amount?: number | null) => {
     if (!amount && amount !== 0) return 'N/A';
@@ -126,6 +129,26 @@ export default function RFQDetailsPage() {
     loadRfq();
   }, [rfqId]);
 
+  // Load usage limits for authenticated users
+  useEffect(() => {
+    const loadUsageLimits = async () => {
+      if (!isAuthenticated) return;
+
+      try {
+        setUsageLimitsLoading(true);
+        const limits = await UsageLimitsService.getUsageSummary();
+        setUsageLimits(limits);
+      } catch (error) {
+        console.error('Error loading usage limits:', error);
+        // Keep null so component uses default values
+      } finally {
+        setUsageLimitsLoading(false);
+      }
+    };
+
+    loadUsageLimits();
+  }, [isAuthenticated]);
+
   const handleNegotiate = (responseId: string) => {
     setSelectedResponse(responseId);
     setShowNegotiationForm(true);
@@ -146,6 +169,12 @@ export default function RFQDetailsPage() {
   };
 
   const handleAcceptQuote = (responseId: string) => {
+    // Check usage limits before allowing acceptance
+    if (usageLimits && usageLimits.quotes.remaining <= 0) {
+      alert(`You've reached your monthly limit of ${usageLimits.quotes.limit} quote responses. Upgrade your plan or wait until next month.`);
+      return;
+    }
+    
     setSelectedResponse(responseId);
     setShowOrderForm(true);
   };
@@ -179,6 +208,14 @@ export default function RFQDetailsPage() {
       setShowOrderForm(false);
       if (created.orderId) router.push(`/orders/${created.orderId}`);
       else alert(`Order created: ${created.orderNumber}`);
+
+      // Refresh usage limits after successful order creation
+      try {
+        const updatedLimits = await UsageLimitsService.getUsageSummary();
+        setUsageLimits(updatedLimits);
+      } catch (error) {
+        console.error('Error refreshing usage limits:', error);
+      }
     } catch (e: any) {
       console.error('Order conversion failed', e);
       alert(e?.message || 'Failed to accept quote/create order');
@@ -213,22 +250,23 @@ export default function RFQDetailsPage() {
             Back to RFQs
           </button>
           
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{rfq.title}</h1>
-              <div className="flex items-center gap-4 text-sm text-gray-600">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 break-words">{rfq.title}</h1>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-600">
                 <span className="flex items-center gap-1">
-                  <Package className="h-4 w-4" />
+                  <Package className="h-4 w-4 flex-shrink-0" />
                   {rfq.category?.name}
                   {rfq.subcategory?.name ? (
                     <>
-                      <span className="mx-1 text-gray-400">›</span>
+                      <span className="mx-1 text-gray-400 hidden sm:inline">›</span>
+                      <span className="sm:hidden">›</span>
                       <span>{rfq.subcategory?.name}</span>
                     </>
                   ) : null}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
+                  <Calendar className="h-4 w-4 flex-shrink-0" />
                   Created {new Date(String(rfq.createdAt)).toLocaleDateString()}
                 </span>
                 <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(rfq.status)}`}>
@@ -240,8 +278,8 @@ export default function RFQDetailsPage() {
               </div>
             </div>
             
-            <div className="text-right">
-              <div className="text-lg font-semibold text-gray-900 mb-1">
+            <div className="text-left lg:text-right lg:flex-shrink-0">
+              <div className="text-lg sm:text-xl font-semibold text-gray-900 mb-1">
                 {rfq.responseAnalytics?.totalResponses || 0} Responses
               </div>
               <div className="text-sm text-gray-600">
@@ -254,10 +292,10 @@ export default function RFQDetailsPage() {
         {/* Tab Navigation */}
         <div className="mb-8">
           <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
+            <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('overview')}
-                className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex-shrink-0 ${
                   activeTab === 'overview'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -268,7 +306,7 @@ export default function RFQDetailsPage() {
               </button>
               <button
                 onClick={() => setActiveTab('responses')}
-                className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex-shrink-0 ${
                   activeTab === 'responses'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -279,7 +317,7 @@ export default function RFQDetailsPage() {
               </button>
               <button
                 onClick={() => setActiveTab('negotiations')}
-                className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex-shrink-0 ${
                   activeTab === 'negotiations'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -294,9 +332,9 @@ export default function RFQDetailsPage() {
 
         {/* Tab Content */}
         {activeTab === 'overview' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
             {/* Main Content */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="xl:col-span-2 space-y-6">
               {/* RFQ Details */}
               <div className="bg-white rounded-lg border p-6">
                 <h2 className="text-xl font-semibold mb-4">RFQ Details</h2>
@@ -306,7 +344,7 @@ export default function RFQDetailsPage() {
                     <p className="text-gray-600">{rfq.description}</p>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {rfq.quantity !== undefined && rfq.quantity !== null && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
@@ -320,7 +358,7 @@ export default function RFQDetailsPage() {
                       </p>
                     </div>
                     {rfq.deliveryLocation && (
-                      <div>
+                      <div className="sm:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2">Delivery Location</label>
                         <p className="text-gray-600 flex items-center gap-1">
                           <MapPin className="h-4 w-4" />
@@ -329,7 +367,7 @@ export default function RFQDetailsPage() {
                       </div>
                     )}
                     {rfq.deliveryTimeline && (
-                      <div>
+                      <div className="sm:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2">{rfq.rfqType === 'service' ? 'Preferred Timeline' : 'Timeline'}</label>
                         <p className="text-gray-600 flex items-center gap-1">
                           <Clock className="h-4 w-4" />
@@ -338,13 +376,13 @@ export default function RFQDetailsPage() {
                       </div>
                     )}
                     {rfq.rfqType === 'service' && rfq.serviceType && (
-                      <div>
+                      <div className="sm:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2">Service Type</label>
                         <p className="text-gray-600">{rfq.serviceType}</p>
                       </div>
                     )}
                     {rfq.rfqType === 'service' && rfq.preferredLocation && (
-                      <div>
+                      <div className="sm:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Location</label>
                         <p className="text-gray-600">{rfq.preferredLocation}</p>
                       </div>
@@ -393,6 +431,35 @@ export default function RFQDetailsPage() {
 
             {/* Sidebar */}
             <div className="space-y-6">
+              {/* Usage Limits Display */}
+              {usageLimits && (
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-4">Your Monthly Limits</h3>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 border border-blue-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">Quote Responses</span>
+                        <span className={`text-sm font-bold ${usageLimits.quotes.remaining > 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                          {usageLimits.quotes.used} / {usageLimits.quotes.limit}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full ${usageLimits.quotes.remaining > 0 ? 'bg-blue-500' : 'bg-red-500'}`}
+                          style={{ width: `${Math.min((usageLimits.quotes.used / usageLimits.quotes.limit) * 100, 100)}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-2">
+                        {usageLimits.quotes.remaining > 0 
+                          ? `${usageLimits.quotes.remaining} responses remaining this month`
+                          : 'Monthly limit reached'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Response Summary */}
               <div className="bg-white rounded-lg border p-6">
                 <h3 className="text-lg font-semibold mb-4">Response Summary</h3>
@@ -495,16 +562,16 @@ export default function RFQDetailsPage() {
                     {/* Quote Items */}
                     <div className="mb-4">
                       <h4 className="font-medium mb-2">Quote Breakdown</h4>
-                      <div className="bg-gray-50 rounded p-4">
+                      <div className="bg-gray-50 rounded p-3 sm:p-4">
                         {response.items.map((item, index) => (
-                          <div key={index} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
-                            <div>
-                              <p className="font-medium">{item.name}</p>
-                              <p className="text-sm text-gray-600">{item.description}</p>
+                          <div key={index} className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-gray-200 last:border-0 gap-2">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm sm:text-base">{item.name}</p>
+                              <p className="text-xs sm:text-sm text-gray-600">{item.description}</p>
                             </div>
-                            <div className="text-right">
-                              <p className="font-medium">{formatCurrency(item.unitPrice)} × {item.quantity}</p>
-                              <p className="text-sm text-gray-600">{formatCurrency(item.unitPrice * item.quantity)}</p>
+                            <div className="text-left sm:text-right flex-shrink-0">
+                              <p className="font-medium text-sm sm:text-base">{formatCurrency(item.unitPrice)} × {item.quantity}</p>
+                              <p className="text-xs sm:text-sm text-gray-600">{formatCurrency(item.unitPrice * item.quantity)}</p>
                             </div>
                           </div>
                         ))}
@@ -549,34 +616,40 @@ export default function RFQDetailsPage() {
                     )}
 
                     {/* Actions */}
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                       <button
                         onClick={() => handleAcceptQuote(response.id)}
-                        className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                        className="flex items-center justify-center gap-2 bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm sm:text-base"
+                        disabled={usageLimits ? usageLimits.quotes.remaining <= 0 : false}
+                        title={usageLimits && usageLimits.quotes.remaining <= 0 ? 'Monthly limit reached' : ''}
                       >
                         <ThumbsUp className="h-4 w-4" />
                         Accept Quote
                       </button>
                       <button
                         onClick={() => handleNegotiate(response.id)}
-                        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                        className="flex items-center justify-center gap-2 bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
+                        disabled={usageLimits ? usageLimits.quotes.remaining <= 0 : false}
+                        title={usageLimits && usageLimits.quotes.remaining <= 0 ? 'Monthly limit reached' : ''}
                       >
                         <MessageSquare className="h-4 w-4" />
                         Negotiate
                       </button>
                       <button
                         onClick={() => handleRejectQuote(response.id)}
-                        className="flex items-center gap-2 border border-red-300 text-red-600 px-4 py-2 rounded-lg hover:bg-red-50"
+                        className="flex items-center justify-center gap-2 border border-red-300 text-red-600 px-3 sm:px-4 py-2 rounded-lg hover:bg-red-50 disabled:opacity-50 text-sm sm:text-base"
+                        disabled={usageLimits ? usageLimits.quotes.remaining <= 0 : false}
+                        title={usageLimits && usageLimits.quotes.remaining <= 0 ? 'Monthly limit reached' : ''}
                       >
                         <ThumbsDown className="h-4 w-4" />
                         Reject
                       </button>
-                      <div className="flex items-center gap-2">
-                        <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                          <Phone className="h-4 w-4" />
+                      <div className="flex gap-2 sm:gap-0 sm:flex-col">
+                        <button className="flex-1 sm:flex-none p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50">
+                          <Phone className="h-4 w-4 mx-auto" />
                         </button>
-                        <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                          <Mail className="h-4 w-4" />
+                        <button className="flex-1 sm:flex-none p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50">
+                          <Mail className="h-4 w-4 mx-auto" />
                         </button>
                       </div>
                     </div>
@@ -677,37 +750,39 @@ export default function RFQDetailsPage() {
         {/* Negotiation Modal */}
         {showNegotiationForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-md w-full p-6">
-              <h3 className="text-lg font-semibold mb-4">Start Negotiation</h3>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Your Message
-                </label>
-                <textarea
-                  value={negotiationMessage}
-                  onChange={(e) => setNegotiationMessage(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={4}
-                  placeholder="Enter your negotiation message..."
-                />
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={handleSendNegotiation}
-                  className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                >
-                  Send Message
-                </button>
-                <button
-                  onClick={() => {
-                    setShowNegotiationForm(false);
-                    setNegotiationMessage('');
-                    setSelectedResponse(null);
-                  }}
-                  className="flex-1 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
+            <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-4 sm:p-6">
+                <h3 className="text-lg font-semibold mb-4">Start Negotiation</h3>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Your Message
+                  </label>
+                  <textarea
+                    value={negotiationMessage}
+                    onChange={(e) => setNegotiationMessage(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                    rows={4}
+                    placeholder="Enter your negotiation message..."
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={handleSendNegotiation}
+                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm sm:text-base"
+                  >
+                    Send Message
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowNegotiationForm(false);
+                      setNegotiationMessage('');
+                      setSelectedResponse(null);
+                    }}
+                    className="flex-1 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm sm:text-base"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -716,94 +791,96 @@ export default function RFQDetailsPage() {
         {/* Accept & Order Modal */}
         {showOrderForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-md w-full p-6">
-              <h3 className="text-lg font-semibold mb-4">{rfq?.rfqType === 'service' ? 'Service Address & Payment' : 'Delivery Address & Payment'}</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Street Address</label>
-                  <input
-                    type="text"
-                    value={address.street}
-                    onChange={(e) => setAddress(prev => ({ ...prev, street: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder="Enter street address"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-4 sm:p-6">
+                <h3 className="text-lg font-semibold mb-4">{rfq?.rfqType === 'service' ? 'Service Address & Payment' : 'Delivery Address & Payment'}</h3>
+                <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium mb-1">City</label>
+                    <label className="block text-sm font-medium mb-1">Street Address</label>
                     <input
                       type="text"
-                      value={address.city}
-                      onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))}
-                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="City"
+                      value={address.street}
+                      onChange={(e) => setAddress(prev => ({ ...prev, street: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+                      placeholder="Enter street address"
                     />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">City</label>
+                      <input
+                        type="text"
+                        value={address.city}
+                        onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))}
+                        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+                        placeholder="City"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">State</label>
+                      <input
+                        type="text"
+                        value={address.state}
+                        onChange={(e) => setAddress(prev => ({ ...prev, state: e.target.value }))}
+                        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+                        placeholder="State"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Postal Code</label>
+                      <input
+                        type="text"
+                        value={address.postalCode}
+                        onChange={(e) => setAddress(prev => ({ ...prev, postalCode: e.target.value }))}
+                        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+                        placeholder="Postal Code"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Country</label>
+                      <input
+                        type="text"
+                        value={address.country}
+                        onChange={(e) => setAddress(prev => ({ ...prev, country: e.target.value }))}
+                        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+                        placeholder="Country"
+                      />
+                    </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">State</label>
-                    <input
-                      type="text"
-                      value={address.state}
-                      onChange={(e) => setAddress(prev => ({ ...prev, state: e.target.value }))}
-                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="State"
-                    />
+                    <label className="block text-sm font-medium mb-1">Payment Method</label>
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value as 'cashfree' | 'wallet')}
+                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+                    >
+                      <option value="wallet">Wallet</option>
+                      <option value="cashfree">Cashfree</option>
+                    </select>
                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Postal Code</label>
-                    <input
-                      type="text"
-                      value={address.postalCode}
-                      onChange={(e) => setAddress(prev => ({ ...prev, postalCode: e.target.value }))}
-                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="Postal Code"
-                    />
+                  <div className="bg-blue-50 p-3 rounded">
+                    <p className="text-sm text-blue-800">
+                      By accepting, the quote will be converted to an order.
+                    </p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Country</label>
-                    <input
-                      type="text"
-                      value={address.country}
-                      onChange={(e) => setAddress(prev => ({ ...prev, country: e.target.value }))}
-                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="Country"
-                    />
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <button
+                      onClick={submitOrder}
+                      disabled={orderLoading}
+                      className="flex-1 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
+                    >
+                      {orderLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingCart className="h-4 w-4" />}
+                      {orderLoading ? 'Processing...' : 'Accept & Create Order'}
+                    </button>
+                    <button
+                      onClick={() => setShowOrderForm(false)}
+                      className="flex-1 px-4 py-2 border rounded hover:bg-gray-50 text-sm sm:text-base"
+                    >
+                      Cancel
+                    </button>
                   </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Payment Method</label>
-                  <select
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value as 'cashfree' | 'wallet')}
-                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                  >
-                    <option value="wallet">Wallet</option>
-                    <option value="cashfree">Cashfree</option>
-                  </select>
-                </div>
-                <div className="bg-blue-50 p-3 rounded">
-                  <p className="text-sm text-blue-800">
-                    By accepting, the quote will be converted to an order.
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={submitOrder}
-                    disabled={orderLoading}
-                    className="flex-1 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {orderLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingCart className="h-4 w-4" />}
-                    {orderLoading ? 'Processing...' : 'Accept & Create Order'}
-                  </button>
-                  <button
-                    onClick={() => setShowOrderForm(false)}
-                    className="px-4 py-2 border rounded hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
                 </div>
               </div>
             </div>

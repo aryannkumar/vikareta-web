@@ -234,7 +234,7 @@ export default function SubcategoryPage() {
         <nav className="flex items-center space-x-2 mb-6 text-sm">
           <Link 
             href="/categories" 
-            className="flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200 hover:underline"
+            className="flex items-center text-orange-600 hover:text-orange-700 font-medium transition-colors duration-200 hover:underline"
           >
             <Package className="w-4 h-4 mr-2" />
             Categories
@@ -242,7 +242,7 @@ export default function SubcategoryPage() {
           <span className="text-gray-400">/</span>
           <Link 
             href={`/categories/${categoryId}`} 
-            className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200 hover:underline"
+            className="text-orange-600 hover:text-orange-700 font-medium transition-colors duration-200 hover:underline"
           >
             {category?.name || 'Category'}
           </Link>
@@ -256,7 +256,7 @@ export default function SubcategoryPage() {
             <Button 
               variant="outline" 
               size="sm" 
-              className="border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
+              className="border-orange-200 text-orange-700 hover:bg-orange-50 hover:border-orange-300 transition-all duration-200 shadow-sm"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to {category?.name || 'Category'}
@@ -265,37 +265,37 @@ export default function SubcategoryPage() {
         </div>
 
         {/* Enhanced Subcategory Header */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-violet-50 via-fuchsia-50 to-pink-50 rounded-3xl border border-violet-200/60 shadow-2xl shadow-violet-500/10 mb-12">
+        <div className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 rounded-3xl border border-orange-200/60 shadow-2xl shadow-orange-500/10 mb-12">
           {/* Enhanced Background Pattern */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-violet-200/40 via-transparent to-fuchsia-200/30"></div>
-          <div className="absolute top-0 right-0 -mt-8 -mr-8 w-36 h-36 bg-gradient-to-br from-violet-400/30 to-fuchsia-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-44 h-44 bg-gradient-to-tr from-pink-400/20 to-violet-400/15 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-gradient-to-r from-fuchsia-400/15 to-pink-400/15 rounded-full blur-2xl opacity-70"></div>
-          <div className="absolute bottom-1/4 left-1/3 w-28 h-28 bg-gradient-to-l from-violet-400/15 to-indigo-400/15 rounded-full blur-2xl opacity-70"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-orange-200/40 via-transparent to-amber-200/30"></div>
+          <div className="absolute top-0 right-0 -mt-8 -mr-8 w-36 h-36 bg-gradient-to-br from-orange-400/30 to-amber-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-44 h-44 bg-gradient-to-tr from-amber-400/20 to-orange-400/15 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-gradient-to-r from-amber-400/15 to-orange-400/15 rounded-full blur-2xl opacity-70"></div>
+          <div className="absolute bottom-1/4 left-1/3 w-28 h-28 bg-gradient-to-l from-orange-400/15 to-amber-400/15 rounded-full blur-2xl opacity-70"></div>
           
           <div className="relative p-8">
             <div className="flex items-start gap-6">
               {/* Enhanced Icon */}
               <div className="relative group">
-                <div className="w-28 h-28 bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-violet-500/30 transform -rotate-6 hover:rotate-0 hover:scale-110 transition-all duration-700 group-hover:shadow-3xl group-hover:shadow-fuchsia-500/40">
+                <div className="w-28 h-28 bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-orange-500/30 transform -rotate-6 hover:rotate-0 hover:scale-110 transition-all duration-700 group-hover:shadow-3xl group-hover:shadow-amber-500/40">
                   <Package className="h-14 w-14 text-white drop-shadow-xl" />
                 </div>
                 <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full border-4 border-white flex items-center justify-center shadow-xl animate-bounce">
                   <span className="text-white text-sm font-black">✓</span>
                 </div>
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-violet-400/30 to-fuchsia-400/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-orange-400/30 to-amber-400/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               </div>
 
               <div className="flex-1">
                 <div className="flex items-center gap-4 mb-4">
                   <Badge 
-                    className="bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white border-0 font-bold px-4 py-2 rounded-2xl shadow-lg shadow-violet-500/30"
+                    className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 font-bold px-4 py-2 rounded-2xl shadow-lg shadow-orange-500/30"
                   >
                     📂 {category?.name || 'Category'}
                   </Badge>
                 </div>
                 
-                <h1 className="text-5xl font-black bg-gradient-to-r from-violet-900 via-fuchsia-800 to-pink-900 bg-clip-text text-transparent mb-6 leading-tight">
+                <h1 className="text-5xl font-black bg-gradient-to-r from-orange-900 via-amber-800 to-orange-900 bg-clip-text text-transparent mb-6 leading-tight">
                   {subcategory?.name || 'Subcategory'}
                 </h1>
                 
@@ -305,15 +305,15 @@ export default function SubcategoryPage() {
                   </p>
                   <div className="flex items-center gap-4 text-sm text-slate-500">
                     <span className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-violet-500 rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
                       Live catalog
                     </span>
                     <span className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-fuchsia-500 rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
                       Instant quotes
                     </span>
                     <span className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-pink-500 rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-orange-600 rounded-full animate-pulse"></div>
                       Fast delivery
                     </span>
                   </div>
@@ -321,13 +321,13 @@ export default function SubcategoryPage() {
 
                 {/* Enhanced Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <div className="group bg-white/90 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-2xl shadow-violet-500/10 hover:shadow-3xl hover:shadow-violet-500/20 hover:-translate-y-3 hover:rotate-1 transition-all duration-500">
+                  <div className="group bg-white/90 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-2xl shadow-orange-500/10 hover:shadow-3xl hover:shadow-orange-500/20 hover:-translate-y-3 hover:rotate-1 transition-all duration-500">
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl shadow-violet-500/30 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+                      <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-xl shadow-orange-500/30 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
                         <Package className="h-8 w-8 text-white" />
                       </div>
                       <div>
-                        <div className="text-3xl font-black text-slate-900 mb-1 group-hover:text-violet-600 transition-colors duration-300">{(totalProducts + totalServices).toLocaleString()}</div>
+                        <div className="text-3xl font-black text-slate-900 mb-1 group-hover:text-orange-600 transition-colors duration-300">{(totalProducts + totalServices).toLocaleString()}</div>
                         <div className="text-sm text-slate-500 font-bold">📦 Total Items</div>
                       </div>
                     </div>
@@ -384,7 +384,7 @@ export default function SubcategoryPage() {
                 <Button
                   variant="outline"
                   onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-3 border-2 border-slate-200 hover:bg-gradient-to-r hover:from-violet-50 hover:to-fuchsia-50 hover:border-violet-300 transition-all duration-300 px-6 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl"
+                  className="flex items-center gap-3 border-2 border-slate-200 hover:bg-gradient-to-r hover:from-orange-50 hover:to-amber-50 hover:border-orange-300 transition-all duration-300 px-6 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl"
                 >
                   <SlidersHorizontal className="h-5 w-5" />
                   🔍 Filters
@@ -414,7 +414,7 @@ export default function SubcategoryPage() {
                     onClick={() => setViewMode('grid')}
                     className={`rounded-none px-6 py-4 font-semibold transition-all duration-300 ${
                       viewMode === 'grid' 
-                        ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-700 hover:to-fuchsia-700 shadow-lg' 
+                        ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:from-orange-700 hover:to-amber-700 shadow-lg' 
                         : 'hover:bg-slate-50 text-slate-600'
                     }`}
                   >
@@ -426,7 +426,7 @@ export default function SubcategoryPage() {
                     onClick={() => setViewMode('list')}
                     className={`rounded-none px-6 py-4 font-semibold transition-all duration-300 ${
                       viewMode === 'list' 
-                        ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-700 hover:to-fuchsia-700 shadow-lg' 
+                        ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:from-orange-700 hover:to-amber-700 shadow-lg' 
                         : 'hover:bg-slate-50 text-slate-600'
                     }`}
                   >
@@ -578,12 +578,12 @@ export default function SubcategoryPage() {
             {sortedItems.map((item) => (
               <div
                 key={item.id}
-                className={`group relative bg-white/95 backdrop-blur-md rounded-3xl border-2 border-slate-200/60 shadow-2xl shadow-slate-500/10 hover:shadow-3xl hover:shadow-violet-500/20 transition-all duration-500 overflow-hidden ${
+                className={`group relative bg-white/95 backdrop-blur-md rounded-3xl border-2 border-slate-200/60 shadow-2xl shadow-slate-500/10 hover:shadow-3xl hover:shadow-orange-500/20 transition-all duration-500 overflow-hidden ${
                   viewMode === 'list' ? 'flex items-center p-8 gap-8 hover:-translate-y-2 hover:rotate-1' : 'hover:-translate-y-4 hover:rotate-2'
                 }`}
               >
                 {/* Enhanced gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-violet-500/0 via-fuchsia-500/0 to-pink-500/0 group-hover:from-violet-500/5 group-hover:via-fuchsia-500/5 group-hover:to-pink-500/5 transition-all duration-500 rounded-3xl"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 via-amber-500/0 to-orange-500/0 group-hover:from-orange-500/5 group-hover:via-amber-500/5 group-hover:to-orange-500/5 transition-all duration-500 rounded-3xl"></div>
                 
                 <div className={`relative overflow-hidden ${viewMode === 'list' ? 'w-40 h-40 flex-shrink-0' : ''}`}>
                   <Image
@@ -614,8 +614,8 @@ export default function SubcategoryPage() {
                   <div className="absolute top-4 right-4">
                     <Badge className={`text-sm font-black px-4 py-2 rounded-2xl shadow-xl ${
                       item.type === 'product' 
-                        ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-blue-500/30' 
-                        : 'bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-purple-500/30'
+                        ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-orange-500/30' 
+                        : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-amber-500/30'
                     }`}>
                       {item.type === 'product' ? '📦 Product' : '🔧 Service'}
                     </Badge>
@@ -635,13 +635,11 @@ export default function SubcategoryPage() {
                 </div>
 
                 <div className={`relative ${viewMode === 'list' ? 'flex-1' : 'p-6'}`}>
-                  <Link href={`/${item.type === 'product' ? 'products' : 'services'}/${item.id}`}>
-                    <h3 className="font-bold text-lg text-gray-900 mb-3 hover:text-blue-600 transition-colors line-clamp-2 group-hover:text-blue-600">
-                      {item.title}
-                    </h3>
-                  </Link>
-
-                  {/* Enhanced Rating and Reviews */}
+                    <Link href={`/${item.type === 'product' ? 'products' : 'services'}/${item.id}`}>
+                      <h3 className="font-bold text-lg text-gray-900 mb-3 hover:text-orange-600 transition-colors line-clamp-2 group-hover:text-orange-600">
+                        {item.title}
+                      </h3>
+                    </Link>                  {/* Enhanced Rating and Reviews */}
                   <div className="flex items-center gap-2 mb-4">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
@@ -663,7 +661,7 @@ export default function SubcategoryPage() {
                   {/* Enhanced Price */}
                   <div className="mb-4">
                     <div className="flex items-center gap-3">
-                      <span className="font-bold text-2xl text-blue-600">
+                      <span className="font-bold text-2xl text-orange-600">
                         ₹{(item.price || 0).toLocaleString()}
                       </span>
                       {item.originalPrice && (
@@ -694,7 +692,7 @@ export default function SubcategoryPage() {
                       <div className="bg-gray-50 rounded-xl p-4">
                         <Link
                           href={`/suppliers/${(item.seller || item.provider).id}`}
-                          className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-2 mb-2 transition-colors"
+                          className="text-sm font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-2 mb-2 transition-colors"
                         >
                           {(item.seller || item.provider).businessName || (item.seller || item.provider).name}
                           {(item.seller || item.provider).isVerified && (
@@ -710,7 +708,7 @@ export default function SubcategoryPage() {
                             <Clock className="h-4 w-4" />
                             <span>Quick Response</span>
                           </div>
-                          <Badge variant="outline" className="text-xs border-blue-200 text-blue-700 bg-blue-50">
+                          <Badge variant="outline" className="text-xs border-orange-200 text-orange-700 bg-orange-50">
                             {item.type === 'product' ? 'Seller' : 'Provider'}
                           </Badge>
                         </div>
@@ -721,13 +719,13 @@ export default function SubcategoryPage() {
                   {/* Enhanced Action Buttons */}
                   <div className="flex gap-4">
                     <Link href={`/${item.type === 'product' ? 'products' : 'services'}/${item.id}`} className="flex-1">
-                      <Button className="w-full bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-600 text-white hover:from-violet-700 hover:via-fuchsia-700 hover:to-pink-700 shadow-2xl shadow-violet-500/30 hover:shadow-3xl hover:shadow-fuchsia-500/40 transition-all duration-500 py-4 rounded-2xl font-black text-lg hover:scale-105">
+                      <Button className="w-full bg-gradient-to-r from-orange-600 via-amber-600 to-orange-600 text-white hover:from-orange-700 hover:via-amber-700 hover:to-orange-700 shadow-2xl shadow-orange-500/30 hover:shadow-3xl hover:shadow-amber-500/40 transition-all duration-500 py-4 rounded-2xl font-black text-lg hover:scale-105">
                         <Eye className="h-5 w-5 mr-3" />
                         🔍 View Details
                       </Button>
                     </Link>
                     {viewMode === 'list' && (
-                      <Button variant="outline" className="px-6 border-2 border-slate-300 hover:bg-gradient-to-r hover:from-violet-50 hover:to-fuchsia-50 hover:border-violet-400 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl">
+                      <Button variant="outline" className="px-6 border-2 border-slate-300 hover:bg-gradient-to-r hover:from-orange-50 hover:to-amber-50 hover:border-orange-400 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl">
                         <ShoppingCart className="h-5 w-5" />
                       </Button>
                     )}
@@ -735,9 +733,9 @@ export default function SubcategoryPage() {
                 </div>
                 
                 {/* Enhanced Hover Border */}
-                <div className="absolute inset-0 rounded-3xl border-4 border-transparent group-hover:border-gradient-to-r group-hover:from-violet-400 group-hover:via-fuchsia-400 group-hover:to-pink-400 transition-all duration-500 pointer-events-none"></div>
-                <div className="absolute inset-0 rounded-3xl ring-4 ring-transparent group-hover:ring-violet-200/50 transition-all duration-500 pointer-events-none"></div>
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-violet-400/0 to-fuchsia-400/0 group-hover:from-violet-400/10 group-hover:to-fuchsia-400/10 transition-all duration-500 pointer-events-none"></div>
+                <div className="absolute inset-0 rounded-3xl border-4 border-transparent group-hover:border-gradient-to-r group-hover:from-orange-400 group-hover:via-amber-400 group-hover:to-orange-400 transition-all duration-500 pointer-events-none"></div>
+                <div className="absolute inset-0 rounded-3xl ring-4 ring-transparent group-hover:ring-orange-200/50 transition-all duration-500 pointer-events-none"></div>
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-orange-400/0 to-amber-400/0 group-hover:from-orange-400/10 group-hover:to-amber-400/10 transition-all duration-500 pointer-events-none"></div>
               </div>
             ))}
           </div>

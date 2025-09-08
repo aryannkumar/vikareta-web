@@ -127,77 +127,72 @@ const FilterSidebar = ({
 // Enhanced animated hero section
 const ProductsHero = () => {
   return (
-    <motion.section 
-      className="relative bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 overflow-hidden"
+    <motion.section
+      className="relative bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
+      transition={{ duration: 1 }}
     >
-      {/* Animated background elements */}
-      <div className="absolute inset-0">
-        <motion.div
-          className="absolute top-20 left-10 w-20 h-20 bg-orange-200 rounded-full opacity-30"
-          animate={{ y: [0, -20, 0], rotate: [0, 180, 360] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-40 right-20 w-16 h-16 bg-amber-200 rounded-full opacity-20"
-          animate={{ y: [0, 15, 0], x: [0, -10, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-20 left-1/3 w-24 h-24 bg-orange-100 rounded-full opacity-25"
-          animate={{ scale: [1, 1.2, 1], rotate: [0, -90, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }} />
       </div>
 
-      <div className="relative container mx-auto px-6 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+        <div className="text-center">
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 border border-orange-200"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <motion.div
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <TrendingUp className="w-4 h-4" />
-              Premium B2B Products
-            </motion.div>
-            
-            <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
-              Discover
-              <span className="bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent"> Quality </span>
-              Products for Your Business
-            </h1>
-            
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Access thousands of verified suppliers and premium products. Build relationships that drive your business forward with enterprise-grade procurement solutions.
-            </p>
+            <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
+            <span className="text-xs sm:text-sm font-medium text-orange-700">Premium Quality Products</span>
+          </motion.div>
 
-            <motion.div 
-              className="flex flex-wrap gap-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-            >
-              <div className="flex items-center gap-2 text-gray-700">
-                <Shield className="w-5 h-5 text-orange-600" />
-                <span className="font-medium">Verified Suppliers</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-700">
-                <Award className="w-5 h-5 text-orange-600" />
-                <span className="font-medium">Quality Assured</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-700">
-                <Zap className="w-5 h-5 text-orange-600" />
-                <span className="font-medium">Fast Delivery</span>
-              </div>
-            </motion.div>
+          <motion.h1
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-3 sm:mb-4 lg:mb-6 leading-tight"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            Discover Amazing
+            <span className="block bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+              Products & Services
+            </span>
+          </motion.h1>
+
+          <motion.p
+            className="text-base sm:text-lg lg:text-xl text-gray-600 mb-6 sm:mb-8 lg:mb-10 max-w-2xl mx-auto leading-relaxed px-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            Find the perfect products and services for your business needs from verified suppliers worldwide
+          </motion.p>
+
+          <motion.div
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-12 lg:mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <div className="flex items-center gap-2 text-sm sm:text-base text-gray-600">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+              <span>10,000+ Products</span>
+            </div>
+            <div className="hidden sm:block w-px h-4 bg-gray-300"></div>
+            <div className="flex items-center gap-2 text-sm sm:text-base text-gray-600">
+              <Award className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+              <span>Verified Suppliers</span>
+            </div>
+            <div className="hidden sm:block w-px h-4 bg-gray-300"></div>
+            <div className="flex items-center gap-2 text-sm sm:text-base text-gray-600">
+              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+              <span>Quality Guaranteed</span>
+            </div>
           </motion.div>
 
           <motion.div
@@ -394,48 +389,49 @@ export default function ProductsPage() {
       {/* Enhanced Hero Section */}
       <ProductsHero />
 
-      <div className="container mx-auto px-6 py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         {/* Enhanced Search and Filters Bar */}
-        <motion.div 
-          className="mb-12"
+        <motion.div
+          className="mb-8 sm:mb-12 lg:mb-16"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6 lg:p-8">
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="mb-6">
+            <form onSubmit={handleSearch} className="mb-4 sm:mb-6">
               <div className="relative max-w-4xl mx-auto">
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <Search className="h-5 w-5" />
+                <div className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <Search className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
                 <input
                   type="text"
                   placeholder="Search products, suppliers, categories..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-32 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 transition-all"
+                  className="w-full pl-10 sm:pl-12 pr-20 sm:pr-32 py-3 sm:py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base shadow-sm"
                 />
-                <Button 
-                  type="submit" 
-                  className="absolute right-2 top-2 bottom-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-6 rounded-lg transition-all"
+                <Button
+                  type="submit"
+                  className="absolute right-2 top-2 bottom-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-4 sm:px-6 rounded-lg transition-all text-sm sm:text-base min-h-[44px]"
                 >
-                  Search
+                  <span className="hidden sm:inline">Search</span>
+                  <Search className="h-4 w-4 sm:hidden" />
                 </Button>
               </div>
             </form>
 
             {/* Filter Controls */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:items-center lg:justify-between lg:gap-6">
+              <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:flex-wrap sm:gap-3 lg:gap-4 lg:items-center">
                 <motion.button
                   onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100 transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100 transition-colors w-full sm:w-auto min-h-[44px] sm:min-h-[40px]"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <SlidersHorizontal className="h-4 w-4" />
-                  Filters
+                  <SlidersHorizontal className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span>Filters</span>
                   <Badge variant="secondary" className="ml-1">
                     {Object.values(filters).filter(Boolean).length}
                   </Badge>
@@ -451,7 +447,7 @@ export default function ProductsPage() {
                     <motion.button
                       key={key}
                       onClick={() => setFilters(prev => ({ ...prev, [key]: !prev[key] }))}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                      className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all min-h-[44px] sm:min-h-[40px] text-sm sm:text-base ${
                         filters[key]
                           ? 'bg-orange-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -459,20 +455,20 @@ export default function ProductsPage() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                       {label}
                     </motion.button>
                   ))}
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-between sm:justify-start gap-3 sm:gap-4">
                 {/* Sort Dropdown */}
-                <div className="relative">
+                <div className="relative min-w-0 flex-1 sm:flex-initial">
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as any)}
-                    className="appearance-none bg-white border border-gray-200 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="appearance-none bg-white border border-gray-200 rounded-lg px-3 sm:px-4 py-2.5 sm:py-2 pr-8 sm:pr-10 focus:outline-none focus:ring-2 focus:ring-orange-500 w-full sm:w-auto text-sm sm:text-base min-w-[140px] sm:min-w-[160px] min-h-[44px] sm:min-h-[40px]"
                   >
                     {sortOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -480,26 +476,26 @@ export default function ProductsPage() {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400 pointer-events-none" />
                 </div>
 
                 {/* View Toggle */}
-                <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                <div className="flex items-center bg-gray-100 rounded-lg p-1 min-h-[44px] sm:min-h-[40px]">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded-md transition-colors ${
+                    className={`p-2 sm:p-2.5 rounded-md transition-colors ${
                       viewMode === 'grid' ? 'bg-white shadow-sm' : 'hover:bg-gray-200'
                     }`}
                   >
-                    <Grid className="h-4 w-4" />
+                    <Grid className="h-4 w-4 sm:h-5 sm:w-5" />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2 rounded-md transition-colors ${
+                    className={`p-2 sm:p-2.5 rounded-md transition-colors ${
                       viewMode === 'list' ? 'bg-white shadow-sm' : 'hover:bg-gray-200'
                     }`}
                   >
-                    <List className="h-4 w-4" />
+                    <List className="h-4 w-4 sm:h-5 sm:w-5" />
                   </button>
                 </div>
               </div>
@@ -523,20 +519,24 @@ export default function ProductsPage() {
           <div className="flex-1">
             {loading ? (
               <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                className={`grid gap-4 sm:gap-6 ${
+                  viewMode === 'grid'
+                    ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                    : 'grid-cols-1'
+                }`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
-                {Array.from({ length: 9 }).map((_, i) => (
+                {Array.from({ length: 8 }).map((_, i) => (
                   <motion.div
                     key={i}
-                    className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+                    className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/20 overflow-hidden"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
                   >
                     <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse" />
-                    <div className="p-4 space-y-3">
+                    <div className="p-4 sm:p-6 space-y-3">
                       <div className="h-4 bg-gray-200 rounded animate-pulse" />
                       <div className="h-3 bg-gray-100 rounded w-2/3 animate-pulse" />
                       <div className="h-3 bg-gray-100 rounded w-1/2 animate-pulse" />
@@ -546,29 +546,29 @@ export default function ProductsPage() {
               </motion.div>
             ) : error ? (
               <motion.div
-                className="text-center py-12"
+                className="text-center py-8 sm:py-12 lg:py-16 px-4"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
               >
-                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Something went wrong</h3>
-                <p className="text-gray-600 mb-6">{error}</p>
-                <Button onClick={fetchProducts} className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700">
+                <AlertCircle className="w-12 h-12 sm:w-16 sm:h-16 text-red-500 mx-auto mb-4" />
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-2">Something went wrong</h3>
+                <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base lg:text-lg">Please try again later</p>
+                <Button onClick={fetchProducts} className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-sm sm:text-base lg:text-lg px-4 sm:px-6 py-2 sm:py-3 min-h-[44px]">
                   Try Again
                 </Button>
               </motion.div>
             ) : products.length === 0 ? (
               <motion.div
-                className="text-center py-12"
+                className="text-center py-8 sm:py-12 lg:py-16 px-4"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
               >
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="w-8 h-8 text-gray-400" />
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
-                <p className="text-gray-600 mb-6">Try adjusting your search criteria or filters</p>
-                <Button onClick={clearFilters} variant="outline">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-2">No products found</h3>
+                <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base lg:text-lg max-w-md mx-auto">Try adjusting your search criteria or filters</p>
+                <Button onClick={clearFilters} variant="outline" className="text-sm sm:text-base lg:text-lg px-4 sm:px-6 py-2 sm:py-3 min-h-[44px]">
                   Clear Filters
                 </Button>
               </motion.div>
@@ -576,9 +576,9 @@ export default function ProductsPage() {
               <>
                 {/* Enhanced Products Grid */}
                 <motion.div
-                  className={`grid gap-6 ${
-                    viewMode === 'grid' 
-                      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                  className={`grid gap-4 sm:gap-6 ${
+                    viewMode === 'grid'
+                      ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
                       : 'grid-cols-1'
                   }`}
                   initial={{ opacity: 0 }}
@@ -588,8 +588,8 @@ export default function ProductsPage() {
                   {products.map((product, index) => (
                     <motion.div
                       key={product.id}
-                      className={`group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 ${
-                        viewMode === 'list' ? 'flex' : ''
+                      className={`group bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300 ${
+                        viewMode === 'list' ? 'flex flex-col sm:flex-row' : ''
                       }`}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -598,7 +598,7 @@ export default function ProductsPage() {
                     >
                       {/* Product Image */}
                       <div className={`relative overflow-hidden ${
-                        viewMode === 'list' ? 'w-48 h-48' : 'aspect-square'
+                        viewMode === 'list' ? 'w-full sm:w-48 lg:w-56 h-48 sm:h-48 lg:h-56' : 'aspect-square'
                       }`}>
                         <Image
                           src={product.images?.[0] || '/placeholder-product.jpg'}
@@ -606,21 +606,21 @@ export default function ProductsPage() {
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        
+
                         {/* Badges */}
-                        <div className="absolute top-3 left-3 flex flex-col gap-2">
+                        <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex flex-col gap-1 sm:gap-2">
                           {(product as any).featured && (
-                            <Badge className="bg-gradient-to-r from-orange-600 to-amber-600 text-white border-0">
+                            <Badge className="bg-gradient-to-r from-orange-600 to-amber-600 text-white border-0 text-xs px-2 py-1">
                               Featured
                             </Badge>
                           )}
                           {(product as any).discount && (
-                            <Badge variant="destructive">
+                            <Badge variant="destructive" className="text-xs px-2 py-1">
                               {(product as any).discount}% OFF
                             </Badge>
                           )}
                           {(product as any).verified && (
-                            <Badge className="bg-green-600 text-white border-0">
+                            <Badge className="bg-green-600 text-white border-0 text-xs px-2 py-1">
                               <Shield className="w-3 h-3 mr-1" />
                               Verified
                             </Badge>
@@ -628,11 +628,11 @@ export default function ProductsPage() {
                         </div>
 
                         {/* Wishlist Button */}
-                        <div className="absolute top-3 right-3">
+                        <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
                           <WishlistButton
                             itemId={product.id}
                             type="product"
-                            className="bg-white/80 hover:bg-white text-gray-700 shadow-sm"
+                            className="bg-white/80 hover:bg-white text-gray-700 shadow-sm w-8 h-8 sm:w-9 sm:h-9"
                           />
                         </div>
 
@@ -641,62 +641,62 @@ export default function ProductsPage() {
                           <div className="flex gap-2">
                             <motion.button
                               onClick={() => handleAddToCart(product)}
-                              className="bg-white text-gray-900 p-2 rounded-full hover:bg-orange-100 transition-colors"
+                              className="bg-white text-gray-900 p-2 sm:p-3 rounded-full hover:bg-orange-100 transition-colors shadow-lg"
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                             >
-                              <ShoppingCart className="w-5 h-5" />
+                              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
                             </motion.button>
                             <motion.button
                               onClick={() => handleContactSupplier(product)}
-                              className="bg-white text-gray-900 p-2 rounded-full hover:bg-orange-100 transition-colors"
+                              className="bg-white text-gray-900 p-2 sm:p-3 rounded-full hover:bg-orange-100 transition-colors shadow-lg"
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                             >
-                              <MessageCircle className="w-5 h-5" />
+                              <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                             </motion.button>
                           </div>
                         </div>
                       </div>
 
                       {/* Product Info */}
-                      <div className="p-6 flex-1">
+                      <div className="p-4 sm:p-6 flex-1">
                         {/* Supplier Info */}
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-6 h-6 bg-gradient-to-r from-orange-600 to-amber-600 rounded-full flex items-center justify-center">
+                        <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                          <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-r from-orange-600 to-amber-600 rounded-full flex items-center justify-center">
                             <span className="text-white text-xs font-bold">
                               {product.supplier?.name?.charAt(0) || 'S'}
                             </span>
                           </div>
-                          <span className="text-sm text-gray-600">{product.supplier?.name}</span>
+                          <span className="text-xs sm:text-sm text-gray-600 truncate">{product.supplier?.name}</span>
                           {product.supplier?.verified && (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs px-1.5 py-0.5">
                               Verified
                             </Badge>
                           )}
                         </div>
 
                         {/* Product Title */}
-                        <Link 
+                        <Link
                           href={`/products/${product.id}`}
                           className="block"
                         >
-                          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-orange-600 transition-colors">
+                          <h3 className="font-semibold text-sm sm:text-base lg:text-lg text-gray-900 mb-1 sm:mb-2 line-clamp-2 group-hover:text-orange-600 transition-colors leading-tight">
                             {product.name}
                           </h3>
                         </Link>
 
                         {/* Category */}
-                        <p className="text-sm text-gray-500 mb-3">{product.category?.name}</p>
+                        <p className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">{product.category?.name}</p>
 
                         {/* Rating */}
                         {(product as any).rating && (
-                          <div className="flex items-center gap-2 mb-3">
+                          <div className="flex items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
                             <div className="flex items-center">
                               {Array.from({ length: 5 }).map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`w-4 h-4 ${
+                                  className={`w-3 h-3 sm:w-4 sm:h-4 ${
                                     i < Math.floor((product as any).rating)
                                       ? 'fill-yellow-400 text-yellow-400'
                                       : 'text-gray-300'
@@ -704,61 +704,61 @@ export default function ProductsPage() {
                                 />
                               ))}
                             </div>
-                            <span className="text-sm text-gray-600">
+                            <span className="text-xs sm:text-sm text-gray-600">
                               {(product as any).rating} ({(product as any).reviewCount || 0})
                             </span>
                           </div>
                         )}
 
                         {/* Price */}
-                        <div className="flex items-center gap-2 mb-4">
-                          <span className="text-2xl font-bold text-gray-900">
+                        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                          <span className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
                             {formatPrice(product.price)}
                           </span>
                           {product.originalPrice && product.originalPrice > product.price && (
-                            <span className="text-lg text-gray-500 line-through">
+                            <span className="text-sm sm:text-base lg:text-lg text-gray-500 line-through">
                               {formatPrice(product.originalPrice)}
                             </span>
                           )}
                         </div>
 
                         {/* Features */}
-                        <div className="flex flex-wrap gap-2 mb-4">
+                        <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
                           {product.inStock && (
-                            <Badge variant="outline" className="text-green-600 border-green-600">
+                            <Badge variant="outline" className="text-green-600 border-green-600 text-xs px-2 py-1">
                               In Stock
                             </Badge>
                           )}
                           {(product as any).freeShipping && (
-                            <Badge variant="outline" className="text-blue-600 border-blue-600">
+                            <Badge variant="outline" className="text-blue-600 border-blue-600 text-xs px-2 py-1">
                               <Truck className="w-3 h-3 mr-1" />
                               Free Shipping
                             </Badge>
                           )}
                           {(product as any).minOrderQuantity && (
-                            <Badge variant="outline">
+                            <Badge variant="outline" className="text-xs px-2 py-1">
                               MOQ: {(product as any).minOrderQuantity}
                             </Badge>
                           )}
                         </div>
 
                         {/* Action Buttons */}
-                        <div className={`flex gap-2 ${viewMode === 'list' ? 'flex-col' : ''}`}>
+                        <div className={`flex gap-2 ${viewMode === 'list' ? 'flex-col sm:flex-row' : ''}`}>
                           <Button
                             onClick={() => handleAddToCart(product)}
-                            className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white"
+                            className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white text-xs sm:text-sm lg:text-base px-3 sm:px-4 py-2 sm:py-2.5 min-h-[40px] sm:min-h-[44px]"
                             disabled={!product.inStock}
                           >
-                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                             {product.inStock ? 'Add to Cart' : 'Out of Stock'}
                           </Button>
                           <Button
                             onClick={() => handleContactSupplier(product)}
                             variant="outline"
-                            className="border-orange-600 text-orange-600 hover:bg-orange-50"
+                            className="flex-1 sm:flex-initial border-orange-600 text-orange-600 hover:bg-orange-50 text-xs sm:text-sm lg:text-base px-3 sm:px-4 py-2 sm:py-2.5 min-h-[40px] sm:min-h-[44px]"
                           >
-                            <MessageCircle className="w-4 h-4 mr-2" />
-                            Contact
+                            <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                            <span className="hidden sm:inline">Contact</span>
                           </Button>
                         </div>
                       </div>

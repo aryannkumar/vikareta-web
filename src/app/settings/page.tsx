@@ -43,6 +43,12 @@ interface UserSettings {
     timezone: string;
     autoSave: boolean;
   };
+  security: {
+    twoFactor: boolean;
+    loginAlerts: boolean;
+    profileVisibility: 'public' | 'private' | 'contacts';
+    dataSharing: boolean;
+  };
 }
 
 export default function SettingsPage() {
@@ -66,6 +72,12 @@ export default function SettingsPage() {
       currency: 'INR',
       timezone: 'Asia/Kolkata',
       autoSave: true
+    },
+    security: {
+      twoFactor: false,
+      loginAlerts: true,
+      profileVisibility: 'public',
+      dataSharing: false
     }
   });
   
@@ -73,6 +85,8 @@ export default function SettingsPage() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('notifications');
   const [hasChanges, setHasChanges] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showSessionsModal, setShowSessionsModal] = useState(false);
 
   const toast = useToast();
   const { theme, setTheme } = useTheme();
@@ -141,7 +155,7 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'privacy', label: 'Privacy', icon: Shield },
+    { id: 'security', label: 'Security', icon: Shield },
     { id: 'preferences', label: 'Preferences', icon: Globe },
     { id: 'appearance', label: 'Appearance', icon: Monitor }
   ];
@@ -167,24 +181,24 @@ export default function SettingsPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Settings</h1>
-              <p className="text-muted-foreground">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 sm:mb-8">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2">Settings</h1>
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Manage your account preferences and privacy settings
               </p>
             </div>
             
             {hasChanges && (
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <AlertCircle className="h-4 w-4" />
-                  You have unsaved changes
+                  <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm">You have unsaved changes</span>
                 </div>
                 <Button
                   onClick={saveSettings}
                   disabled={loading}
-                  className="btn-primary"
+                  className="btn-primary w-full sm:w-auto text-sm sm:text-base"
                 >
                   {loading ? (
                     <>
@@ -202,9 +216,9 @@ export default function SettingsPage() {
             )}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 lg:gap-8">
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="xl:col-span-1">
               <nav className="space-y-2">
                 {tabs.map((tab) => {
                   const IconComponent = tab.icon;
@@ -212,14 +226,14 @@ export default function SettingsPage() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors text-sm sm:text-base ${
                         activeTab === tab.id
                           ? 'bg-primary text-primary-foreground'
                           : 'hover:bg-muted'
                       }`}
                     >
-                      <IconComponent className="h-4 w-4" />
-                      {tab.label}
+                      <IconComponent className="h-4 w-4 flex-shrink-0" />
+                      <span className="truncate">{tab.label}</span>
                     </button>
                   );
                 })}
@@ -227,20 +241,20 @@ export default function SettingsPage() {
             </div>
 
             {/* Content */}
-            <div className="lg:col-span-3">
-              <div className="bg-card rounded-lg border p-6">
+            <div className="xl:col-span-3">
+              <div className="bg-card rounded-lg border p-4 sm:p-6">
                 {activeTab === 'notifications' && (
                   <div>
-                    <h2 className="text-xl font-semibold mb-6">Notification Preferences</h2>
+                    <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Notification Preferences</h2>
                     
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       <div>
-                        <h3 className="font-medium mb-4">Delivery Methods</h3>
-                        <div className="space-y-4">
-                          <label className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium">Email Notifications</div>
-                              <div className="text-sm text-muted-foreground">
+                        <h3 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Delivery Methods</h3>
+                        <div className="space-y-3 sm:space-y-4">
+                          <label className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base">Email Notifications</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
                                 Receive notifications via email
                               </div>
                             </div>
@@ -248,14 +262,14 @@ export default function SettingsPage() {
                               type="checkbox"
                               checked={settings.notifications.email}
                               onChange={(e) => updateSetting('notifications', 'email', e.target.checked)}
-                              className="rounded border-gray-300 text-primary focus:ring-primary"
+                              className="rounded border-gray-300 text-primary focus:ring-primary flex-shrink-0"
                             />
                           </label>
                           
-                          <label className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium">Push Notifications</div>
-                              <div className="text-sm text-muted-foreground">
+                          <label className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base">Push Notifications</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
                                 Receive push notifications in your browser
                               </div>
                             </div>
@@ -263,14 +277,14 @@ export default function SettingsPage() {
                               type="checkbox"
                               checked={settings.notifications.push}
                               onChange={(e) => updateSetting('notifications', 'push', e.target.checked)}
-                              className="rounded border-gray-300 text-primary focus:ring-primary"
+                              className="rounded border-gray-300 text-primary focus:ring-primary flex-shrink-0"
                             />
                           </label>
                           
-                          <label className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium">SMS Notifications</div>
-                              <div className="text-sm text-muted-foreground">
+                          <label className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base">SMS Notifications</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
                                 Receive important updates via SMS
                               </div>
                             </div>
@@ -278,19 +292,19 @@ export default function SettingsPage() {
                               type="checkbox"
                               checked={settings.notifications.sms}
                               onChange={(e) => updateSetting('notifications', 'sms', e.target.checked)}
-                              className="rounded border-gray-300 text-primary focus:ring-primary"
+                              className="rounded border-gray-300 text-primary focus:ring-primary flex-shrink-0"
                             />
                           </label>
                         </div>
                       </div>
 
                       <div>
-                        <h3 className="font-medium mb-4">Notification Types</h3>
-                        <div className="space-y-4">
-                          <label className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium">Order Updates</div>
-                              <div className="text-sm text-muted-foreground">
+                        <h3 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Notification Types</h3>
+                        <div className="space-y-3 sm:space-y-4">
+                          <label className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base">Order Updates</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
                                 Get notified about order status changes
                               </div>
                             </div>
@@ -298,14 +312,14 @@ export default function SettingsPage() {
                               type="checkbox"
                               checked={settings.notifications.orderUpdates}
                               onChange={(e) => updateSetting('notifications', 'orderUpdates', e.target.checked)}
-                              className="rounded border-gray-300 text-primary focus:ring-primary"
+                              className="rounded border-gray-300 text-primary focus:ring-primary flex-shrink-0"
                             />
                           </label>
                           
-                          <label className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium">Promotions & Offers</div>
-                              <div className="text-sm text-muted-foreground">
+                          <label className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base">Promotions & Offers</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
                                 Receive notifications about special offers
                               </div>
                             </div>
@@ -313,14 +327,14 @@ export default function SettingsPage() {
                               type="checkbox"
                               checked={settings.notifications.promotions}
                               onChange={(e) => updateSetting('notifications', 'promotions', e.target.checked)}
-                              className="rounded border-gray-300 text-primary focus:ring-primary"
+                              className="rounded border-gray-300 text-primary focus:ring-primary flex-shrink-0"
                             />
                           </label>
                           
-                          <label className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium">Newsletter</div>
-                              <div className="text-sm text-muted-foreground">
+                          <label className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base">Newsletter</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
                                 Weekly newsletter with market insights
                               </div>
                             </div>
@@ -328,7 +342,7 @@ export default function SettingsPage() {
                               type="checkbox"
                               checked={settings.notifications.newsletter}
                               onChange={(e) => updateSetting('notifications', 'newsletter', e.target.checked)}
-                              className="rounded border-gray-300 text-primary focus:ring-primary"
+                              className="rounded border-gray-300 text-primary focus:ring-primary flex-shrink-0"
                             />
                           </label>
                         </div>
@@ -337,75 +351,119 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                {activeTab === 'privacy' && (
+                                {activeTab === 'security' && (
                   <div>
-                    <h2 className="text-xl font-semibold mb-6">Privacy Settings</h2>
+                    <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Security Settings</h2>
                     
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       <div>
-                        <h3 className="font-medium mb-4">Profile Visibility</h3>
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium mb-2">Who can see your profile?</label>
-                            <select
-                              value={settings.privacy.profileVisibility}
-                              onChange={(e) => updateSetting('privacy', 'profileVisibility', e.target.value)}
-                              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-                            >
-                              <option value="public">Public - Anyone can see</option>
-                              <option value="private">Private - Only you can see</option>
-                            </select>
+                        <h3 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Password & Authentication</h3>
+                        <div className="space-y-3 sm:space-y-4">
+                          <button
+                            onClick={() => setShowPasswordModal(true)}
+                            className="w-full sm:w-auto px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm sm:text-base"
+                          >
+                            Change Password
+                          </button>
+                          
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base">Two-Factor Authentication</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
+                                Add an extra layer of security to your account
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs sm:text-sm text-muted-foreground">
+                                {settings.security.twoFactor ? 'Enabled' : 'Disabled'}
+                              </span>
+                              <button
+                                onClick={() => updateSetting('security', 'twoFactor', !settings.security.twoFactor)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  settings.security.twoFactor ? 'bg-primary' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    settings.security.twoFactor ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            </div>
                           </div>
-                          
-                          <label className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium">Show Email Address</div>
-                              <div className="text-sm text-muted-foreground">
-                                Display your email on your public profile
-                              </div>
-                            </div>
-                            <input
-                              type="checkbox"
-                              checked={settings.privacy.showEmail}
-                              onChange={(e) => updateSetting('privacy', 'showEmail', e.target.checked)}
-                              className="rounded border-gray-300 text-primary focus:ring-primary"
-                            />
-                          </label>
-                          
-                          <label className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium">Show Phone Number</div>
-                              <div className="text-sm text-muted-foreground">
-                                Display your phone number on your public profile
-                              </div>
-                            </div>
-                            <input
-                              type="checkbox"
-                              checked={settings.privacy.showPhone}
-                              onChange={(e) => updateSetting('privacy', 'showPhone', e.target.checked)}
-                              className="rounded border-gray-300 text-primary focus:ring-primary"
-                            />
-                          </label>
                         </div>
                       </div>
 
                       <div>
-                        <h3 className="font-medium mb-4">Communication</h3>
-                        <div className="space-y-4">
-                          <label className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium">Allow Direct Messages</div>
-                              <div className="text-sm text-muted-foreground">
-                                Let other users send you direct messages
+                        <h3 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Login Sessions</h3>
+                        <div className="space-y-3 sm:space-y-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base">Active Sessions</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
+                                Manage your active login sessions
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => setShowSessionsModal(true)}
+                              className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors text-sm"
+                            >
+                              View Sessions
+                            </button>
+                          </div>
+                          
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base">Login Alerts</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
+                                Get notified of new login attempts
                               </div>
                             </div>
                             <input
                               type="checkbox"
-                              checked={settings.privacy.allowMessages}
-                              onChange={(e) => updateSetting('privacy', 'allowMessages', e.target.checked)}
-                              className="rounded border-gray-300 text-primary focus:ring-primary"
+                              checked={settings.security.loginAlerts}
+                              onChange={(e) => updateSetting('security', 'loginAlerts', e.target.checked)}
+                              className="rounded border-gray-300 text-primary focus:ring-primary flex-shrink-0"
                             />
-                          </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Privacy</h3>
+                        <div className="space-y-3 sm:space-y-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base">Profile Visibility</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
+                                Control who can see your profile information
+                              </div>
+                            </div>
+                            <select
+                              value={settings.security.profileVisibility}
+                              onChange={(e) => updateSetting('security', 'profileVisibility', e.target.value)}
+                              className="px-3 py-1.5 border border-gray-300 rounded text-sm focus:ring-primary focus:border-primary flex-shrink-0"
+                            >
+                              <option value="public">Public</option>
+                              <option value="private">Private</option>
+                              <option value="contacts">Contacts Only</option>
+                            </select>
+                          </div>
+                          
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm sm:text-base">Data Sharing</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">
+                                Allow sharing of anonymized data for analytics
+                              </div>
+                            </div>
+                            <input
+                              type="checkbox"
+                              checked={settings.security.dataSharing}
+                              onChange={(e) => updateSetting('security', 'dataSharing', e.target.checked)}
+                              className="rounded border-gray-300 text-primary focus:ring-primary flex-shrink-0"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -414,57 +472,61 @@ export default function SettingsPage() {
 
                 {activeTab === 'preferences' && (
                   <div>
-                    <h2 className="text-xl font-semibold mb-6">Preferences</h2>
+                    <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Preferences</h2>
                     
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium mb-2">Language</label>
-                          <select
-                            value={settings.preferences.language}
-                            onChange={(e) => updateSetting('preferences', 'language', e.target.value)}
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-                          >
-                            <option value="en">English</option>
-                            <option value="hi">हिंदी (Hindi)</option>
-                            <option value="bn">বাংলা (Bengali)</option>
-                            <option value="te">తెలుగు (Telugu)</option>
-                            <option value="mr">मराठी (Marathi)</option>
-                          </select>
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium mb-2">Currency</label>
-                          <select
-                            value={settings.preferences.currency}
-                            onChange={(e) => updateSetting('preferences', 'currency', e.target.value)}
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-                          >
-                            <option value="INR">₹ Indian Rupee (INR)</option>
-                            <option value="USD">$ US Dollar (USD)</option>
-                            <option value="EUR">€ Euro (EUR)</option>
-                          </select>
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium mb-2">Timezone</label>
-                          <select
-                            value={settings.preferences.timezone}
-                            onChange={(e) => updateSetting('preferences', 'timezone', e.target.value)}
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-                          >
-                            <option value="Asia/Kolkata">India Standard Time (IST)</option>
-                            <option value="Asia/Dubai">Gulf Standard Time (GST)</option>
-                            <option value="UTC">Coordinated Universal Time (UTC)</option>
-                          </select>
+                    <div className="space-y-4 sm:space-y-6">
+                      <div>
+                        <h3 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Regional Settings</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                          <div>
+                            <label className="block text-sm font-medium mb-2">Language</label>
+                            <select
+                              value={settings.preferences.language}
+                              onChange={(e) => updateSetting('preferences', 'language', e.target.value)}
+                              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-sm"
+                            >
+                              <option value="en">English</option>
+                              <option value="hi">हिंदी (Hindi)</option>
+                              <option value="bn">বাংলা (Bengali)</option>
+                              <option value="te">తెలుగు (Telugu)</option>
+                              <option value="mr">मराठी (Marathi)</option>
+                            </select>
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium mb-2">Currency</label>
+                            <select
+                              value={settings.preferences.currency}
+                              onChange={(e) => updateSetting('preferences', 'currency', e.target.value)}
+                              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-sm"
+                            >
+                              <option value="INR">₹ Indian Rupee (INR)</option>
+                              <option value="USD">$ US Dollar (USD)</option>
+                              <option value="EUR">€ Euro (EUR)</option>
+                            </select>
+                          </div>
+                          
+                          <div className="sm:col-span-2">
+                            <label className="block text-sm font-medium mb-2">Timezone</label>
+                            <select
+                              value={settings.preferences.timezone}
+                              onChange={(e) => updateSetting('preferences', 'timezone', e.target.value)}
+                              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-sm"
+                            >
+                              <option value="Asia/Kolkata">India Standard Time (IST)</option>
+                              <option value="Asia/Dubai">Gulf Standard Time (GST)</option>
+                              <option value="UTC">Coordinated Universal Time (UTC)</option>
+                            </select>
+                          </div>
                         </div>
                       </div>
                       
                       <div>
-                        <label className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium">Auto-save Drafts</div>
-                            <div className="text-sm text-muted-foreground">
+                        <h3 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Behavior</h3>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-sm sm:text-base">Auto-save Drafts</div>
+                            <div className="text-xs sm:text-sm text-muted-foreground">
                               Automatically save form drafts as you type
                             </div>
                           </div>
@@ -472,9 +534,9 @@ export default function SettingsPage() {
                             type="checkbox"
                             checked={settings.preferences.autoSave}
                             onChange={(e) => updateSetting('preferences', 'autoSave', e.target.checked)}
-                            className="rounded border-gray-300 text-primary focus:ring-primary"
+                            className="rounded border-gray-300 text-primary focus:ring-primary flex-shrink-0"
                           />
-                        </label>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -482,59 +544,59 @@ export default function SettingsPage() {
 
                 {activeTab === 'appearance' && (
                   <div>
-                    <h2 className="text-xl font-semibold mb-6">Appearance</h2>
+                    <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Appearance</h2>
                     
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       <div>
-                        <h3 className="font-medium mb-4">Theme</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <h3 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Theme</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                           <button
                             onClick={() => setTheme('light')}
-                            className={`p-4 border rounded-lg text-left transition-colors ${
+                            className={`p-3 sm:p-4 border rounded-lg text-left transition-colors ${
                               theme === 'light'
                                 ? 'border-primary bg-primary/5'
                                 : 'border-border hover:border-primary/50'
                             }`}
                           >
                             <div className="flex items-center gap-3 mb-2">
-                              <Sun className="h-5 w-5" />
-                              <span className="font-medium">Light</span>
+                              <Sun className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                              <span className="font-medium text-sm sm:text-base">Light</span>
                             </div>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs sm:text-sm text-muted-foreground">
                               Clean and bright interface
                             </p>
                           </button>
                           
                           <button
                             onClick={() => setTheme('dark')}
-                            className={`p-4 border rounded-lg text-left transition-colors ${
+                            className={`p-3 sm:p-4 border rounded-lg text-left transition-colors ${
                               theme === 'dark'
                                 ? 'border-primary bg-primary/5'
                                 : 'border-border hover:border-primary/50'
                             }`}
                           >
                             <div className="flex items-center gap-3 mb-2">
-                              <Moon className="h-5 w-5" />
-                              <span className="font-medium">Dark</span>
+                              <Moon className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                              <span className="font-medium text-sm sm:text-base">Dark</span>
                             </div>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs sm:text-sm text-muted-foreground">
                               Easy on the eyes in low light
                             </p>
                           </button>
                           
                           <button
                             onClick={() => setTheme('system')}
-                            className={`p-4 border rounded-lg text-left transition-colors ${
+                            className={`p-3 sm:p-4 border rounded-lg text-left transition-colors ${
                               theme === 'system'
                                 ? 'border-primary bg-primary/5'
                                 : 'border-border hover:border-primary/50'
                             }`}
                           >
                             <div className="flex items-center gap-3 mb-2">
-                              <Monitor className="h-5 w-5" />
-                              <span className="font-medium">System</span>
+                              <Monitor className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                              <span className="font-medium text-sm sm:text-base">System</span>
                             </div>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs sm:text-sm text-muted-foreground">
                               Matches your device settings
                             </p>
                           </button>
