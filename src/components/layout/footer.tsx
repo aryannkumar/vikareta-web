@@ -157,7 +157,7 @@ export function Footer() {
           {/* Company Info */}
           <motion.div variants={itemVariants} className="lg:col-span-2 space-y-6">
             <div className="flex items-center space-x-3">
-              <Logo className="h-12 w-12" showText={false} />
+              <Logo className="h-16 w-16" showText={false} />
               <div>
                 <h2 className="text-2xl font-bold text-gradient font-lexend">Vikareta</h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Premium B2B Marketplace</p>

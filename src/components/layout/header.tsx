@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Logo } from '@/components/ui/logo';
+import { Logo } from '../ui/logo';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShoppingCart, 
@@ -226,7 +226,11 @@ export function Header() {
                 whileHover={{ scale: 1.05 }} 
                 transition={{ type: 'spring', stiffness: 400, damping: 10 }}
               >
-                <Logo className="h-14 w-auto sm:h-16 md:h-18 lg:h-20 xl:h-22" />
+                <Logo 
+                  className="h-16 w-auto sm:h-18 md:h-20 lg:h-22 xl:h-24" 
+                  showText={false}
+                  priority={true}
+                />
               </motion.div>
             </Link>
           </motion.div>

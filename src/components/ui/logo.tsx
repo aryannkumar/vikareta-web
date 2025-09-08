@@ -7,7 +7,7 @@ interface LogoProps {
   priority?: boolean;
 }
 
-export function Logo({ className = 'h-10 w-10', showText = false, priority = false }: LogoProps) {
+export function Logo({ className = 'h-12 w-auto', showText = false, priority = false }: LogoProps) {
   const [imageError, setImageError] = useState(false);
 
   // Extract height from className for dynamic sizing
@@ -15,14 +15,14 @@ export function Logo({ className = 'h-10 w-10', showText = false, priority = fal
     const heightMatch = className.match(/h-(\d+)/);
     if (heightMatch) {
       const size = parseInt(heightMatch[1]) * 4; // Convert Tailwind h-X to pixels (X * 0.25rem * 16)
-      return Math.max(40, Math.min(200, size)); // Clamp between 40-200px
+      return Math.max(48, Math.min(240, size)); // Clamp between 48-240px for better visibility
     }
-    return 40; // Default size
+    return 48; // Default size - larger than before
   };
 
   const imageSize = getImageSize(className);
 
-  // Fallback SVG logo with premium design
+  // Fallback SVG logo with premium design - no background circle
   const FallbackLogo = () => (
     <svg 
       className={className} 
@@ -43,7 +43,7 @@ export function Logo({ className = 'h-10 w-10', showText = false, priority = fal
           <stop offset="100%" stopColor="#1D4ED8" />
         </linearGradient>
         <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
           <feMerge> 
             <feMergeNode in="coloredBlur"/>
             <feMergeNode in="SourceGraphic"/>
@@ -51,23 +51,20 @@ export function Logo({ className = 'h-10 w-10', showText = false, priority = fal
         </filter>
       </defs>
 
-      {/* Background circle with gradient */}
-      <circle cx="48" cy="48" r="44" fill="url(#primaryGradient)" opacity="0.1" />
-      
-      {/* Main logo shape - Modern V */}
-      <g transform="translate(24 20)">
+      {/* Main logo shape - Modern V without background */}
+      <g transform="translate(20 16)">
         {/* V shape with gradient */}
         <path 
-          d="M8 12 L20 44 L24 44 L36 12 L32 12 L22 38 L12 12 Z" 
+          d="M8 12 L22 52 L28 52 L42 12 L36 12 L26 44 L14 12 Z" 
           fill="url(#primaryGradient)" 
           filter="url(#glow)"
         />
         
         {/* Accent dot */}
-        <circle cx="38" cy="15" r="3" fill="url(#accentGradient)" />
+        <circle cx="44" cy="16" r="4" fill="url(#accentGradient)" />
         
         {/* Underline accent */}
-        <rect x="8" y="48" width="28" height="3" rx="1.5" fill="url(#accentGradient)" opacity="0.7" />
+        <rect x="8" y="58" width="34" height="4" rx="2" fill="url(#accentGradient)" opacity="0.8" />
       </g>
     </svg>
   );
