@@ -72,7 +72,8 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
 
 export async function getSubcategoryById(subcategoryId: string): Promise<Subcategory | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/subcategories/${subcategoryId}`);
+    // First try by slug since frontend routes use slugs
+    const response = await fetch(`${API_BASE_URL}/categories/subcategories/slug/${subcategoryId}`);
     if (!response.ok) {
       if (response.status === 404) return null;
       throw new Error(`Failed to fetch subcategory: ${response.statusText}`);
@@ -81,6 +82,77 @@ export async function getSubcategoryById(subcategoryId: string): Promise<Subcate
     return data.success ? data.data : null;
   } catch (error) {
     console.error('Error fetching subcategory:', error);
+    return null;
+  }
+}
+
+export async function getSubcategoryBySlug(slug: string): Promise<Subcategory | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/categories/subcategories/slug/${slug}`);
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error(`Failed to fetch subcategory: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.success ? data.data : null;
+  } catch (error) {
+    console.error('Error fetching subcategory by slug:', error);
+    return null;
+  }
+}
+
+export async function getSubcategoryProducts(subcategorySlug: string, options?: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  search?: string;
+  userId?: string;
+}) {
+  try {
+    const queryParams = new URLSearchParams();
+    if (options?.page) queryParams.append('page', options.page.toString());
+    if (options?.limit) queryParams.append('limit', options.limit.toString());
+    if (options?.sortBy) queryParams.append('sortBy', options.sortBy);
+    if (options?.search) queryParams.append('search', options.search);
+    if (options?.userId) queryParams.append('userId', options.userId);
+
+    const response = await fetch(`${API_BASE_URL}/categories/subcategories/slug/${subcategorySlug}/products?${queryParams}`);
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error(`Failed to fetch subcategory products: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.success ? data.data : null;
+  } catch (error) {
+    console.error('Error fetching subcategory products:', error);
+    return null;
+  }
+}
+
+export async function getSubcategoryServices(subcategorySlug: string, options?: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  search?: string;
+  userId?: string;
+}) {
+  try {
+    const queryParams = new URLSearchParams();
+    if (options?.page) queryParams.append('page', options.page.toString());
+    if (options?.limit) queryParams.append('limit', options.limit.toString());
+    if (options?.sortBy) queryParams.append('sortBy', options.sortBy);
+    if (options?.search) queryParams.append('search', options.search);
+    if (options?.userId) queryParams.append('userId', options.userId);
+
+    const response = await fetch(`${API_BASE_URL}/categories/subcategories/slug/${subcategorySlug}/services?${queryParams}`);
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error(`Failed to fetch subcategory services: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.success ? data.data : null;
+  } catch (error) {
+    console.error('Error fetching subcategory services:', error);
     return null;
   }
 }
@@ -154,6 +226,9 @@ export const categoriesApi = {
   getCategoryById,
   getCategoryBySlug,
   getSubcategoryById,
+  getSubcategoryBySlug,
+  getSubcategoryProducts,
+  getSubcategoryServices,
   getCategoriesWithSubcategories,
   getSubcategoriesByCategoryId,
   getCategoryWithProducts,

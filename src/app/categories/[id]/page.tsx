@@ -3,59 +3,25 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { 
-  ArrowLeft,
-  Search,
-  Filter,
-  Grid,
-  List,
-  Star,
-  TrendingUp,
   Package,
   Users,
   Building,
-  AlertCircle
+  AlertCircle,
+  TrendingUp
 } from 'lucide-react';
 import { CategoryIcon } from '../../../components/ui/dynamic-icon';
-import { PlaceholderImage } from '../../../components/ui/placeholder-image';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
-import { useToast } from '../../../components/ui/toast-provider';
-import { formatPrice } from '../../../lib/utils';
 import { categoriesApi, type CategoryWithProducts } from '../../../lib/api/categories';
-import { useCartStore } from '../../../lib/stores/cart';
-
-interface CategoryProduct {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  rating: number;
-  reviewCount: number;
-  supplier: {
-    id: string;
-    name: string;
-    location: string;
-    verified: boolean;
-  };
-  subcategory: string;
-  inStock: boolean;
-}
 
 export default function CategoryDetailPage() {
   const params = useParams();
   const [categoryData, setCategoryData] = useState<CategoryWithProducts | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSubcategory, setSelectedSubcategory] = useState('');
-  const [sortBy, setSortBy] = useState('relevance');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  const toast = useToast();
-  const { addItem } = useCartStore();
+  // Removed product-related state since category page only shows subcategories
 
   const sortOptions = [
     { value: 'relevance', label: 'Relevance' },
@@ -65,20 +31,15 @@ export default function CategoryDetailPage() {
     { value: 'newest', label: 'Newest First' }
   ];
 
-  const loadCategoryData = useCallback(async (categoryId: string) => {
+  const loadCategoryData = useCallback(async (categorySlug: string) => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await categoriesApi.getCategoryWithProducts(categoryId, {
-        search: searchQuery || undefined,
-        sortBy: sortBy as any,
-        page: 1,
-        limit: 50
-      });
+      const response = await categoriesApi.getCategoryBySlug(categorySlug);
       
       if (response) {
-        setCategoryData(response);
+        setCategoryData({ ...response, products: [] }); // Category page shows no products
       } else {
         setError('Category not found');
       }
@@ -88,7 +49,7 @@ export default function CategoryDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, sortBy, selectedSubcategory]);
+  }, []);  // Remove dependencies since category page doesn't show products
 
   useEffect(() => {
     if (params.id) {
@@ -96,30 +57,7 @@ export default function CategoryDetailPage() {
     }
   }, [params.id, loadCategoryData]);
 
-  const filteredProducts = (categoryData?.products || []).filter(product => {
-    if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    if (selectedSubcategory && product.subcategory?.slug !== selectedSubcategory) {
-      return false;
-    }
-    return true;
-  });
-
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    switch (sortBy) {
-      case 'price-low':
-        return a.price - b.price;
-      case 'price-high':
-        return b.price - a.price;
-      case 'rating':
-        return b.reviews.average - a.reviews.average;
-      case 'newest':
-        return 0; // In real app, would sort by creation date
-      default:
-        return 0; // relevance
-    }
-  });
+  // No product filtering needed for category page
 
   if (loading) {
     return (
@@ -161,50 +99,108 @@ export default function CategoryDetailPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 mb-8 text-sm">
-          <Link href="/categories" className="text-amber-600 hover:underline hover:text-amber-700">
+        {/* Enhanced Breadcrumb */}
+        <nav className="flex items-center space-x-2 mb-8 text-sm">
+          <Link 
+            href="/categories" 
+            className="flex items-center text-amber-600 hover:text-amber-700 font-medium transition-colors duration-200 hover:underline"
+          >
+            <Package className="w-4 h-4 mr-2" />
             Categories
           </Link>
-          <span className="text-muted-foreground">/</span>
-          <span className="text-foreground">{categoryData.name}</span>
-        </div>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-900 font-semibold">{categoryData.name}</span>
+        </nav>
 
-        {/* Category Header */}
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-8 mb-8 border border-amber-200">
-          <div className="flex items-start gap-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <CategoryIcon category={categoryData} size={32} className="text-white" />
-            </div>
-            
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-4">{categoryData.name}</h1>
-              <p className="text-muted-foreground text-lg mb-6">
-                {categoryData.description}
-              </p>
+        {/* Enhanced Category Header */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 rounded-3xl border border-slate-200/60 shadow-2xl shadow-blue-500/10 mb-12">
+          {/* Enhanced Background Pattern */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-100/50 via-transparent to-purple-100/30"></div>
+          <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-gradient-to-br from-blue-400/30 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-40 h-40 bg-gradient-to-tr from-indigo-400/20 to-cyan-400/15 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl opacity-60"></div>
+          
+          <div className="relative p-8">
+            <div className="flex items-start gap-6">
+              {/* Enhanced Icon */}
+              <div className="relative group">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/25 transform rotate-3 hover:rotate-0 hover:scale-110 transition-all duration-500 group-hover:shadow-3xl group-hover:shadow-purple-500/30">
+                  <CategoryIcon category={categoryData} size={48} className="text-white drop-shadow-lg" />
+                </div>
+                <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full border-3 border-white flex items-center justify-center shadow-lg animate-bounce">
+                  <span className="text-white text-sm font-bold">✓</span>
+                </div>
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/20 to-purple-400/20 blur opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="flex items-center gap-3">
-                  <Package className="h-5 w-5 text-amber-600" />
-                  <div>
-                    <div className="font-semibold">{(categoryData.productCount || 0).toLocaleString()}</div>
-                    <div className="text-sm text-muted-foreground">Products</div>
+              <div className="flex-1">
+                <div className="flex items-center gap-4 mb-4">
+                  <h1 className="text-5xl font-black bg-gradient-to-r from-slate-900 via-blue-900 to-slate-800 bg-clip-text text-transparent leading-tight">
+                    {categoryData.name}
+                  </h1>
+                  {categoryData.featured && (
+                    <span className="px-4 py-2 bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 text-white text-sm font-bold rounded-2xl shadow-lg shadow-orange-500/30 animate-pulse">
+                      ⭐ Featured
+                    </span>
+                  )}
+                </div>
+                
+                <div className="mb-8">
+                  <p className="text-slate-600 text-xl leading-relaxed mb-4 max-w-3xl font-medium">
+                    {categoryData.description || `Discover premium ${categoryData.name.toLowerCase()} from verified suppliers across India with competitive pricing and reliable service.`}
+                  </p>
+                  <div className="flex items-center gap-4 text-sm text-slate-500">
+                    <span className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      Live marketplace
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      Verified suppliers
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                      Instant quotes
+                    </span>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  <Users className="h-5 w-5 text-amber-600" />
-                  <div>
-                    <div className="font-semibold">500+</div>
-                    <div className="text-sm text-muted-foreground">Suppliers</div>
+                {/* Enhanced Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="group bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/50 shadow-lg shadow-blue-500/5 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-2 transition-all duration-500">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <Package className="h-7 w-7 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-3xl font-black text-slate-900 mb-1 group-hover:text-blue-600 transition-colors duration-300">{(categoryData.productCount || 0).toLocaleString()}</div>
+                        <div className="text-sm text-slate-500 font-medium">Products & Services</div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <Building className="h-5 w-5 text-amber-600" />
-                  <div>
-                    <div className="font-semibold">50+</div>
-                    <div className="text-sm text-muted-foreground">Cities</div>
+                  
+                  <div className="group bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/50 shadow-lg shadow-green-500/5 hover:shadow-2xl hover:shadow-green-500/10 hover:-translate-y-2 transition-all duration-500">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <Users className="h-7 w-7 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-3xl font-black text-slate-900 mb-1 group-hover:text-emerald-600 transition-colors duration-300">500+</div>
+                        <div className="text-sm text-slate-500 font-medium">Verified Suppliers</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="group bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/50 shadow-lg shadow-purple-500/5 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2 transition-all duration-500">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <Building className="h-7 w-7 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-3xl font-black text-slate-900 mb-1 group-hover:text-purple-600 transition-colors duration-300">50+</div>
+                        <div className="text-sm text-slate-500 font-medium">Cities Covered</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -212,26 +208,67 @@ export default function CategoryDetailPage() {
           </div>
         </div>
 
-        {/* Subcategories */}
+        {/* Enhanced Subcategories Section */}
         {(categoryData.subcategories?.length || 0) > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">Subcategories</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {categoryData.subcategories?.map((subcategory) => (
-                <Link
-                  key={subcategory.id}
-                  href={`/categories/${categoryData.id}/${subcategory.id}`}
-                  className="bg-card rounded-lg border border-amber-200 p-4 hover:shadow-md hover:border-amber-300 transition-all"
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Explore Subcategories</h2>
+                <p className="text-gray-600">Find exactly what you're looking for in these specialized categories</p>
+              </div>
+              <div className="text-sm text-gray-500">
+                {categoryData.subcategories?.length} subcategories
+              </div>
+            </div>
+            
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {(categoryData.subcategories || []).map((subcategory, index) => (
+                <Link 
+                  key={subcategory.id} 
+                  href={`/categories/${categoryData.slug}/${subcategory.slug}`}
+                  className="group block"
                 >
-                  <h3 className="font-semibold mb-2 text-amber-800">{subcategory.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {subcategory.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs border-amber-300 text-amber-700">
-                      {subcategory.productCount} products
-                    </Badge>
-                    <TrendingUp className="h-4 w-4 text-amber-600" />
+                  <div className="h-full bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-xl shadow-slate-500/10 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-3 hover:rotate-1 transition-all duration-500 overflow-hidden relative">
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <div className="relative p-8">
+                      <div className="flex items-start gap-5">
+                        <div className="relative">
+                          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/30 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+                            <Package className="h-8 w-8 text-white" />
+                          </div>
+                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs font-bold">{index + 1}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex-1">
+                          <h3 className="font-black text-xl text-slate-900 mb-3 group-hover:text-blue-600 transition-colors duration-300 leading-tight">
+                            {subcategory.name}
+                          </h3>
+                          
+                          <p className="text-slate-600 text-sm mb-6 line-clamp-3 leading-relaxed">
+                            {subcategory.description || `Explore premium ${subcategory.name.toLowerCase()} from trusted suppliers with competitive pricing and fast delivery.`}
+                          </p>
+                          
+                          <div className="flex items-center justify-between">
+                            <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 font-semibold px-3 py-1 rounded-xl shadow-lg">
+                              {subcategory.productCount || 0} items
+                            </Badge>
+                            
+                            <div className="text-xs text-slate-500 flex items-center gap-2 font-medium">
+                              <TrendingUp className="h-4 w-4 text-emerald-500" />
+                              Trending
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Enhanced Hover Border */}
+                    <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all duration-500 pointer-events-none"></div>
+                    <div className="absolute inset-0 rounded-2xl ring-2 ring-transparent group-hover:ring-blue-200/50 transition-all duration-500 pointer-events-none"></div>
                   </div>
                 </Link>
               ))}
@@ -239,213 +276,23 @@ export default function CategoryDetailPage() {
           </div>
         )}
 
-        {/* Search and Filters */}
-        <div className="mb-8">
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-            <div className="flex flex-wrap gap-4 items-center">
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-64 pl-10 pr-4 py-2 border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-background"
-                />
+        {/* Enhanced Empty State */}
+        {(categoryData.subcategories?.length || 0) === 0 && (
+          <div className="text-center py-20">
+            <div className="max-w-md mx-auto">
+              <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Package className="h-10 w-10 text-gray-400" />
               </div>
-
-              {/* Subcategory Filter */}
-              {(categoryData.subcategories?.length || 0) > 0 && (
-                <select
-                  value={selectedSubcategory}
-                  onChange={(e) => setSelectedSubcategory(e.target.value)}
-                  className="px-3 py-2 border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-background"
-                >
-                  <option value="">All Subcategories</option>
-                  {categoryData.subcategories?.map((subcategory) => (
-                    <option key={subcategory.id} value={subcategory.name}>
-                      {subcategory.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
-            <div className="flex items-center gap-4">
-              {/* Sort */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-2 border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-background"
-              >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-
-              {/* View Mode */}
-              <div className="flex border border-amber-200 rounded-lg">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className={`rounded-r-none ${viewMode === 'grid' 
-                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700' 
-                    : 'hover:bg-amber-50 text-amber-700'
-                  }`}
-                >
-                  <Grid className="h-4 w-4" />
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">No subcategories yet</h3>
+              <p className="text-gray-600 mb-8 leading-relaxed">
+                This category is being set up. Check back soon for specialized subcategories, or explore other categories in the meantime.
+              </p>
+              <Link href="/categories">
+                <Button className="bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 rounded-xl">
+                  Browse Other Categories
                 </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className={`rounded-l-none ${viewMode === 'list' 
-                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700' 
-                    : 'hover:bg-amber-50 text-amber-700'
-                  }`}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
+              </Link>
             </div>
-          </div>
-        </div>
-
-        {/* Results */}
-        <div className="mb-6">
-          <p className="text-muted-foreground">
-            Showing {sortedProducts.length} products
-          </p>
-        </div>
-
-        {/* Products Grid */}
-        {sortedProducts.length === 0 ? (
-          <div className="text-center py-16">
-            <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No products found</h3>
-            <p className="text-muted-foreground mb-8">
-              Try adjusting your search or filters
-            </p>
-            <Button onClick={() => {
-              setSearchQuery('');
-              setSelectedSubcategory('');
-            }} className="bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700">
-              Clear Filters
-            </Button>
-          </div>
-        ) : (
-          <div className={viewMode === 'grid' 
-            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
-            : 'space-y-4'
-          }>
-            {sortedProducts.map((product) => (
-              <div
-                key={product.id}
-                className={`bg-card rounded-lg border shadow-sm hover:shadow-md transition-all duration-200 ${
-                  viewMode === 'list' ? 'flex items-center p-6 gap-6' : 'card-hover'
-                }`}
-              >
-                <div className={`relative ${viewMode === 'list' ? 'w-32 h-32 flex-shrink-0' : ''}`}>
-                  {product.images && product.images[0] ? (
-                    <Image
-                      src={product.images[0]}
-                      alt={product.name}
-                      width={viewMode === 'list' ? 128 : 300}
-                      height={viewMode === 'list' ? 128 : 200}
-                      className={`object-cover rounded-lg ${
-                        viewMode === 'list' ? 'w-32 h-32' : 'w-full h-48'
-                      }`}
-                    />
-                  ) : (
-                    <PlaceholderImage
-                      type="product"
-                      className={`rounded-lg ${
-                        viewMode === 'list' ? 'w-32 h-32' : 'w-full h-48'
-                      }`}
-                      size={viewMode === 'list' ? 128 : 200}
-                    />
-                  )}
-                  
-                  {product.originalPrice && (
-                    <Badge className="absolute top-2 left-2 bg-red-500 text-white">
-                      {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
-                    </Badge>
-                  )}
-                </div>
-
-                <div className={viewMode === 'list' ? 'flex-1' : 'p-4'}>
-                  <div className="mb-2">
-                    <Badge variant="outline" className="text-xs">
-                      {product.subcategory?.name || product.category.name}
-                    </Badge>
-                  </div>
-
-                  <Link href={`/products/${product.id}`}>
-                    <h3 className="font-semibold text-sm mb-2 hover:text-amber-600 transition-colors line-clamp-2">
-                      {product.name}
-                    </h3>
-                  </Link>
-
-                  <div className="flex items-center gap-1 mb-2">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-3 w-3 ${
-                            i < Math.floor(product.reviews.average)
-                              ? 'text-yellow-400 fill-current'
-                              : 'text-gray-300'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      ({product.reviews.total})
-                    </span>
-                  </div>
-
-                  <div className="mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-lg text-amber-600">
-                        {formatPrice(product.price)}
-                      </span>
-                      {product.originalPrice && (
-                        <span className="text-sm text-muted-foreground line-through">
-                          {formatPrice(product.originalPrice)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mb-3">
-                    <Link
-                      href={`/suppliers/${product.supplier.id}`}
-                      className="text-xs text-amber-600 hover:underline hover:text-amber-700 font-medium"
-                    >
-                      {product.supplier.name}
-                      {product.supplier.verified && (
-                        <span className="ml-1 text-green-600">✓</span>
-                      )}
-                    </Link>
-                    <p className="text-xs text-muted-foreground">
-                      {product.supplier.location}
-                    </p>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Link href={`/products/${product.id}`} className="flex-1">
-                      <Button className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700 text-sm px-3 py-2">
-                        View Details
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         )}
       </div>
