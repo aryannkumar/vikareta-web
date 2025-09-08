@@ -110,8 +110,8 @@ export default function BusinessFunnel() {
                registrationData.city.length > 0 && 
                registrationData.state.length > 0;
       case 4:
-        return registrationData.gstNumber.length > 0 && 
-               registrationData.documents.length > 0;
+        // GSTIN and documents are now optional
+        return true;
       default:
         return true;
     }
@@ -132,22 +132,35 @@ export default function BusinessFunnel() {
     
     setIsLoading(true);
     try {
-      // Create FormData for file upload
-      const formData = new FormData();
-      Object.entries(registrationData).forEach(([key, value]) => {
-        if (key === 'documents') {
-          (value as File[]).forEach(file => {
-            formData.append('documents', file);
-          });
-        } else {
-          formData.append(key, value as string);
+      // Prepare data for backend API
+      const submitData = {
+        businessName: registrationData.businessName,
+        firstName: registrationData.ownerName.split(' ')[0] || '',
+        lastName: registrationData.ownerName.split(' ').slice(1).join(' ') || '',
+        email: registrationData.email,
+        phone: registrationData.phone,
+        password: registrationData.password,
+        userType: 'business',
+        gstin: registrationData.gstNumber || undefined,
+        // Address fields can be added to user profile later
+        businessAddress: registrationData.businessAddress,
+        city: registrationData.city,
+        state: registrationData.state
+      };
+
+      // Remove undefined values
+      Object.keys(submitData).forEach(key => {
+        if (submitData[key as keyof typeof submitData] === undefined) {
+          delete submitData[key as keyof typeof submitData];
         }
       });
-      formData.append('userType', 'business');
 
-      const response = await fetch('/api/auth/register/business', {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
-        body: formData
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submitData)
       });
 
       if (response.ok) {
@@ -155,9 +168,14 @@ export default function BusinessFunnel() {
         setTimeout(() => {
           router.push('/onboarding?type=business');
         }, 2000);
+      } else {
+        const errorData = await response.json();
+        console.error('Registration failed:', errorData);
+        // You might want to show an error message to the user here
       }
     } catch (error) {
       console.error('Business registration failed:', error);
+      // You might want to show an error message to the user here
     } finally {
       setIsLoading(false);
     }
@@ -197,7 +215,7 @@ export default function BusinessFunnel() {
                     type="text"
                     value={registrationData.businessName}
                     onChange={(e) => handleInputChange('businessName', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
                     placeholder="Enter your business name"
                   />
                 </div>
@@ -213,7 +231,7 @@ export default function BusinessFunnel() {
                     type="text"
                     value={registrationData.ownerName}
                     onChange={(e) => handleInputChange('ownerName', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
                     placeholder="Enter owner's full name"
                   />
                 </div>
@@ -229,7 +247,7 @@ export default function BusinessFunnel() {
                     type="email"
                     value={registrationData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
                     placeholder="Enter business email"
                   />
                 </div>
@@ -273,7 +291,7 @@ export default function BusinessFunnel() {
                     type="tel"
                     value={registrationData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
                     placeholder="Enter phone number"
                   />
                 </div>
@@ -289,7 +307,7 @@ export default function BusinessFunnel() {
                     type={showPassword ? 'text' : 'password'}
                     value={registrationData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
                     placeholder="Create a secure password"
                   />
                   <button
@@ -379,7 +397,7 @@ export default function BusinessFunnel() {
                   <textarea
                     value={registrationData.businessAddress}
                     onChange={(e) => handleInputChange('businessAddress', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-20 resize-none"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm h-20 resize-none"
                     placeholder="Enter complete business address"
                   />
                 </div>
@@ -394,7 +412,7 @@ export default function BusinessFunnel() {
                     type="text"
                     value={registrationData.city}
                     onChange={(e) => handleInputChange('city', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
                     placeholder="City"
                   />
                 </div>
@@ -407,7 +425,7 @@ export default function BusinessFunnel() {
                     type="text"
                     value={registrationData.state}
                     onChange={(e) => handleInputChange('state', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
                     placeholder="State"
                   />
                 </div>
@@ -445,14 +463,24 @@ export default function BusinessFunnel() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Business Documents</h2>
-              <p className="text-gray-600">Upload your business verification documents</p>
+              <h2 className="text-2xl font-bold text-gray-900">Business Verification</h2>
+              <p className="text-gray-600">Optional: Add verification details for faster approval</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-sm font-medium text-blue-800">Optional Information</span>
+                </div>
+                <p className="text-xs text-blue-600">
+                  GSTIN and documents help verify your business faster, but are not required for registration.
+                </p>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  GST Number *
+                  GST Number <span className="text-gray-400">(Optional)</span>
                 </label>
                 <div className="relative">
                   <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -460,20 +488,23 @@ export default function BusinessFunnel() {
                     type="text"
                     value={registrationData.gstNumber}
                     onChange={(e) => handleInputChange('gstNumber', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter GST number"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                    placeholder="Enter GST number (optional)"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Business Documents *
+                  Business Documents <span className="text-gray-400">(Optional)</span>
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors bg-gray-50 hover:bg-blue-50/30">
                   <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                   <p className="text-sm text-gray-600 mb-2">
                     Upload GST Certificate, Business Registration, etc.
+                  </p>
+                  <p className="text-xs text-gray-500 mb-4">
+                    PDF, JPG, PNG up to 5MB each
                   </p>
                   <input
                     type="file"
@@ -485,7 +516,7 @@ export default function BusinessFunnel() {
                   />
                   <label
                     htmlFor="document-upload"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg cursor-pointer hover:bg-blue-100"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors"
                   >
                     <Camera className="w-4 h-4" />
                     Choose Files
@@ -493,13 +524,17 @@ export default function BusinessFunnel() {
                 </div>
 
                 {registrationData.documents.length > 0 && (
-                  <div className="mt-3 space-y-2">
+                  <div className="mt-4 space-y-2">
+                    <h4 className="text-sm font-medium text-gray-700">Uploaded Files:</h4>
                     {registrationData.documents.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                        <span className="text-sm text-gray-700 truncate">{file.name}</span>
+                      <div key={index} className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-blue-500" />
+                          <span className="text-sm text-gray-700 truncate max-w-48">{file.name}</span>
+                        </div>
                         <button
                           onClick={() => removeDocument(index)}
-                          className="text-red-500 hover:text-red-700"
+                          className="text-red-500 hover:text-red-700 p-1"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -507,6 +542,16 @@ export default function BusinessFunnel() {
                     ))}
                   </div>
                 )}
+              </div>
+
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">Ready to Submit</span>
+                </div>
+                <p className="text-xs text-green-700">
+                  Your business registration is complete! You can submit now or add verification documents later.
+                </p>
               </div>
             </div>
 
@@ -520,8 +565,8 @@ export default function BusinessFunnel() {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={!validateStep(4) || isLoading}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                disabled={isLoading}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all"
               >
                 {isLoading ? (
                   <>
@@ -530,7 +575,7 @@ export default function BusinessFunnel() {
                   </>
                 ) : (
                   <>
-                    Submit Application
+                    Complete Registration
                     <CheckCircle className="w-4 h-4" />
                   </>
                 )}
@@ -570,7 +615,7 @@ export default function BusinessFunnel() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <motion.div 
@@ -587,9 +632,9 @@ export default function BusinessFunnel() {
             <span>Step {step} of 4</span>
             <span>{Math.round((step / 4) * 100)}% complete</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <motion.div
-              className="bg-blue-600 h-2 rounded-full"
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${(step / 4) * 100}%` }}
               transition={{ duration: 0.3 }}
@@ -598,7 +643,7 @@ export default function BusinessFunnel() {
         </div>
 
         {/* Step Content */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <AnimatePresence mode="wait">
             {renderStep()}
           </AnimatePresence>
