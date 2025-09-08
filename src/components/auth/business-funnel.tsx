@@ -18,108 +18,161 @@ import {
   ArrowLeft,
   CheckCircle,
   FileText,
-  Camera,
-  Upload,
-  X,
+  AlertCircle,
   Store,
   Briefcase,
   Factory,
   ShoppingCart,
   Truck,
-  Globe
+  Globe,
+  Loader2,
+  Shield
 } from 'lucide-react';
 
 interface BusinessRegistrationData {
+  // Required fields
   businessName: string;
-  ownerName: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   password: string;
-  businessType: string;
-  businessAddress: string;
-  city: string;
-  state: string;
-  gstNumber: string;
-  documents: File[];
+  confirmPassword: string;
+  userType: 'business';
+  
+  // Optional fields
+  gstin?: string;
+  location?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+  
+  // Agreement
+  agreeToTerms: boolean;
+  agreeToPrivacy: boolean;
 }
 
 const BUSINESS_TYPES = [
-  { id: 'manufacturer', label: 'Manufacturer', icon: Factory, description: 'Produce goods' },
-  { id: 'wholesaler', label: 'Wholesaler', icon: Store, description: 'Bulk distribution' },
-  { id: 'retailer', label: 'Retailer', icon: ShoppingCart, description: 'Direct sales' },
-  { id: 'service', label: 'Service Provider', icon: Briefcase, description: 'Professional services' },
-  { id: 'distributor', label: 'Distributor', icon: Truck, description: 'Supply chain' },
-  { id: 'exporter', label: 'Exporter', icon: Globe, description: 'International trade' },
+  { id: 'manufacturer', label: 'Manufacturer', icon: Factory, description: 'Manufacturing & Production' },
+  { id: 'wholesaler', label: 'Wholesaler', icon: Store, description: 'Bulk Distribution' },
+  { id: 'retailer', label: 'Retailer', icon: ShoppingCart, description: 'Direct to Consumer' },
+  { id: 'distributor', label: 'Distributor', icon: Truck, description: 'Supply Chain' },
+  { id: 'service_provider', label: 'Service Provider', icon: Briefcase, description: 'Professional Services' },
+  { id: 'exporter', label: 'Exporter/Trader', icon: Globe, description: 'International Trade' },
+];
+
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
+  'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh',
+  'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh',
+  'Uttarakhand', 'West Bengal', 'Delhi', 'Jammu and Kashmir', 'Ladakh'
 ];
 
 export default function BusinessFunnel() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  
   const [registrationData, setRegistrationData] = useState<BusinessRegistrationData>({
     businessName: '',
-    ownerName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     password: '',
-    businessType: '',
-    businessAddress: '',
+    confirmPassword: '',
+    userType: 'business',
+    gstin: '',
+    location: '',
     city: '',
     state: '',
-    gstNumber: '',
-    documents: []
+    country: 'India',
+    postalCode: '',
+    agreeToTerms: false,
+    agreeToPrivacy: false
   });
 
-  const handleInputChange = (field: keyof BusinessRegistrationData, value: string | File[]) => {
+  const handleInputChange = (field: keyof BusinessRegistrationData, value: string | boolean) => {
     setRegistrationData(prev => ({
       ...prev,
       [field]: value
     }));
-  };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      setRegistrationData(prev => ({
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
         ...prev,
-        documents: [...prev.documents, ...Array.from(files)]
+        [field]: ''
       }));
     }
   };
 
-  const removeDocument = (index: number) => {
-    setRegistrationData(prev => ({
-      ...prev,
-      documents: prev.documents.filter((_, i) => i !== index)
-    }));
-  };
+  const validateStep = (currentStep: number): boolean => {
+    const newErrors: Record<string, string> = {};
 
-  const validateStep = (currentStep: number) => {
     switch (currentStep) {
       case 1:
-        return registrationData.businessName.length > 0 && 
-               registrationData.ownerName.length > 0 && 
-               registrationData.email.includes('@');
+        if (!registrationData.businessName.trim()) {
+          newErrors.businessName = 'Business name is required';
+        }
+        if (!registrationData.firstName.trim()) {
+          newErrors.firstName = 'First name is required';
+        }
+        if (!registrationData.lastName.trim()) {
+          newErrors.lastName = 'Last name is required';
+        }
+        if (!registrationData.email.trim()) {
+          newErrors.email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(registrationData.email)) {
+          newErrors.email = 'Please enter a valid email address';
+        }
+        break;
+        
       case 2:
-        return registrationData.phone.length >= 10 && 
-               registrationData.password.length >= 6 &&
-               registrationData.businessType.length > 0;
+        if (!registrationData.phone.trim()) {
+          newErrors.phone = 'Phone number is required';
+        } else if (!/^[0-9+\-() ]{7,20}$/.test(registrationData.phone)) {
+          newErrors.phone = 'Please enter a valid phone number';
+        }
+        if (!registrationData.password) {
+          newErrors.password = 'Password is required';
+        } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(registrationData.password)) {
+          newErrors.password = 'Password must be at least 8 characters with uppercase, lowercase, and number';
+        }
+        if (registrationData.password !== registrationData.confirmPassword) {
+          newErrors.confirmPassword = 'Passwords do not match';
+        }
+        break;
+        
       case 3:
-        return registrationData.businessAddress.length > 0 && 
-               registrationData.city.length > 0 && 
-               registrationData.state.length > 0;
+        // Location step is optional
+        if (registrationData.gstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(registrationData.gstin)) {
+          newErrors.gstin = 'Please enter a valid GSTIN';
+        }
+        break;
+        
       case 4:
-        // GSTIN and documents are now optional
-        return true;
-      default:
-        return true;
+        if (!registrationData.agreeToTerms) {
+          newErrors.agreeToTerms = 'You must agree to the terms and conditions';
+        }
+        if (!registrationData.agreeToPrivacy) {
+          newErrors.agreeToPrivacy = 'You must agree to the privacy policy';
+        }
+        break;
     }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const nextStep = () => {
     if (validateStep(step)) {
-      setStep(prev => Math.min(prev + 1, 5));
+      setStep(prev => Math.min(prev + 1, 4));
     }
   };
 
@@ -135,17 +188,18 @@ export default function BusinessFunnel() {
       // Prepare data for backend API
       const submitData = {
         businessName: registrationData.businessName,
-        firstName: registrationData.ownerName.split(' ')[0] || '',
-        lastName: registrationData.ownerName.split(' ').slice(1).join(' ') || '',
+        firstName: registrationData.firstName,
+        lastName: registrationData.lastName,
         email: registrationData.email,
         phone: registrationData.phone,
         password: registrationData.password,
-        userType: 'business',
-        gstin: registrationData.gstNumber || undefined,
-        // Address fields can be added to user profile later
-        businessAddress: registrationData.businessAddress,
-        city: registrationData.city,
-        state: registrationData.state
+        userType: 'business' as const,
+        gstin: registrationData.gstin || undefined,
+        location: registrationData.location || undefined,
+        city: registrationData.city || undefined,
+        state: registrationData.state || undefined,
+        country: registrationData.country || 'India',
+        postalCode: registrationData.postalCode || undefined,
       };
 
       // Remove undefined values
@@ -171,11 +225,11 @@ export default function BusinessFunnel() {
       } else {
         const errorData = await response.json();
         console.error('Registration failed:', errorData);
-        // You might want to show an error message to the user here
+        setErrors({ submit: errorData.message || 'Registration failed. Please try again.' });
       }
     } catch (error) {
       console.error('Business registration failed:', error);
-      // You might want to show an error message to the user here
+      setErrors({ submit: 'Registration failed. Please check your connection and try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -200,8 +254,8 @@ export default function BusinessFunnel() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Register Your Business</h2>
-              <p className="text-gray-600">Join thousands of businesses on Vikareta</p>
+              <h2 className="text-2xl font-bold text-gray-900">Business Information</h2>
+              <p className="text-gray-600">Tell us about your business and owner details</p>
             </div>
 
             <div className="space-y-4">
@@ -215,25 +269,67 @@ export default function BusinessFunnel() {
                     type="text"
                     value={registrationData.businessName}
                     onChange={(e) => handleInputChange('businessName', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                      errors.businessName ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     placeholder="Enter your business name"
                   />
                 </div>
+                {errors.businessName && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.businessName}
+                  </p>
+                )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Owner Name *
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    value={registrationData.ownerName}
-                    onChange={(e) => handleInputChange('ownerName', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                    placeholder="Enter owner's full name"
-                  />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    First Name *
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      value={registrationData.firstName}
+                      onChange={(e) => handleInputChange('firstName', e.target.value)}
+                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                        errors.firstName ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="First name"
+                    />
+                  </div>
+                  {errors.firstName && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.firstName}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Last Name *
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      value={registrationData.lastName}
+                      onChange={(e) => handleInputChange('lastName', e.target.value)}
+                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                        errors.lastName ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="Last name"
+                    />
+                  </div>
+                  {errors.lastName && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.lastName}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -247,17 +343,24 @@ export default function BusinessFunnel() {
                     type="email"
                     value={registrationData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                      errors.email ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     placeholder="Enter business email"
                   />
                 </div>
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.email}
+                  </p>
+                )}
               </div>
             </div>
 
             <button
               onClick={nextStep}
-              disabled={!validateStep(1)}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 flex items-center justify-center gap-2 transition-colors"
             >
               Continue
               <ArrowRight className="w-4 h-4" />
@@ -277,7 +380,7 @@ export default function BusinessFunnel() {
           >
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-bold text-gray-900">Contact & Security</h2>
-              <p className="text-gray-600">Add contact details and business type</p>
+              <p className="text-gray-600">Add contact details and create a secure password</p>
             </div>
 
             <div className="space-y-4">
@@ -291,10 +394,18 @@ export default function BusinessFunnel() {
                     type="tel"
                     value={registrationData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                    placeholder="Enter phone number"
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                      errors.phone ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="+91 Enter phone number"
                   />
                 </div>
+                {errors.phone && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.phone}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -307,7 +418,9 @@ export default function BusinessFunnel() {
                     type={showPassword ? 'text' : 'password'}
                     value={registrationData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
+                    className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                      errors.password ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     placeholder="Create a secure password"
                   />
                   <button
@@ -318,52 +431,57 @@ export default function BusinessFunnel() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.password}
+                  </p>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Business Type *
+                  Confirm Password *
                 </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {BUSINESS_TYPES.map((type) => {
-                    const Icon = type.icon;
-                    const isSelected = registrationData.businessType === type.id;
-                    
-                    return (
-                      <motion.button
-                        key={type.id}
-                        type="button"
-                        onClick={() => handleInputChange('businessType', type.id)}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`p-3 rounded-lg border text-left transition-all ${
-                          isSelected 
-                            ? 'border-blue-500 bg-blue-50 text-blue-700' 
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <Icon className={`w-5 h-5 mb-1 ${isSelected ? 'text-blue-600' : 'text-gray-400'}`} />
-                        <div className="text-sm font-medium">{type.label}</div>
-                        <div className="text-xs text-gray-500">{type.description}</div>
-                      </motion.button>
-                    );
-                  })}
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={registrationData.confirmPassword}
+                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                      errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="Confirm your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
+                {errors.confirmPassword && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.confirmPassword}
+                  </p>
+                )}
               </div>
             </div>
 
             <div className="flex gap-3">
               <button
                 onClick={prevStep}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
+                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </button>
               <button
                 onClick={nextStep}
-                disabled={!validateStep(2)}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 flex items-center justify-center gap-2 transition-colors"
               >
                 Continue
                 <ArrowRight className="w-4 h-4" />
@@ -383,50 +501,106 @@ export default function BusinessFunnel() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Business Address</h2>
-              <p className="text-gray-600">Where is your business located?</p>
+              <h2 className="text-2xl font-bold text-gray-900">Business Details</h2>
+              <p className="text-gray-600">Optional: Add location and tax information</p>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Business Address *
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-                  <textarea
-                    value={registrationData.businessAddress}
-                    onChange={(e) => handleInputChange('businessAddress', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm h-20 resize-none"
-                    placeholder="Enter complete business address"
-                  />
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-sm font-medium text-blue-800">Optional Information</span>
                 </div>
+                <p className="text-xs text-blue-600">
+                  You can skip this step and add these details later in your profile.
+                </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    City *
+                    GST Number <span className="text-gray-400">(Optional)</span>
                   </label>
-                  <input
-                    type="text"
-                    value={registrationData.city}
-                    onChange={(e) => handleInputChange('city', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                    placeholder="City"
-                  />
+                  <div className="relative">
+                    <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      value={registrationData.gstin || ''}
+                      onChange={(e) => handleInputChange('gstin', e.target.value.toUpperCase())}
+                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                        errors.gstin ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="Enter GST number (optional)"
+                      maxLength={15}
+                    />
+                  </div>
+                  {errors.gstin && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.gstin}
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      City <span className="text-gray-400">(Optional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={registrationData.city || ''}
+                      onChange={(e) => handleInputChange('city', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
+                      placeholder="Enter city"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      State <span className="text-gray-400">(Optional)</span>
+                    </label>
+                    <select
+                      value={registrationData.state || ''}
+                      onChange={(e) => handleInputChange('state', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 shadow-sm"
+                    >
+                      <option value="">Select state</option>
+                      {INDIAN_STATES.map((state) => (
+                        <option key={state} value={state}>
+                          {state}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    State *
+                    Business Address <span className="text-gray-400">(Optional)</span>
+                  </label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+                    <textarea
+                      value={registrationData.location || ''}
+                      onChange={(e) => handleInputChange('location', e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm h-20 resize-none"
+                      placeholder="Enter complete business address"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Postal Code <span className="text-gray-400">(Optional)</span>
                   </label>
                   <input
                     type="text"
-                    value={registrationData.state}
-                    onChange={(e) => handleInputChange('state', e.target.value)}
+                    value={registrationData.postalCode || ''}
+                    onChange={(e) => handleInputChange('postalCode', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                    placeholder="State"
+                    placeholder="Enter postal code"
+                    maxLength={6}
                   />
                 </div>
               </div>
@@ -435,15 +609,14 @@ export default function BusinessFunnel() {
             <div className="flex gap-3">
               <button
                 onClick={prevStep}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
+                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </button>
               <button
                 onClick={nextStep}
-                disabled={!validateStep(3)}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 flex items-center justify-center gap-2 transition-colors"
               >
                 Continue
                 <ArrowRight className="w-4 h-4" />
@@ -463,102 +636,84 @@ export default function BusinessFunnel() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Business Verification</h2>
-              <p className="text-gray-600">Optional: Add verification details for faster approval</p>
+              <h2 className="text-2xl font-bold text-gray-900">Terms & Conditions</h2>
+              <p className="text-gray-600">Please review and accept our terms to continue</p>
             </div>
 
             <div className="space-y-6">
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-blue-800">Optional Information</span>
-                </div>
-                <p className="text-xs text-blue-600">
-                  GSTIN and documents help verify your business faster, but are not required for registration.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  GST Number <span className="text-gray-400">(Optional)</span>
-                </label>
-                <div className="relative">
-                  <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    value={registrationData.gstNumber}
-                    onChange={(e) => handleInputChange('gstNumber', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Enter GST number (optional)"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Business Documents <span className="text-gray-400">(Optional)</span>
-                </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors bg-gray-50 hover:bg-blue-50/30">
-                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600 mb-2">
-                    Upload GST Certificate, Business Registration, etc.
-                  </p>
-                  <p className="text-xs text-gray-500 mb-4">
-                    PDF, JPG, PNG up to 5MB each
-                  </p>
-                  <input
-                    type="file"
-                    multiple
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="document-upload"
-                  />
-                  <label
-                    htmlFor="document-upload"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors"
-                  >
-                    <Camera className="w-4 h-4" />
-                    Choose Files
-                  </label>
-                </div>
-
-                {registrationData.documents.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    <h4 className="text-sm font-medium text-gray-700">Uploaded Files:</h4>
-                    {registrationData.documents.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-blue-500" />
-                          <span className="text-sm text-gray-700 truncate max-w-48">{file.name}</span>
-                        </div>
-                        <button
-                          onClick={() => removeDocument(index)}
-                          className="text-red-500 hover:text-red-700 p-1"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
+              <div className="bg-gray-50 p-6 rounded-lg border">
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      id="agreeToTerms"
+                      checked={registrationData.agreeToTerms}
+                      onChange={(e) => handleInputChange('agreeToTerms', e.target.checked)}
+                      className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label htmlFor="agreeToTerms" className="text-sm text-gray-700">
+                      I agree to the{' '}
+                      <Link href="/terms" className="text-blue-600 hover:text-blue-700 font-medium">
+                        Terms and Conditions
+                      </Link>
+                    </label>
                   </div>
-                )}
+                  {errors.agreeToTerms && (
+                    <p className="text-sm text-red-600 flex items-center gap-1 ml-7">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.agreeToTerms}
+                    </p>
+                  )}
+
+                  <div className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      id="agreeToPrivacy"
+                      checked={registrationData.agreeToPrivacy}
+                      onChange={(e) => handleInputChange('agreeToPrivacy', e.target.checked)}
+                      className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label htmlFor="agreeToPrivacy" className="text-sm text-gray-700">
+                      I agree to the{' '}
+                      <Link href="/privacy" className="text-blue-600 hover:text-blue-700 font-medium">
+                        Privacy Policy
+                      </Link>
+                    </label>
+                  </div>
+                  {errors.agreeToPrivacy && (
+                    <p className="text-sm text-red-600 flex items-center gap-1 ml-7">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.agreeToPrivacy}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="bg-green-50 p-4 rounded-lg border border-green-200">
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-green-800">Ready to Submit</span>
+                  <span className="text-sm font-medium text-green-800">Ready to Register</span>
                 </div>
                 <p className="text-xs text-green-700">
-                  Your business registration is complete! You can submit now or add verification documents later.
+                  Your business account will be created and you'll be taken to the onboarding process.
                 </p>
               </div>
+
+              {errors.submit && (
+                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-600" />
+                    <span className="text-sm font-medium text-red-800">Registration Error</span>
+                  </div>
+                  <p className="text-sm text-red-700 mt-1">{errors.submit}</p>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3">
               <button
                 onClick={prevStep}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
+                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
@@ -566,16 +721,16 @@ export default function BusinessFunnel() {
               <button
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all"
+                className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all"
               >
                 {isLoading ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Submitting...
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Creating Account...
                   </>
                 ) : (
                   <>
-                    Complete Registration
+                    Create Business Account
                     <CheckCircle className="w-4 h-4" />
                   </>
                 )}
@@ -598,12 +753,12 @@ export default function BusinessFunnel() {
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Application Submitted!</h2>
-              <p className="text-gray-600">Your business registration is under review</p>
+              <h2 className="text-2xl font-bold text-gray-900">Account Created Successfully!</h2>
+              <p className="text-gray-600">Welcome to Vikareta! Let's complete your business profile.</p>
             </div>
             <div className="bg-blue-50 p-4 rounded-lg">
               <p className="text-sm text-blue-800">
-                We'll review your application within 24-48 hours and notify you via email.
+                Redirecting you to complete your business onboarding...
               </p>
             </div>
           </motion.div>
