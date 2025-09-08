@@ -1,4 +1,22 @@
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com/api/v1').replace(/\/api\/api$/, '/api').replace(/\/api$/, '/api/v1');
+// Robust API base: ensure exactly one /api/v1 suffix regardless of provided env var
+const RAW_API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'https://api.vikareta.com').replace(/\/$/, '');
+const API_BASE_URL = (() => {
+  if (/\/api\/v1$/.test(RAW_API_BASE)) return RAW_API_BASE; // already correct
+  if (/\/api$/.test(RAW_API_BASE)) return RAW_API_BASE + '/v1';
+  return RAW_API_BASE + '/api/v1';
+})();
+
+// Lightweight GET wrapper to keep credentials + consistent error logging
+async function apiGet(inputPath: string) {
+  const url = `${API_BASE_URL}${inputPath}`;
+  try {
+    const res = await fetch(url, { credentials: 'include' });
+    return res;
+  } catch (err) {
+    console.error('Network error fetching', url, err);
+    throw err;
+  }
+}
 
 export interface Category {
   id: string;
@@ -42,7 +60,7 @@ export interface Subcategory {
 export async function getCategoryById(id: string): Promise<Category | null> {
   try {
     // Try to fetch by slug first (since routes now use slugs)
-    const response = await fetch(`${API_BASE_URL}/categories/slug/${id}`);
+  const response = await apiGet(`/categories/slug/${id}`);
     if (!response.ok) {
       if (response.status === 404) return null;
       throw new Error(`Failed to fetch category: ${response.statusText}`);
@@ -57,7 +75,7 @@ export async function getCategoryById(id: string): Promise<Category | null> {
 
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/categories/slug/${slug}`);
+  const response = await apiGet(`/categories/slug/${slug}`);
     if (!response.ok) {
       if (response.status === 404) return null;
       throw new Error(`Failed to fetch category: ${response.statusText}`);
@@ -73,7 +91,7 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
 export async function getSubcategoryById(subcategoryId: string): Promise<Subcategory | null> {
   try {
     // First try by slug since frontend routes use slugs
-    const response = await fetch(`${API_BASE_URL}/categories/subcategories/slug/${subcategoryId}`);
+  const response = await apiGet(`/categories/subcategories/slug/${subcategoryId}`);
     if (!response.ok) {
       if (response.status === 404) return null;
       throw new Error(`Failed to fetch subcategory: ${response.statusText}`);
@@ -88,7 +106,7 @@ export async function getSubcategoryById(subcategoryId: string): Promise<Subcate
 
 export async function getSubcategoryBySlug(slug: string): Promise<Subcategory | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/categories/subcategories/slug/${slug}`);
+  const response = await apiGet(`/categories/subcategories/slug/${slug}`);
     if (!response.ok) {
       if (response.status === 404) return null;
       throw new Error(`Failed to fetch subcategory: ${response.statusText}`);
@@ -116,7 +134,7 @@ export async function getSubcategoryProducts(subcategorySlug: string, options?: 
     if (options?.search) queryParams.append('search', options.search);
     if (options?.userId) queryParams.append('userId', options.userId);
 
-    const response = await fetch(`${API_BASE_URL}/categories/subcategories/slug/${subcategorySlug}/products?${queryParams}`);
+  const response = await apiGet(`/categories/subcategories/slug/${subcategorySlug}/products?${queryParams}`);
     if (!response.ok) {
       if (response.status === 404) return null;
       throw new Error(`Failed to fetch subcategory products: ${response.statusText}`);
@@ -144,7 +162,7 @@ export async function getSubcategoryServices(subcategorySlug: string, options?: 
     if (options?.search) queryParams.append('search', options.search);
     if (options?.userId) queryParams.append('userId', options.userId);
 
-    const response = await fetch(`${API_BASE_URL}/categories/subcategories/slug/${subcategorySlug}/services?${queryParams}`);
+  const response = await apiGet(`/categories/subcategories/slug/${subcategorySlug}/services?${queryParams}`);
     if (!response.ok) {
       if (response.status === 404) return null;
       throw new Error(`Failed to fetch subcategory services: ${response.statusText}`);
@@ -159,7 +177,7 @@ export async function getSubcategoryServices(subcategorySlug: string, options?: 
 
 export async function getCategoriesWithSubcategories(): Promise<Category[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/categories`);
+  const response = await apiGet(`/categories`);
     if (!response.ok) {
       throw new Error(`Failed to fetch categories: ${response.statusText}`);
     }
@@ -173,7 +191,7 @@ export async function getCategoriesWithSubcategories(): Promise<Category[]> {
 
 export async function getCategories(): Promise<{ success: boolean; data: Category[] }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/categories`);
+  const response = await apiGet(`/categories`);
     if (!response.ok) {
       throw new Error(`Failed to fetch categories: ${response.statusText}`);
     }
@@ -187,7 +205,7 @@ export async function getCategories(): Promise<{ success: boolean; data: Categor
 
 export async function getSubcategoriesByCategoryId(categoryId: string): Promise<Subcategory[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/subcategories/category/${categoryId}`);
+  const response = await apiGet(`/subcategories/category/${categoryId}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch subcategories: ${response.statusText}`);
     }
