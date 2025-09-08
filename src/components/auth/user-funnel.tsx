@@ -21,15 +21,34 @@ import {
   Heart,
   ShoppingBag,
   Clock,
-  Star
+  Star,
+  AlertCircle,
+  Loader2,
+  XCircle,
+  MapPin
 } from 'lucide-react';
 
 interface UserRegistrationData {
-  name: string;
+  // Required fields
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   password: string;
+  confirmPassword: string;
+  userType: 'buyer';
+  
+  // Optional fields
+  address?: string;
+  city?: string;
+  state?: string;
+  pinCode?: string;
   interests: string[];
+  location?: string;
+  
+  // Agreement
+  agreeToTerms: boolean;
+  agreeToPrivacy: boolean;
 }
 
 const USER_INTERESTS = [
@@ -45,20 +64,41 @@ export default function UserFunnel() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  
   const [registrationData, setRegistrationData] = useState<UserRegistrationData>({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     password: '',
-    interests: []
+    confirmPassword: '',
+    userType: 'buyer',
+    interests: [],
+    location: '',
+    agreeToTerms: false,
+    agreeToPrivacy: false
   });
 
-  const handleInputChange = (field: keyof UserRegistrationData, value: string | string[]) => {
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [marketingConsent, setMarketingConsent] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
+  const handleInputChange = (field: keyof UserRegistrationData, value: string | string[] | boolean) => {
     setRegistrationData(prev => ({
       ...prev,
       [field]: value
     }));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
   };
 
   const toggleInterest = (interestId: string) => {
@@ -70,17 +110,56 @@ export default function UserFunnel() {
     }));
   };
 
-  const validateStep = (currentStep: number) => {
+  const validateStep = (currentStep: number): boolean => {
+    const newErrors: Record<string, string> = {};
+
     switch (currentStep) {
       case 1:
-        return registrationData.name.length > 0 && registrationData.email.includes('@');
+        if (!registrationData.firstName.trim()) {
+          newErrors.firstName = 'First name is required';
+        }
+        if (!registrationData.lastName.trim()) {
+          newErrors.lastName = 'Last name is required';
+        }
+        if (!registrationData.email.trim()) {
+          newErrors.email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(registrationData.email)) {
+          newErrors.email = 'Please enter a valid email address';
+        }
+        break;
+        
       case 2:
-        return registrationData.phone.length >= 10 && registrationData.password.length >= 6;
+        if (!registrationData.phone.trim()) {
+          newErrors.phone = 'Phone number is required';
+        } else if (!/^[0-9+\-() ]{7,20}$/.test(registrationData.phone)) {
+          newErrors.phone = 'Please enter a valid phone number';
+        }
+        if (!registrationData.password) {
+          newErrors.password = 'Password is required';
+        } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(registrationData.password)) {
+          newErrors.password = 'Password must be at least 8 characters with uppercase, lowercase, and number';
+        }
+        if (registrationData.password !== registrationData.confirmPassword) {
+          newErrors.confirmPassword = 'Passwords do not match';
+        }
+        break;
+        
       case 3:
-        return registrationData.interests.length > 0;
-      default:
-        return true;
+        // Interests are optional for users
+        break;
+        
+      case 4:
+        if (!registrationData.agreeToTerms) {
+          newErrors.agreeToTerms = 'You must agree to the terms and conditions';
+        }
+        if (!registrationData.agreeToPrivacy) {
+          newErrors.agreeToPrivacy = 'You must agree to the privacy policy';
+        }
+        break;
     }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const nextStep = () => {
@@ -94,32 +173,41 @@ export default function UserFunnel() {
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(3)) return;
+    if (!validateStep(4)) return;
     
     setIsLoading(true);
+    setSubmitError('');
+    
     try {
-      // API call to register user
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...registrationData,
-          userType: 'customer'
+          userType: 'buyer',
+          marketingConsent
         })
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        setStep(4); // Success step
+        // Registration successful
         setTimeout(() => {
           router.push('/onboarding?type=user');
-        }, 2000);
+        }, 1500);
+      } else {
+        setSubmitError(data.message || 'Registration failed. Please try again.');
       }
     } catch (error) {
       console.error('Registration failed:', error);
+      setSubmitError('Network error. Please check your connection and try again.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleRegister = handleSubmit;
 
   const stepVariants = {
     hidden: { opacity: 0, x: 50 },
@@ -145,25 +233,59 @@ export default function UserFunnel() {
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    value={registrationData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                    placeholder="Enter your full name"
-                  />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    First Name *
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      value={registrationData.firstName}
+                      onChange={(e) => handleInputChange('firstName', e.target.value)}
+                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                        errors.firstName ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="First name"
+                    />
+                  </div>
+                  {errors.firstName && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.firstName}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Last Name *
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      value={registrationData.lastName}
+                      onChange={(e) => handleInputChange('lastName', e.target.value)}
+                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                        errors.lastName ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="Last name"
+                    />
+                  </div>
+                  {errors.lastName && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.lastName}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
+                  Email Address *
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -171,17 +293,24 @@ export default function UserFunnel() {
                     type="email"
                     value={registrationData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                      errors.email ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     placeholder="Enter your email"
                   />
                 </div>
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.email}
+                  </p>
+                )}
               </div>
             </div>
 
             <button
               onClick={nextStep}
-              disabled={!validateStep(1)}
-              className="w-full bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 flex items-center justify-center gap-2 transition-colors"
             >
               Continue
               <ArrowRight className="w-4 h-4" />
@@ -201,13 +330,13 @@ export default function UserFunnel() {
           >
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-bold text-gray-900">Secure Your Account</h2>
-              <p className="text-gray-600">Add your phone and create a password</p>
+              <p className="text-gray-600">Add your phone and create a strong password</p>
             </div>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
+                  Phone Number *
                 </label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -215,15 +344,23 @@ export default function UserFunnel() {
                     type="tel"
                     value={registrationData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                    placeholder="Enter your phone number"
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                      errors.phone ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="+91 Enter phone number"
                   />
                 </div>
+                {errors.phone && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.phone}
+                  </p>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
+                  Password *
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -231,8 +368,10 @@ export default function UserFunnel() {
                     type={showPassword ? 'text' : 'password'}
                     value={registrationData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                    placeholder="Create a password"
+                    className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                      errors.password ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="Create a secure password"
                   />
                   <button
                     type="button"
@@ -242,21 +381,57 @@ export default function UserFunnel() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.password}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm Password *
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={registrationData.confirmPassword}
+                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                      errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="Confirm your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.confirmPassword}
+                  </p>
+                )}
               </div>
             </div>
 
             <div className="flex gap-3">
               <button
                 onClick={prevStep}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
+                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </button>
               <button
                 onClick={nextStep}
-                disabled={!validateStep(2)}
-                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 flex items-center justify-center gap-2 transition-colors"
               >
                 Continue
                 <ArrowRight className="w-4 h-4" />
@@ -276,58 +451,84 @@ export default function UserFunnel() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">What interests you?</h2>
-              <p className="text-gray-600">Select categories to personalize your experience</p>
+              <h2 className="text-2xl font-bold text-gray-900">Address Information</h2>
+              <p className="text-gray-600">Help us serve you better with delivery preferences</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              {USER_INTERESTS.map((interest) => {
-                const Icon = interest.icon;
-                const isSelected = registrationData.interests.includes(interest.id);
-                
-                return (
-                  <motion.button
-                    key={interest.id}
-                    onClick={() => toggleInterest(interest.id)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      isSelected 
-                        ? 'border-orange-500 bg-orange-50 text-orange-700' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? 'text-orange-600' : 'text-gray-400'}`} />
-                    <div className="text-sm font-medium">{interest.label}</div>
-                  </motion.button>
-                );
-              })}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Address (Optional)
+                </label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+                  <textarea
+                    value={registrationData.address || ''}
+                    onChange={(e) => handleInputChange('address', e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm resize-none"
+                    placeholder="Enter your complete address"
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    City (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={registrationData.city || ''}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
+                    placeholder="Your city"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    State (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={registrationData.state || ''}
+                    onChange={(e) => handleInputChange('state', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
+                    placeholder="Your state"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  PIN Code (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={registrationData.pinCode || ''}
+                  onChange={(e) => handleInputChange('pinCode', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
+                  placeholder="6-digit PIN code"
+                  maxLength={6}
+                />
+              </div>
             </div>
 
             <div className="flex gap-3">
               <button
                 onClick={prevStep}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2"
+                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </button>
               <button
-                onClick={handleSubmit}
-                disabled={!validateStep(3) || isLoading}
-                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                onClick={nextStep}
+                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 flex items-center justify-center gap-2 transition-colors"
               >
-                {isLoading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Creating Account...
-                  </>
-                ) : (
-                  <>
-                    Complete Registration
-                    <CheckCircle className="w-4 h-4" />
-                  </>
-                )}
+                Continue
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </motion.div>
@@ -341,19 +542,102 @@ export default function UserFunnel() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="text-center space-y-6"
+            className="space-y-6"
           >
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-gray-900">Review & Complete</h2>
+              <p className="text-gray-600">Please review your information and accept our terms</p>
             </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Welcome aboard!</h2>
-              <p className="text-gray-600">Your account has been created successfully</p>
+
+            <div className="bg-gray-50 rounded-lg p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Name:</span>
+                <span className="font-medium">{registrationData.firstName} {registrationData.lastName}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Email:</span>
+                <span className="font-medium">{registrationData.email}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Phone:</span>
+                <span className="font-medium">{registrationData.phone}</span>
+              </div>
+              {registrationData.address && (
+                <div className="flex justify-between items-start">
+                  <span className="text-gray-600">Address:</span>
+                  <span className="font-medium text-right max-w-xs">{registrationData.address}</span>
+                </div>
+              )}
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm text-gray-600">
-                Redirecting you to complete your profile setup...
-              </p>
+
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 mt-0.5"
+                />
+                <label className="text-sm text-gray-600">
+                  I agree to the{' '}
+                  <a href="#" className="text-orange-600 hover:underline">
+                    Terms of Service
+                  </a>{' '}
+                  and{' '}
+                  <a href="#" className="text-orange-600 hover:underline">
+                    Privacy Policy
+                  </a>
+                </label>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={marketingConsent}
+                  onChange={(e) => setMarketingConsent(e.target.checked)}
+                  className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 mt-0.5"
+                />
+                <label className="text-sm text-gray-600">
+                  I would like to receive marketing emails about new products and offers (optional)
+                </label>
+              </div>
+            </div>
+
+            {submitError && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <XCircle className="w-5 h-5 text-red-600" />
+                  <p className="text-sm text-red-800">{submitError}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={prevStep}
+                disabled={isLoading}
+                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </button>
+              <button
+                onClick={handleRegister}
+                disabled={!acceptTerms || isLoading}
+                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Creating Account...
+                  </>
+                ) : (
+                  <>
+                    Complete Registration
+                    <CheckCircle className="w-4 h-4" />
+                  </>
+                )}
+              </button>
             </div>
           </motion.div>
         );
@@ -378,14 +662,14 @@ export default function UserFunnel() {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between text-xs text-gray-500 mb-2">
-            <span>Step {step} of 3</span>
-            <span>{Math.round((step / 3) * 100)}% complete</span>
+            <span>Step {step} of 4</span>
+            <span>{Math.round((step / 4) * 100)}% complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <motion.div
               className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full"
               initial={{ width: 0 }}
-              animate={{ width: `${(step / 3) * 100}%` }}
+              animate={{ width: `${(step / 4) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
           </div>
