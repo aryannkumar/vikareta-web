@@ -1,5 +1,5 @@
 # Multi-stage build for Vikareta Web Frontend
-FROM node:20-alpine AS builder
+FROM alpine:latest AS builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:20-alpine AS runner
+FROM alpine:latest AS runner
 
 WORKDIR /app
 
