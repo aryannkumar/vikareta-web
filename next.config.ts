@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
     optimizePackageImports: [
-      '@heroicons/react',
       'lucide-react',
       'zustand',
       'class-variance-authority',
@@ -22,14 +21,14 @@ const nextConfig: NextConfig = {
   },
 
   // Turbopack configuration (moved from experimental)
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
-  },
+  // turbopack: {
+  //   rules: {
+  //     '*.svg': {
+  //       loaders: ['@svgr/webpack'],
+  //       as: '*.js',
+  //     },
+  //   },
+  // },
 
   // Image optimization
   images: {
@@ -137,10 +136,10 @@ const nextConfig: NextConfig = {
     }
 
     // SVG handling
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: ['@svgr/webpack'],
-    });
+    // config.module.rules.push({
+    //   test: /\.svg$/,
+    //   use: ['@svgr/webpack'],
+    // });
 
     // Add source maps in development
     if (dev && process.env.NEXT_PUBLIC_ENABLE_SOURCE_MAPS === 'true') {
