@@ -98,11 +98,11 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
     businessSuccessRate: stats.businessSuccessRate || defaultStats.businessSuccessRate
   } : defaultStats;
   return (
-    <section className="relative min-h-[60vh] bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 overflow-hidden">
+    <section className="relative min-h-[60vh] bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 overflow-hidden">
       {/* Animated background elements - responsive and optimized */}
       <div className="absolute inset-0">
         <motion.div
-          className="absolute top-4 sm:top-20 left-4 sm:left-20 w-24 h-24 sm:w-48 sm:h-48 md:w-72 md:h-72 bg-blue-400/20 rounded-full blur-2xl sm:blur-3xl"
+          className="absolute top-4 sm:top-20 left-4 sm:left-20 w-24 h-24 sm:w-48 sm:h-48 md:w-72 md:h-72 bg-orange-400/20 rounded-full blur-2xl sm:blur-3xl"
           animate={{
             x: [0, 60, 0],
             y: [0, -30, 0],
@@ -115,7 +115,7 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
           }}
         />
         <motion.div
-          className="absolute bottom-4 sm:bottom-20 right-4 sm:right-20 w-32 h-32 sm:w-64 sm:h-64 md:w-96 md:h-96 bg-cyan-400/15 rounded-full blur-2xl sm:blur-3xl"
+          className="absolute bottom-4 sm:bottom-20 right-4 sm:right-20 w-32 h-32 sm:w-64 sm:h-64 md:w-96 md:h-96 bg-amber-400/15 rounded-full blur-2xl sm:blur-3xl"
           animate={{
             x: [0, -50, 0],
             y: [0, 25, 0],
@@ -128,7 +128,7 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
           }}
         />
         <motion.div
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 sm:w-48 sm:h-48 md:w-80 md:h-80 bg-indigo-400/10 rounded-full blur-2xl sm:blur-3xl"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 sm:w-48 sm:h-48 md:w-80 md:h-80 bg-orange-400/10 rounded-full blur-2xl sm:blur-3xl"
           animate={{ 
             rotate: [0, 360],
             scale: [1, 1.05, 1]
@@ -141,7 +141,7 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
         />
         {/* Additional responsive floating elements */}
         <motion.div
-          className="hidden sm:block absolute top-1/4 right-1/4 w-16 h-16 bg-blue-300/10 rounded-full blur-xl"
+          className="hidden sm:block absolute top-1/4 right-1/4 w-16 h-16 bg-orange-300/10 rounded-full blur-xl"
           animate={{
             y: [0, -20, 0],
             opacity: [0.3, 0.6, 0.3]
@@ -149,7 +149,7 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="hidden md:block absolute bottom-1/4 left-1/4 w-12 h-12 bg-cyan-300/10 rounded-full blur-xl"
+          className="hidden md:block absolute bottom-1/4 left-1/4 w-12 h-12 bg-amber-300/10 rounded-full blur-xl"
           animate={{
             x: [0, 15, 0],
             opacity: [0.2, 0.5, 0.2]
@@ -167,8 +167,8 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 lg:mb-8"
           >
-            <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-blue-300" />
-            <span className="text-xs sm:text-sm font-medium text-white">Verified Business Directory</span>
+            <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
+            <span className="text-xs sm:text-sm font-medium text-orange-700">Verified Business Directory</span>
           </motion.div>
 
           <motion.h1
@@ -177,15 +177,15 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <span className="text-white">Connect with</span>
+            <span className="text-gray-900">Connect with</span>
             <br />
-            <span className="bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
               Trusted Partners
             </span>
           </motion.h1>
 
           <motion.p
-            className="text-base sm:text-lg lg:text-xl text-blue-100 max-w-2xl mx-auto mb-8 sm:mb-10 lg:mb-12 leading-relaxed px-4"
+            className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto mb-8 sm:mb-10 lg:mb-12 leading-relaxed px-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
@@ -202,10 +202,10 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
             transition={{ duration: 0.8, delay: 0.8 }}
           >
             {[
-              { icon: Building2, label: 'Active Businesses', value: `${displayStats.activeBusinesses.toLocaleString()}+`, color: 'from-blue-400 to-cyan-400' },
-              { icon: ShieldCheck, label: 'Verified Partners', value: `${displayStats.verifiedPartners.toLocaleString()}+`, color: 'from-green-400 to-emerald-400' },
-              { icon: Globe, label: 'Cities Covered', value: `${displayStats.citiesCovered}+`, color: 'from-purple-400 to-pink-400' },
-              { icon: Users, label: 'Success Stories', value: `${displayStats.businessSuccessRate}%`, color: 'from-orange-400 to-red-400' }
+              { icon: Building2, label: 'Active Businesses', value: `${displayStats.activeBusinesses.toLocaleString()}+`, color: 'from-orange-500 to-amber-500' },
+              { icon: ShieldCheck, label: 'Verified Partners', value: `${displayStats.verifiedPartners.toLocaleString()}+`, color: 'from-amber-500 to-orange-600' },
+              { icon: Globe, label: 'Cities Covered', value: `${displayStats.citiesCovered}+`, color: 'from-orange-600 to-amber-600' },
+              { icon: Users, label: 'Success Stories', value: `${displayStats.businessSuccessRate}%`, color: 'from-amber-600 to-orange-500' }
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -218,8 +218,8 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
                 <div className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-2 sm:mb-3 lg:mb-4 bg-gradient-to-r ${stat.color} rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg`}>
                   <stat.icon className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-white" />
                 </div>
-                <div className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-white mb-1">{stat.value}</div>
-                <div className="text-xs sm:text-sm text-blue-200 leading-tight">{stat.label}</div>
+                <div className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                <div className="text-xs sm:text-sm text-gray-600 leading-tight">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -412,21 +412,21 @@ export default function BusinessesPage() {
       label: 'Nearby', 
       icon: MapPin, 
       description: 'Businesses in your area',
-      color: 'from-blue-600 to-indigo-600'
+      color: 'from-orange-600 to-amber-600'
     },
     { 
       id: 'popular', 
       label: 'Popular', 
       icon: TrendingUp, 
       description: 'Most trusted suppliers',
-      color: 'from-indigo-600 to-purple-600'
+      color: 'from-amber-600 to-orange-600'
     },
     { 
       id: 'featured', 
       label: 'Featured', 
       icon: Award, 
       description: 'Premium verified suppliers',
-      color: 'from-purple-600 to-blue-600'
+      color: 'from-orange-600 to-amber-600'
     }
   ];
 
@@ -445,7 +445,7 @@ export default function BusinessesPage() {
           variants={itemVariants}
           initial="hidden"
           animate="show"
-          className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-6 lg:p-8 mb-8 sm:mb-12 border border-blue-200"
+          className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-6 lg:p-8 mb-8 sm:mb-12 border border-orange-200"
         >
           {/* Search Bar */}
           <div className="relative mb-6 sm:mb-8">
@@ -461,7 +461,7 @@ export default function BusinessesPage() {
                 setQuery(value);
                 handleSearch(value);
               }}
-              className="w-full pl-10 sm:pl-14 lg:pl-16 pr-4 sm:pr-6 py-3 sm:py-4 lg:py-5 text-sm sm:text-base lg:text-lg border-2 border-blue-200 rounded-xl sm:rounded-2xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 font-medium min-h-[48px]"
+              className="w-full pl-10 sm:pl-14 lg:pl-16 pr-4 sm:pr-6 py-3 sm:py-4 lg:py-5 text-sm sm:text-base lg:text-lg border-2 border-orange-200 rounded-xl sm:rounded-2xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-300 font-medium min-h-[48px]"
             />
           </div>
 
@@ -477,7 +477,7 @@ export default function BusinessesPage() {
                   className={`relative flex items-center gap-3 sm:gap-4 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold transition-all duration-300 min-h-[48px] ${
                     isActive
                       ? 'text-white shadow-xl transform scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:scale-102'
+                      : 'bg-gray-100 text-gray-700 hover:bg-orange-50 hover:scale-102'
                   }`}
                   whileHover={{ scale: isActive ? 1.05 : 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -508,7 +508,7 @@ export default function BusinessesPage() {
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl transition-colors duration-300 font-medium min-h-[48px] w-full sm:w-auto"
+                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-orange-100 hover:bg-orange-200 text-orange-800 rounded-xl transition-colors duration-300 font-medium min-h-[48px] w-full sm:w-auto"
               >
                 <SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="text-sm sm:text-base">Filters</span>
@@ -519,12 +519,12 @@ export default function BusinessesPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 bg-blue-100 rounded-xl p-1 min-h-[48px]">
+            <div className="flex items-center gap-2 bg-orange-100 rounded-xl p-1 min-h-[48px]">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 sm:p-3 rounded-lg transition-colors duration-300 ${
                   viewMode === 'grid'
-                    ? 'bg-white shadow-sm text-blue-600'
+                    ? 'bg-white shadow-sm text-orange-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -534,7 +534,7 @@ export default function BusinessesPage() {
                 onClick={() => setViewMode('list')}
                 className={`p-2 sm:p-3 rounded-lg transition-colors duration-300 ${
                   viewMode === 'list'
-                    ? 'bg-white shadow-sm text-blue-600'
+                    ? 'bg-white shadow-sm text-orange-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -587,7 +587,7 @@ export default function BusinessesPage() {
             <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 max-w-md mx-auto">{error}</p>
             <button
               onClick={() => loadBusinesses(activeTab)}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl min-h-[48px] text-sm sm:text-base"
+              className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl min-h-[48px] text-sm sm:text-base"
             >
               Try Again
             </button>
@@ -599,8 +599,8 @@ export default function BusinessesPage() {
             animate="show"
             className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl lg:rounded-3xl p-6 sm:p-8 lg:p-12 lg:p-16 text-center shadow-lg"
           >
-            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-4 sm:mb-6 lg:mb-8 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
-              <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-indigo-600" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-4 sm:mb-6 lg:mb-8 bg-gradient-to-br from-orange-100 to-amber-100 rounded-full flex items-center justify-center">
+              <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-orange-600" />
             </div>
             <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 sm:mb-4">No businesses found</h3>
             <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 lg:mb-10 max-w-lg mx-auto">
@@ -609,14 +609,14 @@ export default function BusinessesPage() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <button
                 onClick={() => { setQuery(''); setFiltered(businesses); }}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 sm:gap-3 min-h-[48px] text-sm sm:text-base"
+                className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 sm:gap-3 min-h-[48px] text-sm sm:text-base"
               >
                 Show All Businesses
                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               <button
                 onClick={() => { setActiveTab('featured'); loadBusinesses('featured'); }}
-                className="bg-white hover:bg-blue-50 border-2 border-blue-500 text-blue-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl min-h-[48px] text-sm sm:text-base"
+                className="bg-white hover:bg-orange-50 border-2 border-orange-500 text-orange-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl min-h-[48px] text-sm sm:text-base"
               >
                 Browse Featured
               </button>

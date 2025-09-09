@@ -48,6 +48,19 @@ interface HomePageData {
 export default function HomePage() {
   const router = useRouter();
   
+  // Responsive animation hook
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
   const [data, setData] = useState<HomePageData>({
     categories: [],
     featuredProducts: [],
@@ -174,7 +187,7 @@ export default function HomePage() {
         <div className="absolute inset-0 -z-10">
           <motion.div
             className="absolute -top-24 -left-16 w-96 h-96 bg-gradient-to-br from-orange-400/30 via-amber-400/20 to-orange-600/30 rounded-full blur-3xl"
-            animate={{ 
+            animate={isMobile ? {} : { 
               x: [0, 30, -20, 0], 
               y: [0, 10, -15, 0], 
               scale: [1, 1.05, 0.98, 1],
@@ -184,7 +197,7 @@ export default function HomePage() {
           />
           <motion.div
             className="absolute -bottom-20 -right-10 w-[34rem] h-[34rem] bg-gradient-to-tr from-rose-300/20 via-orange-400/20 to-amber-500/30 rounded-full blur-3xl"
-            animate={{ 
+            animate={isMobile ? {} : { 
               x: [0, -20, 25, 0], 
               y: [0, -15, 10, 0], 
               rotate: [360, 240, 120, 0],
@@ -197,7 +210,7 @@ export default function HomePage() {
           <div className="absolute top-1/2 left-1/4 transform -translate-y-1/2">
             <motion.div 
               className="flex items-center space-x-6 opacity-10"
-              animate={{ x: [0, 100, 0] }}
+              animate={isMobile ? {} : { x: [0, 100, 0] }}
               transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
             >
               <div className="w-8 h-8 bg-orange-500 rounded-full" />
@@ -209,13 +222,13 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="container mx-auto px-12 relative">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 relative border-l border-r border-orange-100/20 dark:border-orange-900/20">
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div>
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, ease: 'easeOut' }}
+                transition={{ duration: isMobile ? 0.5 : 0.7, ease: 'easeOut' }}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-700 border border-orange-200 shadow-sm mb-6"
               >
                 <motion.span 
@@ -229,8 +242,8 @@ export default function HomePage() {
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.8, ease: 'easeOut' }}
-                className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight text-gray-900 dark:text-white mb-6"
+                transition={{ delay: 0.1, duration: isMobile ? 0.6 : 0.8, ease: 'easeOut' }}
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight text-gray-900 dark:text-white mb-6"
               >
                 Procure 
                 <motion.span 
@@ -246,7 +259,7 @@ export default function HomePage() {
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
+                transition={{ delay: 0.2, duration: isMobile ? 0.5 : 0.6 }}
                 className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mb-8 leading-relaxed"
               >
                 B2B procurement platform that unifies sourcing, RFQs, supplier management, and compliance—built for speed, transparency, and enterprise-scale savings.
@@ -255,7 +268,7 @@ export default function HomePage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
+                transition={{ delay: 0.3, duration: isMobile ? 0.5 : 0.6 }}
                 className="flex flex-col sm:flex-row gap-4 mb-8"
               >
                 <motion.button
@@ -283,7 +296,7 @@ export default function HomePage() {
               <motion.ul
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35, duration: 0.6 }}
+                transition={{ delay: 0.35, duration: isMobile ? 0.5 : 0.6 }}
                 className="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300"
               >
                 <motion.li 
@@ -361,13 +374,13 @@ export default function HomePage() {
                     <motion.div
                       className="absolute bottom-16 left-8"
                       initial={{ opacity: 0, x: -100 }}
-                      animate={{ 
+                      animate={isMobile ? { opacity: 1, x: 0 } : { 
                         x: [0, 50, 0],
                         y: [0, -4, 0],
                         rotate: [0, 2, -1, 0],
                         opacity: [0.8, 1, 1, 0.8]
                       }}
-                      transition={{ 
+                      transition={isMobile ? { duration: 0.5 } : { 
                         duration: 8, 
                         repeat: Infinity, 
                         ease: 'easeInOut',
@@ -518,12 +531,12 @@ export default function HomePage() {
                     <motion.div
                       className="absolute bottom-32 left-4"
                       initial={{ opacity: 0, x: -100 }}
-                      animate={{ 
+                      animate={isMobile ? { opacity: 1, x: 0 } : { 
                         x: [0, 150, 250], 
                         rotate: [0, 1, 0],
                         opacity: [0.8, 1, 1, 0.8]
                       }}
-                      transition={{ 
+                      transition={isMobile ? { duration: 0.5 } : { 
                         duration: 15, 
                         repeat: Infinity, 
                         ease: 'linear',
@@ -558,12 +571,12 @@ export default function HomePage() {
                     <motion.div
                       className="absolute top-16 left-0"
                       initial={{ opacity: 0, x: -200 }}
-                      animate={{ 
+                      animate={isMobile ? { opacity: 1, x: 0 } : { 
                         x: [0, 400, 800],
                         y: [0, -10, 20, 0],
                         opacity: [0.8, 1, 1, 0.8]
                       }}
-                      transition={{ 
+                      transition={isMobile ? { duration: 0.5 } : { 
                         duration: 12, 
                         repeat: Infinity, 
                         ease: 'easeInOut',
@@ -667,14 +680,22 @@ export default function HomePage() {
                             opacity: 0,
                             scale: 0.5
                           }}
-                          animate={{ 
+                          animate={isMobile ? { 
+                            left: 'calc(100% - 80px)',
+                            top: '50%',
+                            opacity: 1,
+                            scale: 1
+                          } : { 
                             left: 'calc(100% - 80px)',
                             top: '50%',
                             opacity: [0, 1, 1, 0],
                             scale: [0.5, 1, 1, 0.5],
                             rotate: [0, 10, -10, 0]
                           }}
-                          transition={{ 
+                          transition={isMobile ? { 
+                            duration: 0.5,
+                            delay: i * 0.1
+                          } : { 
                             duration: 4 + (i * 0.5),
                             repeat: Infinity, 
                             delay: i * 0.8,
@@ -760,7 +781,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-20 bg-white dark:bg-gray-900">
+      <section className="py-20 bg-white dark:bg-gray-900 border-l border-r border-gray-100/20 dark:border-gray-800/20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <motion.h2 
@@ -869,7 +890,7 @@ export default function HomePage() {
       <CategoryGrid />
 
       {/* Featured Products Section - Premium Enterprise Focus */}
-      <section className="container mx-auto px-6 py-20">
+      <section className="container mx-auto px-6 py-20 border-l border-r border-gray-100/20 dark:border-gray-800/20">
           <div className="text-center mb-16">
             <motion.h2 
               className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent"
@@ -993,7 +1014,7 @@ export default function HomePage() {
         </section>
 
       {/* Featured Services Section - B2B Focus */}
-      <section className="container mx-auto px-6 py-20 bg-gradient-to-br from-gray-50 to-orange-50 dark:from-gray-900 dark:to-gray-800">
+      <section className="container mx-auto px-6 py-20 bg-gradient-to-br from-gray-50 to-orange-50 dark:from-gray-900 dark:to-gray-800 border-l border-r border-orange-100/20 dark:border-orange-900/20">
           <div className="text-center mb-16">
             <motion.h2 
               className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent"
@@ -1103,7 +1124,7 @@ export default function HomePage() {
         </section>
 
       {/* Key Features Section */}
-      <section className="py-20 bg-white dark:bg-gray-900">
+      <section className="py-20 bg-white dark:bg-gray-900 border-l border-r border-gray-100/20 dark:border-gray-800/20">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <motion.h2 
