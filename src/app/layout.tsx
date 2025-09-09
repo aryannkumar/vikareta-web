@@ -102,41 +102,6 @@ export default function RootLayout({
             </ToastProvider>
           </VikaretaAuthProvider>
         </ThemeProvider>
-        {/* Google Identity Services */}
-        <Script
-          src="https://accounts.google.com/gsi/client"
-          strategy="beforeInteractive"
-        />
-        
-        {/* Cashfree SDK */}
-        <Script
-          src="https://sdk.cashfree.com/js/v3/cashfree.js"
-          strategy="beforeInteractive"
-        />
-        
-        <ThemeProvider
-          defaultTheme="system"
-          storageKey="vikareta-theme"
-        >
-          <ToastProvider>
-            <VikaretaAuthProvider>
-              <div className="min-h-screen flex flex-col relative overflow-hidden">
-                {/* Background Pattern */}
-                <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-slate-500/5 pointer-events-none"></div>
-                
-                <MotionBoot />
-                <Header />
-                <main className="flex-1 relative z-10">
-                  <Entrance>
-                    {children}
-                  </Entrance>
-                </main>
-                <Footer />
-              </div>
-            </VikaretaAuthProvider>
-          </ToastProvider>
-        </ThemeProvider>
       </body>
     </html>
   );
