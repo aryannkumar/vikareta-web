@@ -11,11 +11,8 @@ import {
   Mail,
   Lock,
   User,
-  Pho                    <input
-                      type="email"
-                      value={registrationData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      className={`w-full pl-10 pr-4 py-4 sm:py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm text-base sm:text-sm ${  ArrowRight,
+  Phone,
+  ArrowRight,
   ArrowLeft,
   CheckCircle,
   Smartphone,
@@ -167,7 +164,7 @@ export default function UserFunnel() {
 
   const nextStep = () => {
     if (validateStep(step)) {
-      setStep(prev => Math.min(prev + 1, 4));
+      setStep(prev => Math.min(prev + 1, 5));
     }
   };
 
@@ -196,6 +193,7 @@ export default function UserFunnel() {
 
       if (response.ok) {
         // Registration successful
+        setStep(5); // Success step
         setTimeout(() => {
           router.push('/onboarding?type=user');
         }, 1500);
@@ -647,8 +645,8 @@ export default function UserFunnel() {
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
-                  checked={acceptTerms}
-                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  checked={registrationData.agreeToTerms}
+                  onChange={(e) => handleInputChange('agreeToTerms', e.target.checked)}
                   className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 mt-0.5"
                 />
                 <label className="text-sm text-gray-600">
@@ -695,8 +693,8 @@ export default function UserFunnel() {
                 Back
               </button>
               <button
-                onClick={handleRegister}
-                disabled={!acceptTerms || isLoading}
+                onClick={handleSubmit}
+                disabled={!registrationData.agreeToTerms || isLoading}
                 className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
               >
                 {isLoading ? (
@@ -711,6 +709,31 @@ export default function UserFunnel() {
                   </>
                 )}
               </button>
+            </div>
+          </motion.div>
+        );
+
+      case 5:
+        return (
+          <motion.div
+            key="step5"
+            variants={stepVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="text-center space-y-6"
+          >
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+              <CheckCircle className="w-8 h-8 text-green-600" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-gray-900">Account Created Successfully!</h2>
+              <p className="text-gray-600">Welcome to Vikareta! Let's complete your profile setup.</p>
+            </div>
+            <div className="bg-orange-50 p-4 rounded-lg">
+              <p className="text-sm text-orange-800">
+                Redirecting you to complete your profile setup...
+              </p>
             </div>
           </motion.div>
         );
@@ -735,14 +758,14 @@ export default function UserFunnel() {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between text-xs text-gray-500 mb-2">
-            <span>Step {step} of 4</span>
-            <span>{Math.round((step / 4) * 100)}% complete</span>
+            <span>Step {step} of 5</span>
+            <span>{Math.round((step / 5) * 100)}% complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <motion.div
               className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full"
               initial={{ width: 0 }}
-              animate={{ width: `${(step / 4) * 100}%` }}
+              animate={{ width: `${(step / 5) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
           </div>
