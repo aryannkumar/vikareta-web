@@ -50,6 +50,12 @@ export interface RegisterData {
   businessName?: string;
   userType: string;
   gstin?: string;
+  country?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  location?: string;
+  address?: string;
 }
 
 export interface TwoFactorSetup {
