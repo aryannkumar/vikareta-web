@@ -126,9 +126,6 @@ export default function UserFunnel() {
         } else if (!/\S+@\S+\.\S+/.test(registrationData.email)) {
           newErrors.email = 'Please enter a valid email address (e.g., name@example.com)';
         }
-        break;
-        
-      case 2:
         if (!registrationData.phone.trim()) {
           newErrors.phone = 'Phone number is required';
         } else if (!/^[0-9+\-() ]{7,20}$/.test(registrationData.phone)) {
@@ -144,11 +141,7 @@ export default function UserFunnel() {
         }
         break;
         
-      case 3:
-        // Interests are optional for users
-        break;
-        
-      case 4:
+      case 2:
         if (!registrationData.agreeToTerms) {
           newErrors.agreeToTerms = 'Please accept our Terms of Service to continue';
         }
@@ -164,7 +157,7 @@ export default function UserFunnel() {
 
   const nextStep = () => {
     if (validateStep(step)) {
-      setStep(prev => Math.min(prev + 1, 5));
+      setStep(prev => Math.min(prev + 1, 3));
     }
   };
 
@@ -173,7 +166,7 @@ export default function UserFunnel() {
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(4)) return;
+    if (!validateStep(2)) return;
     
     setIsLoading(true);
     setSubmitError('');
@@ -217,7 +210,7 @@ export default function UserFunnel() {
 
       if (response.ok) {
         // Registration successful
-        setStep(5); // Success step
+        setStep(3); // Success step
         setTimeout(() => {
           router.push('/onboarding?type=user');
         }, 1500);
@@ -782,14 +775,14 @@ export default function UserFunnel() {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between text-xs text-gray-500 mb-2">
-            <span>Step {step} of 5</span>
-            <span>{Math.round((step / 5) * 100)}% complete</span>
+            <span>Step {step} of 3</span>
+            <span>{Math.round((step / 3) * 100)}% complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <motion.div
               className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full"
               initial={{ width: 0 }}
-              animate={{ width: `${(step / 5) * 100}%` }}
+              animate={{ width: `${(step / 3) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
           </div>
