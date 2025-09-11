@@ -140,19 +140,39 @@ class ApiClient {
     // In production, acquire CSRF by calling our proxy that sets XSRF-TOKEN
     if (!csrfToken) {
       try {
-        await fetch('/api/csrf-token', { credentials: 'include' });
-        csrfToken = this.getCSRFToken();
+        console.log('Attempting to acquire CSRF token...');
+        
+        // First try the CSRF token endpoint
+        const csrfResp = await fetch('/api/csrf-token', { 
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+          }
+        });
+        
+        if (csrfResp.ok) {
+          console.log('CSRF token endpoint called successfully');
+          csrfToken = this.getCSRFToken();
+        }
 
-        // Fallback: touch auth/me only in the browser to encourage cookie sync
+        // If still no token, try calling auth/me to establish session
         if (!csrfToken) {
+          console.log('No CSRF token found, trying auth/me endpoint...');
           const meResp = await fetch('/api/auth/me', {
             method: 'GET',
             credentials: 'include',
             headers: { 'Accept': 'application/json' },
           });
+          
           // Even if unauthorized, cookies like XSRF-TOKEN may be set by the proxy
-          void meResp;
+          console.log('Auth me response status:', meResp.status);
           csrfToken = this.getCSRFToken();
+        }
+
+        if (csrfToken) {
+          console.log('CSRF token acquired successfully');
+        } else {
+          console.log('Failed to acquire CSRF token');
         }
       } catch (error) {
         console.log('CSRF acquisition failed:', error);
@@ -219,15 +239,26 @@ class ApiClient {
           ...config.headers,
           'X-XSRF-TOKEN': csrfToken,
         };
-      } else if (process.env.NODE_ENV === 'development') {
-        // In development, if we can't get CSRF token, add a development header
-        // This allows testing when the full auth flow isn't working
-        console.log('Development mode: Using auth bypass (no CSRF token available)');
-        config.headers = {
-          ...config.headers,
-          'X-Development-Auth': 'bypass-v2',
-          'X-Development-Mode': 'true',
-        };
+      } else {
+        // If no CSRF token available, try to acquire it before making the request
+        console.log('No CSRF token available, attempting to acquire...');
+        const acquiredToken = await this.ensureCSRFToken();
+        if (acquiredToken) {
+          config.headers = {
+            ...config.headers,
+            'X-XSRF-TOKEN': acquiredToken,
+          };
+        } else {
+          console.log('Still no CSRF token available, proceeding without it');
+          // For registration endpoints, we might need to skip CSRF requirement
+          if (endpoint.includes('/auth/register')) {
+            console.log('Registration endpoint detected, adding bypass header');
+            config.headers = {
+              ...config.headers,
+              'X-Skip-CSRF': 'true',
+            };
+          }
+        }
       }
     }
 

@@ -159,11 +159,8 @@ export default function BusinessFunnel() {
         break;
         
       case 3:
-        if (!registrationData.agreeToTerms) {
-          newErrors.agreeToTerms = 'You must agree to the terms and conditions';
-        }
-        if (!registrationData.agreeToPrivacy) {
-          newErrors.agreeToPrivacy = 'You must agree to the privacy policy';
+        if (!registrationData.agreeToTerms || !registrationData.agreeToPrivacy) {
+          newErrors.agreeToTerms = 'You must agree to both the Terms and Conditions and Privacy Policy';
         }
         break;
     }
@@ -643,44 +640,30 @@ export default function BusinessFunnel() {
                   <div className="flex items-start space-x-3">
                     <input
                       type="checkbox"
-                      id="agreeToTerms"
-                      checked={registrationData.agreeToTerms}
-                      onChange={(e) => handleInputChange('agreeToTerms', e.target.checked)}
+                      id="agreeToTermsAndPrivacy"
+                      checked={registrationData.agreeToTerms && registrationData.agreeToPrivacy}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        handleInputChange('agreeToTerms', checked);
+                        handleInputChange('agreeToPrivacy', checked);
+                      }}
                       className="mt-1 h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
                     />
-                    <label htmlFor="agreeToTerms" className="text-sm text-gray-700">
+                    <label htmlFor="agreeToTermsAndPrivacy" className="text-sm text-gray-700">
                       I agree to the{' '}
                       <Link href="/terms" className="text-orange-600 hover:text-orange-700 font-medium">
                         Terms and Conditions
-                      </Link>
-                    </label>
-                  </div>
-                  {errors.agreeToTerms && (
-                    <p className="text-sm text-red-600 flex items-center gap-1 ml-7">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.agreeToTerms}
-                    </p>
-                  )}
-
-                  <div className="flex items-start space-x-3">
-                    <input
-                      type="checkbox"
-                      id="agreeToPrivacy"
-                      checked={registrationData.agreeToPrivacy}
-                      onChange={(e) => handleInputChange('agreeToPrivacy', e.target.checked)}
-                      className="mt-1 h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
-                    />
-                    <label htmlFor="agreeToPrivacy" className="text-sm text-gray-700">
-                      I agree to the{' '}
+                      </Link>{' '}
+                      and{' '}
                       <Link href="/privacy" className="text-orange-600 hover:text-orange-700 font-medium">
                         Privacy Policy
                       </Link>
                     </label>
                   </div>
-                  {errors.agreeToPrivacy && (
+                  {(errors.agreeToTerms || errors.agreeToPrivacy) && (
                     <p className="text-sm text-red-600 flex items-center gap-1 ml-7">
                       <AlertCircle className="w-4 h-4" />
-                      {errors.agreeToPrivacy}
+                      {errors.agreeToTerms || errors.agreeToPrivacy}
                     </p>
                   )}
                 </div>
@@ -717,7 +700,7 @@ export default function BusinessFunnel() {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={isLoading}
+                disabled={isLoading || !registrationData.agreeToTerms || !registrationData.agreeToPrivacy}
                 className="flex-1 bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 rounded-lg font-medium hover:from-orange-700 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all"
               >
                 {isLoading ? (
