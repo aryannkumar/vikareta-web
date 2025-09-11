@@ -4,7 +4,7 @@ class OnboardingService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5001/api/v1';
+    this.baseUrl = 'https://api.vikareta.com/api/v1';
   }
 
   // Get onboarding status
