@@ -48,7 +48,7 @@ export interface RegisterData {
   firstName?: string;
   lastName?: string;
   businessName?: string;
-  userType?: string;
+  userType: string;
   gstin?: string;
 }
 

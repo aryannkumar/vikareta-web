@@ -112,54 +112,31 @@ class ApiClient {
   }
 
   /**
-   * Get CSRF token from backend if not available in cookies
+   * Get CSRF token from cookie (simplified)
    */
   private async ensureCSRFToken(): Promise<string | null> {
-    // Do not attempt CSRF acquisition during SSR; there is no browser cookie jar
-    if (typeof window === 'undefined') {
+    // Skip CSRF in development for easier testing
+    if (process.env.NODE_ENV === 'development') {
       return null;
     }
 
-    let csrfToken = this.getCSRFToken();
+    // In production, get token from cookie
+    const csrfToken = this.getCSRFToken();
+    if (csrfToken) {
+      return csrfToken;
+    }
 
-    // Only log debug information in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Cookie Debug:', {
-        currentDomain: window.location.hostname,
-        apiDomain: this.baseURL,
-        cookieCount: document.cookie.split(';').filter(c => c.trim()).length,
-        hasXSRF: document.cookie.includes('XSRF-TOKEN'),
+    // If no token, try to get one by calling the CSRF endpoint
+    try {
+      await fetch('/api/csrf-token', { 
+        credentials: 'include',
+        headers: { 'Accept': 'application/json' }
       });
-    }
-
-    // In development, skip CSRF mechanics entirely
-    if (process.env.NODE_ENV === 'development') {
+      return this.getCSRFToken();
+    } catch (error) {
+      console.warn('Failed to acquire CSRF token:', error);
       return null;
     }
-
-    // In production, acquire CSRF by calling our proxy that sets XSRF-TOKEN
-    if (!csrfToken) {
-      try {
-        await fetch('/api/csrf-token', { credentials: 'include' });
-        csrfToken = this.getCSRFToken();
-
-        // Fallback: touch auth/me only in the browser to encourage cookie sync
-        if (!csrfToken) {
-          const meResp = await fetch('/api/auth/me', {
-            method: 'GET',
-            credentials: 'include',
-            headers: { 'Accept': 'application/json' },
-          });
-          // Even if unauthorized, cookies like XSRF-TOKEN may be set by the proxy
-          void meResp;
-          csrfToken = this.getCSRFToken();
-        }
-      } catch (error) {
-        console.log('CSRF acquisition failed:', error);
-      }
-    }
-
-    return csrfToken;
   }
 
   /**
@@ -205,29 +182,18 @@ class ApiClient {
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method || 'GET')) {
       const csrfToken = await this.ensureCSRFToken();
       
-      // Only log CSRF debug info in development (without exposing cookies)
-      if (process.env.NODE_ENV === 'development') {
-        console.log('CSRF Debug:', {
-          method: options.method,
-          hasCSRF: !!csrfToken,
-          cookieCount: typeof window !== 'undefined' ? document.cookie.split(';').filter(c => c.trim()).length : 0
-        });
-      }
-      
       if (csrfToken) {
         config.headers = {
           ...config.headers,
           'X-XSRF-TOKEN': csrfToken,
         };
-      } else if (process.env.NODE_ENV === 'development') {
-        // In development, if we can't get CSRF token, add a development header
-        // This allows testing when the full auth flow isn't working
-        console.log('Development mode: Using auth bypass (no CSRF token available)');
-        config.headers = {
-          ...config.headers,
-          'X-Development-Auth': 'bypass-v2',
-          'X-Development-Mode': 'true',
-        };
+      } else {
+        // For auth endpoints, skip CSRF entirely if no token available
+        if (endpoint.includes('/auth/')) {
+          console.log('Auth endpoint detected, proceeding without CSRF token');
+        } else {
+          console.warn('No CSRF token available for non-auth endpoint');
+        }
       }
     }
 

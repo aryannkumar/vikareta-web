@@ -76,7 +76,7 @@ function ForgotPasswordPageContent() {
       const apiBase = process.env.NEXT_PUBLIC_API_BASE || 
         (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
       
-      const response = await fetch(`${apiBase}/api/auth/forgot-password`, {
+      const response = await fetch(`${apiBase}/api/v1/auth/forgot-password`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -108,7 +108,7 @@ function ForgotPasswordPageContent() {
       const apiBase = process.env.NEXT_PUBLIC_API_BASE || 
         (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
       
-      const response = await fetch(`${apiBase}/api/auth/forgot-password`, {
+      const response = await fetch(`${apiBase}/api/v1/auth/forgot-password`, {
         method: 'POST',
         credentials: 'include',
         headers: {

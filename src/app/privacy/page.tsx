@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Privacy Policy - Vikareta',
-    description: 'Privacy Policy for Vikareta B2B Marketplace',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://vikareta.com'),
+  title: 'Privacy Policy - Vikareta',
+  description: 'Privacy Policy for Vikareta B2B Marketplace',
 };
 
 export default function PrivacyPage() {

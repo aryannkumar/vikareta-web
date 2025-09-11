@@ -28,24 +28,26 @@ export const pincodeSchema = z
 
 // Authentication schemas
 export const loginSchema = z.object({
-  email: emailSchema,
+  email: emailSchema.optional(),
+  phone: phoneSchema.optional(),
   password: z.string().min(1, 'Password is required'),
-});
+}).refine(data => data.email || data.phone, { message: 'Email or phone is required', path: ['email'] });
 
 export const registerSchema = z.object({
   firstName: z.string().min(1, 'First name is required').max(50, 'First name is too long'),
   lastName: z.string().min(1, 'Last name is required').max(50, 'Last name is too long'),
-  email: emailSchema,
+  email: emailSchema.optional(),
   phone: phoneSchema.optional(),
   password: passwordSchema,
   confirmPassword: z.string().min(1, 'Please confirm your password'),
   businessName: z.string().max(100, 'Business name is too long').optional(),
-  gstin: gstinSchema,
+  gstin: gstinSchema.optional(),
+  userType: z.enum(['buyer', 'seller', 'business', 'both'], { required_error: 'Please select your account type' }),
   agreeToTerms: z.boolean().refine(val => val === true, 'You must agree to the terms and conditions'),
 }).refine(data => data.password === data.confirmPassword, {
   message: 'Passwords do not match',
   path: ['confirmPassword'],
-});
+}).refine(data => data.email || data.phone, { message: 'Email or phone is required', path: ['email'] });
 
 export const forgotPasswordSchema = z.object({
   email: emailSchema,

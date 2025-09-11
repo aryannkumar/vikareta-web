@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { AuthService } from '../../lib/api/auth';
 import { Logo } from '../ui/logo';
 import {
   Eye,
@@ -124,36 +125,26 @@ export default function UserFunnel() {
         if (!registrationData.email.trim()) {
           newErrors.email = 'Email is required';
         } else if (!/\S+@\S+\.\S+/.test(registrationData.email)) {
-          newErrors.email = 'Please enter a valid email address';
+          newErrors.email = 'Please enter a valid email address (e.g., name@example.com)';
+        }
+        if (!registrationData.phone.trim()) {
+          newErrors.phone = 'Phone number is required';
+        } else if (!/^[0-9+\-() ]{7,20}$/.test(registrationData.phone)) {
+          newErrors.phone = 'Please enter a valid phone number (e.g., +91 9876543210)';
+        }
+        if (!registrationData.password) {
+          newErrors.password = 'Please create a secure password for your account';
+        } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(registrationData.password)) {
+          newErrors.password = 'Password must be at least 8 characters with uppercase, lowercase, and a number';
+        }
+        if (registrationData.password !== registrationData.confirmPassword) {
+          newErrors.confirmPassword = 'Passwords do not match. Please check and try again';
         }
         break;
         
       case 2:
-        if (!registrationData.phone.trim()) {
-          newErrors.phone = 'Phone number is required';
-        } else if (!/^[0-9+\-() ]{7,20}$/.test(registrationData.phone)) {
-          newErrors.phone = 'Please enter a valid phone number';
-        }
-        if (!registrationData.password) {
-          newErrors.password = 'Password is required';
-        } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(registrationData.password)) {
-          newErrors.password = 'Password must be at least 8 characters with uppercase, lowercase, and number';
-        }
-        if (registrationData.password !== registrationData.confirmPassword) {
-          newErrors.confirmPassword = 'Passwords do not match';
-        }
-        break;
-        
-      case 3:
-        // Interests are optional for users
-        break;
-        
-      case 4:
-        if (!registrationData.agreeToTerms) {
-          newErrors.agreeToTerms = 'You must agree to the terms and conditions';
-        }
-        if (!registrationData.agreeToPrivacy) {
-          newErrors.agreeToPrivacy = 'You must agree to the privacy policy';
+        if (!registrationData.agreeToTerms || !registrationData.agreeToPrivacy) {
+          newErrors.agreeToTerms = 'You must agree to both the Terms of Service and Privacy Policy';
         }
         break;
     }
@@ -164,7 +155,7 @@ export default function UserFunnel() {
 
   const nextStep = () => {
     if (validateStep(step)) {
-      setStep(prev => Math.min(prev + 1, 4));
+      setStep(prev => Math.min(prev + 1, 2));
     }
   };
 
@@ -173,7 +164,7 @@ export default function UserFunnel() {
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(4)) return;
+    if (!validateStep(2)) return;
     
     setIsLoading(true);
     setSubmitError('');
@@ -196,25 +187,58 @@ export default function UserFunnel() {
         })
       });
 
-      const data = await response.json();
+      // Use the AuthService to register
+      await AuthService.register(submitData);
 
-      if (response.ok) {
-        // Registration successful
-        setTimeout(() => {
-          router.push('/onboarding?type=user');
-        }, 1500);
-      } else {
-        setSubmitError(data.message || 'Registration failed. Please try again.');
-      }
+      setStep(3); // Success step
+      setTimeout(() => {
+        router.push('/onboarding?type=user');
+      }, 1500);
     } catch (error) {
       console.error('Registration failed:', error);
-      setSubmitError('Network error. Please check your connection and try again.');
+      setSubmitError(error instanceof Error ? error.message : 'Registration failed. Please check your connection and try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleRegister = handleSubmit;
+  const getPasswordStrength = (password: string) => {
+    let strength = 0;
+    let feedback = [];
+
+    if (password.length >= 8) strength++;
+    else feedback.push('At least 8 characters');
+
+    if (/[a-z]/.test(password)) strength++;
+    else feedback.push('Lowercase letter');
+
+    if (/[A-Z]/.test(password)) strength++;
+    else feedback.push('Uppercase letter');
+
+    if (/\d/.test(password)) strength++;
+    else feedback.push('Number');
+
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+    else feedback.push('Special character');
+
+    return { strength, feedback };
+  };
+
+  const getStrengthColor = (strength: number) => {
+    if (strength <= 1) return 'bg-red-500';
+    if (strength <= 2) return 'bg-orange-500';
+    if (strength <= 3) return 'bg-yellow-500';
+    if (strength <= 4) return 'bg-blue-500';
+    return 'bg-green-500';
+  };
+
+  const getStrengthText = (strength: number) => {
+    if (strength <= 1) return 'Weak';
+    if (strength <= 2) return 'Fair';
+    if (strength <= 3) return 'Good';
+    if (strength <= 4) return 'Strong';
+    return 'Very Strong';
+  };
 
   const stepVariants = {
     hidden: { opacity: 0, x: 50 },
@@ -235,8 +259,8 @@ export default function UserFunnel() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Welcome to Vikareta</h2>
-              <p className="text-gray-600">Let's get you started with your account</p>
+              <h2 className="text-2xl font-bold text-gray-900">Account Setup</h2>
+              <p className="text-gray-600">Create your account with basic information</p>
             </div>
 
             <div className="space-y-4">
@@ -730,7 +754,7 @@ export default function UserFunnel() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="space-y-6"
+            className="text-center space-y-6"
           >
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-bold text-gray-900">Address Information</h2>
@@ -951,13 +975,11 @@ export default function UserFunnel() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="w-full max-w-md mx-auto">
         {/* Logo */}
         <motion.div 
           className="text-center mb-8"
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
           <Logo className="h-20 w-auto" />
         </motion.div>
@@ -965,14 +987,14 @@ export default function UserFunnel() {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between text-xs text-gray-500 mb-2">
-            <span>Step {step} of 4</span>
-            <span>{Math.round((step / 4) * 100)}% complete</span>
+            <span>Step {step} of 2</span>
+            <span>{Math.round((step / 2) * 100)}% complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <motion.div
               className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full"
               initial={{ width: 0 }}
-              animate={{ width: `${(step / 4) * 100}%` }}
+              animate={{ width: `${(step / 2) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
           </div>

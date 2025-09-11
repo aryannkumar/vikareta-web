@@ -31,6 +31,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://vikareta.com'),
   title: 'Vikareta - Premium B2B Marketplace',
   description: 'Connect, Trade, and Grow with Vikareta - Your trusted B2B marketplace for premium business solutions',
   keywords: 'B2B, marketplace, wholesale, suppliers, buyers, trade, premium, business solutions',

@@ -21,7 +21,7 @@ function DashboardPageContent() {
   const checkAuthStatus = async () => {
     try {
       // Check authentication using secure HttpOnly cookies via same-origin proxy
-      const response = await fetch(`/api/auth/me`, {
+      const response = await fetch(`/api/v1/auth/me`, {
         credentials: 'include', // Include HttpOnly cookies
       });
       

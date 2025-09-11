@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://vikareta.com'),
   title: 'Returns & Refunds - Vikareta',
   description: 'Return and refund policy for Vikareta marketplace',
 };

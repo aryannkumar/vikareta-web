@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://vikareta.com'),
   title: 'FAQ - Vikareta',
   description: 'Frequently asked questions about Vikareta B2B Marketplace',
 };
