@@ -179,9 +179,33 @@ export default function UserFunnel() {
     setSubmitError('');
     
     try {
+      // First, fetch CSRF token
+      const csrfResponse = await fetch('/api/csrf-token', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!csrfResponse.ok) {
+        throw new Error('Failed to get CSRF token');
+      }
+
+      // Get the CSRF token from cookies
+      const csrfToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1];
+
+      if (!csrfToken) {
+        throw new Error('CSRF token not found in cookies');
+      }
+
       const response = await fetch('/api/v1/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-xsrf-token': csrfToken,
+        },
+        credentials: 'include',
         body: JSON.stringify({
           ...registrationData,
           userType: 'buyer',

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://vikareta.com'),
   title: 'Cookie Policy - Vikareta',
   description: 'Cookie policy for Vikareta B2B Marketplace',
 };
