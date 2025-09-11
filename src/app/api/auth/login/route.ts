@@ -44,12 +44,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Build cookie header for backend, ensuring XSRF-TOKEN is present alongside any incoming cookies
+    const backendCookie = finalCsrfToken
+      ? `${cookieHeader || ''}${cookieHeader ? '; ' : ''}XSRF-TOKEN=${finalCsrfToken}`
+      : cookieHeader;
+
     const resp = await fetch(`${apiBase}/api/v1/auth/login`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        ...(cookieHeader ? { cookie: cookieHeader } : {}),
+        ...(backendCookie ? { cookie: backendCookie } : {}),
         ...(finalCsrfToken ? { 'X-XSRF-TOKEN': finalCsrfToken } : {}),
       },
       body: JSON.stringify(body || {}),
