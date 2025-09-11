@@ -187,12 +187,11 @@ export default function BusinessFunnel() {
     try {
       // Prepare data for backend API
       const submitData = {
-        businessName: registrationData.businessName,
+        email: registrationData.email,
+        password: registrationData.password,
         firstName: registrationData.firstName,
         lastName: registrationData.lastName,
-        email: registrationData.email,
-        phone: registrationData.phone,
-        password: registrationData.password,
+        businessName: registrationData.businessName,
         userType: 'business' as const,
         gstin: registrationData.gstin || undefined,
         location: registrationData.location || undefined,

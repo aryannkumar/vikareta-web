@@ -4,7 +4,7 @@ import * as React from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Simple fallback Select implementation
+// Custom Select component implementation
 const SelectContext = React.createContext<{
   value?: string;
   onValueChange?: (value: string) => void;

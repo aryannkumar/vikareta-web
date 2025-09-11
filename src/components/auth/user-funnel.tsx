@@ -183,9 +183,16 @@ export default function UserFunnel() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...registrationData,
+          email: registrationData.email,
+          password: registrationData.password,
+          firstName: registrationData.firstName,
+          lastName: registrationData.lastName,
           userType: 'buyer',
-          marketingConsent
+          address: registrationData.address,
+          city: registrationData.city,
+          state: registrationData.state,
+          postalCode: registrationData.pinCode,
+          location: registrationData.location
         })
       });
 
@@ -234,78 +241,159 @@ export default function UserFunnel() {
 
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     First Name *
                   </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
+                  <div className="relative group">
+                    <motion.div
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 transition-colors group-focus-within:text-orange-500"
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <User className="h-5 w-5" />
+                    </motion.div>
+                    <motion.input
                       type="text"
                       value={registrationData.firstName}
                       onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
-                        errors.firstName ? 'border-red-500' : 'border-gray-300'
+                      className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-base shadow-sm hover:shadow-md ${
+                        errors.firstName ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-orange-300 focus:border-orange-500'
                       }`}
                       placeholder="First name"
+                      whileFocus={{ scale: 1.01 }}
+                      transition={{ duration: 0.2 }}
                     />
+                    {registrationData.firstName && !errors.firstName && (
+                      <motion.div
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-500"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <CheckCircle className="h-5 w-5" />
+                      </motion.div>
+                    )}
                   </div>
                   {errors.firstName && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
+                    <motion.p
+                      className="mt-2 text-sm text-red-600 flex items-center gap-2 bg-red-50 px-3 py-2 rounded-lg"
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <AlertCircle className="h-4 w-4 flex-shrink-0" />
                       {errors.firstName}
-                    </p>
+                    </motion.p>
                   )}
-                </div>
+                </motion.div>
 
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                >
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Last Name *
                   </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
+                  <div className="relative group">
+                    <motion.div
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 transition-colors group-focus-within:text-orange-500"
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <User className="h-5 w-5" />
+                    </motion.div>
+                    <motion.input
                       type="text"
                       value={registrationData.lastName}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
-                        errors.lastName ? 'border-red-500' : 'border-gray-300'
+                      className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-base shadow-sm hover:shadow-md ${
+                        errors.lastName ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-orange-300 focus:border-orange-500'
                       }`}
                       placeholder="Last name"
+                      whileFocus={{ scale: 1.01 }}
+                      transition={{ duration: 0.2 }}
                     />
+                    {registrationData.lastName && !errors.lastName && (
+                      <motion.div
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-500"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <CheckCircle className="h-5 w-5" />
+                      </motion.div>
+                    )}
                   </div>
                   {errors.lastName && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
+                    <motion.p
+                      className="mt-2 text-sm text-red-600 flex items-center gap-2 bg-red-50 px-3 py-2 rounded-lg"
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <AlertCircle className="h-4 w-4 flex-shrink-0" />
                       {errors.lastName}
-                    </p>
+                    </motion.p>
                   )}
-                </div>
+                </motion.div>
               </div>
 
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
+              >
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address *
                 </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
+                <div className="relative group">
+                  <motion.div
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 transition-colors group-focus-within:text-orange-500"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Mail className="h-5 w-5" />
+                  </motion.div>
+                  <motion.input
                     type="email"
                     value={registrationData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
-                      errors.email ? 'border-red-500' : 'border-gray-300'
+                    className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-base shadow-sm hover:shadow-md ${
+                      errors.email ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-orange-300 focus:border-orange-500'
                     }`}
                     placeholder="Enter your email"
+                    whileFocus={{ scale: 1.01 }}
+                    transition={{ duration: 0.2 }}
                   />
+                  {registrationData.email && !errors.email && (
+                    <motion.div
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-500"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <CheckCircle className="h-5 w-5" />
+                    </motion.div>
+                  )}
                 </div>
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
+                  <motion.p
+                    className="mt-2 text-sm text-red-600 flex items-center gap-2 bg-red-50 px-3 py-2 rounded-lg"
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
                     {errors.email}
-                  </p>
+                  </motion.p>
                 )}
-              </div>
+              </motion.div>
             </div>
 
             <button
@@ -334,109 +422,303 @@ export default function UserFunnel() {
             </div>
 
             <div className="space-y-4">
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Phone Number *
                 </label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
+                <div className="relative group">
+                  <motion.div
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 transition-colors group-focus-within:text-orange-500"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Phone className="h-5 w-5" />
+                  </motion.div>
+                  <motion.input
                     type="tel"
                     value={registrationData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
-                      errors.phone ? 'border-red-500' : 'border-gray-300'
+                    className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-base shadow-sm hover:shadow-md ${
+                      errors.phone ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-orange-300 focus:border-orange-500'
                     }`}
                     placeholder="+91 Enter phone number"
+                    whileFocus={{ scale: 1.01 }}
+                    transition={{ duration: 0.2 }}
                   />
+                  {registrationData.phone && !errors.phone && (
+                    <motion.div
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-500"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <CheckCircle className="h-5 w-5" />
+                    </motion.div>
+                  )}
                 </div>
                 {errors.phone && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
+                  <motion.p
+                    className="mt-2 text-sm text-red-600 flex items-center gap-2 bg-red-50 px-3 py-2 rounded-lg"
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
                     {errors.phone}
-                  </p>
+                  </motion.p>
                 )}
-              </div>
+              </motion.div>
 
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+              >
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Password *
                 </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
+                <div className="relative group">
+                  <motion.div
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 transition-colors group-focus-within:text-orange-500"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Lock className="h-5 w-5" />
+                  </motion.div>
+                  <motion.input
                     type={showPassword ? 'text' : 'password'}
                     value={registrationData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
-                    className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
-                      errors.password ? 'border-red-500' : 'border-gray-300'
+                    className={`w-full pl-12 pr-14 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-base shadow-sm hover:shadow-md ${
+                      errors.password ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-orange-300 focus:border-orange-500'
                     }`}
                     placeholder="Create a secure password"
+                    whileFocus={{ scale: 1.01 }}
+                    transition={{ duration: 0.2 }}
                   />
-                  <button
+                  <motion.button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors disabled:opacity-50"
+                    disabled={isLoading}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </motion.button>
                 </div>
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.password}
-                  </p>
-                )}
-              </div>
 
-              <div>
+                {/* Password Strength Indicator */}
+                {registrationData.password && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0, y: -10 }}
+                    animate={{ opacity: 1, height: 'auto', y: 0 }}
+                    exit={{ opacity: 0, height: 0, y: -10 }}
+                    className="mt-4 space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-100"
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">Password strength:</span>
+                      <motion.span
+                        className={`text-sm font-semibold ${
+                          registrationData.password.length >= 8 &&
+                          /[A-Z]/.test(registrationData.password) &&
+                          /[a-z]/.test(registrationData.password) &&
+                          /\d/.test(registrationData.password)
+                            ? 'text-green-600'
+                            : registrationData.password.length >= 6
+                            ? 'text-yellow-600'
+                            : 'text-red-600'
+                        }`}
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {registrationData.password.length >= 8 &&
+                         /[A-Z]/.test(registrationData.password) &&
+                         /[a-z]/.test(registrationData.password) &&
+                         /\d/.test(registrationData.password)
+                          ? 'Strong'
+                          : registrationData.password.length >= 6
+                          ? 'Medium'
+                          : 'Weak'}
+                      </motion.span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                      <motion.div
+                        className={`h-3 rounded-full ${
+                          registrationData.password.length >= 8 &&
+                          /[A-Z]/.test(registrationData.password) &&
+                          /[a-z]/.test(registrationData.password) &&
+                          /\d/.test(registrationData.password)
+                            ? 'bg-green-500'
+                            : registrationData.password.length >= 6
+                            ? 'bg-yellow-500'
+                            : 'bg-red-500'
+                        }`}
+                        initial={{ width: 0 }}
+                        animate={{
+                          width: `${
+                            registrationData.password.length >= 8 &&
+                            /[A-Z]/.test(registrationData.password) &&
+                            /[a-z]/.test(registrationData.password) &&
+                            /\d/.test(registrationData.password)
+                              ? 100
+                              : registrationData.password.length >= 6
+                              ? 60
+                              : 30
+                          }%`
+                        }}
+                        transition={{ duration: 0.5, ease: 'easeOut' }}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      {[
+                        { label: '8+ chars', check: registrationData.password.length >= 8 },
+                        { label: 'Uppercase', check: /[A-Z]/.test(registrationData.password) },
+                        { label: 'Lowercase', check: /[a-z]/.test(registrationData.password) },
+                        { label: 'Number', check: /\d/.test(registrationData.password) }
+                      ].map((item, index) => (
+                        <motion.div
+                          key={item.label}
+                          className={`flex items-center ${item.check ? 'text-green-600' : 'text-gray-400'}`}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: index * 0.1 }}
+                        >
+                          <motion.div
+                            animate={{ rotate: item.check ? 0 : 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <CheckCircle className="w-3 h-3 mr-2 flex-shrink-0" />
+                          </motion.div>
+                          {item.label}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {errors.password && (
+                  <motion.p
+                    className="mt-2 text-sm text-red-600 flex items-center gap-2 bg-red-50 px-3 py-2 rounded-lg"
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                    {errors.password}
+                  </motion.p>
+                )}
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
+              >
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Confirm Password *
                 </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
+                <div className="relative group">
+                  <motion.div
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 transition-colors group-focus-within:text-orange-500"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Lock className="h-5 w-5" />
+                  </motion.div>
+                  <motion.input
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={registrationData.confirmPassword}
                     onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                    className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
-                      errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                    className={`w-full pl-12 pr-14 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-base shadow-sm hover:shadow-md ${
+                      errors.confirmPassword ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-orange-300 focus:border-orange-500'
                     }`}
                     placeholder="Confirm your password"
+                    whileFocus={{ scale: 1.01 }}
+                    transition={{ duration: 0.2 }}
                   />
-                  <button
+                  <motion.button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors disabled:opacity-50"
+                    disabled={isLoading}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
                   >
-                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </motion.button>
+                  {registrationData.confirmPassword &&
+                   registrationData.password === registrationData.confirmPassword &&
+                   !errors.confirmPassword && (
+                    <motion.div
+                      className="absolute right-12 top-1/2 transform -translate-y-1/2 text-green-500"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <CheckCircle className="h-5 w-5" />
+                    </motion.div>
+                  )}
                 </div>
                 {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
+                  <motion.p
+                    className="mt-2 text-sm text-red-600 flex items-center gap-2 bg-red-50 px-3 py-2 rounded-lg"
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
                     {errors.confirmPassword}
-                  </p>
+                  </motion.p>
                 )}
-              </div>
+              </motion.div>
             </div>
 
-            <div className="flex gap-3">
-              <button
+            <motion.div
+              className="flex gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.3 }}
+            >
+              <motion.button
                 onClick={prevStep}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 border-2 border-gray-300 text-gray-700 py-4 px-6 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-400 flex items-center justify-center gap-3 transition-all duration-300 text-base shadow-sm hover:shadow-md"
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.4 }}
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-5 h-5" />
                 Back
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={nextStep}
-                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:from-orange-600 hover:to-amber-600 flex items-center justify-center gap-3 text-base relative overflow-hidden group"
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.5 }}
               >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: '100%' }}
+                  transition={{ duration: 0.6 }}
+                />
                 Continue
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+                <ArrowRight className="w-5 h-5" />
+              </motion.button>
+            </motion.div>
           </motion.div>
         );
 
@@ -621,23 +903,44 @@ export default function UserFunnel() {
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </button>
-              <button
+              <motion.button
                 onClick={handleRegister}
                 disabled={!acceptTerms || isLoading}
-                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-base relative overflow-hidden group"
+                whileHover={{ scale: isLoading ? 1 : 1.02, y: isLoading ? 0 : -1 }}
+                whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
               >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: '100%' }}
+                  transition={{ duration: 0.6 }}
+                />
                 {isLoading ? (
-                  <>
+                  <motion.div
+                    className="flex items-center gap-3"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     Creating Account...
-                  </>
+                  </motion.div>
                 ) : (
-                  <>
+                  <motion.div
+                    className="flex items-center gap-3"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     Complete Registration
-                    <CheckCircle className="w-4 h-4" />
-                  </>
+                    <CheckCircle className="w-5 h-5" />
+                  </motion.div>
                 )}
-              </button>
+              </motion.button>
             </div>
           </motion.div>
         );

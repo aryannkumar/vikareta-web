@@ -19,7 +19,8 @@ import {
   Zap,
   Star,
   Globe,
-  TrendingUp
+  TrendingUp,
+  Search
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -208,42 +209,58 @@ export function Header() {
       initial="hidden"
       animate="visible"
     >
-      {/* Premium announcement bar */}
-  <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-center py-2 text-sm font-medium">
-        <div className="flex items-center justify-center space-x-2">
-          <Zap className="w-4 h-4" />
-          <span>🎉 Special Launch Offer: 2 Months Free Subscription! Use code: VIKARETANEW</span>
-          <Star className="w-4 h-4" />
+      {/* Premium announcement bar with enhanced design */}
+      <div className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white text-center py-2 text-sm font-medium relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
+        <div className="relative flex items-center justify-center space-x-2">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          >
+            <Zap className="w-4 h-4" />
+          </motion.div>
+          <span className="font-semibold tracking-wide">🎉 Special Launch Offer: 2 Months Free Subscription! Use code: VIKARETANEW</span>
+          <motion.div
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <Star className="w-4 h-4" />
+          </motion.div>
         </div>
       </div>
 
       <div className="mx-auto px-4 sm:px-6 max-w-none w-full">
         <div className="flex h-16 sm:h-20 items-center justify-between">
-          {/* Premium Logo Section - Raw & Enlarged */}
-          <motion.div variants={itemVariants}>
+          {/* Premium Logo Section - Enhanced */}
+          <motion.div variants={itemVariants} className="flex-shrink-0">
             <Link href="/" className="flex items-center group">
               <motion.div 
                 whileHover={{ scale: 1.05 }} 
                 transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                className="relative"
               >
                 <Logo 
-                  className="h-16 w-auto sm:h-18 md:h-20 lg:h-22 xl:h-24" 
+                  className="h-16 w-auto sm:h-18 md:h-20 lg:h-22 xl:h-24 transition-all duration-300" 
                   showText={false}
                   priority={true}
+                />
+                <motion.div 
+                  className="absolute -inset-2 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full opacity-0 group-hover:opacity-20 blur-lg transition-opacity duration-300"
+                  whileHover={{ scale: 1.1 }}
                 />
               </motion.div>
             </Link>
           </motion.div>
 
-          {/* Premium Navigation - Desktop */}
+          {/* Premium Navigation - Desktop - Enhanced */}
           <motion.nav variants={itemVariants} className="hidden lg:flex items-center space-x-1 flex-1 justify-center">
             {[
-              { href: '/marketplace', label: 'Marketplace', icon: Globe },
-              { href: '/categories', label: 'Categories', icon: Package },
-              { href: '/products', label: 'Products', icon: Star },
-              { href: '/services', label: 'Services', icon: TrendingUp },
-              { href: '/businesses', label: 'Businesses', icon: Store },
-              { href: '/rfqs', label: 'RFQs', icon: FileText }
+              { href: '/marketplace', label: 'Marketplace', icon: Globe, color: 'text-blue-600' },
+              { href: '/categories', label: 'Categories', icon: Package, color: 'text-green-600' },
+              { href: '/products', label: 'Products', icon: Star, color: 'text-yellow-600' },
+              { href: '/services', label: 'Services', icon: TrendingUp, color: 'text-purple-600' },
+              { href: '/businesses', label: 'Businesses', icon: Store, color: 'text-indigo-600' },
+              { href: '/rfqs', label: 'RFQs', icon: FileText, color: 'text-red-600' }
             ].map((item) => (
               <motion.div
                 key={item.href}
@@ -252,17 +269,38 @@ export function Header() {
               >
                 <Link 
                   href={item.href}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-vikareta-orange-600 dark:hover:text-vikareta-orange-400 rounded-xl transition-all duration-300 hover:bg-vikareta-orange-50 dark:hover:bg-vikareta-orange-900/20 group"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-vikareta-orange-600 dark:hover:text-vikareta-orange-400 rounded-xl transition-all duration-300 hover:bg-vikareta-orange-50 dark:hover:bg-vikareta-orange-900/20 group relative"
                 >
-                  <item.icon className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
-                  <span>{item.label}</span>
+                  <motion.div
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <item.icon className={`w-4 h-4 ${item.color} group-hover:scale-110 transition-transform duration-300`} />
+                  </motion.div>
+                  <span className="relative">
+                    {item.label}
+                    <motion.div 
+                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full"
+                      initial={{ scaleX: 0 }}
+                      whileHover={{ scaleX: 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </span>
                 </Link>
               </motion.div>
             ))}
           </motion.nav>
 
-          {/* Premium Actions Section */}
+          {/* Premium Actions Section - Enhanced */}
           <motion.div variants={itemVariants} className="flex items-center space-x-3">
+            {/* Search Button - New Addition */}
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link href="/search">
+                <Button variant="ghost" size="sm" className="relative p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl">
+                  <Search className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                </Button>
+              </Link>
+            </motion.div>
             {/* Notifications */}
             {isAuthenticated && (
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -318,9 +356,7 @@ export function Header() {
                   className="hidden sm:flex items-center space-x-2 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
                   onClick={() => {
                     // Open dashboard directly in new tab - SSO will handle authentication
-                    const dashboardUrl = process.env.NODE_ENV === 'development' 
-                      ? 'http://localhost:3001' 
-                      : `https://${process.env.NEXT_PUBLIC_DASHBOARD_HOST || 'dashboard.vikareta.com'}`;
+                    const dashboardUrl = 'https://dashboard.vikareta.com';
                     window.open(dashboardUrl, '_blank', 'noopener,noreferrer');
                   }}
                 >
@@ -338,15 +374,13 @@ export function Header() {
                   onClick={async () => {
                     try {
                       // SSO sync to admin
-                      const targets = [process.env.NEXT_PUBLIC_ADMIN_HOST || 'admin.vikareta.com'];
+                      const targets = ['admin.vikareta.com'];
                       await syncSSOToSubdomains(targets);
-                      const adminUrl = process.env.NODE_ENV === 'development' 
-                        ? 'http://localhost:3002' 
-                        : `https://${process.env.NEXT_PUBLIC_ADMIN_HOST || 'admin.vikareta.com'}`;
+                      const adminUrl = 'https://admin.vikareta.com';
                       window.open(adminUrl, '_blank', 'noopener,noreferrer');
                     } catch (err) {
                       console.error('Failed to open admin via SSO:', err);
-                      const fallback = process.env.NODE_ENV === 'development' ? 'http://localhost:3002' : `https://${process.env.NEXT_PUBLIC_ADMIN_HOST || 'admin.vikareta.com'}`;
+                      const fallback = 'https://admin.vikareta.com';
                       window.open(fallback, '_blank', 'noopener,noreferrer');
                     }
                   }}
