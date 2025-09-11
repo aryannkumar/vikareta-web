@@ -11,8 +11,11 @@ import {
   Mail,
   Lock,
   User,
-  Phone,
-  ArrowRight,
+  Pho                    <input
+                      type="email"
+                      value={registrationData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      className={`w-full pl-10 pr-4 py-4 sm:py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm text-base sm:text-sm ${  ArrowRight,
   ArrowLeft,
   CheckCircle,
   Smartphone,
@@ -124,7 +127,7 @@ export default function UserFunnel() {
         if (!registrationData.email.trim()) {
           newErrors.email = 'Email is required';
         } else if (!/\S+@\S+\.\S+/.test(registrationData.email)) {
-          newErrors.email = 'Please enter a valid email address';
+          newErrors.email = 'Please enter a valid email address (e.g., name@example.com)';
         }
         break;
         
@@ -132,15 +135,15 @@ export default function UserFunnel() {
         if (!registrationData.phone.trim()) {
           newErrors.phone = 'Phone number is required';
         } else if (!/^[0-9+\-() ]{7,20}$/.test(registrationData.phone)) {
-          newErrors.phone = 'Please enter a valid phone number';
+          newErrors.phone = 'Please enter a valid phone number (e.g., +91 9876543210)';
         }
         if (!registrationData.password) {
-          newErrors.password = 'Password is required';
+          newErrors.password = 'Please create a secure password for your account';
         } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(registrationData.password)) {
-          newErrors.password = 'Password must be at least 8 characters with uppercase, lowercase, and number';
+          newErrors.password = 'Password must be at least 8 characters with uppercase, lowercase, and a number';
         }
         if (registrationData.password !== registrationData.confirmPassword) {
-          newErrors.confirmPassword = 'Passwords do not match';
+          newErrors.confirmPassword = 'Passwords do not match. Please check and try again';
         }
         break;
         
@@ -150,10 +153,10 @@ export default function UserFunnel() {
         
       case 4:
         if (!registrationData.agreeToTerms) {
-          newErrors.agreeToTerms = 'You must agree to the terms and conditions';
+          newErrors.agreeToTerms = 'Please accept our Terms of Service to continue';
         }
         if (!registrationData.agreeToPrivacy) {
-          newErrors.agreeToPrivacy = 'You must agree to the privacy policy';
+          newErrors.agreeToPrivacy = 'Please accept our Privacy Policy to continue';
         }
         break;
     }
@@ -179,7 +182,7 @@ export default function UserFunnel() {
     setSubmitError('');
     
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/v1/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -207,7 +210,43 @@ export default function UserFunnel() {
     }
   };
 
-  const handleRegister = handleSubmit;
+  const getPasswordStrength = (password: string) => {
+    let strength = 0;
+    let feedback = [];
+
+    if (password.length >= 8) strength++;
+    else feedback.push('At least 8 characters');
+
+    if (/[a-z]/.test(password)) strength++;
+    else feedback.push('Lowercase letter');
+
+    if (/[A-Z]/.test(password)) strength++;
+    else feedback.push('Uppercase letter');
+
+    if (/\d/.test(password)) strength++;
+    else feedback.push('Number');
+
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+    else feedback.push('Special character');
+
+    return { strength, feedback };
+  };
+
+  const getStrengthColor = (strength: number) => {
+    if (strength <= 1) return 'bg-red-500';
+    if (strength <= 2) return 'bg-orange-500';
+    if (strength <= 3) return 'bg-yellow-500';
+    if (strength <= 4) return 'bg-blue-500';
+    return 'bg-green-500';
+  };
+
+  const getStrengthText = (strength: number) => {
+    if (strength <= 1) return 'Weak';
+    if (strength <= 2) return 'Fair';
+    if (strength <= 3) return 'Good';
+    if (strength <= 4) return 'Strong';
+    return 'Very Strong';
+  };
 
   const stepVariants = {
     hidden: { opacity: 0, x: 50 },
@@ -244,17 +283,19 @@ export default function UserFunnel() {
                       type="text"
                       value={registrationData.firstName}
                       onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                      className={`w-full pl-10 pr-4 py-4 sm:py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm text-base sm:text-sm ${
                         errors.firstName ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder="First name"
                     />
                   </div>
                   {errors.firstName && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.firstName}
-                    </p>
+                    <div className="mt-1 p-2 bg-red-50 border border-red-200 rounded-md">
+                      <p className="text-sm text-red-700 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                        {errors.firstName}
+                      </p>
+                    </div>
                   )}
                 </div>
 
@@ -268,7 +309,7 @@ export default function UserFunnel() {
                       type="text"
                       value={registrationData.lastName}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                      className={`w-full pl-10 pr-4 py-4 sm:py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm text-base sm:text-sm ${
                         errors.lastName ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder="Last name"
@@ -293,7 +334,7 @@ export default function UserFunnel() {
                     type="email"
                     value={registrationData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm ${
+                    className={`w-full pl-10 pr-4 py-4 sm:py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm text-base sm:text-sm ${
                       errors.email ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Enter your email"
@@ -381,6 +422,38 @@ export default function UserFunnel() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
+                {registrationData.password && (
+                  <div className="mt-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-gray-600">Password strength:</span>
+                      <span className={`text-xs font-medium ${
+                        getPasswordStrength(registrationData.password).strength <= 1 ? 'text-red-600' :
+                        getPasswordStrength(registrationData.password).strength <= 2 ? 'text-orange-600' :
+                        getPasswordStrength(registrationData.password).strength <= 3 ? 'text-yellow-600' :
+                        getPasswordStrength(registrationData.password).strength <= 4 ? 'text-blue-600' :
+                        'text-green-600'
+                      }`}>
+                        {getStrengthText(getPasswordStrength(registrationData.password).strength)}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-300 ${getStrengthColor(getPasswordStrength(registrationData.password).strength)}`}
+                        style={{ width: `${(getPasswordStrength(registrationData.password).strength / 5) * 100}%` }}
+                      />
+                    </div>
+                    {getPasswordStrength(registrationData.password).feedback.length > 0 && (
+                      <div className="mt-2 text-xs text-gray-500">
+                        <p className="font-medium mb-1">To make your password stronger:</p>
+                        <ul className="list-disc list-inside space-y-1">
+                          {getPasswordStrength(registrationData.password).feedback.map((item, index) => (
+                            <li key={index}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
                     <AlertCircle className="w-4 h-4" />
@@ -648,8 +721,8 @@ export default function UserFunnel() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="w-full max-w-md mx-auto">
         {/* Logo */}
         <motion.div 
           className="text-center mb-8"
