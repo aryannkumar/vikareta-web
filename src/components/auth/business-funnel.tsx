@@ -152,15 +152,12 @@ export default function BusinessFunnel() {
         if (!registrationData.businessType) {
           newErrors.businessType = 'Please select a business type';
         }
+        if (!registrationData.agreeToTerms || !registrationData.agreeToPrivacy) {
+          newErrors.agreeToTerms = 'You must agree to both the Terms and Conditions and Privacy Policy';
+        }
         // Optional fields validation
         if (registrationData.gstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(registrationData.gstin)) {
           newErrors.gstin = 'Please enter a valid GSTIN';
-        }
-        break;
-        
-      case 3:
-        if (!registrationData.agreeToTerms || !registrationData.agreeToPrivacy) {
-          newErrors.agreeToTerms = 'You must agree to both the Terms and Conditions and Privacy Policy';
         }
         break;
     }
@@ -171,7 +168,7 @@ export default function BusinessFunnel() {
 
   const nextStep = () => {
     if (validateStep(step)) {
-      setStep(prev => Math.min(prev + 1, 3));
+      setStep(prev => Math.min(prev + 1, 2));
     }
   };
 
@@ -180,7 +177,7 @@ export default function BusinessFunnel() {
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(3)) return;
+    if (!validateStep(2)) return;
     
     setIsLoading(true);
     try {
@@ -212,7 +209,7 @@ export default function BusinessFunnel() {
       // Use the AuthService to register
       await AuthService.register(submitData);
 
-      setStep(4); // Success step
+      setStep(3); // Success step
       setTimeout(() => {
         router.push('/onboarding?type=business');
       }, 2000);
@@ -454,8 +451,8 @@ export default function BusinessFunnel() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Business Type & Details</h2>
-              <p className="text-gray-600">Select your business category and add optional details</p>
+              <h2 className="text-2xl font-bold text-gray-900">Business Type & Terms</h2>
+              <p className="text-gray-600">Select your business category and accept our terms</p>
             </div>
 
             <div className="space-y-6">
@@ -597,44 +594,7 @@ export default function BusinessFunnel() {
                   />
                 </div>
               </div>
-            </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={prevStep}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </button>
-              <button
-                onClick={nextStep}
-                disabled={!registrationData.businessType}
-                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
-              >
-                Continue
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </motion.div>
-        );
-
-      case 3:
-        return (
-          <motion.div
-            key="step3"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="space-y-6"
-          >
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Terms & Conditions</h2>
-              <p className="text-gray-600">Please review and accept our terms to continue</p>
-            </div>
-
-            <div className="space-y-6">
               <div className="bg-gray-50 p-6 rounded-lg border">
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
@@ -700,7 +660,7 @@ export default function BusinessFunnel() {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={isLoading || !registrationData.agreeToTerms || !registrationData.agreeToPrivacy}
+                disabled={isLoading || !registrationData.businessType || !registrationData.agreeToTerms || !registrationData.agreeToPrivacy}
                 className="flex-1 bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 rounded-lg font-medium hover:from-orange-700 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all"
               >
                 {isLoading ? (
@@ -719,10 +679,12 @@ export default function BusinessFunnel() {
           </motion.div>
         );
 
-      case 4:
+
+
+      case 3:
         return (
           <motion.div
-            key="step4"
+            key="step3"
             variants={stepVariants}
             initial="hidden"
             animate="visible"
@@ -755,8 +717,6 @@ export default function BusinessFunnel() {
         {/* Logo */}
         <motion.div 
           className="text-center mb-8"
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
           <Logo className="h-20 w-auto" />
         </motion.div>
@@ -764,14 +724,14 @@ export default function BusinessFunnel() {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between text-xs text-gray-500 mb-2">
-            <span>Step {step} of 3</span>
-            <span>{Math.round((step / 3) * 100)}% complete</span>
+            <span>Step {step} of 2</span>
+            <span>{Math.round((step / 2) * 100)}% complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <motion.div
               className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full"
               initial={{ width: 0 }}
-              animate={{ width: `${(step / 3) * 100}%` }}
+              animate={{ width: `${(step / 2) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
           </div>

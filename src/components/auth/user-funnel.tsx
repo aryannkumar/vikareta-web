@@ -143,10 +143,6 @@ export default function UserFunnel() {
         break;
         
       case 2:
-        // Optional address validation - no required fields
-        break;
-        
-      case 3:
         if (!registrationData.agreeToTerms || !registrationData.agreeToPrivacy) {
           newErrors.agreeToTerms = 'You must agree to both the Terms of Service and Privacy Policy';
         }
@@ -159,7 +155,7 @@ export default function UserFunnel() {
 
   const nextStep = () => {
     if (validateStep(step)) {
-      setStep(prev => Math.min(prev + 1, 3));
+      setStep(prev => Math.min(prev + 1, 2));
     }
   };
 
@@ -168,7 +164,7 @@ export default function UserFunnel() {
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(3)) return;
+    if (!validateStep(2)) return;
     
     setIsLoading(true);
     setSubmitError('');
@@ -200,7 +196,7 @@ export default function UserFunnel() {
       // Use the AuthService to register
       await AuthService.register(submitData);
 
-      setStep(4); // Success step
+      setStep(3); // Success step
       setTimeout(() => {
         router.push('/onboarding?type=user');
       }, 1500);
@@ -490,8 +486,8 @@ export default function UserFunnel() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Preferences</h2>
-              <p className="text-gray-600">Tell us about your interests and location</p>
+              <h2 className="text-2xl font-bold text-gray-900">Preferences & Terms</h2>
+              <p className="text-gray-600">Tell us about your interests and accept our terms</p>
             </div>
 
             <div className="space-y-6">
@@ -597,43 +593,7 @@ export default function UserFunnel() {
                   />
                 </div>
               </div>
-            </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={prevStep}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </button>
-              <button
-                onClick={nextStep}
-                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 flex items-center justify-center gap-2 transition-colors"
-              >
-                Continue
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </motion.div>
-        );
-
-      case 3:
-        return (
-          <motion.div
-            key="step3"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="space-y-6"
-          >
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Terms & Conditions</h2>
-              <p className="text-gray-600">Please review and accept our terms to continue</p>
-            </div>
-
-            <div className="space-y-6">
               <div className="bg-gray-50 p-6 rounded-lg border">
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
@@ -731,10 +691,12 @@ export default function UserFunnel() {
           </motion.div>
         );
 
-      case 4:
+
+
+      case 3:
         return (
           <motion.div
-            key="step4"
+            key="step3"
             variants={stepVariants}
             initial="hidden"
             animate="visible"
@@ -767,8 +729,6 @@ export default function UserFunnel() {
         {/* Logo */}
         <motion.div 
           className="text-center mb-8"
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
           <Logo className="h-20 w-auto" />
         </motion.div>
@@ -776,14 +736,14 @@ export default function UserFunnel() {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between text-xs text-gray-500 mb-2">
-            <span>Step {step} of 3</span>
-            <span>{Math.round((step / 3) * 100)}% complete</span>
+            <span>Step {step} of 2</span>
+            <span>{Math.round((step / 2) * 100)}% complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <motion.div
               className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full"
               initial={{ width: 0 }}
-              animate={{ width: `${(step / 3) * 100}%` }}
+              animate={{ width: `${(step / 2) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
           </div>

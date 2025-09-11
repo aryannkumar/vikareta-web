@@ -112,74 +112,31 @@ class ApiClient {
   }
 
   /**
-   * Get CSRF token from backend if not available in cookies
+   * Get CSRF token from cookie (simplified)
    */
   private async ensureCSRFToken(): Promise<string | null> {
-    // Do not attempt CSRF acquisition during SSR; there is no browser cookie jar
-    if (typeof window === 'undefined') {
+    // Skip CSRF in development for easier testing
+    if (process.env.NODE_ENV === 'development') {
       return null;
     }
 
-    let csrfToken = this.getCSRFToken();
+    // In production, get token from cookie
+    const csrfToken = this.getCSRFToken();
+    if (csrfToken) {
+      return csrfToken;
+    }
 
-    // Only log debug information in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Cookie Debug:', {
-        currentDomain: window.location.hostname,
-        apiDomain: this.baseURL,
-        cookieCount: document.cookie.split(';').filter(c => c.trim()).length,
-        hasXSRF: document.cookie.includes('XSRF-TOKEN'),
+    // If no token, try to get one by calling the CSRF endpoint
+    try {
+      await fetch('/api/csrf-token', { 
+        credentials: 'include',
+        headers: { 'Accept': 'application/json' }
       });
-    }
-
-    // In development, skip CSRF mechanics entirely
-    if (process.env.NODE_ENV === 'development') {
+      return this.getCSRFToken();
+    } catch (error) {
+      console.warn('Failed to acquire CSRF token:', error);
       return null;
     }
-
-    // In production, acquire CSRF by calling our proxy that sets XSRF-TOKEN
-    if (!csrfToken) {
-      try {
-        console.log('Attempting to acquire CSRF token...');
-        
-        // First try the CSRF token endpoint
-        const csrfResp = await fetch('/api/csrf-token', { 
-          credentials: 'include',
-          headers: {
-            'Accept': 'application/json',
-          }
-        });
-        
-        if (csrfResp.ok) {
-          console.log('CSRF token endpoint called successfully');
-          csrfToken = this.getCSRFToken();
-        }
-
-        // If still no token, try calling auth/me to establish session
-        if (!csrfToken) {
-          console.log('No CSRF token found, trying auth/me endpoint...');
-          const meResp = await fetch('/api/auth/me', {
-            method: 'GET',
-            credentials: 'include',
-            headers: { 'Accept': 'application/json' },
-          });
-          
-          // Even if unauthorized, cookies like XSRF-TOKEN may be set by the proxy
-          console.log('Auth me response status:', meResp.status);
-          csrfToken = this.getCSRFToken();
-        }
-
-        if (csrfToken) {
-          console.log('CSRF token acquired successfully');
-        } else {
-          console.log('Failed to acquire CSRF token');
-        }
-      } catch (error) {
-        console.log('CSRF acquisition failed:', error);
-      }
-    }
-
-    return csrfToken;
   }
 
   /**
@@ -225,39 +182,17 @@ class ApiClient {
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method || 'GET')) {
       const csrfToken = await this.ensureCSRFToken();
       
-      // Only log CSRF debug info in development (without exposing cookies)
-      if (process.env.NODE_ENV === 'development') {
-        console.log('CSRF Debug:', {
-          method: options.method,
-          hasCSRF: !!csrfToken,
-          cookieCount: typeof window !== 'undefined' ? document.cookie.split(';').filter(c => c.trim()).length : 0
-        });
-      }
-      
       if (csrfToken) {
         config.headers = {
           ...config.headers,
           'X-XSRF-TOKEN': csrfToken,
         };
       } else {
-        // If no CSRF token available, try to acquire it before making the request
-        console.log('No CSRF token available, attempting to acquire...');
-        const acquiredToken = await this.ensureCSRFToken();
-        if (acquiredToken) {
-          config.headers = {
-            ...config.headers,
-            'X-XSRF-TOKEN': acquiredToken,
-          };
+        // For auth endpoints, skip CSRF entirely if no token available
+        if (endpoint.includes('/auth/')) {
+          console.log('Auth endpoint detected, proceeding without CSRF token');
         } else {
-          console.log('Still no CSRF token available, proceeding without it');
-          // For registration endpoints, we might need to skip CSRF requirement
-          if (endpoint.includes('/auth/register')) {
-            console.log('Registration endpoint detected, adding bypass header');
-            config.headers = {
-              ...config.headers,
-              'X-Skip-CSRF': 'true',
-            };
-          }
+          console.warn('No CSRF token available for non-auth endpoint');
         }
       }
     }
