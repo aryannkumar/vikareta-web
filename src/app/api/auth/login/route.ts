@@ -3,12 +3,46 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(req: NextRequest) {
   try {
     const apiBase = process.env.NEXT_PUBLIC_API_BASE || (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : 'https://api.vikareta.com');
-    console.log('Main Site Login API: Forwarding to', `${apiBase}/api/auth/login`);
+    console.log('Main Site Login API: Forwarding to', `${apiBase}/api/v1/auth/login`);
 
     let body: any = {};
     try { body = await req.json(); } catch { body = {}; }
 
     const cookieHeader = req.headers.get('cookie') || '';
+    const csrfHeader = req.headers.get('x-xsrf-token') || req.headers.get('X-XSRF-TOKEN') || req.headers.get('x-csrf-token') || undefined;
+
+    // If no CSRF token provided, try to acquire one first
+    let finalCsrfToken = csrfHeader;
+    if (!finalCsrfToken) {
+      console.log('No CSRF token provided, attempting to acquire one...');
+      try {
+        const csrfResp = await fetch(`${apiBase}/csrf-token`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+            ...(cookieHeader ? { cookie: cookieHeader } : {}),
+          },
+        });
+
+        if (csrfResp.ok) {
+          console.log('CSRF token acquired successfully');
+          // Extract CSRF token from response cookies
+          const csrfCookie = csrfResp.headers.get('set-cookie');
+          if (csrfCookie) {
+            const tokenMatch = csrfCookie.match(/XSRF-TOKEN=([^;]+)/);
+            if (tokenMatch) {
+              finalCsrfToken = decodeURIComponent(tokenMatch[1]);
+              console.log('Extracted CSRF token from cookie');
+            }
+          }
+        } else {
+          console.log('Failed to acquire CSRF token, proceeding without it');
+        }
+      } catch (csrfError) {
+        console.log('CSRF acquisition failed:', csrfError);
+      }
+    }
 
     const resp = await fetch(`${apiBase}/api/v1/auth/login`, {
       method: 'POST',
@@ -16,6 +50,7 @@ export async function POST(req: NextRequest) {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         ...(cookieHeader ? { cookie: cookieHeader } : {}),
+        ...(finalCsrfToken ? { 'X-XSRF-TOKEN': finalCsrfToken } : {}),
       },
       body: JSON.stringify(body || {}),
     });

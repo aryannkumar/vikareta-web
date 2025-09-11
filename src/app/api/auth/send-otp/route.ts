@@ -8,13 +8,46 @@ export async function POST(req: NextRequest) {
   const cookieHeader = req.headers.get('cookie') || '';
   const csrfHeader = req.headers.get('x-xsrf-token') || req.headers.get('X-XSRF-TOKEN') || req.headers.get('x-csrf-token') || undefined;
 
+    // If no CSRF token provided, try to acquire one first
+    let finalCsrfToken = csrfHeader;
+    if (!finalCsrfToken) {
+      console.log('No CSRF token provided for send-otp, attempting to acquire one...');
+      try {
+        const csrfResp = await fetch(`${apiBase}/csrf-token`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+            ...(cookieHeader ? { cookie: cookieHeader } : {}),
+          },
+        });
+
+        if (csrfResp.ok) {
+          console.log('CSRF token acquired successfully for send-otp');
+          // Extract CSRF token from response cookies
+          const csrfCookie = csrfResp.headers.get('set-cookie');
+          if (csrfCookie) {
+            const tokenMatch = csrfCookie.match(/XSRF-TOKEN=([^;]+)/);
+            if (tokenMatch) {
+              finalCsrfToken = decodeURIComponent(tokenMatch[1]);
+              console.log('Extracted CSRF token from cookie for send-otp');
+            }
+          }
+        } else {
+          console.log('Failed to acquire CSRF token for send-otp, proceeding without it');
+        }
+      } catch (csrfError) {
+        console.log('CSRF acquisition failed for send-otp:', csrfError);
+      }
+    }
+
     const resp = await fetch(`${apiBase}/api/v1/auth/send-otp`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         ...(cookieHeader ? { cookie: cookieHeader } : {}),
-    ...(csrfHeader ? { 'X-XSRF-TOKEN': csrfHeader } : {}),
+    ...(finalCsrfToken ? { 'X-XSRF-TOKEN': finalCsrfToken } : {}),
       },
       body: JSON.stringify(body || {}),
     });
