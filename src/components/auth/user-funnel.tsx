@@ -159,7 +159,7 @@ export default function UserFunnel() {
 
   const nextStep = () => {
     if (validateStep(step)) {
-      setStep(prev => Math.min(prev + 1, 3));
+      setStep(prev => Math.min(prev + 1, 5));
     }
   };
 
@@ -167,34 +167,30 @@ export default function UserFunnel() {
     setStep(prev => Math.max(prev - 1, 1));
   };
 
-  const handleSubmit = async () => {
+  const handleRegister = async () => {
     if (!validateStep(3)) return;
     
     setIsLoading(true);
     setSubmitError('');
     
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: registrationData.email,
-          password: registrationData.password,
-          firstName: registrationData.firstName,
-          lastName: registrationData.lastName,
-          userType: 'buyer',
-          address: registrationData.address,
-          city: registrationData.city,
-          state: registrationData.state,
-          postalCode: registrationData.pinCode,
-          location: registrationData.location
-        })
+      // Ensure CSRF token is available before registration
+      await fetch('/api/csrf-token', {
+        method: 'GET',
+        credentials: 'include',
       });
 
       // Use the AuthService to register
-      await AuthService.register(submitData);
+      await AuthService.register({
+        email: registrationData.email,
+        phone: registrationData.phone,
+        password: registrationData.password,
+        firstName: registrationData.firstName,
+        lastName: registrationData.lastName,
+        userType: 'buyer'
+      });
 
-      setStep(4); // Success step
+      setStep(5); // Success step
       setTimeout(() => {
         router.push('/onboarding?type=user');
       }, 1500);
@@ -753,162 +749,6 @@ export default function UserFunnel() {
       case 3:
         return (
           <motion.div
-            key="step2"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="text-center space-y-6"
-          >
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Address Information</h2>
-              <p className="text-gray-600">Help us serve you better with delivery preferences</p>
-            </div>
-              <h2 className="text-2xl font-bold text-gray-900">Preferences</h2>
-              <p className="text-gray-600">Tell us about your interests and location</p>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  What are you interested in? (Optional)
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {USER_INTERESTS.map((interest) => {
-                    const IconComponent = interest.icon;
-                    return (
-                      <button
-                        key={interest.id}
-                        onClick={() => toggleInterest(interest.id)}
-                        className={`p-3 border-2 rounded-lg text-left transition-all hover:shadow-md ${
-                          registrationData.interests.includes(interest.id)
-                            ? 'border-orange-500 bg-orange-50 shadow-md'
-                            : 'border-gray-200 hover:border-orange-300'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className={`p-1.5 rounded-lg ${
-                            registrationData.interests.includes(interest.id)
-                              ? 'bg-orange-100 text-orange-600'
-                              : 'bg-gray-100 text-gray-600'
-                          }`}>
-                            <IconComponent className="w-4 h-4" />
-                          </div>
-                          <span className="font-medium text-gray-900 text-sm">{interest.label}</span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border border-orange-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-orange-800">Optional Information</span>
-                </div>
-                <p className="text-xs text-orange-600">
-                  You can skip this information and add it later in your profile.
-                </p>
-              </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Address (Optional)
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-                  <textarea
-                    value={registrationData.address || ''}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm resize-none"
-                    placeholder="Enter your complete address"
-                    rows={3}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    City (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={registrationData.city || ''}
-                    onChange={(e) => handleInputChange('city', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                    placeholder="Your city"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    State (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={registrationData.state || ''}
-                    onChange={(e) => handleInputChange('state', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                    placeholder="Your state"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  PIN Code (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={registrationData.pinCode || ''}
-                  onChange={(e) => handleInputChange('pinCode', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                  placeholder="6-digit PIN code"
-                  maxLength={6}
-                />
-              </div>
-            </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    PIN Code (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={registrationData.pinCode || ''}
-                    onChange={(e) => handleInputChange('pinCode', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                    placeholder="6-digit PIN code"
-                    maxLength={6}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={prevStep}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center gap-2 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </button>
-              <button
-                onClick={nextStep}
-                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 flex items-center justify-center gap-2 transition-colors"
-              >
-                Continue
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </motion.div>
-        );
-
-      case 3:
-        return (
-          <motion.div
             key="step3"
             variants={stepVariants}
             initial="hidden"
@@ -1008,72 +848,6 @@ export default function UserFunnel() {
                 </label>
               </div>
             </div>
-            <div className="space-y-6">
-              <div className="bg-gray-50 p-6 rounded-lg border">
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <input
-                      type="checkbox"
-                      id="agreeToTermsAndPrivacy"
-                      checked={registrationData.agreeToTerms && registrationData.agreeToPrivacy}
-                      onChange={(e) => {
-                        const checked = e.target.checked;
-                        handleInputChange('agreeToTerms', checked);
-                        handleInputChange('agreeToPrivacy', checked);
-                      }}
-                      className="mt-1 h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
-                    />
-                    <label htmlFor="agreeToTermsAndPrivacy" className="text-sm text-gray-700">
-                      I agree to the{' '}
-                      <Link href="/terms" className="text-orange-600 hover:text-orange-700 font-medium">
-                        Terms of Service
-                      </Link>{' '}
-                      and{' '}
-                      <Link href="/privacy" className="text-orange-600 hover:text-orange-700 font-medium">
-                        Privacy Policy
-                      </Link>
-                    </label>
-                  </div>
-                  {(errors.agreeToTerms || errors.agreeToPrivacy) && (
-                    <p className="text-sm text-red-600 flex items-center gap-1 ml-7">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.agreeToTerms || errors.agreeToPrivacy}
-                    </p>
-                  )}
-
-                  <div className="flex items-start space-x-3">
-                    <input
-                      type="checkbox"
-                      id="marketingConsent"
-                      checked={marketingConsent}
-                      onChange={(e) => setMarketingConsent(e.target.checked)}
-                      className="mt-1 h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
-                    />
-                    <label htmlFor="marketingConsent" className="text-sm text-gray-600">
-                      I would like to receive marketing emails about new products and offers (optional)
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-green-800">Ready to Register</span>
-                </div>
-                <p className="text-xs text-green-700">
-                  Your account will be created and you'll be taken to the onboarding process.
-                </p>
-              </div>
-
-            {submitError && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <XCircle className="w-5 h-5 text-red-600" />
-                  <p className="text-sm text-red-800">{submitError}</p>
-                </div>
-              </div>
-            )}
 
             <div className="flex gap-3">
               <button
@@ -1122,22 +896,14 @@ export default function UserFunnel() {
                   </motion.div>
                 )}
               </motion.button>
-                  </>
-                ) : (
-                  <>
-                    Create Account
-                    <CheckCircle className="w-4 h-4" />
-                  </>
-                )}
-              </button>
             </div>
           </motion.div>
         );
 
-      case 4:
+      case 5:
         return (
           <motion.div
-            key="step4"
+            key="step5"
             variants={stepVariants}
             initial="hidden"
             animate="visible"
@@ -1179,14 +945,14 @@ export default function UserFunnel() {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between text-xs text-gray-500 mb-2">
-            <span>Step {step} of 3</span>
-            <span>{Math.round((step / 3) * 100)}% complete</span>
+            <span>Step {step} of 5</span>
+            <span>{Math.round((step / 5) * 100)}% complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <motion.div
               className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full"
               initial={{ width: 0 }}
-              animate={{ width: `${(step / 3) * 100}%` }}
+              animate={{ width: `${(step / 5) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
           </div>

@@ -42,7 +42,7 @@ const Tooltip: React.FC<TooltipProps> = ({
 
   const handleMouseEnter = () => {
     if (timeoutId) clearTimeout(timeoutId);
-    const id = setTimeout(() => setIsVisible(true), delay);
+    const id = setTimeout(() => setIsVisible(true), delay) as unknown as number;
     setTimeoutId(id);
   };
 

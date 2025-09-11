@@ -24,7 +24,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
         repeat: animate ? Infinity : 0,
         ease: 'easeInOut'
       }}
-      {...props}
+      {...(props as any)}
     />
   );
 };

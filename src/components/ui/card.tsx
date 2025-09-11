@@ -4,7 +4,7 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { motion, HTMLMotionProps } from 'framer-motion';
 
-interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, keyof HTMLMotionProps<"div">>, HTMLMotionProps<"div"> {
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   hover?: boolean;
   interactive?: boolean;
 }
@@ -31,7 +31,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      {...props}
+      {...(props as any)}
     />
   )
 );
@@ -47,7 +47,7 @@ const CardHeader = React.forwardRef<
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.3, delay: 0.1 }}
-    {...props}
+    {...(props as any)}
   />
 ));
 CardHeader.displayName = 'CardHeader';
@@ -65,7 +65,7 @@ const CardTitle = React.forwardRef<
     initial={{ opacity: 0, x: -10 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ duration: 0.3, delay: 0.2 }}
-    {...props}
+    {...(props as any)}
   />
 ));
 CardTitle.displayName = 'CardTitle';
@@ -80,7 +80,7 @@ const CardDescription = React.forwardRef<
     initial={{ opacity: 0, x: -10 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ duration: 0.3, delay: 0.3 }}
-    {...props}
+    {...(props as any)}
   />
 ));
 CardDescription.displayName = 'CardDescription';
@@ -95,7 +95,7 @@ const CardContent = React.forwardRef<
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.3, delay: 0.4 }}
-    {...props}
+    {...(props as any)}
   />
 ));
 CardContent.displayName = 'CardContent';
@@ -110,7 +110,7 @@ const CardFooter = React.forwardRef<
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.3, delay: 0.5 }}
-    {...props}
+    {...(props as any)}
   />
 ));
 CardFooter.displayName = 'CardFooter';

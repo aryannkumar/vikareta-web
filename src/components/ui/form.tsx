@@ -58,7 +58,7 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={isDisabled}
       whileHover={!isDisabled ? { scale: 1.02 } : {}}
       whileTap={!isDisabled ? { scale: 0.98 } : {}}
-      {...props}
+      {...(props as any)}
     >
       {loading && (
         <motion.div
@@ -153,7 +153,7 @@ export const Input: React.FC<InputProps> = ({
           )}
           disabled={isDisabled}
           whileFocus={{ scale: 1.01 }}
-          {...props}
+          {...(props as any)}
         />
 
         {icon && (
@@ -238,7 +238,7 @@ export const Textarea: React.FC<TextareaProps> = ({
           )}
           disabled={isDisabled}
           whileFocus={{ scale: 1.01 }}
-          {...props}
+          {...(props as any)}
         />
 
         {loading && (

@@ -37,9 +37,8 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, keyof HTMLMotionProps<"button">>,
-    VariantProps<typeof buttonVariants>,
-    Omit<HTMLMotionProps<"button">, "color"> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
   loadingText?: string;
@@ -62,21 +61,28 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ...props
   }, ref) => {
     const isDisabled = disabled || loading;
-    const Comp = asChild ? Slot : motion.button;
 
-    const motionProps = asChild ? {} : {
-      whileHover: !isDisabled ? { scale: 1.02 } : {},
-      whileTap: !isDisabled ? { scale: 0.98 } : {},
-      transition: { duration: 0.2, ease: "easeOut" }
-    };
+    if (asChild) {
+      return (
+        <Slot
+          className={cn(buttonVariants({ variant, size, className }))}
+          ref={ref}
+          {...props}
+        >
+          {children}
+        </Slot>
+      );
+    }
 
     return (
-      <Comp
+      <motion.button
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         disabled={isDisabled}
-        {...motionProps}
-        {...props}
+        whileHover={!isDisabled ? { scale: 1.02 } : {}}
+        whileTap={!isDisabled ? { scale: 0.98 } : {}}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        {...(props as any)}
       >
         {/* Shine effect for gradient buttons */}
         {(variant === "default" || variant === "destructive" || variant === "success" || variant === "warning") && !isDisabled && (
@@ -129,7 +135,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             </motion.span>
           )}
         </motion.div>
-      </Comp>
+      </motion.button>
     );
   }
 );
