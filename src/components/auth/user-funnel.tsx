@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { AuthService } from '../../lib/api/auth';
 import { Logo } from '../ui/logo';
 import {
   Eye,
@@ -142,6 +143,10 @@ export default function UserFunnel() {
         break;
         
       case 2:
+        // Optional address validation - no required fields
+        break;
+        
+      case 3:
         if (!registrationData.agreeToTerms) {
           newErrors.agreeToTerms = 'Please accept our Terms of Service to continue';
         }
@@ -166,60 +171,45 @@ export default function UserFunnel() {
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(2)) return;
+    if (!validateStep(3)) return;
     
     setIsLoading(true);
     setSubmitError('');
     
     try {
-      // First, fetch CSRF token
-      const csrfResponse = await fetch('/api/csrf-token', {
-        method: 'GET',
-        credentials: 'include',
+      // Prepare data for backend API
+      const submitData = {
+        firstName: registrationData.firstName,
+        lastName: registrationData.lastName,
+        email: registrationData.email,
+        phone: registrationData.phone,
+        password: registrationData.password,
+        userType: 'buyer' as const,
+        address: registrationData.address || undefined,
+        city: registrationData.city || undefined,
+        state: registrationData.state || undefined,
+        pinCode: registrationData.pinCode || undefined,
+        interests: registrationData.interests,
+        marketingConsent
+      };
+
+      // Remove undefined values
+      Object.keys(submitData).forEach(key => {
+        if (submitData[key as keyof typeof submitData] === undefined) {
+          delete submitData[key as keyof typeof submitData];
+        }
       });
 
-      if (!csrfResponse.ok) {
-        throw new Error('Failed to get CSRF token');
-      }
+      // Use the AuthService to register
+      await AuthService.register(submitData);
 
-      // Get the CSRF token from cookies
-      const csrfToken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('XSRF-TOKEN='))
-        ?.split('=')[1];
-
-      if (!csrfToken) {
-        throw new Error('CSRF token not found in cookies');
-      }
-
-      const response = await fetch('/api/v1/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-xsrf-token': csrfToken,
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          ...registrationData,
-          userType: 'buyer',
-          marketingConsent
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Registration successful
-        setStep(3); // Success step
-        setTimeout(() => {
-          router.push('/onboarding?type=user');
-        }, 1500);
-      } else {
-        setSubmitError(data.message || 'Registration failed. Please try again.');
-      }
+      setStep(4); // Success step
+      setTimeout(() => {
+        router.push('/onboarding?type=user');
+      }, 1500);
     } catch (error) {
       console.error('Registration failed:', error);
-      setSubmitError('Network error. Please check your connection and try again.');
+      setSubmitError(error instanceof Error ? error.message : 'Registration failed. Please check your connection and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -282,8 +272,8 @@ export default function UserFunnel() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Welcome to Vikareta</h2>
-              <p className="text-gray-600">Let's get you started with your account</p>
+              <h2 className="text-2xl font-bold text-gray-900">Account Setup</h2>
+              <p className="text-gray-600">Create your account with basic information</p>
             </div>
 
             <div className="space-y-4">
@@ -362,34 +352,7 @@ export default function UserFunnel() {
                   </p>
                 )}
               </div>
-            </div>
 
-            <button
-              onClick={nextStep}
-              className="w-full bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 flex items-center justify-center gap-2 transition-colors"
-            >
-              Continue
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </motion.div>
-        );
-
-      case 2:
-        return (
-          <motion.div
-            key="step2"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="space-y-6"
-          >
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Secure Your Account</h2>
-              <p className="text-gray-600">Add your phone and create a strong password</p>
-            </div>
-
-            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Phone Number *
@@ -509,6 +472,136 @@ export default function UserFunnel() {
               </div>
             </div>
 
+            <button
+              onClick={nextStep}
+              className="w-full bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 flex items-center justify-center gap-2 transition-colors"
+            >
+              Continue
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </motion.div>
+        );
+
+      case 2:
+        return (
+          <motion.div
+            key="step2"
+            variants={stepVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="space-y-6"
+          >
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-gray-900">Preferences</h2>
+              <p className="text-gray-600">Tell us about your interests and location</p>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  What are you interested in? (Optional)
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {USER_INTERESTS.map((interest) => {
+                    const IconComponent = interest.icon;
+                    return (
+                      <button
+                        key={interest.id}
+                        onClick={() => toggleInterest(interest.id)}
+                        className={`p-3 border-2 rounded-lg text-left transition-all hover:shadow-md ${
+                          registrationData.interests.includes(interest.id)
+                            ? 'border-orange-500 bg-orange-50 shadow-md'
+                            : 'border-gray-200 hover:border-orange-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className={`p-1.5 rounded-lg ${
+                            registrationData.interests.includes(interest.id)
+                              ? 'bg-orange-100 text-orange-600'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            <IconComponent className="w-4 h-4" />
+                          </div>
+                          <span className="font-medium text-gray-900 text-sm">{interest.label}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border border-orange-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                  <span className="text-sm font-medium text-orange-800">Optional Information</span>
+                </div>
+                <p className="text-xs text-orange-600">
+                  You can skip this information and add it later in your profile.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Full Address (Optional)
+                  </label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+                    <textarea
+                      value={registrationData.address || ''}
+                      onChange={(e) => handleInputChange('address', e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm resize-none"
+                      placeholder="Enter your complete address"
+                      rows={3}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      City (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={registrationData.city || ''}
+                      onChange={(e) => handleInputChange('city', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
+                      placeholder="Your city"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      State (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={registrationData.state || ''}
+                      onChange={(e) => handleInputChange('state', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
+                      placeholder="Your state"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    PIN Code (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={registrationData.pinCode || ''}
+                    onChange={(e) => handleInputChange('pinCode', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
+                    placeholder="6-digit PIN code"
+                    maxLength={6}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="flex gap-3">
               <button
                 onClick={prevStep}
@@ -539,68 +632,91 @@ export default function UserFunnel() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Address Information</h2>
-              <p className="text-gray-600">Help us serve you better with delivery preferences</p>
+              <h2 className="text-2xl font-bold text-gray-900">Terms & Conditions</h2>
+              <p className="text-gray-600">Please review and accept our terms to continue</p>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Address (Optional)
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-                  <textarea
-                    value={registrationData.address || ''}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm resize-none"
-                    placeholder="Enter your complete address"
-                    rows={3}
-                  />
+            <div className="space-y-6">
+              <div className="bg-gray-50 p-6 rounded-lg border">
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      id="agreeToTerms"
+                      checked={registrationData.agreeToTerms}
+                      onChange={(e) => handleInputChange('agreeToTerms', e.target.checked)}
+                      className="mt-1 h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                    />
+                    <label htmlFor="agreeToTerms" className="text-sm text-gray-700">
+                      I agree to the{' '}
+                      <Link href="/terms" className="text-orange-600 hover:text-orange-700 font-medium">
+                        Terms of Service
+                      </Link>
+                    </label>
+                  </div>
+                  {errors.agreeToTerms && (
+                    <p className="text-sm text-red-600 flex items-center gap-1 ml-7">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.agreeToTerms}
+                    </p>
+                  )}
+
+                  <div className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      id="agreeToPrivacy"
+                      checked={registrationData.agreeToPrivacy}
+                      onChange={(e) => handleInputChange('agreeToPrivacy', e.target.checked)}
+                      className="mt-1 h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                    />
+                    <label htmlFor="agreeToPrivacy" className="text-sm text-gray-700">
+                      I agree to the{' '}
+                      <Link href="/privacy" className="text-orange-600 hover:text-orange-700 font-medium">
+                        Privacy Policy
+                      </Link>
+                    </label>
+                  </div>
+                  {errors.agreeToPrivacy && (
+                    <p className="text-sm text-red-600 flex items-center gap-1 ml-7">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.agreeToPrivacy}
+                    </p>
+                  )}
+
+                  <div className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      id="marketingConsent"
+                      checked={marketingConsent}
+                      onChange={(e) => setMarketingConsent(e.target.checked)}
+                      className="mt-1 h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                    />
+                    <label htmlFor="marketingConsent" className="text-sm text-gray-600">
+                      I would like to receive marketing emails about new products and offers (optional)
+                    </label>
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    City (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={registrationData.city || ''}
-                    onChange={(e) => handleInputChange('city', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                    placeholder="Your city"
-                  />
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">Ready to Register</span>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    State (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={registrationData.state || ''}
-                    onChange={(e) => handleInputChange('state', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                    placeholder="Your state"
-                  />
-                </div>
+                <p className="text-xs text-green-700">
+                  Your account will be created and you'll be taken to the onboarding process.
+                </p>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  PIN Code (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={registrationData.pinCode || ''}
-                  onChange={(e) => handleInputChange('pinCode', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 shadow-sm"
-                  placeholder="6-digit PIN code"
-                  maxLength={6}
-                />
-              </div>
+              {submitError && (
+                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-600" />
+                    <span className="text-sm font-medium text-red-800">Registration Error</span>
+                  </div>
+                  <p className="text-sm text-red-700 mt-1">{submitError}</p>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3">
@@ -612,11 +728,21 @@ export default function UserFunnel() {
                 Back
               </button>
               <button
-                onClick={nextStep}
-                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 flex items-center justify-center gap-2 transition-colors"
+                onClick={handleSubmit}
+                disabled={isLoading || !registrationData.agreeToTerms}
+                className="flex-1 bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 rounded-lg font-medium hover:from-orange-700 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all"
               >
-                Continue
-                <ArrowRight className="w-4 h-4" />
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Creating Account...
+                  </>
+                ) : (
+                  <>
+                    Create Account
+                    <CheckCircle className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </div>
           </motion.div>
@@ -626,114 +752,6 @@ export default function UserFunnel() {
         return (
           <motion.div
             key="step4"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="space-y-6"
-          >
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Review & Complete</h2>
-              <p className="text-gray-600">Please review your information and accept our terms</p>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg p-6 space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Name:</span>
-                <span className="font-medium">{registrationData.firstName} {registrationData.lastName}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Email:</span>
-                <span className="font-medium">{registrationData.email}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Phone:</span>
-                <span className="font-medium">{registrationData.phone}</span>
-              </div>
-              {registrationData.address && (
-                <div className="flex justify-between items-start">
-                  <span className="text-gray-600">Address:</span>
-                  <span className="font-medium text-right max-w-xs">{registrationData.address}</span>
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  checked={registrationData.agreeToTerms}
-                  onChange={(e) => handleInputChange('agreeToTerms', e.target.checked)}
-                  className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 mt-0.5"
-                />
-                <label className="text-sm text-gray-600">
-                  I agree to the{' '}
-                  <a href="#" className="text-orange-600 hover:underline">
-                    Terms of Service
-                  </a>{' '}
-                  and{' '}
-                  <a href="#" className="text-orange-600 hover:underline">
-                    Privacy Policy
-                  </a>
-                </label>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  checked={marketingConsent}
-                  onChange={(e) => setMarketingConsent(e.target.checked)}
-                  className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 mt-0.5"
-                />
-                <label className="text-sm text-gray-600">
-                  I would like to receive marketing emails about new products and offers (optional)
-                </label>
-              </div>
-            </div>
-
-            {submitError && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <XCircle className="w-5 h-5 text-red-600" />
-                  <p className="text-sm text-red-800">{submitError}</p>
-                </div>
-              </div>
-            )}
-
-            <div className="flex gap-3">
-              <button
-                onClick={prevStep}
-                disabled={isLoading}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={!registrationData.agreeToTerms || isLoading}
-                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
-              >
-                {isLoading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Creating Account...
-                  </>
-                ) : (
-                  <>
-                    Complete Registration
-                    <CheckCircle className="w-4 h-4" />
-                  </>
-                )}
-              </button>
-            </div>
-          </motion.div>
-        );
-
-      case 5:
-        return (
-          <motion.div
-            key="step5"
             variants={stepVariants}
             initial="hidden"
             animate="visible"

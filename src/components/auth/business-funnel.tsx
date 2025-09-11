@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { AuthService } from '../../lib/api/auth';
 import { Logo } from '../ui/logo';
 import {
   Eye,
@@ -186,26 +187,6 @@ export default function BusinessFunnel() {
     
     setIsLoading(true);
     try {
-      // First, fetch CSRF token
-      const csrfResponse = await fetch('/api/csrf-token', {
-        method: 'GET',
-        credentials: 'include',
-      });
-
-      if (!csrfResponse.ok) {
-        throw new Error('Failed to get CSRF token');
-      }
-
-      // Get the CSRF token from cookies
-      const csrfToken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('XSRF-TOKEN='))
-        ?.split('=')[1];
-
-      if (!csrfToken) {
-        throw new Error('CSRF token not found in cookies');
-      }
-
       // Prepare data for backend API
       const submitData = {
         businessName: registrationData.businessName,
@@ -231,29 +212,16 @@ export default function BusinessFunnel() {
         }
       });
 
-      const response = await fetch('/api/v1/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-xsrf-token': csrfToken,
-        },
-        credentials: 'include',
-        body: JSON.stringify(submitData)
-      });
+      // Use the AuthService to register
+      await AuthService.register(submitData);
 
-      if (response.ok) {
-        setStep(4); // Success step
-        setTimeout(() => {
-          router.push('/onboarding?type=business');
-        }, 2000);
-      } else {
-        const errorData = await response.json();
-        console.error('Registration failed:', errorData);
-        setErrors({ submit: errorData.message || 'Registration failed. Please try again.' });
-      }
+      setStep(4); // Success step
+      setTimeout(() => {
+        router.push('/onboarding?type=business');
+      }, 2000);
     } catch (error) {
       console.error('Business registration failed:', error);
-      setErrors({ submit: 'Registration failed. Please check your connection and try again.' });
+      setErrors({ submit: error instanceof Error ? error.message : 'Registration failed. Please check your connection and try again.' });
     } finally {
       setIsLoading(false);
     }
