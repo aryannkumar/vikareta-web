@@ -198,7 +198,6 @@ export default function BusinessFunnel() {
         lastName: registrationData.lastName,
         businessName: registrationData.businessName,
         userType: 'business' as const,
-        businessType: registrationData.businessType,
         gstin: registrationData.gstin || undefined,
         location: registrationData.location || undefined,
         city: registrationData.city || undefined,
