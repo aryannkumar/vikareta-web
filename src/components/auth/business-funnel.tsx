@@ -20,12 +20,6 @@ import {
   CheckCircle,
   FileText,
   AlertCircle,
-  Store,
-  Briefcase,
-  Factory,
-  ShoppingCart,
-  Truck,
-  Globe,
   Loader2,
   Shield
 } from 'lucide-react';
@@ -48,21 +42,11 @@ interface BusinessRegistrationData {
   state?: string;
   country?: string;
   postalCode?: string;
-  businessType?: string;
   
   // Agreement
   agreeToTerms: boolean;
   agreeToPrivacy: boolean;
 }
-
-const BUSINESS_TYPES = [
-  { id: 'manufacturer', label: 'Manufacturer', icon: Factory, description: 'Manufacturing & Production' },
-  { id: 'wholesaler', label: 'Wholesaler', icon: Store, description: 'Bulk Distribution' },
-  { id: 'retailer', label: 'Retailer', icon: ShoppingCart, description: 'Direct to Consumer' },
-  { id: 'distributor', label: 'Distributor', icon: Truck, description: 'Supply Chain' },
-  { id: 'service_provider', label: 'Service Provider', icon: Briefcase, description: 'Professional Services' },
-  { id: 'exporter', label: 'Exporter/Trader', icon: Globe, description: 'International Trade' },
-];
 
 const INDIAN_STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
@@ -149,9 +133,6 @@ export default function BusinessFunnel() {
         break;
         
       case 2:
-        if (!registrationData.businessType) {
-          newErrors.businessType = 'Please select a business type';
-        }
         // Optional fields validation
         if (registrationData.gstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(registrationData.gstin)) {
           newErrors.gstin = 'Please enter a valid GSTIN';
@@ -193,6 +174,7 @@ export default function BusinessFunnel() {
       // Prepare data for backend API
       const submitData = {
         email: registrationData.email,
+        phone: registrationData.phone,
         password: registrationData.password,
         firstName: registrationData.firstName,
         lastName: registrationData.lastName,
@@ -458,51 +440,11 @@ export default function BusinessFunnel() {
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-900">Business Type & Details</h2>
-              <p className="text-gray-600">Select your business category and add optional details</p>
+              <h2 className="text-2xl font-bold text-gray-900">Business Details</h2>
+              <p className="text-gray-600">Add optional business information</p>
             </div>
 
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Business Type *
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {BUSINESS_TYPES.map((type) => {
-                    const IconComponent = type.icon;
-                    return (
-                      <button
-                        key={type.id}
-                        onClick={() => handleInputChange('businessType', type.id)}
-                        className={`p-3 border-2 rounded-lg text-left transition-all hover:shadow-md ${
-                          registrationData.businessType === type.id
-                            ? 'border-orange-500 bg-orange-50 shadow-md'
-                            : 'border-gray-200 hover:border-orange-300'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className={`p-1.5 rounded-lg ${
-                            registrationData.businessType === type.id
-                              ? 'bg-orange-100 text-orange-600'
-                              : 'bg-gray-100 text-gray-600'
-                          }`}>
-                            <IconComponent className="w-4 h-4" />
-                          </div>
-                          <span className="font-medium text-gray-900 text-sm">{type.label}</span>
-                        </div>
-                        <p className="text-xs text-gray-600">{type.description}</p>
-                      </button>
-                    );
-                  })}
-                </div>
-                {errors.businessType && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.businessType}
-                  </p>
-                )}
-              </div>
-
               <div className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border border-orange-200">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
@@ -613,8 +555,7 @@ export default function BusinessFunnel() {
               </button>
               <button
                 onClick={nextStep}
-                disabled={!registrationData.businessType}
-                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 flex items-center justify-center gap-2 transition-colors"
               >
                 Continue
                 <ArrowRight className="w-4 h-4" />
