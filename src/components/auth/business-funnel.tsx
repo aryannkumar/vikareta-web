@@ -184,6 +184,12 @@ export default function BusinessFunnel() {
     
     setIsLoading(true);
     try {
+      // Ensure CSRF token is available before registration
+      await fetch('/api/csrf-token', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
       // Prepare data for backend API
       const submitData = {
         email: registrationData.email,
