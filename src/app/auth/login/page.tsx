@@ -664,21 +664,21 @@ function LoginPageContent() {
           <motion.div variants={itemVariants} className="text-center mb-6 sm:mb-8">
             <Link href="/" className="inline-block mb-4 sm:mb-6">
               <motion.div 
-                className="flex items-center justify-center"
+                className="flex items-center justify-center w-20 h-20 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full shadow-lg"
                 whileHover={{ scale: 1.05, rotate: 2 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <Logo 
-                  className="h-16 w-auto sm:h-20 md:h-24" 
+                  className="h-12 w-12" 
                   showText={false}
                   priority={true}
                 />
               </motion.div>
             </Link>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-2">
               Welcome Back
             </h1>
-            <p className="text-gray-600 text-base sm:text-lg px-4">
+            <p className="text-gray-600 text-lg sm:text-xl px-4">
               Sign in to continue your business journey
             </p>
           </motion.div>
@@ -724,194 +724,296 @@ function LoginPageContent() {
                 <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                   {/* Email/Phone Field */}
                   {authMethod === 'email' ? (
-                    <div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
                       <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
                         Email Address
                       </label>
-                      <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                        <input
+                      <div className="relative group">
+                        <motion.div
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 transition-colors group-focus-within:text-orange-500"
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Mail className="h-5 w-5" />
+                        </motion.div>
+                        <motion.input
                           id="email"
                           type="email"
                           value={formData.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
-                          className={`w-full pl-12 pr-4 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-sm sm:text-base ${
-                            errors.email ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-amber-300'
+                          className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-base shadow-sm hover:shadow-md ${
+                            errors.email ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-orange-300 focus:border-orange-500'
                           } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                           placeholder="Enter your email address"
                           disabled={loading}
                           autoComplete="email"
                           spellCheck="false"
+                          whileFocus={{ scale: 1.01 }}
+                          transition={{ duration: 0.2 }}
                         />
+                        {formData.email && !errors.email && (
+                          <motion.div
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-500"
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <Check className="h-5 w-5" />
+                          </motion.div>
+                        )}
                       </div>
                       {errors.email && (
-                        <motion.div 
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="flex items-center gap-2 mt-2 text-red-500 text-sm"
+                        <motion.div
+                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          className="flex items-center gap-2 mt-2 text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg"
                         >
-                          <AlertCircle className="h-4 w-4" />
+                          <AlertCircle className="h-4 w-4 flex-shrink-0" />
                           {errors.email}
                         </motion.div>
                       )}
-                    </div>
+                    </motion.div>
                   ) : (
-                    <div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                    >
                       <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
                         Phone Number
                       </label>
-                      <div className="relative">
-                        <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                        <input
+                      <div className="relative group">
+                        <motion.div
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 transition-colors group-focus-within:text-orange-500"
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Phone className="h-5 w-5" />
+                        </motion.div>
+                        <motion.input
                           id="phone"
                           type="tel"
                           value={formData.phone}
                           onChange={(e) => handleInputChange('phone', e.target.value)}
-                          className={`w-full pl-12 pr-4 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-sm sm:text-base ${
-                            errors.phone ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-amber-300'
+                          className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-base shadow-sm hover:shadow-md ${
+                            errors.phone ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-orange-300 focus:border-orange-500'
                           } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                           placeholder="+91 98765 43210"
                           disabled={loading}
                           autoComplete="tel"
+                          whileFocus={{ scale: 1.01 }}
+                          transition={{ duration: 0.2 }}
                         />
+                        {formData.phone && !errors.phone && (
+                          <motion.div
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-500"
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <Check className="h-5 w-5" />
+                          </motion.div>
+                        )}
                       </div>
                       {errors.phone && (
-                        <motion.div 
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="flex items-center gap-2 mt-2 text-red-500 text-sm"
+                        <motion.div
+                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          className="flex items-center gap-2 mt-2 text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg"
                         >
-                          <AlertCircle className="h-4 w-4" />
+                          <AlertCircle className="h-4 w-4 flex-shrink-0" />
                           {errors.phone}
                         </motion.div>
                       )}
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Password Field */}
-                  <div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.2 }}
+                  >
                     <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
                       Password
                     </label>
-                    <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                      <input
+                    <div className="relative group">
+                      <motion.div
+                        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 transition-colors group-focus-within:text-orange-500"
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Lock className="h-5 w-5" />
+                      </motion.div>
+                      <motion.input
                         id="password"
                         type={showPassword ? 'text' : 'password'}
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
-                        className={`w-full pl-12 pr-14 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-sm sm:text-base ${
-                          errors.password ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-amber-300'
+                        className={`w-full pl-12 pr-14 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/80 backdrop-blur-sm text-gray-800 placeholder-gray-500 transition-all duration-300 text-base shadow-sm hover:shadow-md ${
+                          errors.password ? 'border-red-500 bg-red-50/50 shake' : 'border-gray-200 hover:border-orange-300 focus:border-orange-500'
                         } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         placeholder="Enter your password"
                         disabled={loading}
                         autoComplete="current-password"
+                        whileFocus={{ scale: 1.01 }}
+                        transition={{ duration: 0.2 }}
                       />
-                      <button
+                      <motion.button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-amber-600 transition-colors"
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors disabled:opacity-50"
                         disabled={loading}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
                       >
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                      </button>
+                      </motion.button>
                     </div>
 
                     {/* Password Strength Indicator */}
                     {formData.password && (
                       <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="mt-3 space-y-2"
+                        initial={{ opacity: 0, height: 0, y: -10 }}
+                        animate={{ opacity: 1, height: 'auto', y: 0 }}
+                        exit={{ opacity: 0, height: 0, y: -10 }}
+                        className="mt-4 space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-100"
+                        transition={{ duration: 0.3 }}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">Password strength:</span>
-                          <span className={`text-sm font-medium ${getPasswordStrength(formData.password).color}`}>
+                          <span className="text-sm font-medium text-gray-700">Password strength:</span>
+                          <motion.span
+                            className={`text-sm font-semibold ${getPasswordStrength(formData.password).color}`}
+                            key={getPasswordStrength(formData.password).label}
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.2 }}
+                          >
                             {getPasswordStrength(formData.password).label}
-                          </span>
+                          </motion.span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                           <motion.div
-                            className={`h-2 rounded-full ${getPasswordStrength(formData.password).bgColor}`}
+                            className={`h-3 rounded-full ${getPasswordStrength(formData.password).bgColor}`}
                             initial={{ width: 0 }}
                             animate={{ width: `${(getPasswordStrength(formData.password).score / 5) * 100}%` }}
-                            transition={{ duration: 0.3 }}
+                            transition={{ duration: 0.5, ease: 'easeOut' }}
                           />
                         </div>
-                        <div className="grid grid-cols-2 gap-1 text-xs text-gray-600">
-                          <div className={`flex items-center ${getPasswordStrength(formData.password).checks.length ? 'text-green-600' : 'text-gray-400'}`}>
-                            <Check className="w-3 h-3 mr-1 flex-shrink-0" />
-                            8+ chars
-                          </div>
-                          <div className={`flex items-center ${getPasswordStrength(formData.password).checks.uppercase ? 'text-green-600' : 'text-gray-400'}`}>
-                            <Check className="w-3 h-3 mr-1 flex-shrink-0" />
-                            Uppercase
-                          </div>
-                          <div className={`flex items-center ${getPasswordStrength(formData.password).checks.lowercase ? 'text-green-600' : 'text-gray-400'}`}>
-                            <Check className="w-3 h-3 mr-1 flex-shrink-0" />
-                            Lowercase
-                          </div>
-                          <div className={`flex items-center ${getPasswordStrength(formData.password).checks.number ? 'text-green-600' : 'text-gray-400'}`}>
-                            <Check className="w-3 h-3 mr-1 flex-shrink-0" />
-                            Number
-                          </div>
-                          <div className={`flex items-center ${getPasswordStrength(formData.password).checks.special ? 'text-green-600' : 'text-gray-400'}`}>
-                            <Check className="w-3 h-3 mr-1 flex-shrink-0" />
-                            Special
-                          </div>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          {[
+                            { key: 'length', label: '8+ chars', check: getPasswordStrength(formData.password).checks.length },
+                            { key: 'uppercase', label: 'Uppercase', check: getPasswordStrength(formData.password).checks.uppercase },
+                            { key: 'lowercase', label: 'Lowercase', check: getPasswordStrength(formData.password).checks.lowercase },
+                            { key: 'number', label: 'Number', check: getPasswordStrength(formData.password).checks.number },
+                            { key: 'special', label: 'Special', check: getPasswordStrength(formData.password).checks.special }
+                          ].map((item, index) => (
+                            <motion.div
+                              key={item.key}
+                              className={`flex items-center ${item.check ? 'text-green-600' : 'text-gray-400'}`}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.3, delay: index * 0.1 }}
+                            >
+                              <motion.div
+                                animate={{ rotate: item.check ? 0 : 0 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <Check className="w-3 h-3 mr-2 flex-shrink-0" />
+                              </motion.div>
+                              {item.label}
+                            </motion.div>
+                          ))}
                         </div>
                       </motion.div>
                     )}
 
                     {errors.password && (
                       <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-2 mt-2 text-red-500 text-sm"
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        className="flex items-center gap-2 mt-3 text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg"
                       >
-                        <AlertCircle className="h-4 w-4" />
+                        <AlertCircle className="h-4 w-4 flex-shrink-0" />
                         {errors.password}
                       </motion.div>
                     )}
-                  </div>
+                  </motion.div>
 
                   {/* Remember Me & Forgot Password */}
-                  <div className="flex items-center justify-between">
-                    <label className="flex items-center">
-                      <input
+                  <motion.div
+                    className="flex items-center justify-between"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.4 }}
+                  >
+                    <label className="flex items-center group cursor-pointer">
+                      <motion.input
                         type="checkbox"
-                        className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                        className="rounded border-gray-300 text-orange-600 focus:ring-orange-500 focus:ring-2 w-4 h-4"
                         disabled={loading}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
                       />
-                      <span className="ml-2 text-sm text-gray-600">Remember me</span>
+                      <span className="ml-3 text-sm text-gray-600 group-hover:text-gray-800 transition-colors">Remember me</span>
                     </label>
-                    <Link
-                      href="/auth/forgot-password"
-                      className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
                     >
-                      Forgot password?
-                    </Link>
-                  </div>
+                      <Link
+                        href="/auth/forgot-password"
+                        className="text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors"
+                      >
+                        Forgot password?
+                      </Link>
+                    </motion.div>
+                  </motion.div>
 
                   {/* Submit Button */}
                   <motion.button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white py-4 px-6 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:from-amber-600 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-base relative overflow-hidden group"
+                    whileHover={{ scale: loading ? 1 : 1.02, y: loading ? 0 : -1 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.3 }}
                   >
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                      initial={{ x: '-100%' }}
+                      whileHover={{ x: '100%' }}
+                      transition={{ duration: 0.6 }}
+                    />
                     {loading ? (
-                      <>
+                      <motion.div
+                        className="flex items-center gap-3"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      >
                         <Loader2 className="h-5 w-5 animate-spin" />
-                        Signing in...
-                      </>
+                        <span>Signing in...</span>
+                      </motion.div>
                     ) : (
-                      <>
-                        Sign In
+                      <motion.div
+                        className="flex items-center gap-3"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <span>Sign In</span>
                         <ArrowRight className="h-5 w-5" />
-                      </>
+                      </motion.div>
                     )}
                   </motion.button>
                 </form>
