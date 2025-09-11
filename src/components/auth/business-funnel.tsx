@@ -173,19 +173,19 @@ export default function BusinessFunnel() {
 
       // Prepare data for backend API
       const submitData = {
-        email: registrationData.email,
-        phone: registrationData.phone,
+        email: registrationData.email.trim() || undefined,
+        phone: registrationData.phone.trim() || undefined,
         password: registrationData.password,
         firstName: registrationData.firstName,
         lastName: registrationData.lastName,
         businessName: registrationData.businessName,
         userType: 'business' as const,
-        gstin: registrationData.gstin || undefined,
-        location: registrationData.location || undefined,
-        city: registrationData.city || undefined,
-        state: registrationData.state || undefined,
+        gstin: registrationData.gstin?.trim() || undefined,
+        location: registrationData.location?.trim() || undefined,
+        city: registrationData.city?.trim() || undefined,
+        state: registrationData.state?.trim() || undefined,
         country: registrationData.country || 'India',
-        postalCode: registrationData.postalCode || undefined,
+        postalCode: registrationData.postalCode?.trim() || undefined,
       };
 
       // Remove undefined values
