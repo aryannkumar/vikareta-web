@@ -34,7 +34,7 @@ const useSecureSSOAuth = () => {
         hasPassword: !!loginData.password 
       });
 
-      const response = await fetch(`/api/v1/auth/login`, {
+  const response = await fetch(`/api/auth/login`, {
         method: 'POST',
         credentials: 'include', // Critical: Include HttpOnly cookies
         headers: {
@@ -82,7 +82,7 @@ const useSecureSSOAuth = () => {
 
   const checkSession = async () => {
     try {
-  const response = await fetch(`/api/v1/auth/me`, {
+  const response = await fetch(`/api/auth/me`, {
         credentials: 'include', // Include HttpOnly cookies
       });
       
@@ -234,7 +234,7 @@ function LoginPageContent() {
         const p = (async () => {
           try {
             // Request signed SSO token via same-origin proxy to include cookies
-            const resp = await fetch(`/api/v1/auth/sso-token`, {
+            const resp = await fetch(`/api/auth/sso-token`, {
               method: 'POST',
               credentials: 'include', // Send HttpOnly authentication cookie
               headers: { 
@@ -420,7 +420,7 @@ function LoginPageContent() {
     try {
   const identifier = normalizeIdentifier(authMethod, authMethod === 'email' ? formData.email : formData.phone);
       const csrf = await ensureCsrfToken();
-      const resp = await fetch('/api/v1/auth/send-otp', {
+  const resp = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
         credentials: 'include',
@@ -470,7 +470,7 @@ function LoginPageContent() {
       try {
         const identifier = normalizeIdentifier(authMethod, authMethod === 'email' ? formData.email : formData.phone);
         const csrf = await ensureCsrfToken();
-        const resp = await fetch('/api/v1/auth/verify-otp', {
+  const resp = await fetch('/api/auth/verify-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
           credentials: 'include',
@@ -519,7 +519,7 @@ function LoginPageContent() {
         // If still no user, try a refresh (requires CSRF in header)
         if (!effectiveUser) {
           const csrf = await ensureCsrfToken();
-          await fetch('/api/v1/auth/refresh', {
+          await fetch('/api/auth/refresh', {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
