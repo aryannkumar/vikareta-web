@@ -6,24 +6,7 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { usePersonalization } from '../../lib/auth/vikareta/hooks/use-personalization';
-import { useVikaretaAuth } from '../../lib/auth/vikareta/hooks/use-vikareta-auth';
-
-interface RecentlyViewedProps {
-  maxItems?: number;
-  onProductClick?: (productId: string) => void;
-}
-
-/**
- * Vikareta Platform - Personalization Components
- * UI components for displaying personalized content
- * Shows recently viewed products, recommendations, and preferences
- */
-
-'use client';
-
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePersonalization } from '../../lib/auth/vikareta/hooks/use-personalization';
 import { useVikaretaAuth } from '../../lib/auth/vikareta/hooks/use-vikareta-auth';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';

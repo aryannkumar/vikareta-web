@@ -357,6 +357,13 @@ export class VikaretaSSOClient {
 
     return tokenCookie ? decodeURIComponent(tokenCookie.split('=')[1]) : null;
   }
+
+  /**
+   * Get access token for API requests
+   */
+  getAccessToken(): string | null {
+    return this.getTokenFromCookie();
+  }
 }
 
 // Export singleton instance
