@@ -69,17 +69,12 @@ export default function OrderDetailPage() {
     if (!order) return;
 
     try {
-      const response = await ordersApi.cancelOrder(order.id, 'User requested cancellation');
-
-      if (response.success) {
-        toast.success('Success', 'Order cancelled successfully');
-        fetchOrderDetail(order.id); // Refresh the order
-      } else {
-        toast.error('Error', 'Failed to cancel order');
-      }
+      await ordersApi.cancelOrder(order.id, 'User requested cancellation');
+      toast.success('Success', 'Order cancelled successfully');
+      fetchOrderDetail(order.id); // Refresh the order
     } catch (error) {
       console.error('Error cancelling order:', error);
-      toast.error('Error', 'Failed to cancel order');
+      toast.error('Error', 'Order cancellation is not currently supported');
     }
   };
 

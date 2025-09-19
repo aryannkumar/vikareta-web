@@ -136,12 +136,13 @@ export const productsApi = {
   },
 
   async getProductReviews(productId: string, page: number = 1, limit: number = 10) {
+    // Backend doesn't have product-specific reviews endpoint, use generic /reviews with productId filter
     return apiClient.get<{
       reviews: ProductReview[];
       total: number;
       page: number;
       totalPages: number;
-  }>(`/products/${productId}/reviews`, { page, limit });
+  }>(`/reviews`, { productId, page, limit });
   },
 
   async addProductReview(productId: string, review: {
@@ -150,11 +151,12 @@ export const productsApi = {
     comment: string;
     images?: string[];
   }) {
-  return apiClient.post<ProductReview>(`/products/${productId}/reviews`, review);
+  return apiClient.post<ProductReview>(`/reviews`, { ...review, productId });
   },
 
   async getRelatedProducts(productId: string, limit: number = 8) {
-  return apiClient.get<Product[]>(`/products/${productId}/related`, { limit });
+  // Backend doesn't have related products endpoint, this would need to be implemented
+  throw new Error('Related products are not currently supported');
   },
 
   async searchProducts(query: string, filters?: Omit<ProductFilters, 'search'>) {
@@ -162,7 +164,7 @@ export const productsApi = {
       products: Product[];
       total: number;
       suggestions: string[];
-  }>('/products/search', { q: query, ...filters });
+  }>('/search/products', { q: query, ...filters });
   },
 
   async getFeaturedProducts(limit: number = 12) {
@@ -170,6 +172,7 @@ export const productsApi = {
   },
 
   async getProductsByCategory(categoryId: string, filters?: Omit<ProductFilters, 'category'>) {
+    // Backend doesn't have category-specific products endpoint, use main products endpoint with category filter
     return apiClient.get<{
       products: Product[];
       total: number;
@@ -181,19 +184,20 @@ export const productsApi = {
         description: string;
         image?: string;
       };
-  }>(`/categories/${categoryId}/products`, filters);
+  }>(`/products`, { ...filters, categoryId });
   },
 
   async addToWishlist(productId: string) {
-  return apiClient.post(`/products/${productId}/wishlist`);
+  return apiClient.post('/wishlist', { productId });
   },
 
   async removeFromWishlist(productId: string) {
-  return apiClient.delete(`/products/${productId}/wishlist`);
+  return apiClient.delete(`/wishlist/products/${productId}`);
   },
 
   async reportProduct(productId: string, reason: string, description?: string) {
-  return apiClient.post(`/products/${productId}/report`, { reason, description });
+  // Backend doesn't have product report endpoint, this would need to be implemented
+  throw new Error('Product reporting is not currently supported');
   },
 
   async contactSupplier(productId: string, data: {
@@ -206,7 +210,8 @@ export const productsApi = {
       phone: string;
     };
   }) {
-    return apiClient.post(`/products/${productId}/contact-supplier`, data);
+    // Backend doesn't have contact supplier endpoint, this would need to be implemented
+    throw new Error('Contact supplier is not currently supported');
   },
 
   async requestQuote(productId: string, data: {
@@ -220,14 +225,12 @@ export const productsApi = {
       phone: string;
     };
   }) {
-    return apiClient.post(`/products/${productId}/request-quote`, data);
+    // Backend doesn't have request quote endpoint, this would need to be implemented
+    throw new Error('Request quote is not currently supported');
   },
 
   async checkAvailability(productId: string, quantity: number, variantId?: string) {
-    return apiClient.get<{
-      available: boolean;
-      maxQuantity: number;
-      estimatedDelivery: string;
-    }>(`/products/${productId}/availability`, { quantity, variantId });
+    // Backend doesn't have availability check endpoint, this would need to be implemented
+    throw new Error('Availability check is not currently supported');
   }
 };

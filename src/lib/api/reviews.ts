@@ -205,30 +205,20 @@ export class ReviewService {
     };
   }
 
-  // Mark a review as helpful
+  // Mark a review as helpful (not available in backend)
   static async markReviewHelpful(reviewId: string): Promise<void> {
-    const response = await apiClient.post(`/reviews/${reviewId}/helpful`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to mark review as helpful');
-    }
+    // Backend doesn't have helpful endpoint, this would need to be implemented
+    throw new Error('Marking reviews as helpful is not currently supported');
   }
 
-  // Get review statistics
+  // Get review statistics (not available in backend)
   static async getReviewStats(targetId: string, targetType: 'product' | 'service' | 'business'): Promise<{
     totalReviews: number;
     averageRating: number;
     ratingDistribution: Record<number, number>;
     verifiedReviews: number;
   }> {
-    const response = await apiClient.get('/reviews/stats', { targetId, targetType });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch review stats');
-    }
-    return response.data as {
-      totalReviews: number;
-      averageRating: number;
-      ratingDistribution: Record<number, number>;
-      verifiedReviews: number;
-    };
+    // Backend doesn't have review stats endpoint, this would need to be implemented
+    throw new Error('Review statistics are not currently supported');
   }
 }

@@ -181,32 +181,23 @@ export class AdminService {
   }
 
   static async getUser(userId: string): Promise<AdminUser> {
-    const response = await apiClient.get<AdminUser>(`/admin/users/${userId}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch user');
-    }
-    return response.data;
+    // Individual user endpoint not implemented in backend
+    throw new Error('Individual user management not available');
   }
 
   static async updateUserStatus(userId: string, status: string, reason?: string): Promise<void> {
-    const response = await apiClient.put(`/admin/users/${userId}/status`, { status, reason });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to update user status');
-    }
+    // User status update not implemented in backend
+    throw new Error('User status management not available');
   }
 
   static async deleteUser(userId: string, reason?: string): Promise<void> {
-    const response = await apiClient.delete(`/admin/users/${userId}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to delete user');
-    }
+    // User deletion not implemented in backend
+    throw new Error('User deletion not available');
   }
 
   static async resetUserPassword(userId: string): Promise<void> {
-    const response = await apiClient.post(`/admin/users/${userId}/reset-password`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to reset user password');
-    }
+    // Password reset functionality not implemented in backend
+    throw new Error('Password reset functionality not available');
   }
 
   // ===== EXISTING ORDER MANAGEMENT METHODS =====
@@ -237,23 +228,18 @@ export class AdminService {
   }
 
   static async getOrder(orderId: string): Promise<AdminOrder> {
-    const response = await apiClient.get<AdminOrder>(`/admin/orders/${orderId}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch order');
-    }
-    return response.data;
+    // Individual order endpoint not implemented in backend
+    throw new Error('Individual order management not available');
   }
 
   static async updateOrderStatus(orderId: string, status: string, notes?: string): Promise<void> {
-    const response = await apiClient.put(`/admin/orders/${orderId}/status`, { status, notes });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to update order status');
-    }
+    // Order status update not implemented in backend
+    throw new Error('Order status management not available');
   }
 
   // ===== EXISTING ANALYTICS METHODS =====
   static async getAnalytics(period?: string): Promise<AdminAnalytics> {
-    const response = await apiClient.get<AdminAnalytics>('/admin/system/analytics/overview', { period });
+    const response = await apiClient.get<AdminAnalytics>('/analytics/dashboard', { timeframe: period || 'month' });
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch analytics');
     }
@@ -274,24 +260,8 @@ export class AdminService {
       timestamp: string;
     }>;
   }> {
-    const response = await apiClient.get<{
-      status: 'healthy' | 'warning' | 'critical';
-      services: Array<{
-        name: string;
-        status: string;
-        uptime: number;
-        responseTime: number;
-      }>;
-      alerts: Array<{
-        level: 'info' | 'warning' | 'error';
-        message: string;
-        timestamp: string;
-      }>;
-    }>('/admin/system/health');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch system health');
-    }
-    return response.data;
+    // System health endpoint not implemented in backend
+    throw new Error('System health monitoring not available');
   }
 
   // ===== EXISTING SYSTEM MANAGEMENT METHODS =====
@@ -315,53 +285,29 @@ export class AdminService {
     page: number;
     totalPages: number;
   }> {
-    const response = await apiClient.get<{
-      logs: Array<{
-        id: string;
-        level: string;
-        message: string;
-        service: string;
-        timestamp: string;
-        metadata?: Record<string, any>;
-      }>;
-      total: number;
-      page: number;
-      totalPages: number;
-    }>('/admin/system/logs', filters);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch system logs');
-    }
-    return response.data;
+    // System logs endpoint not implemented in backend
+    throw new Error('System logging not available');
   }
 
   static async clearSystemCache(): Promise<void> {
-    const response = await apiClient.post('/admin/system/cache/clear');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to clear system cache');
-    }
+    // System cache management not implemented in backend
+    throw new Error('System cache management not available');
   }
 
   static async restartService(serviceName: string): Promise<void> {
-    const response = await apiClient.post(`/admin/system/services/${serviceName}/restart`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to restart service');
-    }
+    // Service restart functionality not implemented in backend
+    throw new Error('Service restart functionality not available');
   }
 
   // ===== EXISTING CONFIGURATION METHODS =====
   static async getSystemConfig(): Promise<Record<string, any>> {
-    const response = await apiClient.get<Record<string, any>>('/admin/system/config');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch system config');
-    }
-    return response.data;
+    // System configuration management not implemented in backend
+    throw new Error('System configuration management not available');
   }
 
   static async updateSystemConfig(config: Record<string, any>): Promise<void> {
-    const response = await apiClient.put('/admin/system/config', config);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to update system config');
-    }
+    // System configuration management not implemented in backend
+    throw new Error('System configuration management not available');
   }
 
   // ===== EXISTING BACKUP & RECOVERY METHODS =====
@@ -370,15 +316,8 @@ export class AdminService {
     status: 'pending' | 'in_progress' | 'completed' | 'failed';
     createdAt: string;
   }> {
-    const response = await apiClient.post<{
-      id: string;
-      status: 'pending' | 'in_progress' | 'completed' | 'failed';
-      createdAt: string;
-    }>('/admin/system/backup');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to create backup');
-    }
-    return response.data;
+    // Backup functionality not implemented in backend
+    throw new Error('Backup functionality not available');
   }
 
   static async getBackups(): Promise<Array<{
@@ -389,25 +328,13 @@ export class AdminService {
     createdAt: string;
     downloadUrl?: string;
   }>> {
-    const response = await apiClient.get<Array<{
-      id: string;
-      name: string;
-      size: number;
-      status: 'completed' | 'failed';
-      createdAt: string;
-      downloadUrl?: string;
-    }>>('/admin/system/backups');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch backups');
-    }
-    return response.data;
+    // Backup functionality not implemented in backend
+    throw new Error('Backup functionality not available');
   }
 
   static async restoreBackup(backupId: string): Promise<void> {
-    const response = await apiClient.post(`/admin/system/backups/${backupId}/restore`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to restore backup');
-    }
+    // Backup functionality not implemented in backend
+    throw new Error('Backup functionality not available');
   }
 
   // ===== EXISTING SECURITY METHODS =====
@@ -434,39 +361,28 @@ export class AdminService {
     page: number;
     totalPages: number;
   }> {
-    const response = await apiClient.get<{
-      logs: Array<{
-        id: string;
-        action: string;
-        userId?: string;
-        userName?: string;
-        ip: string;
-        userAgent: string;
-        timestamp: string;
-        details?: Record<string, any>;
-      }>;
-      total: number;
-      page: number;
-      totalPages: number;
-    }>('/admin/security/logs', filters);
+    // Use the available security events endpoint
+    const response = await apiClient.get('/security/events', filters);
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch security logs');
     }
-    return response.data;
+    // Transform the response to match expected format
+    return {
+      logs: (response.data as any)?.events || [],
+      total: (response.data as any)?.total || 0,
+      page: (response.data as any)?.page || 1,
+      totalPages: (response.data as any)?.totalPages || 1
+    };
   }
 
   static async blockIP(ip: string, reason?: string): Promise<void> {
-    const response = await apiClient.post('/admin/security/block-ip', { ip, reason });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to block IP');
-    }
+    // IP blocking functionality not implemented in backend
+    throw new Error('IP blocking functionality not available');
   }
 
   static async unblockIP(ip: string): Promise<void> {
-    const response = await apiClient.delete(`/admin/security/block-ip/${ip}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to unblock IP');
-    }
+    // IP blocking functionality not implemented in backend
+    throw new Error('IP blocking functionality not available');
   }
 
   static async getBlockedIPs(): Promise<Array<{
@@ -476,17 +392,8 @@ export class AdminService {
     reason?: string;
     attempts: number;
   }>> {
-    const response = await apiClient.get<Array<{
-      ip: string;
-      blockedAt: string;
-      blockedBy: string;
-      reason?: string;
-      attempts: number;
-    }>>('/admin/security/blocked-ips');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch blocked IPs');
-    }
-    return response.data;
+    // IP blocking functionality not implemented in backend
+    throw new Error('IP blocking functionality not available');
   }
 
   // ===== NEW BUSINESS MANAGEMENT METHODS =====

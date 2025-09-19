@@ -147,7 +147,7 @@ export const ordersApi = {
   },
 
   async cancelOrder(id: string, reason?: string) {
-    return apiClient.post(`/orders/${id}/cancel`, { reason });
+    return apiClient.put<Order>(`/orders/${id}/status`, { status: 'cancelled', notes: reason });
   },
 
   async getMyOrders(filters?: Omit<OrderFilters, 'customerId'>) {
@@ -156,7 +156,7 @@ export const ordersApi = {
       total: number;
       page: number;
       totalPages: number;
-    }>('/orders/my', filters);
+    }>('/orders/buyer', filters);
   },
 
   async getSupplierOrders(filters?: Omit<OrderFilters, 'supplierId'>) {
@@ -165,11 +165,12 @@ export const ordersApi = {
       total: number;
       page: number;
       totalPages: number;
-    }>('/orders/supplier', filters);
+    }>('/orders/seller', filters);
   },
 
   async addOrderNote(id: string, note: string, isInternal: boolean = false) {
-    return apiClient.post(`/orders/${id}/notes`, { note, isInternal });
+    // Backend doesn't have notes endpoint, this would need to be implemented
+    throw new Error('Order notes are not currently supported');
   },
 
   async updateTrackingInfo(id: string, data: {
@@ -177,7 +178,7 @@ export const ordersApi = {
     trackingUrl?: string;
     carrier?: string;
   }) {
-    return apiClient.put(`/orders/${id}/tracking`, data);
+    return apiClient.post(`/orders/${id}/tracking-events`, data);
   },
 
   async requestRefund(id: string, data: {
@@ -185,20 +186,17 @@ export const ordersApi = {
     amount?: number;
     items?: string[];
   }) {
-    return apiClient.post(`/orders/${id}/refund`, data);
+    // Backend doesn't have refund endpoint, this would need to be implemented
+    throw new Error('Order refunds are not currently supported');
   },
 
   async downloadInvoice(id: string) {
-    return apiClient.get<{ url: string }>(`/orders/${id}/invoice`);
+    // Backend doesn't have invoice endpoint, this would need to be implemented
+    throw new Error('Invoice download is not currently supported');
   },
 
   async getOrderStats(dateFrom?: string, dateTo?: string) {
-    return apiClient.get<{
-      totalOrders: number;
-      totalRevenue: number;
-      averageOrderValue: number;
-      statusBreakdown: Record<string, number>;
-      revenueByMonth: Array<{ month: string; revenue: number }>;
-    }>('/orders/stats', { dateFrom, dateTo });
+    // Backend doesn't have general order stats endpoint, use specific endpoints like /orders/pending/stats or /orders/completed/stats
+    throw new Error('General order stats are not currently supported. Use specific stats endpoints.');
   }
 };

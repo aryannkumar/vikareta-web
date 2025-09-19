@@ -75,7 +75,8 @@ export const searchApi = {
       }
     });
 
-    const response = await apiClient.get(`/search?${searchParams.toString()}`);
+    // Use the global search endpoint
+    const response = await apiClient.get(`/search/global?${searchParams.toString()}`);
     if (!response.success) {
       throw new Error(response.error || 'Search failed');
     }

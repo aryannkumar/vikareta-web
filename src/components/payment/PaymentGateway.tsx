@@ -24,7 +24,7 @@ interface PaymentGatewayComponentProps {
 
 declare global {
   interface Window {
-    Razorpay: any;
+    Razorpay: new (options: any) => any;
     Stripe: any;
     PayPal: any;
     Cashfree: (config: { mode: 'production' | 'sandbox' }) => {

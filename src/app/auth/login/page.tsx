@@ -20,10 +20,11 @@ import {
   ArrowLeft,
   Check
 } from 'lucide-react';
+import { AuthService, type User } from '../../../lib/api/auth';
 
   // Secure SSO auth implementation using HttpOnly cookies
 const useSecureSSOAuth = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const login = async (loginData: any) => {
@@ -34,40 +35,20 @@ const useSecureSSOAuth = () => {
         hasPassword: !!loginData.password 
       });
 
-  const response = await fetch(`/api/auth/login`, {
-        method: 'POST',
-        credentials: 'include', // Critical: Include HttpOnly cookies
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginData),
-      });
+      // Use AuthService instead of direct fetch
+      const result = await AuthService.login(loginData);
 
-      console.log('Main Site Login: API response status:', response.status, response.ok);
-
-      if (!response.ok) {
-        let errorText = 'Login failed';
-        try {
-          const errorData = await response.json();
-          errorText = errorData.message || errorData.error?.message || `HTTP ${response.status}`;
-        } catch {
-          errorText = `HTTP ${response.status}: ${response.statusText}`;
-        }
-        throw new Error(errorText);
-      }
-
-      const result = await response.json();
       console.log('Main Site Login: API response data:', { 
-        success: result.success, 
+        success: true, 
         hasUser: !!result.user,
         userType: result.user?.userType 
       });
       
-      if (result.success && result.user) {
+      if (result.user) {
         setUser(result.user);
-        return result;
+        return { success: true, user: result.user };
       } else {
-        throw new Error(result.error?.message || result.message || 'Login failed');
+        throw new Error('Login failed');
       }
     } catch (error) {
       console.error('Main Site Login: Error occurred:', error);
@@ -80,14 +61,11 @@ const useSecureSSOAuth = () => {
     }
   };
 
-  const checkSession = async () => {
+  const checkSession = async (): Promise<User | null> => {
     try {
-  const response = await fetch(`/api/auth/me`, {
-        credentials: 'include', // Include HttpOnly cookies
-      });
-      
-      const result = await response.json();
-      if (result.success && result.user) {
+      // Use AuthService instead of direct fetch
+      const result = await AuthService.getProfile();
+      if (result.user) {
         setUser(result.user);
         return result.user;
       }
@@ -216,7 +194,7 @@ function LoginPageContent() {
   const { login, user, checkSession } = useSecureSSOAuth();
 
   // Simple cross-domain auth helpers
-  const getPostLoginRedirectUrl = (_user: any) => {
+  const getPostLoginRedirectUrl = (user: User | null) => {
     // Always land on homepage after login; let users navigate via header
     return '/';
   };
@@ -318,7 +296,7 @@ function LoginPageContent() {
     return getCSRFToken();
   };
 
-  const hasDashboardAccess = (user: any) => {
+  const hasDashboardAccess = (user: User | null) => {
     return user?.userType === 'business' || user?.userType === 'admin';
   };
 
@@ -418,15 +396,9 @@ function LoginPageContent() {
   const sendOtp = async () => {
     setOtpLoading(true);
     try {
-  const identifier = normalizeIdentifier(authMethod, authMethod === 'email' ? formData.email : formData.phone);
-      const csrf = await ensureCsrfToken();
-  const resp = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
-        credentials: 'include',
-        body: JSON.stringify({ phone: identifier })
-      });
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const identifier = normalizeIdentifier(authMethod, authMethod === 'email' ? formData.email : formData.phone);
+      // Use AuthService instead of direct fetch
+      await AuthService.sendOTP(identifier);
       setOtpTimer(30);
       toast.success('OTP Sent!', `Verification code sent to your ${authMethod === 'email' ? 'email' : 'phone number'}`);
     } catch (error) {
@@ -469,22 +441,9 @@ function LoginPageContent() {
       setLoading(true);
       try {
         const identifier = normalizeIdentifier(authMethod, authMethod === 'email' ? formData.email : formData.phone);
-        const csrf = await ensureCsrfToken();
-  const resp = await fetch('/api/auth/verify-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
-          credentials: 'include',
-          body: JSON.stringify({ phone: identifier, otp: formData.otp })
-        });
-        if (resp.ok) {
-          handleLoginSuccess();
-        } else {
-          const text = await resp.text().catch(() => '');
-          let data: any = {};
-          try { data = text ? JSON.parse(text) : {}; } catch { data = { message: text }; }
-          console.warn('OTP verify failed', { status: resp.status, body: data });
-          setErrors({ otp: data?.error?.message || 'Invalid OTP. Please try again.' });
-        }
+        // Use AuthService instead of direct fetch
+        const result = await AuthService.verifyOTP(identifier, formData.otp);
+        handleLoginSuccess(result.user);
       } catch (error) {
         console.error('OTP verification error:', error);
         toast.error('Verification Failed', 'Invalid OTP. Please try again.');
@@ -495,7 +454,7 @@ function LoginPageContent() {
   };
 
   // Handle successful login
-  const handleLoginSuccess = async (loggedInUser?: any) => {
+  const handleLoginSuccess = async (loggedInUser?: User | null) => {
     toast.success('Login Successful!', 'Redirecting...');
 
     setTimeout(async () => {
@@ -518,15 +477,11 @@ function LoginPageContent() {
         }
         // If still no user, try a refresh (requires CSRF in header)
         if (!effectiveUser) {
-          const csrf = await ensureCsrfToken();
-          await fetch('/api/auth/refresh', {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {}) },
-            body: JSON.stringify({})
-          }).catch(() => {});
-          const sessionUser2 = await checkSession();
-          if (sessionUser2) effectiveUser = sessionUser2;
+          try {
+            await AuthService.refreshToken();
+            const sessionUser2 = await checkSession();
+            if (sessionUser2) effectiveUser = sessionUser2;
+          } catch {}
         }
       } catch {}
 

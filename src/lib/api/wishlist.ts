@@ -51,18 +51,23 @@ export const wishlistApi = {
     return apiClient.delete(`/wishlist/${wishlistId}`);
   },
 
-  // Remove item from wishlist by item ID and type
+  // Remove item from wishlist by item ID and type (use legacy endpoints for now)
   async removeItemFromWishlist(type: 'product' | 'service' | 'business', itemId: string) {
-    return apiClient.delete(`/wishlist/item/${type}/${itemId}`);
+    // Use legacy endpoints that match backend
+    return apiClient.delete(`/wishlist/${type}s/${itemId}`);
   },
 
   // Check if item is in wishlist
   async checkWishlist(type: 'product' | 'service' | 'business', itemId: string) {
-    return apiClient.get<WishlistCheckResponse>(`/wishlist/check/${type}/${itemId}`);
+    const params: any = {};
+    if (type === 'product') params.productId = itemId;
+    else if (type === 'service') params.serviceId = itemId;
+    else if (type === 'business') params.businessId = itemId;
+    return apiClient.get<WishlistCheckResponse>(`/wishlist/status`, params);
   },
 
   // Clear entire wishlist
   async clearWishlist() {
-    return apiClient.delete('/wishlist');
+    return apiClient.delete('/wishlist/clear');
   },
 };

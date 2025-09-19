@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AuthService, type User } from '../../lib/api/auth';
+import { dashboardApi } from '../../lib/api/dashboard';
 
 function DashboardPageContent() {
   const [loading, setLoading] = useState(true);
   const [redirecting, setRedirecting] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -20,14 +22,10 @@ function DashboardPageContent() {
 
   const checkAuthStatus = async () => {
     try {
-      // Check authentication using secure HttpOnly cookies via same-origin proxy
-      const response = await fetch(`/api/v1/auth/me`, {
-        credentials: 'include', // Include HttpOnly cookies
-      });
+      // Use AuthService instead of direct fetch
+      const result = await AuthService.getProfile();
       
-      const result = await response.json();
-      
-      if (result.success && result.user) {
+      if (result.user) {
         setUser(result.user);
         setIsAuthenticated(true);
       } else {

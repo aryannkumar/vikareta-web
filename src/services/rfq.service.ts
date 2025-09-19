@@ -1,5 +1,7 @@
 import { RFQRequest, RFQResponse } from '../types/payment';
 import { vikaretaSSOClient } from '../lib/auth/vikareta';
+import { rfqApi } from '../lib/api/rfq';
+import { getApiUrl } from '../config/api';
 
 // Normalize API host: remove trailing /api if present; always prefix endpoints with /api/v1
 const API_HOST = (
@@ -313,27 +315,80 @@ export class RFQService {
 
   async getRfqs(filters?: RfqFilters): Promise<{ rfqs: RfqDetails[]; pagination: any }> {
     try {
-      const queryParams = new URLSearchParams();
-      
-      if (filters) {
-        Object.entries(filters).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            queryParams.append(key, value.toString());
-          }
-        });
+      // Transform service filters to API filters
+      const apiFilters: any = {
+        category: filters?.categoryId,
+        subcategory: filters?.subcategoryId,
+        location: filters?.location,
+        budgetMin: filters?.minBudget,
+        budgetMax: filters?.maxBudget,
+        status: filters?.status,
+        search: filters?.search,
+        page: filters?.page,
+        limit: filters?.limit,
+        sortBy: filters?.sortBy === 'createdAt' ? 'newest' : 'budget'
+      };
+
+      const response = await rfqApi.getRFQs(apiFilters);
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to fetch RFQs');
       }
 
-  const response = await fetch(apiUrl(`/rfqs?${queryParams.toString()}`), {
-        headers: this.getHeaders(),
-      });
+      // Transform API response to service format
+      const rfqs: RfqDetails[] = response.data.rfqs.map(rfq => ({
+        id: rfq.id,
+        title: rfq.title,
+        description: rfq.description,
+        categoryId: rfq.category.id,
+        subcategoryId: rfq.subcategory?.id,
+        quantity: rfq.quantity,
+        budgetMin: rfq.budget?.min,
+        budgetMax: rfq.budget?.max,
+        deliveryTimeline: rfq.deliveryDate,
+        deliveryLocation: rfq.deliveryLocation,
+        status: rfq.status,
+        expiresAt: new Date(rfq.expiresAt),
+        createdAt: new Date(rfq.createdAt),
+        updatedAt: new Date(rfq.updatedAt),
+        buyer: {
+          id: rfq.buyerId,
+          firstName: null,
+          lastName: null,
+          businessName: rfq.buyerName,
+          verificationTier: 'basic',
+          isVerified: false
+        },
+        category: {
+          id: rfq.category.id,
+          name: rfq.category.name,
+          slug: rfq.category.name.toLowerCase().replace(/\s+/g, '-')
+        },
+        subcategory: rfq.subcategory ? {
+          id: rfq.subcategory.id,
+          name: rfq.subcategory.name,
+          slug: rfq.subcategory.name.toLowerCase().replace(/\s+/g, '-')
+        } : null,
+        quotes: [],
+        rfqType: 'product',
+        quoteCount: rfq.responseCount,
+        isExpired: new Date(rfq.expiresAt) < new Date(),
+        daysRemaining: Math.max(0, Math.ceil((new Date(rfq.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))),
+        attachments: rfq.attachments,
+        canEdit: false,
+        canQuote: false
+      }));
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to fetch RFQs');
-      }
-
-      const result = await response.json();
-      return result.data;
+      return {
+        rfqs,
+        pagination: {
+          page: response.data.page,
+          limit: filters?.limit || 10,
+          total: response.data.total,
+          totalPages: response.data.totalPages,
+          hasNext: response.data.page < response.data.totalPages,
+          hasPrev: response.data.page > 1
+        }
+      };
     } catch (error) {
       console.error('Error fetching RFQs:', error);
       throw error;
@@ -342,27 +397,105 @@ export class RFQService {
 
   async getMyRfqsWithResponses(filters?: RfqFilters): Promise<MyRfqsWithResponsesResult> {
     try {
-      const queryParams = new URLSearchParams();
-      
-      if (filters) {
-        Object.entries(filters).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            queryParams.append(key, value.toString());
-          }
-        });
+      // Transform service filters to API filters
+      const apiFilters: any = {
+        category: filters?.categoryId,
+        subcategory: filters?.subcategoryId,
+        location: filters?.location,
+        budgetMin: filters?.minBudget,
+        budgetMax: filters?.maxBudget,
+        status: filters?.status,
+        search: filters?.search,
+        page: filters?.page,
+        limit: filters?.limit
+      };
+
+      const response = await rfqApi.getMyRFQs(apiFilters);
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to fetch RFQs with responses');
       }
 
-  const response = await fetch(apiUrl(`/rfqs/my-with-responses?${queryParams.toString()}`), {
-        headers: this.getHeaders(),
-      });
+      // Transform API response to service format
+      const rfqs: RfqWithResponses[] = response.data.rfqs.map(rfq => ({
+        id: rfq.id,
+        title: rfq.title,
+        description: rfq.description,
+        categoryId: rfq.category.id,
+        subcategoryId: rfq.subcategory?.id,
+        quantity: rfq.quantity,
+        budgetMin: rfq.budget?.min,
+        budgetMax: rfq.budget?.max,
+        deliveryTimeline: rfq.deliveryDate,
+        deliveryLocation: rfq.deliveryLocation,
+        status: rfq.status,
+        expiresAt: new Date(rfq.expiresAt),
+        createdAt: new Date(rfq.createdAt),
+        updatedAt: new Date(rfq.updatedAt),
+        buyer: {
+          id: rfq.buyerId,
+          firstName: null,
+          lastName: null,
+          businessName: rfq.buyerName,
+          verificationTier: 'basic',
+          isVerified: false
+        },
+        category: {
+          id: rfq.category.id,
+          name: rfq.category.name,
+          slug: rfq.category.name.toLowerCase().replace(/\s+/g, '-')
+        },
+        subcategory: rfq.subcategory ? {
+          id: rfq.subcategory.id,
+          name: rfq.subcategory.name,
+          slug: rfq.subcategory.name.toLowerCase().replace(/\s+/g, '-')
+        } : null,
+        quotes: [],
+        rfqType: 'product',
+        quoteCount: rfq.responseCount,
+        isExpired: new Date(rfq.expiresAt) < new Date(),
+        daysRemaining: Math.max(0, Math.ceil((new Date(rfq.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))),
+        attachments: rfq.attachments,
+        canEdit: false,
+        canQuote: false,
+        responses: {
+          platform: [], // Would need separate call to get responses
+          whatsapp: []
+        },
+        responseAnalytics: {
+          totalResponses: rfq.responseCount,
+          platformResponses: rfq.responseCount,
+          whatsappResponses: 0,
+          averagePrice: null,
+          lowestPrice: null,
+          highestPrice: null,
+          averageResponseTime: null,
+          verifiedSellerResponses: 0,
+          lastResponseAt: null
+        }
+      }));
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to fetch RFQs with responses');
-      }
-
-      const result = await response.json();
-      return result.data;
+      return {
+        rfqs,
+        pagination: {
+          page: response.data.page,
+          limit: filters?.limit || 10,
+          total: response.data.total,
+          totalPages: response.data.totalPages,
+          hasNext: response.data.page < response.data.totalPages,
+          hasPrev: response.data.page > 1
+        },
+        summary: {
+          totalRfqs: response.data.total,
+          totalResponses: 0, // Would need to calculate
+          averageResponsesPerRfq: 0,
+          rfqsWithResponses: 0,
+          rfqsWithoutResponses: 0,
+          platformResponsesTotal: 0,
+          whatsappResponsesTotal: 0,
+          totalValueQuoted: 0,
+          averageQuoteValue: 0
+        }
+      };
     } catch (error) {
       console.error('Error fetching RFQs with responses:', error);
       throw error;
@@ -371,17 +504,55 @@ export class RFQService {
 
   async getRfqById(rfqId: string): Promise<RfqDetails> {
     try {
-  const response = await fetch(apiUrl(`/rfqs/${rfqId}`), {
-        headers: this.getHeaders(),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to fetch RFQ');
+      const response = await rfqApi.getRFQ(rfqId);
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to fetch RFQ');
       }
 
-      const result = await response.json();
-      return result.data;
+      // Transform API response to match service interface
+      const rfq = response.data;
+      return {
+        id: rfq.id,
+        title: rfq.title,
+        description: rfq.description,
+        categoryId: rfq.category.id,
+        subcategoryId: rfq.subcategory?.id,
+        quantity: rfq.quantity,
+        budgetMin: rfq.budget?.min,
+        budgetMax: rfq.budget?.max,
+        deliveryTimeline: rfq.deliveryDate,
+        deliveryLocation: rfq.deliveryLocation,
+        status: rfq.status,
+        expiresAt: new Date(rfq.expiresAt),
+        createdAt: new Date(rfq.createdAt),
+        updatedAt: new Date(rfq.updatedAt),
+        buyer: {
+          id: rfq.buyerId,
+          firstName: null,
+          lastName: null,
+          businessName: rfq.buyerName,
+          verificationTier: 'basic', // Default value
+          isVerified: false // Default value
+        },
+        category: {
+          id: rfq.category.id,
+          name: rfq.category.name,
+          slug: rfq.category.name.toLowerCase().replace(/\s+/g, '-')
+        },
+        subcategory: rfq.subcategory ? {
+          id: rfq.subcategory.id,
+          name: rfq.subcategory.name,
+          slug: rfq.subcategory.name.toLowerCase().replace(/\s+/g, '-')
+        } : null,
+        quotes: [], // Would need separate call
+        rfqType: 'product', // Default assumption
+        quoteCount: rfq.responseCount,
+        isExpired: new Date(rfq.expiresAt) < new Date(),
+        daysRemaining: Math.max(0, Math.ceil((new Date(rfq.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))),
+        attachments: rfq.attachments,
+        canEdit: false, // Would need to determine based on user
+        canQuote: false // Would need to determine based on user
+      };
     } catch (error) {
       console.error('Error fetching RFQ:', error);
       throw error;
@@ -419,19 +590,71 @@ export class RFQService {
 
   async updateRfq(rfqId: string, updateData: Partial<CreateRfqData>): Promise<RfqDetails> {
     try {
-  const response = await fetch(apiUrl(`/rfqs/${rfqId}`), {
-        method: 'PUT',
-        headers: this.getHeaders(),
-        body: JSON.stringify(updateData),
-      });
+      // Transform service data format to API format
+      const apiData: any = {
+        title: updateData.title,
+        description: updateData.description,
+        categoryId: updateData.categoryId,
+        subcategoryId: updateData.subcategoryId,
+        quantity: updateData.quantity,
+        budget: updateData.budgetMin || updateData.budgetMax ? {
+          min: updateData.budgetMin,
+          max: updateData.budgetMax
+        } : undefined,
+        deliveryLocation: updateData.deliveryLocation,
+        deliveryDate: updateData.deliveryTimeline,
+        expiresAt: updateData.expiresAt?.toISOString()
+      };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to update RFQ');
+      const response = await rfqApi.updateRFQ(rfqId, apiData);
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to update RFQ');
       }
 
-      const result = await response.json();
-      return result.data;
+      // Transform response back to service format
+      const rfq = response.data;
+      return {
+        id: rfq.id,
+        title: rfq.title,
+        description: rfq.description,
+        categoryId: rfq.category.id,
+        subcategoryId: rfq.subcategory?.id,
+        quantity: rfq.quantity,
+        budgetMin: rfq.budget?.min,
+        budgetMax: rfq.budget?.max,
+        deliveryTimeline: rfq.deliveryDate,
+        deliveryLocation: rfq.deliveryLocation,
+        status: rfq.status,
+        expiresAt: new Date(rfq.expiresAt),
+        createdAt: new Date(rfq.createdAt),
+        updatedAt: new Date(rfq.updatedAt),
+        buyer: {
+          id: rfq.buyerId,
+          firstName: null,
+          lastName: null,
+          businessName: rfq.buyerName,
+          verificationTier: 'basic',
+          isVerified: false
+        },
+        category: {
+          id: rfq.category.id,
+          name: rfq.category.name,
+          slug: rfq.category.name.toLowerCase().replace(/\s+/g, '-')
+        },
+        subcategory: rfq.subcategory ? {
+          id: rfq.subcategory.id,
+          name: rfq.subcategory.name,
+          slug: rfq.subcategory.name.toLowerCase().replace(/\s+/g, '-')
+        } : null,
+        quotes: [],
+        rfqType: 'product',
+        quoteCount: rfq.responseCount,
+        isExpired: new Date(rfq.expiresAt) < new Date(),
+        daysRemaining: Math.max(0, Math.ceil((new Date(rfq.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))),
+        attachments: rfq.attachments,
+        canEdit: false,
+        canQuote: false
+      };
     } catch (error) {
       console.error('Error updating RFQ:', error);
       throw error;
@@ -482,14 +705,9 @@ export class RFQService {
 
   async deleteRfq(rfqId: string): Promise<void> {
     try {
-  const response = await fetch(apiUrl(`/rfqs/${rfqId}`), {
-        method: 'DELETE',
-        headers: this.getHeaders(),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to delete RFQ');
+      const response = await rfqApi.deleteRFQ(rfqId);
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to delete RFQ');
       }
     } catch (error) {
       console.error('Error deleting RFQ:', error);
@@ -534,24 +752,10 @@ export class RFQService {
 
   async uploadAttachment(file: File): Promise<string> {
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-  const response = await fetch(apiUrl('/rfqs/upload'), {
-        method: 'POST',
-        headers: {
-          ...(this.authToken && { 'Authorization': `Bearer ${this.authToken}` }),
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to upload attachment');
-      }
-
-      const result = await response.json();
-      return result.data.url;
+      await rfqApi.uploadAttachment(file);
+      // If we reach here, the API call succeeded but since this endpoint doesn't exist,
+      // we should throw an error
+      throw new Error('Upload attachment endpoint not available');
     } catch (error) {
       console.error('Error uploading attachment:', error);
       throw error;

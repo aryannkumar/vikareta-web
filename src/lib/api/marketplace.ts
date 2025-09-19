@@ -226,29 +226,14 @@ export class MarketplaceService {
     searchTime: number;
     filters: MarketplaceSearchFilters;
   }> {
-    const response = await apiClient.get<{
-      listings: MarketplaceListing[];
-      total: number;
-      page: number;
-      totalPages: number;
-      hasNext: boolean;
-      hasPrev: boolean;
-      searchTime: number;
-      filters: MarketplaceSearchFilters;
-    }>('/marketplace/listings/search', filters);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to search marketplace listings');
-    }
-    return response.data;
+    // Marketplace listings not implemented in backend
+    throw new Error('Marketplace listings search not available');
   }
 
   // Get marketplace listing by ID
   static async getListing(listingId: string): Promise<MarketplaceListing> {
-    const response = await apiClient.get<MarketplaceListing>(`/marketplace/listings/${listingId}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch marketplace listing');
-    }
-    return response.data;
+    // Marketplace listings not implemented in backend
+    throw new Error('Marketplace listings not available');
   }
 
   // Get user's marketplace listings
@@ -265,97 +250,62 @@ export class MarketplaceService {
     hasNext: boolean;
     hasPrev: boolean;
   }> {
-    const endpoint = userId ? `/marketplace/users/${userId}/listings` : '/marketplace/my-listings';
-    const response = await apiClient.get<{
-      listings: MarketplaceListing[];
-      total: number;
-      page: number;
-      totalPages: number;
-      hasNext: boolean;
-      hasPrev: boolean;
-    }>(endpoint, filters);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch user listings');
-    }
-    return response.data;
+    // Marketplace listings not implemented in backend
+    throw new Error('Marketplace listings not available');
   }
 
   // Create new marketplace listing
   static async createListing(data: CreateListingData): Promise<MarketplaceListing> {
-    const response = await apiClient.post<MarketplaceListing>('/marketplace/listings', data);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to create marketplace listing');
-    }
-    return response.data;
+    // Marketplace listings not implemented in backend
+    throw new Error('Marketplace listings not available');
   }
 
   // Update marketplace listing
   static async updateListing(listingId: string, data: UpdateListingData): Promise<MarketplaceListing> {
-    const response = await apiClient.put<MarketplaceListing>(`/marketplace/listings/${listingId}`, data);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to update marketplace listing');
-    }
-    return response.data;
+    // Marketplace listings not implemented in backend
+    throw new Error('Marketplace listings not available');
   }
 
   // Delete marketplace listing
   static async deleteListing(listingId: string): Promise<void> {
-    const response = await apiClient.delete(`/marketplace/listings/${listingId}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to delete marketplace listing');
-    }
+    // Marketplace listings not implemented in backend
+    throw new Error('Marketplace listings not available');
   }
 
   // Get marketplace categories
   static async getCategories(): Promise<MarketplaceCategory[]> {
-    const response = await apiClient.get<MarketplaceCategory[]>('/marketplace/categories');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch marketplace categories');
-    }
-    return response.data;
+    // Marketplace categories not implemented in backend
+    throw new Error('Marketplace categories not available');
   }
 
   // Get marketplace category by slug
   static async getCategoryBySlug(slug: string): Promise<MarketplaceCategory> {
-    const response = await apiClient.get<MarketplaceCategory>(`/marketplace/categories/${slug}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch marketplace category');
-    }
-    return response.data;
+    // Marketplace categories not implemented in backend
+    throw new Error('Marketplace categories not available');
   }
 
   // Get featured marketplace listings
   static async getFeaturedListings(limit?: number): Promise<MarketplaceListing[]> {
-    const response = await apiClient.get<MarketplaceListing[]>('/marketplace/listings/featured', { limit });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch featured listings');
-    }
-    return response.data;
+    // Marketplace listings not implemented in backend
+    throw new Error('Marketplace listings not available');
   }
 
   // Get promoted marketplace listings
   static async getPromotedListings(limit?: number): Promise<MarketplaceListing[]> {
-    const response = await apiClient.get<MarketplaceListing[]>('/marketplace/listings/promoted', { limit });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch promoted listings');
-    }
-    return response.data;
+    // Marketplace listings not implemented in backend
+    throw new Error('Marketplace listings not available');
   }
 
   // Add listing to favorites
   static async addToFavorites(listingId: string): Promise<void> {
-    const response = await apiClient.post('/marketplace/favorites', { listingId });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to add listing to favorites');
-    }
+    // Marketplace favorites not implemented in backend
+    throw new Error('Marketplace favorites not available');
   }
 
   // Remove listing from favorites
   static async removeFromFavorites(listingId: string): Promise<void> {
-    const response = await apiClient.delete(`/marketplace/favorites/${listingId}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to remove listing from favorites');
-    }
+    // Marketplace favorites not implemented in backend
+    throw new Error('Marketplace favorites not available');
   }
 
   // Get user's favorite listings
@@ -370,50 +320,26 @@ export class MarketplaceService {
     hasNext: boolean;
     hasPrev: boolean;
   }> {
-    const response = await apiClient.get<{
-      listings: MarketplaceListing[];
-      total: number;
-      page: number;
-      totalPages: number;
-      hasNext: boolean;
-      hasPrev: boolean;
-    }>('/marketplace/favorites', filters);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch favorite listings');
-    }
-    return response.data;
+    // Marketplace favorites not implemented in backend
+    throw new Error('Marketplace favorites not available');
   }
 
   // Check if listing is favorited by user
   static async isFavorited(listingId: string): Promise<boolean> {
-    const response = await apiClient.get<{ favorited: boolean }>(`/marketplace/favorites/${listingId}/check`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to check favorite status');
-    }
-    return response.data.favorited;
+    // Marketplace favorites not implemented in backend
+    throw new Error('Marketplace favorites not available');
   }
 
   // Report marketplace listing
   static async reportListing(listingId: string, reason: string, description?: string): Promise<void> {
-    const response = await apiClient.post('/marketplace/reports', {
-      listingId,
-      reason,
-      description
-    });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to report listing');
-    }
+    // Marketplace reports not implemented in backend
+    throw new Error('Marketplace reports not available');
   }
 
   // Contact seller
   static async contactSeller(listingId: string, message: string): Promise<void> {
-    const response = await apiClient.post('/marketplace/contact', {
-      listingId,
-      message
-    });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to contact seller');
-    }
+    // Marketplace contact not implemented in backend
+    throw new Error('Marketplace contact not available');
   }
 
   // Get marketplace statistics
@@ -427,11 +353,8 @@ export class MarketplaceService {
 
   // Get similar listings
   static async getSimilarListings(listingId: string, limit?: number): Promise<MarketplaceListing[]> {
-    const response = await apiClient.get<MarketplaceListing[]>(`/marketplace/listings/${listingId}/similar`, { limit });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch similar listings');
-    }
-    return response.data;
+    // Similar listings not implemented in backend
+    throw new Error('Similar listings not available');
   }
 
   // Get trending searches
@@ -440,15 +363,8 @@ export class MarketplaceService {
     count: number;
     trend: 'up' | 'down' | 'stable';
   }>> {
-    const response = await apiClient.get<Array<{
-      query: string;
-      count: number;
-      trend: 'up' | 'down' | 'stable';
-    }>>('/marketplace/trending-searches');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch trending searches');
-    }
-    return response.data;
+    // Trending searches not implemented in backend
+    throw new Error('Trending searches not available');
   }
 
   // Get location suggestions
@@ -461,19 +377,8 @@ export class MarketplaceService {
       lng: number;
     };
   }>> {
-    const response = await apiClient.get<Array<{
-      city: string;
-      state: string;
-      country: string;
-      coordinates?: {
-        lat: number;
-        lng: number;
-      };
-    }>>('/marketplace/locations/suggestions', { query });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch location suggestions');
-    }
-    return response.data;
+    // Location suggestions not implemented in backend
+    throw new Error('Location suggestions not available');
   }
 
   // Bulk update listings
@@ -486,22 +391,8 @@ export class MarketplaceService {
       error?: string;
     }>;
   }> {
-    const response = await apiClient.post<{
-      updated: number;
-      failed: number;
-      results: Array<{
-        listingId: string;
-        success: boolean;
-        error?: string;
-      }>;
-    }>('/marketplace/bulk-update', {
-      listingIds,
-      updates
-    });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to bulk update listings');
-    }
-    return response.data;
+    // Bulk update not implemented in backend
+    throw new Error('Bulk update not available');
   }
 
   // Get marketplace alerts/notifications
@@ -514,27 +405,14 @@ export class MarketplaceService {
     read: boolean;
     createdAt: string;
   }>> {
-    const response = await apiClient.get<Array<{
-      id: string;
-      type: 'price_drop' | 'similar_listing' | 'outbid' | 'listing_expired';
-      title: string;
-      message: string;
-      listingId?: string;
-      read: boolean;
-      createdAt: string;
-    }>>('/marketplace/alerts');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch marketplace alerts');
-    }
-    return response.data;
+    // Marketplace alerts not implemented in backend
+    throw new Error('Marketplace alerts not available');
   }
 
   // Mark alert as read
   static async markAlertAsRead(alertId: string): Promise<void> {
-    const response = await apiClient.put(`/marketplace/alerts/${alertId}/read`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to mark alert as read');
-    }
+    // Marketplace alerts not implemented in backend
+    throw new Error('Marketplace alerts not available');
   }
 
   // Create marketplace alert subscription
@@ -555,15 +433,8 @@ export class MarketplaceService {
     active: boolean;
     createdAt: string;
   }> {
-    const response = await apiClient.post<{
-      id: string;
-      active: boolean;
-      createdAt: string;
-    }>('/marketplace/alert-subscriptions', data);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to create alert subscription');
-    }
-    return response.data;
+    // Alert subscriptions not implemented in backend
+    throw new Error('Alert subscriptions not available');
   }
 
   // Get user's alert subscriptions
@@ -584,35 +455,14 @@ export class MarketplaceService {
     createdAt: string;
     lastTriggered?: string;
   }>> {
-    const response = await apiClient.get<Array<{
-      id: string;
-      query?: string;
-      category?: string;
-      minPrice?: number;
-      maxPrice?: number;
-      location?: {
-        city?: string;
-        state?: string;
-        country?: string;
-        radius?: number;
-      };
-      frequency: 'immediate' | 'daily' | 'weekly';
-      active: boolean;
-      createdAt: string;
-      lastTriggered?: string;
-    }>>('/marketplace/alert-subscriptions');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch alert subscriptions');
-    }
-    return response.data;
+    // Alert subscriptions not implemented in backend
+    throw new Error('Alert subscriptions not available');
   }
 
   // Delete alert subscription
   static async deleteAlertSubscription(subscriptionId: string): Promise<void> {
-    const response = await apiClient.delete(`/marketplace/alert-subscriptions/${subscriptionId}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to delete alert subscription');
-    }
+    // Alert subscriptions not implemented in backend
+    throw new Error('Alert subscriptions not available');
   }
 }
 
@@ -865,13 +715,13 @@ export const marketplaceApi = {
     };
   },
 
-  // Get a single business by id (maps to provider details)
+  // Get a single business by id (maps to user profile endpoint)
   getBusinessById: async (id: string): Promise<{ success: boolean; data: any | null }> => {
     if (!id) return { success: false, data: null };
     
     try {
-      // Backend exposes provider details at /api/providers/:id
-      const response = await apiClient.get(`/providers/${encodeURIComponent(id)}`);
+      // Backend exposes user profiles at /api/v1/users/:id
+      const response = await apiClient.get(`/users/${encodeURIComponent(id)}`);
       if (!response.success) {
         return { success: false, data: null };
       }
@@ -905,18 +755,10 @@ export const marketplaceApi = {
     return { success: true, message: 'Share tracked (client-side only)' };
   },
 
-  // Get promotional campaigns
+  // Get promotional campaigns (not available in backend)
   getPromotionalCampaigns: async (location?: string) => {
-    const params = location ? `?location=${location}` : '';
-    const response = await apiClient.get(`/marketplace/promotions${params}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch promotional campaigns');
-    }
-    
-    return {
-      success: true,
-      data: (response.data as any[]) || []
-    };
+    // Backend doesn't have promotions endpoint, this would need to be implemented
+    throw new Error('Promotional campaigns are not currently supported');
   },
 
   // Search marketplace

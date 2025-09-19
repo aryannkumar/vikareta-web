@@ -52,18 +52,18 @@ export const notificationsApi = {
     },
 
     async getUnreadCount() {
-        return apiClient.get<{ count: number }>('/notifications/unread-count');
+        throw new Error('Unread count endpoint not available');
     },
 
     async getPreferences() {
-        return apiClient.get<NotificationPreferences>('/notifications/preferences');
+        throw new Error('Notification preferences endpoint not available');
     },
 
     async updatePreferences(preferences: Partial<NotificationPreferences>) {
-        return apiClient.put<NotificationPreferences>('/notifications/preferences', preferences);
+        throw new Error('Update notification preferences endpoint not available');
     },
 
     async testNotification(type: string) {
-        return apiClient.post('/notifications/test', { type });
+        throw new Error('Test notification endpoint not available');
     }
 };

@@ -1,7 +1,14 @@
 import { PaymentGateway, PaymentRequest, PaymentResponse } from '../types/payment';
 import { vikaretaSSOClient } from '../lib/auth/vikareta';
+import { paymentApi } from '../lib/api/payment';
+import { getApiUrl } from '../config/api';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+// Razorpay type declarations
+declare global {
+  interface Window {
+    Razorpay: new (options: any) => any;
+  }
+}
 
 export class PaymentService {
   private static instance: PaymentService;
@@ -37,16 +44,34 @@ export class PaymentService {
 
   async getAvailableGateways(): Promise<PaymentGateway[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/payments/gateways`, {
-        headers: this.getHeaders(),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch payment gateways');
-      }
-      
-      const data = await response.json();
-      return data.data || [];
+      const apiGateways = await paymentApi.getPaymentGateways();
+
+      // Transform API response to match service interface
+      return apiGateways.map(gateway => ({
+        id: gateway.id,
+        name: gateway.name,
+        slug: gateway.code,
+        logo: `/images/payment/${gateway.code}.png`,
+        status: gateway.isActive ? 'active' : 'inactive',
+        config: {
+          // Add gateway-specific config based on type
+          ...(gateway.code === 'razorpay' && {
+            key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY || '',
+            currency: 'INR',
+            theme_color: '#3399cc'
+          }),
+          ...(gateway.code === 'cashfree' && {
+            app_id: process.env.NEXT_PUBLIC_CASHFREE_APP_ID || '',
+            environment: process.env.NEXT_PUBLIC_CASHFREE_ENV || 'sandbox',
+            currency: 'INR'
+          }),
+          ...(gateway.code === 'phonepe' && {
+            merchant_id: process.env.NEXT_PUBLIC_PHONEPE_MERCHANT_ID || '',
+            environment: process.env.NEXT_PUBLIC_PHONEPE_ENV || 'UAT'
+          }),
+          ...(gateway.code === 'cod' && {})
+        }
+      }));
     } catch (error) {
       console.error('Error fetching payment gateways:', error);
       // Return default gateways as fallback
@@ -104,19 +129,35 @@ export class PaymentService {
 
   async createPayment(request: PaymentRequest): Promise<PaymentResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/payments/create`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify(request),
+      const paymentIntent = await paymentApi.createPaymentIntent({
+        amount: request.amount,
+        currency: request.currency,
+        paymentMethod: request.paymentMethod || 'card',
+        orderId: request.orderId,
+        description: request.description,
+        returnUrl: request.returnUrl,
+        metadata: request.metadata
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Payment creation failed');
-      }
+      // Transform API response to match service interface
+      const statusMap: Record<string, 'success' | 'pending' | 'failed'> = {
+        'succeeded': 'success',
+        'pending': 'pending',
+        'processing': 'pending',
+        'failed': 'failed',
+        'cancelled': 'failed'
+      };
 
-      const data = await response.json();
-      return data.data;
+      return {
+        success: paymentIntent.status === 'succeeded',
+        orderId: paymentIntent.orderId || request.orderId,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        status: statusMap[paymentIntent.status] || 'pending',
+        transactionId: paymentIntent.id,
+        paymentUrl: paymentIntent.paymentUrl,
+        gatewayResponse: paymentIntent
+      };
     } catch (error) {
       console.error('Payment creation error:', error);
       return {
@@ -142,7 +183,8 @@ export class PaymentService {
     };
   }): Promise<PaymentResponse & { paymentSessionId?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/payments/cashfree/create-order`, {
+      const baseUrl = await getApiUrl();
+      const response = await fetch(`${baseUrl}/payments/cashfree/create-order`, {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify(request),
@@ -170,19 +212,32 @@ export class PaymentService {
 
   async verifyPayment(gateway: string, verificationData: Record<string, any>): Promise<PaymentResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/payments/${gateway}/verify`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify(verificationData),
+      // For verification, we need to confirm the payment intent
+      const intentId = verificationData.intentId || verificationData.orderId;
+      const transaction = await paymentApi.confirmPayment(intentId, {
+        paymentMethodId: verificationData.paymentMethodId,
+        returnUrl: verificationData.returnUrl
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Payment verification failed');
-      }
+      // Transform API response to match service interface
+      const statusMap: Record<string, 'success' | 'pending' | 'failed'> = {
+        'succeeded': 'success',
+        'pending': 'pending',
+        'processing': 'pending',
+        'failed': 'failed',
+        'refunded': 'failed',
+        'cancelled': 'failed'
+      };
 
-      const data = await response.json();
-      return data.data;
+      return {
+        success: transaction.status === 'succeeded',
+        orderId: transaction.orderId || verificationData.orderId,
+        amount: transaction.amount,
+        currency: transaction.currency,
+        status: statusMap[transaction.status] || 'pending',
+        transactionId: transaction.id,
+        gatewayResponse: transaction
+      };
     } catch (error) {
       console.error('Payment verification error:', error);
       return {
@@ -198,16 +253,13 @@ export class PaymentService {
 
   async getPaymentStatus(orderId: string): Promise<{ status: string; transactionId?: string; details?: any }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/payments/status/${orderId}`, {
-        headers: this.getHeaders(),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch payment status');
-      }
-      
-      const data = await response.json();
-      return data.data;
+      // Try to get transaction by order ID - this might need adjustment based on API
+      const transaction = await paymentApi.getTransaction(orderId);
+      return {
+        status: transaction.status,
+        transactionId: transaction.id,
+        details: transaction
+      };
     } catch (error) {
       console.error('Error fetching payment status:', error);
       return { status: 'unknown' };
@@ -216,19 +268,27 @@ export class PaymentService {
 
   async capturePayment(paymentId: string, amount?: number): Promise<PaymentResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/payments/${paymentId}/capture`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify({ amount }),
-      });
+      // For capture, we confirm the payment intent
+      const transaction = await paymentApi.confirmPayment(paymentId);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Payment capture failed');
-      }
+      const statusMap: Record<string, 'success' | 'pending' | 'failed'> = {
+        'succeeded': 'success',
+        'pending': 'pending',
+        'processing': 'pending',
+        'failed': 'failed',
+        'refunded': 'failed',
+        'cancelled': 'failed'
+      };
 
-      const data = await response.json();
-      return data.data;
+      return {
+        success: transaction.status === 'succeeded',
+        orderId: transaction.orderId,
+        amount: transaction.amount,
+        currency: transaction.currency,
+        status: statusMap[transaction.status] || 'pending',
+        transactionId: transaction.id,
+        gatewayResponse: transaction
+      };
     } catch (error) {
       console.error('Payment capture error:', error);
       return {
@@ -244,19 +304,20 @@ export class PaymentService {
 
   async refundPayment(paymentId: string, amount?: number, reason?: string): Promise<PaymentResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/payments/${paymentId}/refund`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify({ amount, reason }),
+      const refundData = await paymentApi.processRefund(paymentId, {
+        amount: amount || 0,
+        reason: reason || 'Customer request'
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Payment refund failed');
-      }
-
-      const data = await response.json();
-      return data.data;
+      return {
+        success: refundData.status === 'success' || refundData.status === 'completed',
+        orderId: '', // Not available in refund response
+        amount: refundData.amount,
+        currency: 'INR',
+        status: 'success',
+        transactionId: refundData.refundId,
+        gatewayResponse: refundData
+      };
     } catch (error) {
       console.error('Payment refund error:', error);
       return {
@@ -393,7 +454,8 @@ export class PaymentService {
   // WhatsApp Integration Methods
   async sendPaymentConfirmation(orderId: string, buyerId: string): Promise<void> {
     try {
-      await fetch(`${API_BASE_URL}/payments/notifications/confirmation`, {
+      const baseUrl = await getApiUrl();
+      await fetch(`${baseUrl}/payments/notifications/confirmation`, {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify({ orderId, buyerId }),
@@ -405,7 +467,8 @@ export class PaymentService {
 
   async sendPaymentReceipt(orderId: string, buyerId: string): Promise<void> {
     try {
-      await fetch(`${API_BASE_URL}/payments/notifications/receipt`, {
+      const baseUrl = await getApiUrl();
+      await fetch(`${baseUrl}/payments/notifications/receipt`, {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify({ orderId, buyerId }),

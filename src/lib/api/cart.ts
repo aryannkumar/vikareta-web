@@ -93,15 +93,7 @@ export const cartApi = {
     subtotal: number;
     total: number;
   }> {
-    const response = await apiClient.get<{
-      itemCount: number;
-      subtotal: number;
-      total: number;
-    }>('/cart/summary');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch cart summary');
-    }
-    return response.data;
+    throw new Error('Cart summary endpoint not available');
   },
 
   // Check item availability
@@ -110,19 +102,7 @@ export const cartApi = {
     maxQuantity: number;
     estimatedDelivery: string;
   }> {
-    const response = await apiClient.get<{
-      available: boolean;
-      maxQuantity: number;
-      estimatedDelivery: string;
-    }>('/cart/availability', {
-      productId,
-      quantity,
-      variantId
-    });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to check availability');
-    }
-    return response.data;
+    throw new Error('Availability check endpoint not available');
   },
 
   // Apply coupon to cart
@@ -136,28 +116,12 @@ export const cartApi = {
       discountValue: number;
     };
   }> {
-    const response = await apiClient.post<{
-      discount: number;
-      total: number;
-      coupon: {
-        id: string;
-        code: string;
-        discountType: string;
-        discountValue: number;
-      };
-    }>('/cart/coupon', { code });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to apply coupon');
-    }
-    return response.data;
+    throw new Error('Coupon endpoint not available');
   },
 
   // Remove coupon from cart
   async removeCoupon(): Promise<void> {
-    const response = await apiClient.delete('/cart/coupon');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to remove coupon');
-    }
+    throw new Error('Coupon endpoint not available');
   },
 
   // Bulk update cart items
@@ -165,19 +129,12 @@ export const cartApi = {
     itemId: string;
     quantity: number;
   }>): Promise<Cart> {
-    const response = await apiClient.put<Cart>('/cart/bulk', { updates });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to update cart items');
-    }
-    return response.data;
+    throw new Error('Bulk update endpoint not available');
   },
 
   // Move item to wishlist
   async moveToWishlist(itemId: string): Promise<void> {
-    const response = await apiClient.post(`/cart/items/${itemId}/wishlist`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to move item to wishlist');
-    }
+    throw new Error('Move to wishlist endpoint not available');
   },
 
   // Get cart recommendations
@@ -188,16 +145,6 @@ export const cartApi = {
     price: number;
     reason: string;
   }>> {
-    const response = await apiClient.get<Array<{
-      id: string;
-      name: string;
-      image: string;
-      price: number;
-      reason: string;
-    }>>('/cart/recommendations');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch recommendations');
-    }
-    return response.data;
+    throw new Error('Recommendations endpoint not available');
   }
 };

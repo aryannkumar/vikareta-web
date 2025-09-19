@@ -121,11 +121,11 @@ export const rfqApi = {
       total: number;
       page: number;
       totalPages: number;
-    }>('/rfqs/my', filters);
+    }>('/rfqs/buyer', filters);
   },
 
   async getRFQResponses(rfqId: string) {
-    return apiClient.get<RFQResponse[]>(`/rfqs/${rfqId}/responses`);
+    throw new Error('RFQ responses endpoint not available');
   },
 
   async submitRFQResponse(rfqId: string, data: {
@@ -136,7 +136,7 @@ export const rfqApi = {
     attachments?: string[];
     specifications?: Record<string, any>;
   }) {
-    return apiClient.post<RFQResponse>(`/rfqs/${rfqId}/responses`, data);
+    throw new Error('Submit RFQ response endpoint not available');
   },
 
   async updateRFQResponse(rfqId: string, responseId: string, data: {
@@ -147,15 +147,15 @@ export const rfqApi = {
     attachments?: string[];
     specifications?: Record<string, any>;
   }) {
-    return apiClient.put<RFQResponse>(`/rfqs/${rfqId}/responses/${responseId}`, data);
+    throw new Error('Update RFQ response endpoint not available');
   },
 
   async acceptRFQResponse(rfqId: string, responseId: string) {
-    return apiClient.post(`/rfqs/${rfqId}/responses/${responseId}/accept`);
+    throw new Error('Accept RFQ response endpoint not available');
   },
 
   async rejectRFQResponse(rfqId: string, responseId: string, reason?: string) {
-    return apiClient.post(`/rfqs/${rfqId}/responses/${responseId}/reject`, { reason });
+    throw new Error('Reject RFQ response endpoint not available');
   },
 
   async closeRFQ(id: string, reason?: string) {
@@ -163,8 +163,6 @@ export const rfqApi = {
   },
 
   async uploadAttachment(file: File) {
-    const formData = new FormData();
-    formData.append('file', file);
-    return apiClient.upload<{ url: string; filename: string }>('/rfqs/upload', formData);
+    throw new Error('Upload attachment endpoint not available');
   }
 };

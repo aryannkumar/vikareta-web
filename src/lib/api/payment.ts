@@ -69,11 +69,7 @@ export interface RefundData {
 export const paymentApi = {
   // Get user's saved payment methods
   async getPaymentMethods(): Promise<PaymentMethod[]> {
-    const response = await apiClient.get<PaymentMethod[]>('/payments/methods');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch payment methods');
-    }
-    return response.data;
+    throw new Error('Payment methods endpoint not available');
   },
 
   // Add payment method
@@ -82,11 +78,7 @@ export const paymentApi = {
     token: string; // Token from payment gateway
     isDefault?: boolean;
   }): Promise<PaymentMethod> {
-    const response = await apiClient.post<PaymentMethod>('/payments/methods', data);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to add payment method');
-    }
-    return response.data;
+    throw new Error('Add payment method endpoint not available');
   },
 
   // Update payment method
@@ -94,37 +86,22 @@ export const paymentApi = {
     isDefault?: boolean;
     isActive?: boolean;
   }): Promise<PaymentMethod> {
-    const response = await apiClient.put<PaymentMethod>(`/payments/methods/${id}`, data);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to update payment method');
-    }
-    return response.data;
+    throw new Error('Update payment method endpoint not available');
   },
 
   // Delete payment method
   async deletePaymentMethod(id: string): Promise<void> {
-    const response = await apiClient.delete(`/payments/methods/${id}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to delete payment method');
-    }
+    throw new Error('Delete payment method endpoint not available');
   },
 
   // Create payment intent
   async createPaymentIntent(data: CreatePaymentIntentData): Promise<PaymentIntent> {
-    const response = await apiClient.post<PaymentIntent>('/payments/intent', data);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to create payment intent');
-    }
-    return response.data;
+    throw new Error('Payment intent endpoint not available');
   },
 
   // Get payment intent
   async getPaymentIntent(id: string): Promise<PaymentIntent> {
-    const response = await apiClient.get<PaymentIntent>(`/payments/intent/${id}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch payment intent');
-    }
-    return response.data;
+    throw new Error('Get payment intent endpoint not available');
   },
 
   // Confirm payment
@@ -132,11 +109,7 @@ export const paymentApi = {
     paymentMethodId?: string;
     returnUrl?: string;
   }): Promise<PaymentTransaction> {
-    const response = await apiClient.post<PaymentTransaction>(`/payments/intent/${intentId}/confirm`, data);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to confirm payment');
-    }
-    return response.data;
+    throw new Error('Confirm payment endpoint not available');
   },
 
   // Get payment transactions
@@ -153,25 +126,12 @@ export const paymentApi = {
     page: number;
     totalPages: number;
   }> {
-    const response = await apiClient.get<{
-      transactions: PaymentTransaction[];
-      total: number;
-      page: number;
-      totalPages: number;
-    }>('/payments/transactions', filters);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch transactions');
-    }
-    return response.data;
+    throw new Error('Payment transactions endpoint not available');
   },
 
   // Get payment transaction by ID
   async getTransaction(id: string): Promise<PaymentTransaction> {
-    const response = await apiClient.get<PaymentTransaction>(`/payments/transactions/${id}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch transaction');
-    }
-    return response.data;
+    throw new Error('Get transaction endpoint not available');
   },
 
   // Process refund
@@ -180,15 +140,7 @@ export const paymentApi = {
     amount: number;
     status: string;
   }> {
-    const response = await apiClient.post<{
-      refundId: string;
-      amount: number;
-      status: string;
-    }>(`/payments/transactions/${transactionId}/refund`, data);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to process refund');
-    }
-    return response.data;
+    throw new Error('Process refund endpoint not available');
   },
 
   // Get payment gateways
@@ -203,21 +155,7 @@ export const paymentApi = {
       fixed?: number;
     };
   }>> {
-    const response = await apiClient.get<Array<{
-      id: string;
-      name: string;
-      code: string;
-      isActive: boolean;
-      supportedMethods: string[];
-      fees: {
-        percentage?: number;
-        fixed?: number;
-      };
-    }>>('/payments/gateways');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch payment gateways');
-    }
-    return response.data;
+    throw new Error('Payment gateways endpoint not available');
   },
 
   // Get payment statistics
@@ -233,22 +171,7 @@ export const paymentApi = {
       count: number;
     }>;
   }> {
-    const response = await apiClient.get<{
-      totalPayments: number;
-      totalAmount: number;
-      successRate: number;
-      averagePayment: number;
-      paymentMethods: Record<string, number>;
-      dailyPayments: Array<{
-        date: string;
-        amount: number;
-        count: number;
-      }>;
-    }>('/payments/stats', { period });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch payment stats');
-    }
-    return response.data;
+    throw new Error('Payment stats endpoint not available');
   },
 
   // Validate payment method
@@ -257,15 +180,7 @@ export const paymentApi = {
     message?: string;
     fees?: number;
   }> {
-    const response = await apiClient.post<{
-      valid: boolean;
-      message?: string;
-      fees?: number;
-    }>(`/payments/methods/${methodId}/validate`, { amount });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to validate payment method');
-    }
-    return response.data;
+    throw new Error('Validate payment method endpoint not available');
   },
 
   // Get payment receipt
@@ -273,13 +188,6 @@ export const paymentApi = {
     receiptUrl: string;
     downloadUrl: string;
   }> {
-    const response = await apiClient.get<{
-      receiptUrl: string;
-      downloadUrl: string;
-    }>(`/payments/transactions/${transactionId}/receipt`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch payment receipt');
-    }
-    return response.data;
+    throw new Error('Payment receipt endpoint not available');
   }
 };

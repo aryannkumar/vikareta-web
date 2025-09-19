@@ -179,11 +179,8 @@ export const servicesApi = {
 
   // Get services by provider
   getServicesByProvider: async (providerId: string): Promise<ServicesResponse> => {
-    const response = await apiClient.get<{ services: Service[]; total: number; page: number; limit: number; hasMore: boolean }>(`/providers/${providerId}/services`);
-    return {
-      success: response.success,
-      data: response.data as any,
-    } as ServicesResponse;
+    // Provider-specific services endpoint not implemented in backend
+    throw new Error('Provider services endpoint not available');
   },
 
   // Get service categories (uses main categories endpoint)
@@ -253,11 +250,8 @@ export const servicesApi = {
     rating: number;
     comment: string;
   }): Promise<{ success: boolean; data: ServiceReview }> => {
-    const response = await apiClient.post(`/services/${serviceId}/reviews`, review);
-    return {
-      success: response.success,
-      data: response.data as ServiceReview,
-    } as { success: boolean; data: ServiceReview };
+    // Service reviews endpoint not implemented in backend
+    throw new Error('Service reviews not available');
   },
 
   // Get service reviews
@@ -270,11 +264,8 @@ export const servicesApi = {
       ratingDistribution: Record<number, number>;
     };
   }> => {
-    const response = await apiClient.get(`/services/${serviceId}/reviews?page=${page}&limit=${limit}`);
-    return {
-      success: response.success,
-      data: response.data as any,
-    } as any;
+    // Service reviews endpoint not implemented in backend
+    throw new Error('Service reviews not available');
   },
 
   // Contact service provider
@@ -287,11 +278,8 @@ export const servicesApi = {
       phone?: string;
     };
   }): Promise<{ success: boolean; data: { messageId: string } }> => {
-    const response = await apiClient.post(`/services/${serviceId}/contact`, message);
-    return {
-      success: response.success,
-      data: response.data as any,
-    };
+    // Contact provider endpoint not implemented in backend
+    throw new Error('Contact provider functionality not available');
   },
 
   // Request service quote
@@ -307,10 +295,7 @@ export const servicesApi = {
       company?: string;
     };
   }): Promise<{ success: boolean; data: { quoteId: string } }> => {
-    const response = await apiClient.post(`/services/${serviceId}/quote`, requirements);
-    return {
-      success: response.success,
-      data: response.data as any,
-    };
+    // Request quote endpoint not implemented in backend
+    throw new Error('Request quote functionality not available');
   }
 };

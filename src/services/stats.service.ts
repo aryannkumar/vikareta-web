@@ -1,4 +1,5 @@
 import { vikaretaSSOClient } from '../lib/auth/vikareta';
+import { apiClient } from '../lib/api/client';
 
 // Normalize API host: remove trailing /api if present; always prefix endpoints with /api/v1
 const API_HOST = (
@@ -92,17 +93,13 @@ export class StatsService {
 
   async getPlatformStats(): Promise<PlatformStats> {
     try {
-      const response = await fetch(apiUrl('/stats'), {
-        headers: this.getHeaders(),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to fetch platform stats');
+      const response = await apiClient.get<PlatformStats>('/stats');
+      
+      if (response.success) {
+        return response.data;
+      } else {
+        throw new Error(response.error || 'Failed to fetch platform stats');
       }
-
-      const result = await response.json();
-      return result.data;
     } catch (error) {
       console.error('Error fetching platform stats:', error);
       // Return mock data if API fails
@@ -112,17 +109,14 @@ export class StatsService {
 
   async getMarketplaceStats(timeframe: 'day' | 'week' | 'month' | 'year' = 'month'): Promise<MarketplaceStats> {
     try {
-      const response = await fetch(apiUrl(`/stats/marketplace?timeframe=${timeframe}`), {
-        headers: this.getHeaders(),
-      });
-
-      if (!response.ok) {
+      const response = await apiClient.get<MarketplaceStats>(`/stats/marketplace?timeframe=${timeframe}`);
+      
+      if (response.success) {
+        return response.data;
+      } else {
         // If endpoint doesn't exist, return mock data
         return this.getMockMarketplaceStats();
       }
-
-      const result = await response.json();
-      return result.data;
     } catch (error) {
       console.error('Error fetching marketplace stats:', error);
       return this.getMockMarketplaceStats();
@@ -131,17 +125,14 @@ export class StatsService {
 
   async getDashboardStats(): Promise<DashboardStats> {
     try {
-      const response = await fetch(apiUrl('/stats/dashboard'), {
-        headers: this.getHeaders(),
-      });
-
-      if (!response.ok) {
+      const response = await apiClient.get<DashboardStats>('/stats/dashboard');
+      
+      if (response.success) {
+        return response.data;
+      } else {
         // If endpoint doesn't exist, return mock data
         return this.getMockDashboardStats();
       }
-
-      const result = await response.json();
-      return result.data;
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
       return this.getMockDashboardStats();
@@ -150,17 +141,14 @@ export class StatsService {
 
   async getCategoryStats(): Promise<CategoryStats[]> {
     try {
-      const response = await fetch(apiUrl('/stats/categories'), {
-        headers: this.getHeaders(),
-      });
-
-      if (!response.ok) {
+      const response = await apiClient.get<CategoryStats[]>('/stats/categories');
+      
+      if (response.success) {
+        return response.data;
+      } else {
         // If endpoint doesn't exist, return mock data
         return this.getMockCategoryStats();
       }
-
-      const result = await response.json();
-      return result.data;
     } catch (error) {
       console.error('Error fetching category stats:', error);
       return this.getMockCategoryStats();

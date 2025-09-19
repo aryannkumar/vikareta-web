@@ -18,7 +18,10 @@ import {
   Clock,
   MapPin,
   Package,
-  Users
+  Users,
+  Bookmark,
+  X,
+  History
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +30,9 @@ import { formatPrice } from '@/lib/utils';
 import { searchApi, type SearchResult, type SearchFilters } from '@/lib/api/search';
 import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
 import { WishlistButton } from '@/components/ui/wishlist-button';
+import SavedSearches from '@/components/search/SavedSearches';
+import SearchHistory from '@/components/search/SearchHistory';
+import AdvancedFilterPresets from '@/components/search/AdvancedFilterPresets';
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
@@ -42,6 +48,8 @@ function SearchPageContent() {
   const [sortBy, setSortBy] = useState<SearchFilters['sortBy']>('createdAt');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+  const [showSavedSearches, setShowSavedSearches] = useState(false);
+  const [activeTab, setActiveTab] = useState<'saved' | 'history'>('saved');
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -119,6 +127,12 @@ function SearchPageContent() {
         // Save search for analytics
         try {
           await searchApi.saveSearch(searchQuery, response.data.total || 0);
+          
+          // Add to search history
+          if (typeof window !== 'undefined') {
+            const historyUtils = await import('@/components/search/SearchHistory');
+            historyUtils.searchHistoryUtils.addToHistory(searchQuery, response.data.total || 0);
+          }
         } catch (analyticsError) {
           // Don't fail the search if analytics fails
           console.warn('Failed to save search analytics:', analyticsError);
@@ -232,6 +246,64 @@ function SearchPageContent() {
     }
   };
 
+  const handleLoadSavedSearch = (savedSearch: any) => {
+    // Load the saved search parameters
+    setSearchQuery(savedSearch.query);
+    setSelectedType(savedSearch.filters?.type || '');
+    setSelectedCategory(savedSearch.filters?.category || '');
+    setPriceRange({
+      min: savedSearch.filters?.minPrice?.toString() || '',
+      max: savedSearch.filters?.maxPrice?.toString() || ''
+    });
+    setSortBy(savedSearch.filters?.sortBy || 'createdAt');
+    setShowSavedSearches(false);
+    toast.success('Search loaded', `Loaded "${savedSearch.name}"`);
+  };
+
+  const handleDeleteSavedSearch = (searchId: string) => {
+    // This will be handled by the SavedSearches component
+    console.log('Deleted search:', searchId);
+  };
+
+  const handleToggleFavorite = (searchId: string) => {
+    // This will be handled by the SavedSearches component
+    console.log('Toggled favorite for search:', searchId);
+  };
+
+  const handleToggleNotifications = (searchId: string) => {
+    // This will be handled by the SavedSearches component
+    console.log('Toggled notifications for search:', searchId);
+  };
+
+  const handleLoadSearchHistory = (query: string) => {
+    setSearchQuery(query);
+    setShowSavedSearches(false);
+    performSearch();
+    toast.success('Search loaded', `Searching for "${query}"`);
+  };
+
+  const handleClearSearchHistory = () => {
+    toast.success('History cleared', 'Search history has been cleared');
+  };
+
+  const handleApplyPreset = (preset: any) => {
+    // Apply the preset filters
+    setSelectedType(preset.filters?.type || '');
+    setSelectedCategory(preset.filters?.category || '');
+    setPriceRange({
+      min: preset.filters?.minPrice?.toString() || '',
+      max: preset.filters?.maxPrice?.toString() || ''
+    });
+    setSortBy(preset.filters?.sortBy || 'createdAt');
+    
+    // Close filters and perform search
+    setShowFilters(false);
+    toast.success('Preset applied', `Applied "${preset.name}" filter preset`);
+    
+    // Perform search with new filters
+    setTimeout(() => performSearch(), 100);
+  };
+
   const getResultLink = (result: SearchResult) => {
     switch (result.type) {
       case 'product':
@@ -257,13 +329,27 @@ function SearchPageContent() {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-4 sm:mb-6 lg:mb-8">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 lg:mb-4 text-gray-900 leading-tight">
-              Search Results
-              {query && <span className="text-gray-600 font-normal text-lg sm:text-xl md:text-2xl lg:text-3xl"> for "{query}"</span>}
-            </h1>
-            <p className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
-              Find products, services, and businesses that match your needs
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 lg:mb-4 text-gray-900 leading-tight">
+                  Search Results
+                  {query && <span className="text-gray-600 font-normal text-lg sm:text-xl md:text-2xl lg:text-3xl"> for "{query}"</span>}
+                </h1>
+                <p className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
+                  Find products, services, and businesses that match your needs
+                </p>
+              </div>
+
+              {/* Saved Searches Button */}
+              <Button
+                variant="outline"
+                onClick={() => setShowSavedSearches(true)}
+                className="flex items-center gap-2 h-11 sm:h-12 px-4 text-sm sm:text-base"
+              >
+                <Bookmark className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Saved Searches</span>
+              </Button>
+            </div>
           </div>
 
           {/* Search and Filters */}
@@ -406,6 +492,21 @@ function SearchPageContent() {
             {showFilters && (
               <div className="mt-4 sm:mt-6 p-4 sm:p-6 border rounded-lg bg-muted/30 shadow-sm">
                 <h3 className="font-semibold mb-4 text-base sm:text-lg">Advanced Filters</h3>
+                
+                {/* Filter Presets */}
+                <div className="mb-6">
+                  <AdvancedFilterPresets
+                    onApplyPreset={handleApplyPreset}
+                    currentFilters={{
+                      type: selectedType,
+                      category: selectedCategory,
+                      minPrice: priceRange.min ? parseInt(priceRange.min) : undefined,
+                      maxPrice: priceRange.max ? parseInt(priceRange.max) : undefined,
+                      sortBy
+                    }}
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   <div>
                     <label className="block text-sm sm:text-base font-medium mb-2">Location</label>
@@ -632,6 +733,74 @@ function SearchPageContent() {
           )}
         </div>
       </div>
+
+      {/* Saved Searches Dialog */}
+      {showSavedSearches && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-background rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">Search Management</h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowSavedSearches(false)}
+                  className="h-8 w-8 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Tabs */}
+              <div className="flex space-x-1 bg-muted p-1 rounded-lg">
+                <Button
+                  variant={activeTab === 'saved' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setActiveTab('saved')}
+                  className="flex-1"
+                >
+                  <Bookmark className="h-4 w-4 mr-2" />
+                  Saved Searches
+                </Button>
+                <Button
+                  variant={activeTab === 'history' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setActiveTab('history')}
+                  className="flex-1"
+                >
+                  <History className="h-4 w-4 mr-2" />
+                  Recent Searches
+                </Button>
+              </div>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[60vh]">
+              {activeTab === 'saved' ? (
+                <SavedSearches
+                  currentQuery={searchQuery}
+                  currentFilters={{
+                    type: selectedType,
+                    category: selectedCategory,
+                    minPrice: priceRange.min ? parseInt(priceRange.min) : undefined,
+                    maxPrice: priceRange.max ? parseInt(priceRange.max) : undefined,
+                    sortBy
+                  }}
+                  onLoadSearch={handleLoadSavedSearch}
+                  onDeleteSearch={handleDeleteSavedSearch}
+                  onToggleFavorite={handleToggleFavorite}
+                  onToggleNotifications={handleToggleNotifications}
+                />
+              ) : (
+                <SearchHistory
+                  onLoadSearch={handleLoadSearchHistory}
+                  onClearHistory={handleClearSearchHistory}
+                  maxItems={10}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

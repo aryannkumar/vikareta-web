@@ -154,172 +154,96 @@ export interface UpdateShippingAddressData {
   country?: string;
 }
 
-export class ShippingService {
+export const shippingApi = {
   // Get all shipping providers
-  static async getProviders(): Promise<ShippingProvider[]> {
-    const response = await apiClient.get('/shipping/providers');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch shipping providers');
-    }
-    return response.data as ShippingProvider[];
-  }
+  async getProviders() {
+    return apiClient.get<ShippingProvider[]>('/shipping/providers');
+  },
 
   // Calculate shipping cost
-  static async calculateShipping(request: ShippingCalculationRequest): Promise<{
-    rates: ShippingRate[];
-    recommended?: ShippingRate;
-  }> {
-    const response = await apiClient.post('/shipping/calculate', request);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to calculate shipping');
-    }
-    return response.data as {
+  async calculateShipping(request: ShippingCalculationRequest) {
+    return apiClient.post<{
       rates: ShippingRate[];
       recommended?: ShippingRate;
-    };
-  }
+    }>('/shipping/calculate', request);
+  },
 
   // Create a shipment
-  static async createShipment(shipmentData: CreateShipmentData): Promise<Shipment> {
-    const response = await apiClient.post('/shipping/create-shipment', shipmentData);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to create shipment');
-    }
-    return response.data as Shipment;
-  }
+  async createShipment(shipmentData: CreateShipmentData) {
+    return apiClient.post<Shipment>('/shipping/create-shipment', shipmentData);
+  },
 
   // Track a shipment
-  static async trackShipment(trackingNumber: string): Promise<{
-    shipment: Shipment;
-    events: ShipmentEvent[];
-  }> {
-    const response = await apiClient.get(`/shipping/track/${trackingNumber}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to track shipment');
-    }
-    return response.data as {
+  async trackShipment(trackingNumber: string) {
+    return apiClient.get<{
       shipment: Shipment;
       events: ShipmentEvent[];
-    };
-  }
+    }>(`/shipping/track/${trackingNumber}`);
+  },
 
   // Get shipping addresses
-  static async getAddresses(): Promise<ShippingAddress[]> {
-    const response = await apiClient.get('/shipping/addresses');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch shipping addresses');
-    }
-    return response.data as ShippingAddress[];
-  }
+  async getAddresses() {
+    return apiClient.get<ShippingAddress[]>('/shipping/addresses');
+  },
 
   // Create shipping address
-  static async createAddress(addressData: CreateShippingAddressData): Promise<ShippingAddress> {
-    const response = await apiClient.post('/shipping/addresses', addressData);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to create shipping address');
-    }
-    return response.data as ShippingAddress;
-  }
+  async createAddress(addressData: CreateShippingAddressData) {
+    return apiClient.post<ShippingAddress>('/shipping/addresses', addressData);
+  },
 
   // Update shipping address
-  static async updateAddress(id: string, addressData: UpdateShippingAddressData): Promise<ShippingAddress> {
-    const response = await apiClient.patch(`/shipping/addresses/${id}`, addressData);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to update shipping address');
-    }
-    return response.data as ShippingAddress;
-  }
+  async updateAddress(id: string, addressData: UpdateShippingAddressData) {
+    return apiClient.patch<ShippingAddress>(`/shipping/addresses/${id}`, addressData);
+  },
 
   // Delete shipping address
-  static async deleteAddress(id: string): Promise<void> {
-    const response = await apiClient.delete(`/shipping/addresses/${id}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to delete shipping address');
-    }
-  }
+  async deleteAddress(id: string) {
+    return apiClient.delete(`/shipping/addresses/${id}`);
+  },
 
   // Set default shipping address
-  static async setDefaultAddress(id: string): Promise<void> {
-    const response = await apiClient.post(`/shipping/addresses/${id}/default`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to set default address');
-    }
-  }
+  async setDefaultAddress(id: string) {
+    return apiClient.post(`/shipping/addresses/${id}/default`);
+  },
 
   // Get shipment by ID
-  static async getShipment(id: string): Promise<Shipment> {
-    const response = await apiClient.get(`/shipping/shipments/${id}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch shipment');
-    }
-    return response.data as Shipment;
-  }
+  async getShipment(id: string) {
+    throw new Error('Get shipment endpoint not available');
+  },
 
   // Get shipments for user/order
-  static async getShipments(filters?: {
+  async getShipments(filters?: {
     orderId?: string;
     status?: string;
     page?: number;
     limit?: number;
-  }): Promise<{
-    shipments: Shipment[];
-    total: number;
-    page: number;
-    totalPages: number;
-  }> {
-    const response = await apiClient.get('/shipping/shipments', filters);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch shipments');
-    }
-    return response.data as {
-      shipments: Shipment[];
-      total: number;
-      page: number;
-      totalPages: number;
-    };
-  }
+  }) {
+    throw new Error('Get shipments endpoint not available');
+  },
 
   // Add tracking event (for providers/webhooks)
-  static async addTrackingEvent(eventData: {
+  async addTrackingEvent(eventData: {
     shipmentId: string;
     status: string;
     description: string;
     location?: string;
     timestamp?: string;
-  }): Promise<ShipmentEvent> {
-    const response = await apiClient.post('/shipping/tracking/events', eventData);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to add tracking event');
-    }
-    return response.data as ShipmentEvent;
-  }
+  }) {
+    throw new Error('Add tracking event endpoint not available');
+  },
 
   // Get tracking events
-  static async getTrackingEvents(shipmentId?: string): Promise<ShipmentEvent[]> {
-    const response = await apiClient.get('/shipping/tracking/events', shipmentId ? { shipmentId } : undefined);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch tracking events');
-    }
-    return response.data as ShipmentEvent[];
-  }
+  async getTrackingEvents(shipmentId?: string) {
+    throw new Error('Get tracking events endpoint not available');
+  },
 
   // Test shipping webhook (for development/testing)
-  static async testShippingWebhook(): Promise<{
-    success: boolean;
-    message: string;
-  }> {
-    const response = await apiClient.post('/shipping/webhooks/test');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to test shipping webhook');
-    }
-    return response.data as {
-      success: boolean;
-      message: string;
-    };
-  }
+  async testShippingWebhook() {
+    throw new Error('Test shipping webhook endpoint not available');
+  },
 
   // Get shipping rates for cart/order
-  static async getShippingRates(orderData: {
+  async getShippingRates(orderData: {
     items: Array<{
       weight: number;
       dimensions?: {
@@ -330,28 +254,12 @@ export class ShippingService {
       quantity: number;
     }>;
     destinationAddress: ShippingAddress;
-  }): Promise<ShippingRate[]> {
-    const response = await apiClient.post('/shipping/rates', orderData);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to get shipping rates');
-    }
-    return response.data as ShippingRate[];
-  }
+  }) {
+    throw new Error('Get shipping rates endpoint not available');
+  },
 
   // Validate shipping address
-  static async validateAddress(address: CreateShippingAddressData): Promise<{
-    valid: boolean;
-    suggestions?: ShippingAddress[];
-    errors?: string[];
-  }> {
-    const response = await apiClient.post('/shipping/validate-address', address);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to validate address');
-    }
-    return response.data as {
-      valid: boolean;
-      suggestions?: ShippingAddress[];
-      errors?: string[];
-    };
+  async validateAddress(address: CreateShippingAddressData) {
+    throw new Error('Validate address endpoint not available');
   }
-}
+};

@@ -93,7 +93,7 @@ export interface ShippingAddress {
 export const userApi = {
   // Get current user profile
   async getProfile(): Promise<UserProfile> {
-    const response = await apiClient.get<UserProfile>('/auth/me');
+    const response = await apiClient.get<UserProfile>('/users/profile');
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch profile');
     }
@@ -102,7 +102,7 @@ export const userApi = {
 
   // Update user profile
   async updateProfile(data: UpdateUserProfile): Promise<UserProfile> {
-    const response = await apiClient.put<UserProfile>('/auth/profile', data);
+    const response = await apiClient.put<UserProfile>('/users/profile', data);
     if (!response.success) {
       throw new Error(response.error || 'Failed to update profile');
     }
@@ -122,7 +122,7 @@ export const userApi = {
 
   // Get user documents
   async getDocuments(): Promise<UserDocument[]> {
-    const response = await apiClient.get<UserDocument[]>('/users/documents');
+    const response = await apiClient.get<UserDocument[]>('/users/verification-documents');
     if (!response.success) {
       throw new Error(response.error || 'Failed to fetch documents');
     }
@@ -135,7 +135,7 @@ export const userApi = {
     formData.append('documentType', documentType);
     formData.append('documentNumber', documentNumber);
     formData.append('document', file);
-    const response = await apiClient.upload('/users/documents', formData);
+    const response = await apiClient.upload('/users/verification-documents', formData);
     if (!response.success) {
       throw new Error(response.error || 'Failed to upload document');
     }
@@ -144,45 +144,27 @@ export const userApi = {
 
   // Get shipping addresses
   async getShippingAddresses(): Promise<ShippingAddress[]> {
-    const response = await apiClient.get<ShippingAddress[]>('/users/shipping-addresses');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch shipping addresses');
-    }
-    return response.data;
+    throw new Error('Use shipping API for address management');
   },
 
   // Add shipping address
   async addShippingAddress(address: Omit<ShippingAddress, 'id' | 'createdAt' | 'updatedAt'>): Promise<ShippingAddress> {
-    const response = await apiClient.post<ShippingAddress>('/users/shipping-addresses', address);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to add shipping address');
-    }
-    return response.data;
+    throw new Error('Use shipping API for address management');
   },
 
   // Update shipping address
   async updateShippingAddress(id: string, address: Partial<ShippingAddress>): Promise<ShippingAddress> {
-    const response = await apiClient.put<ShippingAddress>(`/users/shipping-addresses/${id}`, address);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to update shipping address');
-    }
-    return response.data;
+    throw new Error('Use shipping API for address management');
   },
 
   // Delete shipping address
   async deleteShippingAddress(id: string): Promise<void> {
-    const response = await apiClient.delete(`/users/shipping-addresses/${id}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to delete shipping address');
-    }
+    throw new Error('Use shipping API for address management');
   },
 
   // Set default shipping address
   async setDefaultShippingAddress(id: string): Promise<void> {
-    const response = await apiClient.patch(`/users/shipping-addresses/${id}/default`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to set default shipping address');
-    }
+    throw new Error('Use shipping API for address management');
   },
 
   // Get user statistics
@@ -209,51 +191,32 @@ export const userApi = {
     currentPassword: string;
     newPassword: string;
   }): Promise<void> {
-    const response = await apiClient.post('/auth/change-password', data);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to change password');
-    }
+    throw new Error('Change password endpoint not available');
   },
 
   // Send email verification
   async sendEmailVerification(): Promise<void> {
-    const response = await apiClient.post('/auth/send-verification-email');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to send verification email');
-    }
+    throw new Error('Send email verification endpoint not available');
   },
 
   // Verify email
   async verifyEmail(token: string): Promise<void> {
-    const response = await apiClient.get(`/auth/verify-email/${token}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to verify email');
-    }
+    throw new Error('Verify email endpoint not available');
   },
 
   // Enable 2FA
   async enable2FA(): Promise<{ secret: string; qrCode: string }> {
-    const response = await apiClient.post('/auth/2fa/enable');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to enable 2FA');
-    }
-    return response.data as { secret: string; qrCode: string };
+    throw new Error('Enable 2FA endpoint not available');
   },
 
   // Disable 2FA
   async disable2FA(): Promise<void> {
-    const response = await apiClient.post('/auth/2fa/disable');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to disable 2FA');
-    }
+    throw new Error('Disable 2FA endpoint not available');
   },
 
   // Verify 2FA
   async verify2FA(code: string): Promise<void> {
-    const response = await apiClient.post('/auth/2fa/verify', { code });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to verify 2FA');
-    }
+    throw new Error('Verify 2FA endpoint not available');
   },
 
   // Get user sessions
@@ -265,33 +228,16 @@ export const userApi = {
     lastActivity: string;
     createdAt: string;
   }>> {
-    const response = await apiClient.get('/auth/sessions');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch sessions');
-    }
-    return response.data as Array<{
-      id: string;
-      deviceInfo: any;
-      location: any;
-      isCurrent: boolean;
-      lastActivity: string;
-      createdAt: string;
-    }>;
+    throw new Error('Get sessions endpoint not available');
   },
 
   // Revoke session
   async revokeSession(sessionId: string): Promise<void> {
-    const response = await apiClient.delete(`/auth/sessions/${sessionId}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to revoke session');
-    }
+    throw new Error('Revoke session endpoint not available');
   },
 
   // Revoke all sessions
   async revokeAllSessions(): Promise<void> {
-    const response = await apiClient.delete('/auth/sessions');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to revoke all sessions');
-    }
+    throw new Error('Revoke all sessions endpoint not available');
   }
 };

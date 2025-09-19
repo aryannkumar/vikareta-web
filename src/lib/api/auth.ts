@@ -123,11 +123,12 @@ export class AuthService {
     }
   }
 
-  // Logout from all devices
+  // Logout from all devices (not available in backend, use regular logout)
   static async logoutAll(): Promise<void> {
-    const response = await apiClient.post('/auth/logout-all');
+    // Backend doesn't have logout-all endpoint, so we'll just logout current session
+    const response = await apiClient.post('/auth/logout');
     if (!response.success) {
-      throw new Error(response.error || 'Logout from all devices failed');
+      throw new Error(response.error || 'Logout failed');
     }
 
     // Clear stored tokens
@@ -145,10 +146,9 @@ export class AuthService {
       throw new Error('No refresh token available');
     }
 
-    const response = await apiClient.post<{ accessToken: string; refreshToken: string }>('/auth/refresh', {
+    const response = await apiClient.post<{ accessToken: string; refreshToken: string }>('/auth/refresh-token', {
       refreshToken
     });
-
     if (!response.success) {
       throw new Error(response.error || 'Token refresh failed');
     }
@@ -239,9 +239,9 @@ export class AuthService {
     }
   }
 
-  // Verify email
+  // Verify email (GET with token in URL)
   static async verifyEmail(token: string): Promise<void> {
-    const response = await apiClient.post('/auth/verify-email', { token });
+    const response = await apiClient.get(`/auth/verify-email/${token}`);
     if (!response.success) {
       throw new Error(response.error || 'Failed to verify email');
     }
@@ -295,7 +295,7 @@ export class AuthService {
   }
 
   static async revokeAllSessions(): Promise<void> {
-    const response = await apiClient.post('/auth/sessions/revoke-all');
+    const response = await apiClient.delete('/auth/sessions');
     if (!response.success) {
       throw new Error(response.error || 'Failed to revoke all sessions');
     }
@@ -314,10 +314,9 @@ export class AuthService {
     window.location.href = `${baseURL}/auth/linkedin`;
   }
 
+  // DigiLocker login (not available in backend)
   static async digilockerLogin(): Promise<void> {
-    // Redirect to DigiLocker OAuth
-    const baseURL = process.env.NEXT_PUBLIC_API_BASE || 'https://api.vikareta.com';
-    window.location.href = `${baseURL}/auth/digilocker`;
+    throw new Error('DigiLocker authentication is not currently supported');
   }
 
   // Handle OAuth callback

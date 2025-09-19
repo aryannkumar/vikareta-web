@@ -127,17 +127,12 @@ export default function OrdersPage() {
 
   const handleCancelOrder = async (orderId: string) => {
     try {
-      const response = await ordersApi.cancelOrder(orderId, 'User requested cancellation');
-      
-      if (response.success) {
-        toast.success('Success', 'Order cancelled successfully');
-        fetchOrders(); // Refresh the list
-      } else {
-        toast.error('Error', 'Failed to cancel order');
-      }
+      await ordersApi.cancelOrder(orderId, 'User requested cancellation');
+      toast.success('Success', 'Order cancelled successfully');
+      fetchOrders(); // Refresh the list
     } catch (error) {
       console.error('Error cancelling order:', error);
-      toast.error('Error', 'Failed to cancel order');
+      toast.error('Error', 'Order cancellation is not currently supported');
     }
   };
 

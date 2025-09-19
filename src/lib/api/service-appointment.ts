@@ -92,11 +92,7 @@ export class ServiceAppointmentService {
 
   // Update service appointment
   static async updateServiceAppointment(id: string, data: UpdateServiceAppointmentData): Promise<ServiceAppointment> {
-    const response = await apiClient.put<ServiceAppointment>(`/service-appointments/${id}`, data);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to update service appointment');
-    }
-    return response.data;
+    throw new Error('Update service appointment endpoint not implemented in backend');
   }
 
   // Update appointment status
@@ -113,7 +109,7 @@ export class ServiceAppointmentService {
     scheduledDate: string;
     duration?: string;
   }): Promise<ServiceAppointment> {
-    const response = await apiClient.post<ServiceAppointment>(`/service-appointments/${id}/reschedule`, data);
+    const response = await apiClient.patch<ServiceAppointment>(`/service-appointments/${id}/reschedule`, data);
     if (!response.success) {
       throw new Error(response.error || 'Failed to reschedule appointment');
     }
@@ -122,11 +118,7 @@ export class ServiceAppointmentService {
 
   // Cancel appointment
   static async cancelAppointment(id: string, reason?: string): Promise<ServiceAppointment> {
-    const response = await apiClient.post<ServiceAppointment>(`/service-appointments/${id}/cancel`, { reason });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to cancel appointment');
-    }
-    return response.data;
+    throw new Error('Cancel appointment endpoint not implemented in backend');
   }
 
   // Get appointments for current user
@@ -136,43 +128,22 @@ export class ServiceAppointmentService {
     page: number;
     totalPages: number;
   }> {
-    const response = await apiClient.get<{
-      appointments: ServiceAppointment[];
-      total: number;
-      page: number;
-      totalPages: number;
-    }>('/service-appointments/my', filters);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch my appointments');
-    }
-    return response.data;
+    throw new Error('Get my appointments endpoint not implemented in backend');
   }
 
   // Get upcoming appointments
   static async getUpcomingAppointments(limit: number = 10): Promise<ServiceAppointment[]> {
-    const response = await apiClient.get<ServiceAppointment[]>(`/service-appointments/upcoming?limit=${limit}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch upcoming appointments');
-    }
-    return response.data;
+    throw new Error('Get upcoming appointments endpoint not implemented in backend');
   }
 
   // Get today's appointments
   static async getTodaysAppointments(): Promise<ServiceAppointment[]> {
-    const response = await apiClient.get<ServiceAppointment[]>('/service-appointments/today');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch today\'s appointments');
-    }
-    return response.data;
+    throw new Error('Get today\'s appointments endpoint not implemented in backend');
   }
 
   // Get appointments by date range
   static async getAppointmentsByDateRange(startDate: string, endDate: string): Promise<ServiceAppointment[]> {
-    const response = await apiClient.get<ServiceAppointment[]>(`/service-appointments/range?start=${startDate}&end=${endDate}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch appointments by date range');
-    }
-    return response.data;
+    throw new Error('Get appointments by date range endpoint not implemented in backend');
   }
 
   // Get appointment statistics
@@ -189,23 +160,7 @@ export class ServiceAppointmentService {
     appointmentsByStatus: Record<string, number>;
     appointmentsByService: Record<string, number>;
   }> {
-    const response = await apiClient.get<{
-      totalAppointments: number;
-      scheduledAppointments: number;
-      completedAppointments: number;
-      cancelledAppointments: number;
-      noShowAppointments: number;
-      upcomingAppointments: number;
-      todaysAppointments: number;
-      completionRate: number;
-      averageDuration: number;
-      appointmentsByStatus: Record<string, number>;
-      appointmentsByService: Record<string, number>;
-    }>('/service-appointments/stats');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch appointment stats');
-    }
-    return response.data;
+    throw new Error('Get appointment stats endpoint not implemented in backend');
   }
 
   // Send appointment reminder
@@ -214,15 +169,7 @@ export class ServiceAppointmentService {
     message: string;
     sentTo: string;
   }> {
-    const response = await apiClient.post<{
-      success: boolean;
-      message: string;
-      sentTo: string;
-    }>(`/service-appointments/${id}/reminder`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to send appointment reminder');
-    }
-    return response.data;
+    throw new Error('Send appointment reminder endpoint not implemented in backend');
   }
 
   // Bulk update appointment statuses
@@ -239,20 +186,7 @@ export class ServiceAppointmentService {
       error?: string;
     }>;
   }> {
-    const response = await apiClient.post<{
-      success: boolean;
-      updated: number;
-      failed: number;
-      results: Array<{
-        id: string;
-        success: boolean;
-        error?: string;
-      }>;
-    }>('/service-appointments/bulk-update-status', { updates });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to bulk update appointment statuses');
-    }
-    return response.data;
+    throw new Error('Bulk update appointment statuses endpoint not implemented in backend');
   }
 
   // Get available time slots for a service
@@ -262,16 +196,7 @@ export class ServiceAppointmentService {
     available: boolean;
     duration: string;
   }>> {
-    const response = await apiClient.get<Array<{
-      startTime: string;
-      endTime: string;
-      available: boolean;
-      duration: string;
-    }>>(`/service-appointments/available-slots?serviceId=${serviceId}&date=${date}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch available time slots');
-    }
-    return response.data;
+    throw new Error('Get available time slots endpoint not implemented in backend');
   }
 
   // Check appointment conflicts
@@ -288,18 +213,7 @@ export class ServiceAppointmentService {
       endTime: string;
     }>;
   }> {
-    const response = await apiClient.post<{
-      hasConflict: boolean;
-      conflictingAppointments?: ServiceAppointment[];
-      suggestedAlternatives?: Array<{
-        startTime: string;
-        endTime: string;
-      }>;
-    }>('/service-appointments/check-conflicts', data);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to check appointment conflicts');
-    }
-    return response.data;
+    throw new Error('Check appointment conflicts endpoint not implemented in backend');
   }
 
   // Get appointment calendar view
@@ -315,21 +229,6 @@ export class ServiceAppointmentService {
     }>;
     busyDays: string[];
   }> {
-    const response = await apiClient.get<{
-      month: number;
-      year: number;
-      appointments: Array<{
-        id: string;
-        date: string;
-        serviceTitle: string;
-        status: string;
-        duration?: string;
-      }>;
-      busyDays: string[];
-    }>(`/service-appointments/calendar?month=${month}&year=${year}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch appointment calendar');
-    }
-    return response.data;
+    throw new Error('Get appointment calendar endpoint not implemented in backend');
   }
 }

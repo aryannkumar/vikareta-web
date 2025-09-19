@@ -205,7 +205,7 @@ export async function getCategories(): Promise<{ success: boolean; data: Categor
 
 export async function getSubcategoriesByCategoryId(categoryId: string): Promise<Subcategory[]> {
   try {
-  const response = await apiGet(`/subcategories/category/${categoryId}`);
+  const response = await apiGet(`/categories/${categoryId}/subcategories`);
     if (!response.ok) {
       throw new Error(`Failed to fetch subcategories: ${response.statusText}`);
     }

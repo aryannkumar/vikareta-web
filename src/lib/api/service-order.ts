@@ -56,25 +56,12 @@ export class ServiceOrderService {
     page: number;
     totalPages: number;
   }> {
-    const response = await apiClient.get<{
-      serviceOrders: ServiceOrder[];
-      total: number;
-      page: number;
-      totalPages: number;
-    }>('/service-orders', filters);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch service orders');
-    }
-    return response.data;
+    throw new Error('Get service orders endpoint not implemented in backend');
   }
 
   // Get service order by ID
   static async getServiceOrderById(id: string): Promise<ServiceOrder> {
-    const response = await apiClient.get<ServiceOrder>(`/service-orders/${id}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch service order');
-    }
-    return response.data;
+    throw new Error('Get service order by ID endpoint not implemented in backend');
   }
 
   // Update service order status
@@ -93,16 +80,7 @@ export class ServiceOrderService {
     page: number;
     totalPages: number;
   }> {
-    const response = await apiClient.get<{
-      serviceOrders: ServiceOrder[];
-      total: number;
-      page: number;
-      totalPages: number;
-    }>('/service-orders/my', filters);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch my service orders');
-    }
-    return response.data;
+    throw new Error('Get my service orders endpoint not implemented in backend');
   }
 
   // Get service orders as provider
@@ -112,16 +90,7 @@ export class ServiceOrderService {
     page: number;
     totalPages: number;
   }> {
-    const response = await apiClient.get<{
-      serviceOrders: ServiceOrder[];
-      total: number;
-      page: number;
-      totalPages: number;
-    }>('/service-orders/provider', filters);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch provider service orders');
-    }
-    return response.data;
+    throw new Error('Get provider service orders endpoint not implemented in backend');
   }
 
   // Get service orders as customer
@@ -131,34 +100,17 @@ export class ServiceOrderService {
     page: number;
     totalPages: number;
   }> {
-    const response = await apiClient.get<{
-      serviceOrders: ServiceOrder[];
-      total: number;
-      page: number;
-      totalPages: number;
-    }>('/service-orders/customer', filters);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch customer service orders');
-    }
-    return response.data;
+    throw new Error('Get customer service orders endpoint not implemented in backend');
   }
 
   // Get upcoming service orders
   static async getUpcomingServiceOrders(limit: number = 10): Promise<ServiceOrder[]> {
-    const response = await apiClient.get<ServiceOrder[]>(`/service-orders/upcoming?limit=${limit}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch upcoming service orders');
-    }
-    return response.data;
+    throw new Error('Get upcoming service orders endpoint not implemented in backend');
   }
 
   // Get service orders by date range
   static async getServiceOrdersByDateRange(startDate: string, endDate: string): Promise<ServiceOrder[]> {
-    const response = await apiClient.get<ServiceOrder[]>(`/service-orders/range?start=${startDate}&end=${endDate}`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch service orders by date range');
-    }
-    return response.data;
+    throw new Error('Get service orders by date range endpoint not implemented in backend');
   }
 
   // Get service order statistics
@@ -176,51 +128,22 @@ export class ServiceOrderService {
     serviceOrdersByService: Record<string, number>;
     revenueByService: Record<string, number>;
   }> {
-    const response = await apiClient.get<{
-      totalServiceOrders: number;
-      pendingServiceOrders: number;
-      confirmedServiceOrders: number;
-      scheduledServiceOrders: number;
-      inProgressServiceOrders: number;
-      completedServiceOrders: number;
-      cancelledServiceOrders: number;
-      completionRate: number;
-      averageCompletionTime: number;
-      serviceOrdersByStatus: Record<string, number>;
-      serviceOrdersByService: Record<string, number>;
-      revenueByService: Record<string, number>;
-    }>('/service-orders/stats');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch service order stats');
-    }
-    return response.data;
+    throw new Error('Get service order stats endpoint not implemented in backend');
   }
 
   // Mark service order as completed
   static async completeServiceOrder(id: string, notes?: string): Promise<ServiceOrder> {
-    const response = await apiClient.post<ServiceOrder>(`/service-orders/${id}/complete`, { notes });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to complete service order');
-    }
-    return response.data;
+    throw new Error('Complete service order endpoint not implemented in backend');
   }
 
   // Cancel service order
   static async cancelServiceOrder(id: string, reason?: string): Promise<ServiceOrder> {
-    const response = await apiClient.post<ServiceOrder>(`/service-orders/${id}/cancel`, { reason });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to cancel service order');
-    }
-    return response.data;
+    throw new Error('Cancel service order endpoint not implemented in backend');
   }
 
   // Reschedule service order
   static async rescheduleServiceOrder(id: string, scheduledDate: string): Promise<ServiceOrder> {
-    const response = await apiClient.post<ServiceOrder>(`/service-orders/${id}/reschedule`, { scheduledDate });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to reschedule service order');
-    }
-    return response.data;
+    throw new Error('Reschedule service order endpoint not implemented in backend');
   }
 
   // Send service order reminder
@@ -229,15 +152,7 @@ export class ServiceOrderService {
     message: string;
     sentTo: string;
   }> {
-    const response = await apiClient.post<{
-      success: boolean;
-      message: string;
-      sentTo: string;
-    }>(`/service-orders/${id}/reminder`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to send service order reminder');
-    }
-    return response.data;
+    throw new Error('Send service order reminder endpoint not implemented in backend');
   }
 
   // Bulk update service order statuses
@@ -255,20 +170,7 @@ export class ServiceOrderService {
       error?: string;
     }>;
   }> {
-    const response = await apiClient.post<{
-      success: boolean;
-      updated: number;
-      failed: number;
-      results: Array<{
-        id: string;
-        success: boolean;
-        error?: string;
-      }>;
-    }>('/service-orders/bulk-update-status', { updates });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to bulk update service order statuses');
-    }
-    return response.data;
+    throw new Error('Bulk update service order statuses endpoint not implemented in backend');
   }
 
   // Get service order timeline
@@ -280,18 +182,7 @@ export class ServiceOrderService {
     userId?: string;
     userName?: string;
   }>> {
-    const response = await apiClient.get<Array<{
-      id: string;
-      type: 'created' | 'status_changed' | 'scheduled' | 'completed' | 'cancelled';
-      description: string;
-      timestamp: string;
-      userId?: string;
-      userName?: string;
-    }>>(`/service-orders/${orderId}/timeline`);
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to fetch service order timeline');
-    }
-    return response.data;
+    throw new Error('Get service order timeline endpoint not implemented in backend');
   }
 
   // Rate service order (customer feedback)
@@ -299,13 +190,6 @@ export class ServiceOrderService {
     success: boolean;
     message: string;
   }> {
-    const response = await apiClient.post<{
-      success: boolean;
-      message: string;
-    }>(`/service-orders/${id}/rate`, { rating, review });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to rate service order');
-    }
-    return response.data;
+    throw new Error('Rate service order endpoint not implemented in backend');
   }
 }
