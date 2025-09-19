@@ -208,13 +208,11 @@ function ForgotPasswordPageContent() {
             {/* Header */}
             <div className="text-center mb-6 sm:mb-8">
               <Link href="/" className="inline-block mb-4 sm:mb-6">
-                <div className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 flex items-center justify-center mx-auto shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                  <img 
-                    src="/img/logo.png" 
-                    alt="Vikareta Logo" 
-                    className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 object-contain" 
-                  />
-                </div>
+                <img 
+                  src="/img/logo.svg" 
+                  alt="Vikareta Logo" 
+                  className="h-16 w-auto sm:h-20 md:h-24 mx-auto" 
+                />
               </Link>
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2">
                 Forgot Password?

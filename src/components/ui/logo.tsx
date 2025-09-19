@@ -73,7 +73,7 @@ export function Logo({ className = 'h-12 w-auto', showText = false, priority = f
     <div className={`flex items-center gap-2 ${showText ? 'space-x-3' : ''}`}>
       {!imageError ? (
         <Image
-          src="/img/logo.png"
+          src="/img/logo.svg"
           alt="Vikareta Logo"
           width={imageSize}
           height={imageSize}

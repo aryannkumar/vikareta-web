@@ -618,17 +618,11 @@ function LoginPageContent() {
           {/* Header */}
           <motion.div variants={itemVariants} className="text-center mb-6 sm:mb-8">
             <Link href="/" className="inline-block mb-4 sm:mb-6">
-              <motion.div 
-                className="flex items-center justify-center w-20 h-20 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full shadow-lg"
-                whileHover={{ scale: 1.05, rotate: 2 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Logo 
-                  className="h-12 w-12" 
-                  showText={false}
-                  priority={true}
-                />
-              </motion.div>
+              <Logo 
+                className="h-16 w-auto sm:h-20 md:h-24 mx-auto" 
+                showText={false}
+                priority={true}
+              />
             </Link>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-2">
               Welcome Back

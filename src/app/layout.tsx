@@ -37,9 +37,9 @@ export const metadata: Metadata = {
   keywords: 'B2B, marketplace, wholesale, suppliers, buyers, trade, premium, business solutions',
   authors: [{ name: 'Vikareta Team' }],
   icons: {
-    icon: '/img/logo.png',
-    shortcut: '/img/logo.png',
-    apple: '/img/logo.png',
+    icon: '/img/logo.svg',
+    shortcut: '/img/logo.svg',
+    apple: '/img/logo.svg',
   },
   openGraph: {
     title: 'Vikareta - Premium B2B Marketplace',
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     siteName: 'Vikareta',
     images: [
       {
-        url: '/img/logo.png',
+        url: '/img/logo.svg',
         width: 800,
         height: 600,
         alt: 'Vikareta Logo',
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Vikareta - Premium B2B Marketplace',
     description: 'Connect, Trade, and Grow with Vikareta',
-    images: ['/img/logo.png'],
+    images: ['/img/logo.svg'],
   },
 };
 
