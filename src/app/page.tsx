@@ -25,6 +25,7 @@ import {
 import { TestimonialsSection } from '@/components/sections/TestimonialsSection';
 import { CTASection } from '@/components/sections/CTASection';
 import { CategoryGrid } from '@/components/sections/CategoryGrid';
+import { ProcurementJourney } from '@/components/sections/ProcurementJourney';
 import { productsApi } from '@/lib/api/products';
 import { servicesApi } from '@/lib/api/services';
 import { apiClient } from '@/lib/api/client';
