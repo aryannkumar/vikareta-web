@@ -109,18 +109,20 @@ export class AuthService {
     return response.data;
   }
 
-  // Logout user
-  static async logout(): Promise<void> {
-    const response = await apiClient.post('/auth/logout');
+  // Create guest session
+  static async createGuestSession(): Promise<AuthTokens> {
+    const response = await apiClient.post<AuthTokens>('/auth/create-guest-session');
     if (!response.success) {
-      throw new Error(response.error || 'Logout failed');
+      throw new Error(response.error || 'Failed to create guest session');
     }
 
-    // Clear stored tokens
+    // Store tokens in localStorage for client-side use
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      localStorage.setItem('accessToken', response.data.accessToken);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
     }
+
+    return response.data;
   }
 
   // Logout from all devices (not available in backend, use regular logout)

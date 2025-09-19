@@ -574,6 +574,29 @@ function LoginPageContent() {
     }
   };
 
+  const handleGuestLogin = async () => {
+    setLoading(true);
+    try {
+      console.log('Web Guest Login: Attempting guest session creation');
+
+      // Use AuthService for guest login
+      const result = await AuthService.createGuestSession();
+
+      if (result.user) {
+        console.log('Web Guest Login: Guest session created successfully');
+        handleLoginSuccess(result.user);
+      } else {
+        console.error('Web Guest Login: Failed to create guest session');
+        toast.error('Guest Login Failed', 'Unable to create guest session. Please try again.');
+      }
+    } catch (error) {
+      console.error('Web Guest Login: Error occurred:', error);
+      toast.error('Guest Login Failed', 'An error occurred during guest login.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <motion.div 
       initial="initial"
@@ -1166,6 +1189,23 @@ function LoginPageContent() {
                     </svg>
                     <span className="font-medium text-gray-700 group-hover:text-green-700 transition-colors">
                       {loading ? 'Connecting...' : 'Continue with DigiLocker'}
+                    </span>
+                  </motion.button>
+
+                  {/* Guest Login Button */}
+                  <motion.button
+                    onClick={handleGuestLogin}
+                    disabled={loading}
+                    className={`w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-gray-200 rounded-xl sm:rounded-2xl hover:border-purple-300 hover:bg-purple-50 transition-all duration-300 bg-white shadow-sm group text-sm sm:text-base ${
+                      loading ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'
+                    }`}
+                    whileHover={{ scale: loading ? 1 : 1.02 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
+                    aria-label="Continue as Guest"
+                  >
+                    <Shield className="h-5 w-5 text-gray-700 group-hover:text-purple-600 transition-colors flex-shrink-0" />
+                    <span className="font-medium text-gray-700 group-hover:text-purple-700 transition-colors">
+                      {loading ? 'Creating Guest Session...' : 'Continue as Guest'}
                     </span>
                   </motion.button>
                 </div>

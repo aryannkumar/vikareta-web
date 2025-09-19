@@ -10,12 +10,20 @@ export interface VikaretaUser {
   firstName?: string;
   lastName?: string;
   businessName?: string;
-  userType?: 'buyer' | 'business' | 'admin' | 'super_admin';
+  userType?: 'buyer' | 'business' | 'admin' | 'super_admin' | 'guest';
   verificationTier?: 'unverified' | 'basic' | 'verified' | 'premium';
   isVerified?: boolean;
   phone?: string;
   gstin?: string;
   createdAt: string;
+  isGuest?: boolean;
+}
+
+export interface GuestUser extends VikaretaUser {
+  userType: 'guest';
+  isGuest: true;
+  sessionId: string;
+  expiresAt: string;
 }
 
 export interface VikaretaAuthTokens {
@@ -112,7 +120,18 @@ export function isVikaretaUser(user: any): user is VikaretaUser {
   return user && 
          typeof user.id === 'string' && 
          user.id.length > 0 &&
-         (!user.email || typeof user.email === 'string');
+         (!user.email || typeof user.email === 'string') &&
+         (!user.isGuest || typeof user.isGuest === 'boolean');
+}
+
+export function isGuestUser(user: any): user is GuestUser {
+  return user && 
+         typeof user.id === 'string' && 
+         user.id.length > 0 &&
+         user.userType === 'guest' && 
+         user.isGuest === true &&
+         typeof user.sessionId === 'string' &&
+         typeof user.expiresAt === 'string';
 }
 
 export function isVikaretaAuthTokens(tokens: any): tokens is VikaretaAuthTokens {
@@ -128,4 +147,95 @@ export function isVikaretaAuthData(data: any): data is VikaretaAuthData {
          isVikaretaUser(data.user) && 
          isVikaretaAuthTokens(data.tokens) &&
          ['main', 'dashboard', 'admin'].includes(data.domain);
+}
+
+// ===== PERSONALIZATION TYPES =====
+
+export interface GuestPersonalizationData {
+  guestId: string;
+  preferences: {
+    language: string;
+    currency: string;
+    theme: 'light' | 'dark' | 'auto';
+    location?: {
+      country: string;
+      city: string;
+      timezone: string;
+    };
+    notifications: {
+      email: boolean;
+      push: boolean;
+      sms: boolean;
+    };
+  };
+  browsingHistory: {
+    recentlyViewed: string[]; // Product IDs
+    searchHistory: string[];
+    categoryViews: Record<string, number>; // Category ID -> view count
+  };
+  cart: {
+    items: Array<{
+      productId: string;
+      quantity: number;
+      addedAt: string;
+      variant?: Record<string, any>;
+    }>;
+    lastUpdated: string;
+  };
+  wishlist: string[]; // Product IDs
+  recommendations: {
+    recentlyViewed: string[];
+    recommendedProducts: string[];
+    trendingCategories: string[];
+    suggestedSearches: string[];
+  };
+  sessionData: {
+    createdAt: string;
+    lastActivity: string;
+    pageViews: number;
+    timeSpent: number; // in seconds
+    deviceInfo: {
+      userAgent: string;
+      screenSize: string;
+      platform: string;
+    };
+  };
+}
+
+export interface PersonalizationUpdate {
+  preferences?: Partial<GuestPersonalizationData['preferences']>;
+  browsingHistory?: Partial<GuestPersonalizationData['browsingHistory']>;
+  cart?: Partial<GuestPersonalizationData['cart']>;
+  wishlist?: string[];
+  recommendations?: Partial<GuestPersonalizationData['recommendations']>;
+  sessionData?: Partial<GuestPersonalizationData['sessionData']>;
+}
+
+export interface PersonalizationPreferences {
+  language: string;
+  currency: string;
+  theme: 'light' | 'dark' | 'auto';
+  location?: {
+    country: string;
+    city: string;
+    timezone: string;
+  };
+  notifications: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
+}
+
+export interface CartItem {
+  productId: string;
+  quantity: number;
+  addedAt: string;
+  variant?: Record<string, any>;
+}
+
+export interface ProductRecommendation {
+  productId: string;
+  score: number;
+  reason: 'recently_viewed' | 'similar_category' | 'trending' | 'wishlist_related';
 }
