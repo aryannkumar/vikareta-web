@@ -102,8 +102,8 @@ export class StatsService {
       }
     } catch (error) {
       console.error('Error fetching platform stats:', error);
-      // Return mock data if API fails
-      return this.getMockPlatformStats();
+      // Return concrete fallback data instead of mock
+      return this.getFallbackPlatformStats();
     }
   }
 
@@ -114,12 +114,12 @@ export class StatsService {
       if (response.success) {
         return response.data;
       } else {
-        // If endpoint doesn't exist, return mock data
-        return this.getMockMarketplaceStats();
+        // Return concrete fallback data instead of mock
+        return this.getFallbackMarketplaceStats();
       }
     } catch (error) {
       console.error('Error fetching marketplace stats:', error);
-      return this.getMockMarketplaceStats();
+      return this.getFallbackMarketplaceStats();
     }
   }
 
@@ -130,12 +130,12 @@ export class StatsService {
       if (response.success) {
         return response.data;
       } else {
-        // If endpoint doesn't exist, return mock data
-        return this.getMockDashboardStats();
+        // Return concrete fallback data instead of mock
+        return this.getFallbackDashboardStats();
       }
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
-      return this.getMockDashboardStats();
+      return this.getFallbackDashboardStats();
     }
   }
 
@@ -146,218 +146,64 @@ export class StatsService {
       if (response.success) {
         return response.data;
       } else {
-        // If endpoint doesn't exist, return mock data
-        return this.getMockCategoryStats();
+        // Return concrete fallback data instead of mock
+        return this.getFallbackCategoryStats();
       }
     } catch (error) {
       console.error('Error fetching category stats:', error);
-      return this.getMockCategoryStats();
+      return this.getFallbackCategoryStats();
     }
   }
 
-  // Mock data methods
-  private getMockPlatformStats(): PlatformStats {
+  // Concrete fallback methods - return empty/zero values instead of mock data
+  private getFallbackPlatformStats(): PlatformStats {
     return {
-      successfulDeals: 2847,
-      totalCategories: 45,
-      totalProducts: 12543,
-      totalSuppliers: 892,
-      totalBuyers: 2156,
-      totalServices: 3241,
-      totalRFQs: 1850,
-      totalOrders: 4521,
-      totalRevenue: 28500000,
-      activeUsers: 1250
+      successfulDeals: 0,
+      totalCategories: 0,
+      totalProducts: 0,
+      totalSuppliers: 0,
+      totalBuyers: 0,
+      totalServices: 0,
+      totalRFQs: 0,
+      totalOrders: 0,
+      totalRevenue: 0,
+      activeUsers: 0
     };
   }
 
-  private getMockMarketplaceStats(): MarketplaceStats {
+  private getFallbackMarketplaceStats(): MarketplaceStats {
     return {
       overview: {
-        totalValue: 28500000,
-        totalTransactions: 4521,
-        activeUsers: 1250,
-        growthRate: 15.3
+        totalValue: 0,
+        totalTransactions: 0,
+        activeUsers: 0,
+        growthRate: 0
       },
-      categories: [
-        {
-          id: '1',
-          name: 'Electronics',
-          productCount: 1250,
-          serviceCount: 180,
-          rfqCount: 245,
-          orderCount: 890,
-          revenue: 8500000,
-          growth: 12.5
-        },
-        {
-          id: '2',
-          name: 'Machinery',
-          productCount: 980,
-          serviceCount: 145,
-          rfqCount: 198,
-          orderCount: 756,
-          revenue: 12500000,
-          growth: 18.2
-        },
-        {
-          id: '3',
-          name: 'Textiles',
-          productCount: 1450,
-          serviceCount: 220,
-          rfqCount: 167,
-          orderCount: 623,
-          revenue: 4200000,
-          growth: 8.7
-        },
-        {
-          id: '4',
-          name: 'Chemicals',
-          productCount: 780,
-          serviceCount: 95,
-          rfqCount: 134,
-          orderCount: 445,
-          revenue: 2800000,
-          growth: 22.1
-        }
-      ],
+      categories: [],
       trends: {
-        daily: [
-          { date: '2024-01-01', value: 125000, transactions: 45 },
-          { date: '2024-01-02', value: 98000, transactions: 38 },
-          { date: '2024-01-03', value: 156000, transactions: 52 }
-        ],
-        weekly: [
-          { week: 'Week 1', value: 850000, transactions: 285 },
-          { week: 'Week 2', value: 920000, transactions: 312 },
-          { week: 'Week 3', value: 780000, transactions: 267 }
-        ],
-        monthly: [
-          { month: 'Jan', value: 2850000, transactions: 890 },
-          { month: 'Feb', value: 3200000, transactions: 945 },
-          { month: 'Mar', value: 2950000, transactions: 876 }
-        ]
+        daily: [],
+        weekly: [],
+        monthly: []
       },
       topPerformers: {
-        categories: [
-          { name: 'Machinery', revenue: 12500000, growth: 18.2 },
-          { name: 'Electronics', revenue: 8500000, growth: 12.5 },
-          { name: 'Textiles', revenue: 4200000, growth: 8.7 }
-        ],
-        products: [
-          { name: 'Industrial Pump', sales: 145, revenue: 725000 },
-          { name: 'Cotton Fabric', sales: 98, revenue: 392000 },
-          { name: 'Chemical Solvent', sales: 87, revenue: 348000 }
-        ],
-        services: [
-          { name: 'IT Consulting', bookings: 145, revenue: 72500 },
-          { name: 'Equipment Maintenance', bookings: 98, revenue: 39200 },
-          { name: 'Software Installation', bookings: 87, revenue: 34800 }
-        ]
+        categories: [],
+        products: [],
+        services: []
       }
     };
   }
 
-  private getMockDashboardStats(): DashboardStats {
+  private getFallbackDashboardStats(): DashboardStats {
     return {
-      platform: this.getMockPlatformStats(),
-      marketplace: this.getMockMarketplaceStats(),
-      recentActivity: [
-        {
-          type: 'order',
-          description: 'New order placed for Industrial Machinery',
-          amount: 125000,
-          timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString()
-        },
-        {
-          type: 'rfq',
-          description: 'RFQ created for Chemical Supplies',
-          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString()
-        },
-        {
-          type: 'user',
-          description: 'New business registered: Tech Solutions Ltd',
-          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString()
-        },
-        {
-          type: 'product',
-          description: 'New product listed: Advanced Circuit Board',
-          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString()
-        }
-      ],
-      alerts: [
-        {
-          type: 'success',
-          message: 'Monthly revenue target achieved (105% of goal)',
-          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString()
-        },
-        {
-          type: 'warning',
-          message: 'Low stock alert for 15 products',
-          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString()
-        },
-        {
-          type: 'info',
-          message: 'New category "Renewable Energy" added',
-          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString()
-        }
-      ]
+      platform: this.getFallbackPlatformStats(),
+      marketplace: this.getFallbackMarketplaceStats(),
+      recentActivity: [],
+      alerts: []
     };
   }
 
-  private getMockCategoryStats(): CategoryStats[] {
-    return [
-      {
-        id: '1',
-        name: 'Electronics',
-        productCount: 1250,
-        serviceCount: 180,
-        rfqCount: 245,
-        orderCount: 890,
-        revenue: 8500000,
-        growth: 12.5
-      },
-      {
-        id: '2',
-        name: 'Machinery',
-        productCount: 980,
-        serviceCount: 145,
-        rfqCount: 198,
-        orderCount: 756,
-        revenue: 12500000,
-        growth: 18.2
-      },
-      {
-        id: '3',
-        name: 'Textiles',
-        productCount: 1450,
-        serviceCount: 220,
-        rfqCount: 167,
-        orderCount: 623,
-        revenue: 4200000,
-        growth: 8.7
-      },
-      {
-        id: '4',
-        name: 'Chemicals',
-        productCount: 780,
-        serviceCount: 95,
-        rfqCount: 134,
-        orderCount: 445,
-        revenue: 2800000,
-        growth: 22.1
-      },
-      {
-        id: '5',
-        name: 'Food & Beverages',
-        productCount: 620,
-        serviceCount: 120,
-        rfqCount: 89,
-        orderCount: 345,
-        revenue: 1800000,
-        growth: 15.8
-      }
-    ];
+  private getFallbackCategoryStats(): CategoryStats[] {
+    return [];
   }
 }
 
