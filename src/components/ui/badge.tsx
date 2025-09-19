@@ -13,10 +13,10 @@ const badgeVariants = cva(
         default:
           "border-transparent bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-md",
         secondary:
-          "border-transparent bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-900 dark:text-gray-100 hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-500 hover:shadow-md",
+          "border-transparent bg-gradient-to-r from-gray-100 to-gray-200 text-gray-900 hover:from-gray-200 hover:to-gray-300 hover:shadow-md",
         destructive:
           "border-transparent bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 hover:shadow-md",
-        outline: "text-foreground border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800",
+        outline: "text-foreground border-gray-300 hover:bg-gray-50",
         success:
           "border-transparent bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 hover:shadow-md",
         warning:

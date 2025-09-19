@@ -37,9 +37,12 @@ export const metadata: Metadata = {
   keywords: 'B2B, marketplace, wholesale, suppliers, buyers, trade, premium, business solutions',
   authors: [{ name: 'Vikareta Team' }],
   icons: {
-    icon: '/img/logo.svg',
-    shortcut: '/img/logo.svg',
-    apple: '/img/logo.svg',
+    icon: [
+      { url: '/img/favicon/favicon.svg', type: 'image/svg+xml' },
+      { url: '/img/favicon/favicon.ico', sizes: 'any' },
+    ],
+    shortcut: '/img/favicon/favicon.svg',
+    apple: '/img/favicon/favicon.svg',
   },
   openGraph: {
     title: 'Vikareta - Premium B2B Marketplace',
@@ -49,8 +52,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: '/img/logo.svg',
-        width: 800,
-        height: 600,
+        width: 1200,
+        height: 630,
         alt: 'Vikareta Logo',
       },
     ],
@@ -85,10 +88,7 @@ export default function RootLayout({
       </head>
             <body className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 font-inter antialiased">
         <MotionBoot />
-        <ThemeProvider
-          defaultTheme="light"
-          storageKey="vikareta-theme"
-        >
+        <ThemeProvider>
           <VikaretaAuthProvider>
             <ToastProvider>
               <div className="flex flex-col min-h-screen">

@@ -83,13 +83,13 @@ export function FeaturedServices() {
   const getServiceTypeColor = (serviceType: string) => {
     switch (serviceType) {
       case 'one-time':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300';
+        return 'bg-green-100 text-green-700';
       case 'monthly':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300';
+        return 'bg-blue-100 text-blue-700';
       case 'project-based':
-        return 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300';
+        return 'bg-orange-100 text-orange-700';
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-700';
     }
   };
 

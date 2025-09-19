@@ -202,8 +202,8 @@ export function Header() {
     <motion.header 
       className={`sticky top-0 z-50 w-full transition-all duration-500 ${
         isScrolled 
-          ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 shadow-lg' 
-          : 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200/30 dark:border-gray-700/30'
+          ? 'bg-white/95 backdrop-blur-xl border-b border-gray-200/50 shadow-lg' 
+          : 'bg-white/80 backdrop-blur-sm border-b border-gray-200/30'
       }`}
       variants={headerVariants}
       initial="hidden"
@@ -240,7 +240,7 @@ export function Header() {
                 className="relative"
               >
                 <Logo 
-                  className="h-16 w-auto sm:h-18 md:h-20 lg:h-22 xl:h-24 transition-all duration-300" 
+                  className="h-8 w-auto sm:h-10 md:h-12 transition-all duration-300" 
                   showText={false}
                   priority={true}
                 />
@@ -269,7 +269,7 @@ export function Header() {
               >
                 <Link 
                   href={item.href}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-vikareta-orange-600 dark:hover:text-vikareta-orange-400 rounded-xl transition-all duration-300 hover:bg-vikareta-orange-50 dark:hover:bg-vikareta-orange-900/20 group relative"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-semibold text-gray-700 hover:text-orange-600 rounded-xl transition-all duration-300 hover:bg-orange-50 group relative"
                 >
                   <motion.div
                     whileHover={{ rotate: 360 }}
@@ -296,8 +296,8 @@ export function Header() {
             {/* Search Button - New Addition */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link href="/search">
-                <Button variant="ghost" size="sm" className="relative p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl">
-                  <Search className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                <Button variant="ghost" size="sm" className="relative p-3 hover:bg-blue-50 rounded-xl">
+                  <Search className="h-5 w-5 text-gray-600" />
                 </Button>
               </Link>
             </motion.div>
@@ -305,8 +305,8 @@ export function Header() {
             {isAuthenticated && (
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link href="/notifications">
-                  <Button variant="ghost" size="sm" className="relative p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                    <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <Button variant="ghost" size="sm" className="relative p-3 hover:bg-blue-50 rounded-xl">
+                    <Bell className="h-5 w-5 text-gray-600" />
                     {unreadNotifications > 0 && (
                       <span className="absolute -top-1 -right-1 h-6 w-6 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
                         {unreadNotifications > 99 ? '99+' : unreadNotifications}
@@ -321,8 +321,8 @@ export function Header() {
             {isAuthenticated && (
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link href="/wishlist">
-                  <Button variant="ghost" size="sm" className="relative p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                    <Heart className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <Button variant="ghost" size="sm" className="relative p-3 hover:bg-blue-50 rounded-xl">
+                    <Heart className="h-5 w-5 text-gray-600" />
                     {wishlistCount > 0 && (
                       <span className="absolute -top-1 -right-1 h-6 w-6 bg-gradient-to-r from-pink-500 to-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
                         {wishlistCount > 99 ? '99+' : wishlistCount}
@@ -336,8 +336,8 @@ export function Header() {
             {/* Cart */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link href="/cart">
-                <Button variant="ghost" size="sm" className="relative p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                  <ShoppingCart className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                <Button variant="ghost" size="sm" className="relative p-3 hover:bg-blue-50 rounded-xl">
+                  <ShoppingCart className="h-5 w-5 text-gray-600" />
                   {cartItemCount > 0 && (
                     <span className="absolute -top-1 -right-1 h-6 w-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
                       {cartItemCount > 99 ? '99+' : cartItemCount}
@@ -353,7 +353,7 @@ export function Header() {
                 <Button 
                   size="sm" 
                   variant="outline"
-                  className="hidden sm:flex items-center space-x-2 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                  className="hidden sm:flex items-center space-x-2 border-2 border-blue-600 text-blue-600 hover:bg-blue-50"
                   onClick={() => {
                     // Open dashboard directly in new tab - SSO will handle authentication
                     const dashboardUrl = 'https://dashboard.vikareta.com';
@@ -370,7 +370,7 @@ export function Header() {
                 <Button 
                   size="sm" 
                   variant="outline"
-                  className="hidden sm:flex items-center space-x-2 border-2 border-purple-600 text-purple-600 hover:bg-purple-50 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-900/20"
+                  className="hidden sm:flex items-center space-x-2 border-2 border-purple-600 text-purple-600 hover:bg-purple-50"
                   onClick={async () => {
                     try {
                       // SSO sync to admin
@@ -510,7 +510,7 @@ export function Header() {
               <div className="flex items-center space-x-3">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link href="/auth/login">
-                    <Button variant="ghost" size="sm" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-semibold">
+                    <Button variant="ghost" size="sm" className="text-gray-700 hover:text-blue-600 font-semibold">
                       Login
                     </Button>
                   </Link>
@@ -542,7 +542,7 @@ export function Header() {
                       exit={{ rotate: 90, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <X className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                      <X className="h-6 w-6 text-gray-600" />
                     </motion.div>
                   ) : (
                     <motion.div
@@ -552,7 +552,7 @@ export function Header() {
                       exit={{ rotate: -90, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Menu className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                      <Menu className="h-6 w-6 text-gray-600" />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -569,7 +569,7 @@ export function Header() {
               initial="hidden"
               animate="visible"
               exit="hidden"
-              className="lg:hidden border-t border-gray-200 dark:border-gray-700 py-6 bg-white dark:bg-gray-900 overflow-hidden"
+              className="lg:hidden border-t border-gray-200 py-6 bg-white overflow-hidden"
             >
               {/* Mobile Navigation */}
               <nav className="space-y-2">
@@ -588,7 +588,7 @@ export function Header() {
                   >
                     <Link 
                       href={item.href}
-                      className="flex items-center space-x-3 px-4 py-4 text-base font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300"
+                      className="flex items-center space-x-3 px-4 py-4 text-base font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <item.icon className="w-5 h-5" />
@@ -602,7 +602,7 @@ export function Header() {
               {!isAuthenticated ? (
                 <motion.div variants={itemVariants} className="mt-6 space-y-3">
                   <Link href="/auth/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full justify-center py-4 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20">
+                    <Button variant="outline" className="w-full justify-center py-4 border-2 border-blue-600 text-blue-600 hover:bg-blue-50">
                       Login to Your Account
                     </Button>
                   </Link>
@@ -613,10 +613,10 @@ export function Header() {
                   </Link>
                 </motion.div>
               ) : (
-                <motion.div variants={itemVariants} className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 space-y-2">
+                <motion.div variants={itemVariants} className="mt-6 pt-6 border-t border-gray-200 space-y-2">
                   <Link 
                     href="/orders" 
-                    className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300"
+                    className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <Package className="w-5 h-5" />
@@ -624,7 +624,7 @@ export function Header() {
                   </Link>
                   <Link 
                     href="/wishlist" 
-                    className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-300"
+                    className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-gray-700 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-300"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <Heart className="w-5 h-5" />
@@ -632,7 +632,7 @@ export function Header() {
                   </Link>
                   <Link 
                     href="/notifications" 
-                    className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300"
+                    className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <Bell className="w-5 h-5" />
@@ -645,7 +645,7 @@ export function Header() {
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-300 w-full text-left"
+                    className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 w-full text-left"
                   >
                     <LogOut className="w-5 h-5" />
                     <span>Log out</span>

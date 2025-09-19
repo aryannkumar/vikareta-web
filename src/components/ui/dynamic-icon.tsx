@@ -96,8 +96,8 @@ const CATEGORY_STYLE_MAP: Record<string, { bgClass: string; iconClass: string }>
 export const IconBackground: React.FC<IconBackgroundProps> = ({
     category,
     size = 64,
-    className = "w-full h-56 flex items-center justify-center bg-gradient-to-br from-blue-50 to-orange-50 dark:from-gray-800 dark:to-gray-700",
-    iconClassName = "text-blue-600 dark:text-blue-400"
+    className = "w-full h-56 flex items-center justify-center bg-gradient-to-br from-blue-50 to-orange-50",
+    iconClassName = "text-blue-600"
 }) => {
     const id = (category && (category.id || (category.name || '').toLowerCase().replace(/\s+/g, '-'))) || '';
     const palette = CATEGORY_STYLE_MAP[id] || { bgClass: 'from-blue-50 to-orange-50', iconClass: 'text-blue-600' };

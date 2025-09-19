@@ -104,8 +104,8 @@ export const designSystem = {
 
 export const premiumComponents = {
   card: {
-    base: "bg-white dark:bg-neutral-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-neutral-200 dark:border-neutral-700",
-    premium: "bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-neutral-200 dark:border-neutral-700",
+    base: "bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-neutral-200",
+    premium: "bg-gradient-to-br from-white to-neutral-50 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-neutral-200",
     interactive: "cursor-pointer hover:scale-[1.02] hover:shadow-premium transition-all duration-300"
   },
   

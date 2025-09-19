@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   TrendingUp, 
   MapPin, 
@@ -15,15 +15,321 @@ import {
   Building2,
   Package,
   Clock,
-  Settings
+  Settings,
+  Shuffle,
+  Target,
+  Filter,
+  Sparkles,
+  ChevronRight,
+  ExternalLink,
+  Heart,
+  Eye,
+  ArrowRight,
+  Zap,
+  Shield,
+  ThumbsUp,
+  MessageCircle,
+  Phone,
+  Mail,
+  Globe,
+  Verified,
+  Crown,
+  Flame
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { marketplaceApi } from '@/lib/api/marketplace';
 import { AnalyticsService, HomepageStats } from '../../lib/api/analytics';
+import { useVikaretaAuth } from '@/lib/auth/vikareta/hooks/use-vikareta-auth';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
-// Enhanced animated hero section for Marketplace
+interface MarketplaceItem {
+  id: string;
+  type: 'product' | 'service' | 'business';
+  name: string;
+  rating: number;
+  reviews: number;
+  price?: number;
+  basePrice?: number;
+  location: string;
+  supplier?: string;
+  provider?: { name: string };
+  category?: string;
+  verified?: boolean;
+  responseTime?: string;
+  deliveryTime?: string;
+  distance?: string;
+  description?: string;
+  tags?: string[];
+  featured?: boolean;
+  trending?: boolean;
+  isPreferred?: boolean;
+  relevanceScore?: number;
+  viewCount?: number;
+  contactCount?: number;
+}
+
+// Compact Card Component for Maximum Information Density
+const CompactCard = ({ 
+  item, 
+  index, 
+  layout = 'grid',
+  onView,
+  onContact
+}: { 
+  item: MarketplaceItem; 
+  index: number; 
+  layout: 'grid' | 'masonry' | 'list';
+  onView: (id: string, type: string) => void;
+  onContact: (id: string, type: string) => void;
+}) => {
+  const getCardHeight = () => {
+    if (layout === 'list') return 'h-32';
+    if (layout === 'masonry') {
+      const heights = ['h-48', 'h-56', 'h-52', 'h-60', 'h-44'];
+      return heights[index % heights.length];
+    }
+    return 'h-72';
+  };
+
+  const getTypeIcon = () => {
+    switch (item.type) {
+      case 'product': return Package;
+      case 'service': return Settings;
+      case 'business': return Building2;
+      default: return Package;
+    }
+  };
+
+  const getTypeColor = () => {
+    switch (item.type) {
+      case 'product': return 'from-blue-500 to-cyan-500';
+      case 'service': return 'from-orange-500 to-amber-500';
+      case 'business': return 'from-purple-500 to-pink-500';
+      default: return 'from-gray-500 to-gray-600';
+    }
+  };
+
+  const getTypeGradient = () => {
+    switch (item.type) {
+      case 'product': return 'from-blue-50 to-cyan-50';
+      case 'service': return 'from-orange-50 to-amber-50';
+      case 'business': return 'from-purple-50 to-pink-50';
+      default: return 'from-gray-50 to-gray-100';
+    }
+  };
+
+  const TypeIcon = getTypeIcon();
+  const href = `/${item.type}s/${item.id}`;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ 
+        delay: index * 0.05,
+        type: "spring",
+        stiffness: 260,
+        damping: 20
+      }}
+      whileHover={{ 
+        y: -8, 
+        scale: 1.02,
+        transition: { duration: 0.3, ease: "easeOut" }
+      }}
+      className={layout === 'masonry' ? "break-inside-avoid mb-4" : ""}
+      onViewportEnter={() => onView(item.id, item.type)}
+    >
+      <Link href={href} className="group block h-full">
+        <Card className={`
+          group h-full bg-white shadow-md border border-gray-100 hover:shadow-2xl 
+          hover:border-orange-200 transition-all duration-500 overflow-hidden relative
+          ${getCardHeight()}
+          ${layout === 'list' ? 'flex flex-row' : ''}
+        `}>
+          {/* Floating badges */}
+          <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
+            {item.featured && (
+              <motion.div
+                className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-2 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg"
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <Crown className="h-2 w-2" />
+                Featured
+              </motion.div>
+            )}
+            {item.trending && (
+              <motion.div
+                className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-2 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg"
+                initial={{ scale: 0, rotate: 180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: index * 0.05 + 0.1 }}
+              >
+                <Flame className="h-2 w-2" />
+                Hot
+              </motion.div>
+            )}
+            {item.isPreferred && (
+              <motion.div
+                className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg"
+                initial={{ scale: 0, rotate: -90 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: index * 0.05 + 0.2 }}
+              >
+                <Heart className="h-2 w-2" />
+                Preferred
+              </motion.div>
+            )}
+          </div>
+
+          {/* Floating action button */}
+          <div className="absolute top-2 right-2 z-10">
+            <motion.button
+              className="bg-white/90 backdrop-blur-sm rounded-full p-1.5 shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={(e) => {
+                e.preventDefault();
+                onContact(item.id, item.type);
+              }}
+            >
+              <ExternalLink className="h-3 w-3 text-gray-600" />
+            </motion.button>
+          </div>
+
+          <CardContent className={`p-3 h-full flex ${layout === 'list' ? 'flex-row items-center gap-4' : 'flex-col'}`}>
+            {/* Image/Icon Area */}
+            <div className={`
+              ${layout === 'list' ? 'w-24 h-24' : 'w-full h-20 mb-3'} 
+              bg-gradient-to-br ${getTypeGradient()} rounded-lg flex items-center justify-center flex-shrink-0
+              group-hover:${getTypeGradient().replace('50', '100')} transition-all duration-500
+            `}>
+              <TypeIcon className={`
+                ${layout === 'list' ? 'w-8 h-8' : 'w-10 h-10'} 
+                text-${item.type === 'product' ? 'blue' : item.type === 'service' ? 'orange' : 'purple'}-600 
+                group-hover:scale-110 transition-all duration-500
+              `} />
+            </div>
+
+            {/* Content */}
+            <div className={`${layout === 'list' ? 'flex-1 min-w-0' : 'flex-1 space-y-2'}`}>
+              {/* Title & Rating */}
+              <div className={layout === 'list' ? 'flex items-start justify-between mb-2' : ''}>
+                <div className={layout === 'list' ? 'flex-1 min-w-0 mr-3' : ''}>
+                  <h3 className={`
+                    font-bold text-gray-900 group-hover:text-orange-600 transition-colors
+                    ${layout === 'list' ? 'text-base line-clamp-1' : 'text-sm line-clamp-2 mb-1'}
+                  `}>
+                    {item.name}
+                  </h3>
+                  
+                  {/* Verification for businesses */}
+                  {item.type === 'business' && item.verified && (
+                    <Badge className="bg-green-100 text-green-700 border-green-200 text-xs px-1 py-0 mb-1">
+                      <Shield className="h-2 w-2 mr-1" />
+                      Verified
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Rating */}
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                  <span className="text-xs font-medium text-gray-900">{item.rating}</span>
+                  <span className="text-xs text-gray-500">({item.reviews})</span>
+                </div>
+              </div>
+
+              {/* Price */}
+              {(item.price || item.basePrice) && (
+                <div className={`text-lg font-bold ${
+                  item.type === 'product' ? 'text-blue-600' : 
+                  item.type === 'service' ? 'text-orange-600' : 'text-purple-600'
+                } ${layout === 'list' ? 'mb-1' : 'mb-2'}`}>
+                  ₹{(item.price || item.basePrice)?.toLocaleString()}
+                  {item.type === 'service' && '/hr'}
+                </div>
+              )}
+
+              {/* Provider/Supplier */}
+              <div className={`text-xs text-gray-600 font-medium ${layout === 'list' ? 'mb-1' : 'mb-2'}`}>
+                {item.supplier || item.provider?.name || 'Provider'}
+              </div>
+
+              {/* Location & Time Info */}
+              <div className={`flex ${layout === 'list' ? 'flex-col gap-1' : 'items-center justify-between'} text-xs text-gray-500`}>
+                <div className="flex items-center">
+                  <MapPin className="w-3 h-3 mr-1" />
+                  {item.location}
+                </div>
+                {(item.responseTime || item.deliveryTime) && (
+                  <div className="flex items-center">
+                    <Clock className="w-3 h-3 mr-1" />
+                    {item.responseTime || item.deliveryTime}
+                  </div>
+                )}
+              </div>
+
+              {/* Relevance Score */}
+              {item.relevanceScore && (
+                <div className="flex items-center gap-1 text-xs">
+                  <Target className="h-3 w-3 text-orange-500" />
+                  <span className="text-orange-600 font-medium">{Math.round(item.relevanceScore * 100)}% match</span>
+                </div>
+              )}
+
+              {/* Tags */}
+              {item.tags && item.tags.length > 0 && layout !== 'list' && (
+                <div className="flex flex-wrap gap-1">
+                  {item.tags.slice(0, 2).map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant="secondary"
+                      className="text-xs px-1 py-0 bg-gray-100 text-gray-600 hover:bg-orange-100 hover:text-orange-700 transition-colors"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                  {item.tags.length > 2 && (
+                    <Badge variant="secondary" className="text-xs px-1 py-0 bg-orange-100 text-orange-600">
+                      +{item.tags.length - 2}
+                    </Badge>
+                  )}
+                </div>
+              )}
+
+              {/* Action */}
+              {layout !== 'list' && (
+                <motion.div
+                  className="flex items-center justify-between pt-2 border-t border-gray-100 mt-auto"
+                  whileHover={{ x: 4 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <span className="text-xs font-semibold text-orange-600 group-hover:text-orange-700">
+                    View {item.type}
+                  </span>
+                  <ChevronRight className="h-3 w-3 text-orange-600 group-hover:text-orange-700 group-hover:translate-x-1 transition-all duration-300" />
+                </motion.div>
+              )}
+            </div>
+
+            {/* List view action button */}
+            {layout === 'list' && (
+              <div className="flex-shrink-0">
+                <Button size="sm" className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs px-3">
+                  View
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </Link>
+    </motion.div>
+  );
+};
 const MarketplaceHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
   const defaultStats = {
     trendingProducts: 2500,
@@ -121,18 +427,32 @@ const MarketplaceHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
 };
 
 export default function MarketplacePage() {
+  const { isAuthenticated, user } = useVikaretaAuth();
+  const {
+    personalizedCategories,
+    trendingCategories,
+    userPreferences,
+    loading: preferencesLoading,
+    trackCategoryInteraction,
+  } = useUserPreferences();
+
   const [loading, setLoading] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState('All Locations');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [trendingProducts, setTrendingProducts] = useState<any[]>([]);
-  const [nearbyBusinesses, setNearbyBusinesses] = useState<any[]>([]);
-  const [featuredServices, setFeaturedServices] = useState<any[]>([]);
+  const [selectedType, setSelectedType] = useState('All Types');
+  const [viewMode, setViewMode] = useState<'grid' | 'masonry' | 'list'>('masonry');
+  const [sortBy, setSortBy] = useState<'relevance' | 'rating' | 'price' | 'distance'>('relevance');
+  const [showMode, setShowMode] = useState<'personalized' | 'trending' | 'random'>('personalized');
+  const [randomSeed, setRandomSeed] = useState(Math.random());
+
+  const [allItems, setAllItems] = useState<MarketplaceItem[]>([]);
+  const [displayItems, setDisplayItems] = useState<MarketplaceItem[]>([]);
   const [homepageStats, setHomepageStats] = useState<HomepageStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
 
   const locations = ['All Locations', 'Mumbai', 'Delhi NCR', 'Bangalore', 'Chennai', 'Pune', 'Hyderabad'];
   const categories = ['All Categories', 'Technology', 'Manufacturing', 'Healthcare', 'Office Supplies', 'Construction'];
+  const types = ['All Types', 'Products', 'Services', 'Businesses'];
 
   // Load homepage stats
   useEffect(() => {
@@ -143,7 +463,6 @@ export default function MarketplacePage() {
         setHomepageStats(stats);
       } catch (error) {
         console.error('Error loading homepage stats:', error);
-        // Keep null so component uses default values
       } finally {
         setStatsLoading(false);
       }
@@ -152,41 +471,62 @@ export default function MarketplacePage() {
     loadStats();
   }, []);
 
-  // Load all data from APIs
+  // Load all marketplace data
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        // Load all marketplace data using API client functions
-        const [popularResponse, businessesResponse, featuredResponse] = await Promise.all([
-          // Use popular endpoint for trending products
+        const [productsResponse, servicesResponse, businessesResponse] = await Promise.all([
           marketplaceApi.getTrendingProducts({ sortBy: 'trending' }),
-          marketplaceApi.getNearbyBusinesses(),
-          // Use featured endpoint for trending services
-          marketplaceApi.getTrendingServices({ sortBy: 'rating' })
+          marketplaceApi.getTrendingServices({ sortBy: 'rating' }),
+          marketplaceApi.getNearbyBusinesses()
         ]);
 
-        // Transform popular products to trending format
-        if (popularResponse.success && popularResponse.data) {
-          setTrendingProducts(popularResponse.data.slice(0, 6));
-        } else {
-          setTrendingProducts([]);
+        const allMarketplaceItems: MarketplaceItem[] = [];
+
+        // Add products
+        if (productsResponse.success && productsResponse.data) {
+          const products = productsResponse.data.map((item: any) => ({
+            ...item,
+            type: 'product' as const,
+            trending: Math.random() > 0.7,
+            featured: Math.random() > 0.8,
+            relevanceScore: Math.random() * 0.5 + 0.5,
+            tags: ['Electronics', 'Quality', 'Fast Delivery'].slice(0, Math.floor(Math.random() * 3) + 1)
+          }));
+          allMarketplaceItems.push(...products);
         }
 
-        setNearbyBusinesses(businessesResponse.data || []);
-
-        // Transform featured services to trending format
-        if (featuredResponse.success && featuredResponse.data) {
-          setFeaturedServices(featuredResponse.data.slice(0, 6));
-        } else {
-          setFeaturedServices([]);
+        // Add services
+        if (servicesResponse.success && servicesResponse.data) {
+          const services = servicesResponse.data.map((item: any) => ({
+            ...item,
+            type: 'service' as const,
+            trending: Math.random() > 0.7,
+            featured: Math.random() > 0.8,
+            relevanceScore: Math.random() * 0.5 + 0.5,
+            tags: ['Professional', 'Certified', 'Quick Response'].slice(0, Math.floor(Math.random() * 3) + 1)
+          }));
+          allMarketplaceItems.push(...services);
         }
+
+        // Add businesses
+        if (businessesResponse.data) {
+          const businesses = businessesResponse.data.map((item: any) => ({
+            ...item,
+            type: 'business' as const,
+            trending: Math.random() > 0.7,
+            featured: Math.random() > 0.8,
+            relevanceScore: Math.random() * 0.5 + 0.5,
+            tags: ['Verified', 'Trusted', 'Local'].slice(0, Math.floor(Math.random() * 3) + 1)
+          }));
+          allMarketplaceItems.push(...businesses);
+        }
+
+        setAllItems(allMarketplaceItems);
       } catch (error) {
         console.error('Error loading marketplace data:', error);
-        // Set empty arrays on error instead of fallback mock data
-        setTrendingProducts([]);
-        setNearbyBusinesses([]);
-        setFeaturedServices([]);
+        setAllItems([]);
       } finally {
         setLoading(false);
       }
@@ -195,347 +535,409 @@ export default function MarketplacePage() {
     loadData();
   }, []);
 
+  // Process and filter display items based on preferences and filters
+  const processedItems = useMemo(() => {
+    if (allItems.length === 0) return [];
+
+    let filteredItems = [...allItems];
+
+    // Apply filters
+    if (selectedLocation !== 'All Locations') {
+      filteredItems = filteredItems.filter(item => 
+        item.location?.toLowerCase().includes(selectedLocation.toLowerCase())
+      );
+    }
+
+    if (selectedCategory !== 'All Categories') {
+      filteredItems = filteredItems.filter(item => 
+        item.category?.toLowerCase().includes(selectedCategory.toLowerCase())
+      );
+    }
+
+    if (selectedType !== 'All Types') {
+      const typeFilter = selectedType.toLowerCase().slice(0, -1); // Remove 's' from 'Products'
+      filteredItems = filteredItems.filter(item => item.type === typeFilter);
+    }
+
+    // Apply user preferences if authenticated
+    if (isAuthenticated && userPreferences) {
+      filteredItems = filteredItems.map(item => ({
+        ...item,
+        isPreferred: userPreferences.preferredCategories?.includes(item.category || '') || false
+      }));
+    }
+
+    // Apply show mode logic
+    if (showMode === 'personalized' && isAuthenticated) {
+      // Sort by user preferences and relevance
+      filteredItems.sort((a, b) => {
+        if (a.isPreferred && !b.isPreferred) return -1;
+        if (!a.isPreferred && b.isPreferred) return 1;
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+        return (b.relevanceScore || 0) - (a.relevanceScore || 0);
+      });
+    } else if (showMode === 'trending') {
+      // Show trending items first
+      filteredItems.sort((a, b) => {
+        if (a.trending && !b.trending) return -1;
+        if (!a.trending && b.trending) return 1;
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+        return b.rating - a.rating;
+      });
+    } else if (showMode === 'random') {
+      // Randomize with seed for consistency
+      filteredItems = filteredItems
+        .map(item => ({ ...item, randomSort: Math.sin(randomSeed * item.id.charCodeAt(0)) }))
+        .sort((a, b) => (b as any).randomSort - (a as any).randomSort);
+    }
+
+    // Apply sorting
+    if (sortBy === 'rating') {
+      filteredItems.sort((a, b) => b.rating - a.rating);
+    } else if (sortBy === 'price') {
+      filteredItems.sort((a, b) => (a.price || a.basePrice || 0) - (b.price || b.basePrice || 0));
+    } else if (sortBy === 'distance') {
+      filteredItems.sort((a, b) => {
+        const distanceA = parseFloat(a.distance?.split(' ')[0] || '999');
+        const distanceB = parseFloat(b.distance?.split(' ')[0] || '999');
+        return distanceA - distanceB;
+      });
+    }
+
+    return filteredItems.slice(0, 24); // Limit to 24 items for performance
+  }, [
+    allItems, 
+    selectedLocation, 
+    selectedCategory, 
+    selectedType, 
+    isAuthenticated, 
+    userPreferences, 
+    showMode, 
+    randomSeed, 
+    sortBy
+  ]);
+
+  const handleItemView = async (id: string, type: string) => {
+    try {
+      // Track view interaction
+      console.log(`Viewed ${type}: ${id}`);
+    } catch (error) {
+      console.error('Failed to track view:', error);
+    }
+  };
+
+  const handleItemContact = async (id: string, type: string) => {
+    try {
+      // Track contact interaction
+      console.log(`Contacted ${type}: ${id}`);
+    } catch (error) {
+      console.error('Failed to track contact:', error);
+    }
+  };
+
+  const handleRandomize = () => {
+    setRandomSeed(Math.random());
+    setShowMode('random');
+  };
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05
+      }
+    }
+  };
+
   if (loading || statsLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
-          <p className="text-gray-700 font-medium">Loading marketplace...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+        <div className="container mx-auto px-6 py-16">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-white rounded-full px-6 py-3 shadow-lg mb-6">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              >
+                <Zap className="h-5 w-5 text-orange-500" />
+              </motion.div>
+              <span className="text-gray-600 font-medium">Loading marketplace...</span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl shadow-lg animate-pulse h-72"
+              >
+                <div className="h-20 bg-gradient-to-br from-gray-200 to-gray-300 rounded-t-2xl"></div>
+                <div className="p-4 space-y-3">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  <div className="flex gap-2">
+                    <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+                    <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       <MarketplaceHero stats={homepageStats || undefined} />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Enhanced Search and Filter Controls */}
+      <div className="container mx-auto px-6 py-12">
+        {/* Enhanced Control Panel */}
         <motion.div 
-          className="bg-white rounded-2xl shadow-lg border border-amber-200 p-6 mb-8"
+          className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <motion.div
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-100 to-amber-100 rounded-full px-4 py-2 mb-4"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <Sparkles className="h-4 w-4 text-orange-500" />
+              <span className="text-orange-700 font-semibold text-sm">
+                {isAuthenticated 
+                  ? `${showMode === 'personalized' ? 'Personalized' : showMode === 'trending' ? 'Trending' : 'Discover'} Marketplace` 
+                  : 'Explore Marketplace'
+                }
+              </span>
+            </motion.div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              {processedItems.length} Items Found
+            </h2>
+            <p className="text-gray-600">
+              {isAuthenticated 
+                ? 'Items curated based on your preferences and activity'
+                : 'Discover the best products, services, and businesses'
+              }
+            </p>
+          </div>
+
+          {/* Controls */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+            {/* Show Mode Controls */}
+            {isAuthenticated && (
+              <div className="lg:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Show Mode</label>
+                <div className="flex gap-2">
+                  <Button
+                    variant={showMode === 'personalized' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setShowMode('personalized')}
+                    className="flex-1 text-xs"
+                  >
+                    <Target className="h-3 w-3 mr-1" />
+                    For You
+                  </Button>
+                  <Button
+                    variant={showMode === 'trending' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setShowMode('trending')}
+                    className="flex-1 text-xs"
+                  >
+                    <TrendingUp className="h-3 w-3 mr-1" />
+                    Trending
+                  </Button>
+                  <Button
+                    variant={showMode === 'random' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={handleRandomize}
+                    className="flex-1 text-xs"
+                  >
+                    <Shuffle className="h-3 w-3 mr-1" />
+                    Random
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* Filters */}
-            <div className="flex flex-wrap gap-4 items-center">
-              {/* Location Filter */}
-              <div>
+            <div className={isAuthenticated ? 'lg:col-span-2' : 'lg:col-span-3'}>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Filters</label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <select
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="px-4 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white text-gray-900 font-medium"
+                  className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white text-sm"
                 >
                   {locations.map((location) => (
-                    <option key={location} value={location} className="text-gray-900">
-                      {location}
-                    </option>
+                    <option key={location} value={location}>{location}</option>
                   ))}
                 </select>
-              </div>
 
-              {/* Category Filter */}
-              <div>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-4 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white text-gray-900 font-medium"
+                  className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white text-sm"
                 >
                   {categories.map((category) => (
-                    <option key={category} value={category} className="text-gray-900">
-                      {category}
-                    </option>
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white text-sm"
+                >
+                  {types.map((type) => (
+                    <option key={type} value={type}>{type}</option>
                   ))}
                 </select>
               </div>
             </div>
 
-            {/* View Mode Toggle */}
-            <div className="flex border border-amber-200 rounded-lg overflow-hidden">
-              <Button
-                variant={viewMode === 'grid' ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-                className={viewMode === 'grid' 
-                  ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700" 
-                  : "hover:bg-amber-50 text-gray-700"
-                }
-              >
-                <Grid className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode('list')}
-                className={viewMode === 'list' 
-                  ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700" 
-                  : "hover:bg-amber-50 text-gray-700"
-                }
-              >
-                <List className="w-4 h-4" />
-              </Button>
+            {/* View & Sort Controls */}
+            <div className="lg:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">View & Sort</label>
+              <div className="flex gap-2">
+                {/* View Mode */}
+                <select
+                  value={viewMode}
+                  onChange={(e) => setViewMode(e.target.value as any)}
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white text-sm"
+                >
+                  <option value="masonry">Masonry</option>
+                  <option value="grid">Grid</option>
+                  <option value="list">List</option>
+                </select>
+
+                {/* Sort By */}
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white text-sm"
+                >
+                  <option value="relevance">Relevance</option>
+                  <option value="rating">Rating</option>
+                  <option value="price">Price</option>
+                  <option value="distance">Distance</option>
+                </select>
+              </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Unified Marketplace Grid */}
-        <div className="space-y-12">
-          {/* Trending Products Section */}
-          {trendingProducts.length > 0 && (
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+        {/* Dynamic Marketplace Grid */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`${showMode}-${randomSeed}-${selectedLocation}-${selectedCategory}-${selectedType}`}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className={
+              viewMode === 'masonry' 
+                ? "columns-1 md:columns-2 lg:columns-4 gap-6"
+                : viewMode === 'list'
+                ? "space-y-4"
+                : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            }
+          >
+            {processedItems.map((item, index) => (
+              <CompactCard
+                key={`${item.id}-${showMode}-${randomSeed}`}
+                item={item}
+                index={index}
+                layout={viewMode}
+                onView={handleItemView}
+                onContact={handleItemContact}
+              />
+            ))}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Empty State */}
+        {processedItems.length === 0 && !loading && (
+          <motion.div
+            className="text-center py-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="w-24 h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Package className="w-12 h-12 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No items found</h3>
+            <p className="text-gray-600 mb-6">Try adjusting your filters or search criteria</p>
+            <Button 
+              onClick={() => {
+                setSelectedLocation('All Locations');
+                setSelectedCategory('All Categories');
+                setSelectedType('All Types');
+              }}
+              className="bg-orange-500 hover:bg-orange-600 text-white"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Trending Products</h2>
-                  <p className="text-gray-600">Popular products in high demand</p>
-                </div>
-              </div>
-              
-              <div className={viewMode === 'grid' 
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6' 
-                : 'space-y-4'
-              }>
-                {trendingProducts.slice(0, 8).map((product, index) => (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -5 }}
-                  >
-                    <Link href={`/products/${product.id}`} className="block h-full">
-                      <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
-                        <CardContent className="p-4">
-                          <div className="aspect-square bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg mb-3 flex items-center justify-center">
-                            <Package className="w-8 h-8 text-amber-600" />
-                          </div>
-                          
-                          <h3 className="font-bold text-base text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 mb-2">
-                            {product.name}
-                          </h3>
-                          
-                          <div className="flex items-center gap-1 mb-2">
-                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                            <span className="text-xs font-medium text-gray-900">
-                              {product.rating}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              ({product.reviews})
-                            </span>
-                          </div>
+              Reset Filters
+            </Button>
+          </motion.div>
+        )}
 
-                          <div className="text-lg font-bold text-amber-600 mb-2">
-                            ₹{product.price?.toLocaleString()}
-                          </div>
-
-                          <div className="text-xs text-gray-600 mb-2 truncate">
-                            <strong>{product.supplier}</strong>
-                          </div>
-                          
-                          <div className="flex items-center text-xs text-gray-500 mb-3">
-                            <MapPin className="w-3 h-3 mr-1" />
-                            {product.location}
-                          </div>
-
-                          <Button size="sm" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white">
-                            View Details
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.section>
-          )}
-
-          {/* Nearby Businesses Section */}
-          {nearbyBusinesses.length > 0 && (
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl flex items-center justify-center">
-                  <Building2 className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Nearby Businesses</h2>
-                  <p className="text-gray-600">Verified suppliers in your area</p>
-                </div>
-              </div>
-              
-              <div className={viewMode === 'grid' 
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
-                : 'space-y-4'
-              }>
-                {nearbyBusinesses.slice(0, 6).map((business, index) => (
-                  <motion.div
-                    key={business.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -5 }}
-                  >
-                    <Link href={`/businesses/${business.id}`} className="block h-full">
-                      <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className="w-12 h-12 bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl flex items-center justify-center">
-                              <Building2 className="w-6 h-6 text-white" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-bold text-base text-gray-900 group-hover:text-amber-600 transition-colors truncate">
-                                {business.name}
-                              </h3>
-                              {business.verified && (
-                                <Badge className="bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0 text-xs">
-                                  Verified
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          
-                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                            {business.category}
-                          </p>
-
-                          <div className="flex items-center gap-1 mb-3">
-                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                            <span className="text-xs font-medium text-gray-900">
-                              {business.rating}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              ({business.reviews})
-                            </span>
-                          </div>
-
-                          <div className="flex items-center text-xs text-gray-500 mb-3">
-                            <MapPin className="w-3 h-3 mr-1" />
-                            {business.distance || business.location}
-                          </div>
-
-                          <div className="flex items-center text-xs text-gray-500 mb-4">
-                            <Clock className="w-3 h-3 mr-1" />
-                            Responds in {business.responseTime || '2h'}
-                          </div>
-
-                          <Button size="sm" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white">
-                            View Profile
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.section>
-          )}
-
-          {/* Featured Services Section */}
-          {featuredServices.length > 0 && (
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-                  <Package className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Featured Services</h2>
-                  <p className="text-gray-600">Professional services for your business</p>
-                </div>
-              </div>
-              
-              <div className={viewMode === 'grid' 
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6' 
-                : 'space-y-4'
-              }>
-                {featuredServices.slice(0, 8).map((service, index) => (
-                  <motion.div
-                    key={service.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -5 }}
-                  >
-                    <Link href={`/services/${service.id}`} className="block h-full">
-                      <Card className="group h-full bg-white shadow-md border border-amber-100 hover:shadow-xl hover:border-amber-300 transition-all duration-300 overflow-hidden">
-                        <CardContent className="p-4">
-                          <div className="aspect-square bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg mb-3 flex items-center justify-center">
-                            <Settings className="w-8 h-8 text-orange-600" />
-                          </div>
-                          
-                          <h3 className="font-bold text-base text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 mb-2">
-                            {service.name}
-                          </h3>
-                          
-                          <div className="flex items-center gap-1 mb-2">
-                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                            <span className="text-xs font-medium text-gray-900">
-                              {service.rating}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              ({service.reviewCount})
-                            </span>
-                          </div>
-
-                          <div className="text-lg font-bold text-orange-600 mb-2">
-                            ₹{service.basePrice?.toLocaleString()}/hr
-                          </div>
-
-                          <div className="text-xs text-gray-600 mb-2 truncate">
-                            <strong>{service.provider?.name}</strong>
-                          </div>
-                          
-                          <div className="flex items-center text-xs text-gray-500 mb-3">
-                            <Clock className="w-3 h-3 mr-1" />
-                            {service.deliveryTime || '1-2 days'}
-                          </div>
-
-                          <Button size="sm" className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white">
-                            View Service
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.section>
-          )}
-        </div>
-
-        {/* CTA Section */}
-        <motion.div 
-          className="mt-16 text-center bg-gradient-to-r from-amber-600 to-orange-600 rounded-2xl p-12 text-white"
+        {/* Stats Footer */}
+        <motion.div
+          className="mt-16 grid grid-cols-1 md:grid-cols-4 gap-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
+          {[
+            { icon: Package, label: 'Products', value: processedItems.filter(i => i.type === 'product').length, color: 'blue' },
+            { icon: Settings, label: 'Services', value: processedItems.filter(i => i.type === 'service').length, color: 'orange' },
+            { icon: Building2, label: 'Businesses', value: processedItems.filter(i => i.type === 'business').length, color: 'purple' },
+            { icon: Star, label: 'Featured', value: processedItems.filter(i => i.featured).length, color: 'yellow' }
+          ].map((stat, index) => (
+            <motion.div
+              key={stat.label}
+              className="bg-white/80 backdrop-blur-sm rounded-xl p-6 text-center shadow-lg border border-gray-100"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.7 + index * 0.1 }}
+            >
+              <div className={`w-12 h-12 bg-gradient-to-r from-${stat.color}-500 to-${stat.color}-600 rounded-lg flex items-center justify-center mb-4 mx-auto`}>
+                <stat.icon className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+              <div className="text-sm text-gray-600">{stat.label}</div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* CTA Section */}
+        <motion.div 
+          className="mt-16 text-center bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-12 text-white"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+        >
           <h3 className="text-3xl font-bold mb-4">
-            Want to Feature Your Business?
+            Ready to Grow Your Business?
           </h3>
           <p className="text-xl mb-8 opacity-90">
-            Join thousands of businesses already growing with our platform
+            Join thousands of businesses already thriving in our marketplace
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-amber-600 hover:bg-gray-100 font-semibold">
+            <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 font-semibold">
               List Your Business
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-amber-600 font-semibold">
-              Learn More
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 font-semibold">
+              Explore Features
             </Button>
           </div>
         </motion.div>

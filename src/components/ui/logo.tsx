@@ -15,9 +15,9 @@ export function Logo({ className = 'h-12 w-auto', showText = false, priority = f
     const heightMatch = className.match(/h-(\d+)/);
     if (heightMatch) {
       const size = parseInt(heightMatch[1]) * 4; // Convert Tailwind h-X to pixels (X * 0.25rem * 16)
-      return Math.max(48, Math.min(240, size)); // Clamp between 48-240px for better visibility
+      return Math.max(32, Math.min(192, size)); // Clamp between 32-192px for better navbar/logo usage
     }
-    return 48; // Default size - larger than before
+    return 48; // Default size
   };
 
   const imageSize = getImageSize(className);
