@@ -13,7 +13,8 @@ import {
   Star,
   TrendingUp,
   Target,
-  ChevronRight
+  ChevronRight,
+  Search
 } from 'lucide-react';
 import { IconBackground } from '@/components/ui/dynamic-icon';
 import { Button } from '@/components/ui/button';
@@ -241,33 +242,62 @@ export function CategoryGrid() {
   }
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-24 bg-gradient-to-br from-gray-50 via-orange-50/30 to-amber-50/20">
       <div className="container mx-auto px-6">
-        {/* Simple Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        {/* Enhanced Header */}
+        <div className="text-center mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 border border-orange-200/50 mb-6"
+          >
+            <motion.div
+              className="w-2 h-2 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <span className="text-orange-700 font-semibold text-sm">Explore Categories</span>
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
+          >
             {isAuthenticated ? 'Categories for You' : 'Browse Categories'}
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+          >
             {isAuthenticated
-              ? 'Discover products and services based on your interests'
-              : 'Find exactly what your business needs across various categories'
+              ? 'Discover products and services tailored to your business needs and preferences'
+              : 'Find exactly what your business needs across our comprehensive category collection'
             }
-          </p>
+          </motion.p>
         </div>
 
         {/* Homepage-Style Category Showcase */}
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {displayCategories.length > 0 && (
             <>
-              {/* Featured Categories - Horizontal Layout */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+              {/* Featured Categories - Enhanced Horizontal Layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
                 {displayCategories.slice(0, 2).map((category, index) => {
                   const colors = getCategoryColor(category);
-                  
+
                   return (
-                    <div
+                    <motion.div
                       key={category.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      whileHover={{ y: -8 }}
                       className="group"
                     >
                       <Link
@@ -276,59 +306,104 @@ export function CategoryGrid() {
                         onClick={() => handleCategoryClick(category.id, category.slug)}
                       >
                         <div className={`
-                          relative bg-white rounded-2xl p-8 h-48 shadow-sm
-                          border ${colors.border} ${colors.hover} transition-all duration-200 
-                          group-hover:shadow-md
+                          relative bg-white rounded-3xl p-8 h-56 shadow-lg hover:shadow-2xl
+                          border ${colors.border} ${colors.hover} transition-all duration-300
+                          overflow-hidden
                         `}>
-                          <div className="flex items-center h-full">
+                          {/* Background Pattern */}
+                          <div className={`absolute inset-0 opacity-5 bg-gradient-to-br ${colors.bg}`}></div>
+
+                          <div className="relative flex items-center h-full">
                             <div className={`
-                              w-20 h-20 rounded-2xl bg-gradient-to-br ${colors.bg} 
-                              flex items-center justify-center mr-6 transition-transform duration-200
+                              w-24 h-24 rounded-3xl bg-gradient-to-br ${colors.bg}
+                              flex items-center justify-center mr-8 transition-all duration-300
+                              group-hover:scale-110 group-hover:rotate-3 shadow-lg
                             `}>
                               <IconBackground
                                 category={category}
-                                size={40}
+                                size={48}
                                 className="bg-transparent"
                                 iconClassName={`${colors.icon}`}
                               />
                             </div>
                             <div className="flex-1">
-                              <h3 className="text-2xl font-bold text-gray-900 mb-2 transition-colors">
+                              <h3 className="text-3xl font-bold text-gray-900 mb-3 transition-colors group-hover:text-orange-600">
                                 {category.name}
                               </h3>
-                              <p className="text-gray-600 mb-3 line-clamp-2">
-                                {category.description || 'Explore quality products and services'}
+                              <p className="text-gray-600 mb-4 line-clamp-2 leading-relaxed">
+                                {category.description || 'Explore quality products and services in this category'}
                               </p>
                               {category.productCount && (
-                                <p className="text-sm text-gray-500">
-                                  {category.productCount.toLocaleString()} products available
-                                </p>
+                                <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                                    <Package className="h-4 w-4" />
+                                    <span>{category.productCount.toLocaleString()} products</span>
+                                  </div>
+                                  {category.supplierCount && (
+                                    <>
+                                      <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                                        <Users className="h-4 w-4" />
+                                        <span>{category.supplierCount} suppliers</span>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
                               )}
                             </div>
-                            <ChevronRight className="w-6 h-6 text-gray-400 transition-colors duration-200" />
+                            <motion.div
+                              className="ml-6"
+                              whileHover={{ x: 4 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <ChevronRight className="w-8 h-8 text-gray-400 transition-colors group-hover:text-orange-500" />
+                            </motion.div>
                           </div>
 
-                          {/* Simple preference indicator */}
-                          {category.isPreferred && (
-                            <div className="absolute top-4 right-4">
-                              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                            </div>
-                          )}
+                          {/* Enhanced preference indicators */}
+                          <div className="absolute top-6 right-6 flex gap-2">
+                            {category.isPreferred && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg"
+                              >
+                                <Heart className="w-4 h-4 text-white fill-current" />
+                              </motion.div>
+                            )}
+                            {category.isTrending && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.1 }}
+                                className="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg"
+                              >
+                                <TrendingUp className="w-4 h-4 text-white" />
+                              </motion.div>
+                            )}
+                          </div>
+
+                          {/* Hover effect overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"></div>
                         </div>
                       </Link>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
 
-              {/* Remaining Categories - Clean Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {/* Remaining Categories - Enhanced Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                 {displayCategories.slice(2).map((category, index) => {
                   const colors = getCategoryColor(category);
-                  
+
                   return (
-                    <div
+                    <motion.div
                       key={category.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.05 }}
+                      whileHover={{ y: -6, scale: 1.02 }}
                       className="group"
                     >
                       <Link
@@ -337,39 +412,54 @@ export function CategoryGrid() {
                         onClick={() => handleCategoryClick(category.id, category.slug)}
                       >
                         <div className={`
-                          relative bg-white rounded-xl p-4 h-28 shadow-sm
-                          border ${colors.border} ${colors.hover} transition-all duration-200 
-                          group-hover:shadow-md
+                          relative bg-white rounded-2xl p-6 h-40 shadow-lg hover:shadow-xl
+                          border ${colors.border} ${colors.hover} transition-all duration-300
+                          overflow-hidden
                         `}>
-                          <div className="flex flex-col items-center justify-center h-full text-center">
-                            <div className={`
-                              w-12 h-12 rounded-lg bg-gradient-to-br ${colors.bg} 
-                              flex items-center justify-center mb-2 transition-transform duration-200
-                            `}>
+                          {/* Background Pattern */}
+                          <div className={`absolute inset-0 opacity-5 bg-gradient-to-br ${colors.bg}`}></div>
+
+                          <div className="relative flex flex-col items-center justify-center h-full text-center">
+                            <motion.div
+                              className={`
+                                w-16 h-16 rounded-2xl bg-gradient-to-br ${colors.bg}
+                                flex items-center justify-center mb-4 transition-all duration-300
+                                group-hover:scale-110 group-hover:rotate-6 shadow-lg
+                              `}
+                              whileHover={{ rotate: 12 }}
+                            >
                               <IconBackground
                                 category={category}
-                                size={24}
+                                size={32}
                                 className="bg-transparent"
                                 iconClassName={`${colors.icon}`}
                               />
-                            </div>
-                            <h3 className="text-sm font-semibold text-gray-900 transition-colors line-clamp-2">
+                            </motion.div>
+                            <h3 className="text-lg font-bold text-gray-900 transition-colors group-hover:text-orange-600 line-clamp-2 leading-tight">
                               {category.name}
                             </h3>
+                            {category.productCount && (
+                              <p className="text-xs text-gray-500 mt-2">
+                                {category.productCount.toLocaleString()} items
+                              </p>
+                            )}
                           </div>
 
-                          {/* Simple indicators */}
-                          <div className="absolute top-2 right-2 flex gap-1">
+                          {/* Enhanced indicators */}
+                          <div className="absolute top-3 right-3 flex gap-1">
                             {category.isPreferred && (
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-sm"></div>
                             )}
                             {category.isTrending && (
-                              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                              <div className="w-3 h-3 bg-gradient-to-r from-red-500 to-pink-600 rounded-full shadow-sm"></div>
                             )}
                           </div>
+
+                          {/* Hover effect */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
                         </div>
                       </Link>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -377,15 +467,74 @@ export function CategoryGrid() {
           )}
         </div>
 
-        {/* Simple CTA */}
-        <div className="text-center mt-16">
-          <Link href="/categories">
-            <Button className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
-              Explore All Categories
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
-        </div>
+        {/* Enhanced CTA Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-center mt-20"
+        >
+          <div className="bg-gradient-to-r from-white via-orange-50/50 to-amber-50/50 rounded-3xl p-12 shadow-lg border border-orange-100/50">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Can't find what you're looking for?
+            </h3>
+            <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+              Explore our complete collection of categories and discover new opportunities for your business procurement needs.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/categories">
+                <motion.button
+                  className="group relative bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-10 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 text-lg overflow-hidden"
+                  whileHover={{ scale: 1.05, y: -3 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="relative flex items-center gap-3">
+                    <Target className="h-6 w-6" />
+                    <span>Explore All Categories</span>
+                    <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
+                  </div>
+                </motion.button>
+              </Link>
+
+              <Link href="/search">
+                <motion.button
+                  className="group border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-10 py-4 rounded-2xl font-bold transition-all duration-300 text-lg"
+                  whileHover={{ scale: 1.05, y: -3 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center gap-3">
+                    <Search className="h-6 w-6" />
+                    <span>Advanced Search</span>
+                  </div>
+                </motion.button>
+              </Link>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-8 mt-12 pt-8 border-t border-orange-200/50">
+              <div className="text-center">
+                <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+                  500+
+                </div>
+                <div className="text-sm text-gray-600 mt-1">Categories</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+                  50K+
+                </div>
+                <div className="text-sm text-gray-600 mt-1">Products</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+                  10K+
+                </div>
+                <div className="text-sm text-gray-600 mt-1">Suppliers</div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
