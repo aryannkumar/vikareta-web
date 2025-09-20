@@ -27,7 +27,7 @@ export class VikaretaSSOClient {
     try {
       // Get stored auth state
       const storedState = vikaretaCrossDomainAuth.getStoredAuthData();
-      
+
       if (storedState.isAuthenticated && storedState.user) {
         // Validate stored user data
         if (!isVikaretaUser(storedState.user)) {
@@ -72,8 +72,20 @@ export class VikaretaSSOClient {
             return { user: data.user, isAuthenticated: true, isLoading: false, error: null, sessionId: data.sessionId || null };
           }
         }
-  } catch {
-        // Ignore bootstrap failures; fall through to unauthenticated state
+      } catch {
+        // Ignore bootstrap failures; fall through to guest session creation
+      }
+
+      // If no authenticated session found, create a guest session for better UX
+      console.log('No authenticated session found, creating guest session...');
+      try {
+        const guestState = await this.createGuestSession();
+        if (guestState.user) {
+          console.log('Guest session created successfully');
+          return guestState;
+        }
+      } catch (error) {
+        console.warn('Failed to create guest session:', error);
       }
 
       return { user: null, isAuthenticated: false, isLoading: false, error: null, sessionId: null };

@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
 
   // Guest-allowed routes (limited access for guest users)
-  const guestRoutes = ['/products', '/categories', '/search', '/cart', '/checkout'];
+  const guestRoutes = ['/', '/products', '/categories', '/search', '/cart', '/checkout'];
 
   // Check if the current route is public
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
