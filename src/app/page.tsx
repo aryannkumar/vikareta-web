@@ -393,7 +393,7 @@ export default function HomePage() {
                 <motion.button className="bg-orange-600 hover:bg-orange-700 text-white px-10 py-4 rounded-2xl font-bold" onClick={() => router.push('/services')}>
                   <div className="flex items-center gap-3">
                     <Store className="h-6 w-6" />
-                    <span>Explore All Services</span>
+                    <span>Explore Services</span>
                     <ArrowRight className="h-6 w-6" />
                   </div>
                 </motion.button>

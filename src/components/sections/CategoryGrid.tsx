@@ -492,7 +492,7 @@ export function CategoryGrid() {
                   <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="relative flex items-center gap-3">
                     <Target className="h-6 w-6" />
-                    <span>Explore All Categories</span>
+                    <span>Explore Categories</span>
                     <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
                   </div>
                 </motion.button>

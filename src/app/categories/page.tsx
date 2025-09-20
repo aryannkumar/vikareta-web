@@ -22,6 +22,23 @@ import { Badge } from '@/components/ui/badge';
 import { CategoryIcon } from '@/components/ui/dynamic-icon';
 import { categoriesApi, type Category } from '@/lib/api/categories';
 import { AnalyticsService, HomepageStats } from '../../lib/api/analytics';
+const categoryColors = [
+  { bg: 'from-blue-500 to-cyan-500', hover: 'group-hover:text-blue-600', border: 'border-blue-600', text: 'text-blue-600' },
+  { bg: 'from-green-500 to-emerald-500', hover: 'group-hover:text-green-600', border: 'border-green-600', text: 'text-green-600' },
+  { bg: 'from-purple-500 to-pink-500', hover: 'group-hover:text-purple-600', border: 'border-purple-600', text: 'text-purple-600' },
+  { bg: 'from-red-500 to-rose-500', hover: 'group-hover:text-red-600', border: 'border-red-600', text: 'text-red-600' },
+  { bg: 'from-indigo-500 to-blue-500', hover: 'group-hover:text-indigo-600', border: 'border-indigo-600', text: 'text-indigo-600' },
+  { bg: 'from-teal-500 to-cyan-500', hover: 'group-hover:text-teal-600', border: 'border-teal-600', text: 'text-teal-600' },
+  { bg: 'from-orange-500 to-amber-500', hover: 'group-hover:text-orange-600', border: 'border-orange-600', text: 'text-orange-600' },
+  { bg: 'from-pink-500 to-rose-500', hover: 'group-hover:text-pink-600', border: 'border-pink-600', text: 'text-pink-600' },
+  { bg: 'from-violet-500 to-purple-500', hover: 'group-hover:text-violet-600', border: 'border-violet-600', text: 'text-violet-600' },
+  { bg: 'from-lime-500 to-green-500', hover: 'group-hover:text-lime-600', border: 'border-lime-600', text: 'text-lime-600' },
+];
+
+// Function to get color for category
+const getCategoryColor = (index: number) => {
+  return categoryColors[index % categoryColors.length];
+};
 
 // Enhanced animated hero section
 const CategoriesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
@@ -283,57 +300,60 @@ export default function CategoriesPage() {
             animate={{ opacity: 1 }}
             transition={{ staggerChildren: 0.1 }}
           >
-            {filteredCategories.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-              >
-                <Link href={`/categories/${category.slug}`}>
-                  <Card className="group h-full bg-white shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden relative">
-                    <CardContent className="p-6">
-                      {/* Category Header */}
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="w-14 h-14 bg-gradient-to-r from-orange-600 to-amber-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <CategoryIcon category={category} size={28} className="text-white" />
+            {filteredCategories.map((category, index) => {
+              const colorScheme = getCategoryColor(index);
+              return (
+                <motion.div
+                  key={category.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -5 }}
+                >
+                  <Link href={`/categories/${category.slug}`}>
+                    <Card className="group h-full bg-white shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden relative">
+                      <CardContent className="p-6">
+                        {/* Category Header */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className={`w-14 h-14 bg-gradient-to-r ${colorScheme.bg} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                            <CategoryIcon category={category} size={28} className="text-white" />
+                          </div>
+                          {category.featured && (
+                            <Badge className={`bg-gradient-to-r ${colorScheme.bg} text-white border-0`}>
+                              Featured
+                            </Badge>
+                          )}
                         </div>
-                        {category.featured && (
-                          <Badge className="bg-gradient-to-r from-orange-600 to-amber-600 text-white border-0">
-                            Featured
-                          </Badge>
-                        )}
-                      </div>
 
-                      {/* Category Content */}
-                      <div className="space-y-3">
-                        <h3 className="font-bold text-lg text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2">
-                          {category.name}
-                        </h3>
-                        
-                        <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed">
-                          {category.description || 'Explore our wide range of products and services in this category'}
-                        </p>
-
-                        {/* Category Stats */}
-                        <div className="flex items-center justify-between pt-2">
-                          <Badge variant="outline" className="text-orange-600 border-orange-600">
-                            <Package className="w-3 h-3 mr-1" />
-                            {(category.productCount || 0).toLocaleString()}
-                          </Badge>
+                        {/* Category Content */}
+                        <div className="space-y-3">
+                          <h3 className={`font-bold text-lg text-gray-900 ${colorScheme.hover} transition-colors line-clamp-2`}>
+                            {category.name}
+                          </h3>
                           
-                          <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" />
-                        </div>
-                      </div>
+                          <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed">
+                            {category.description || 'Explore our wide range of products and services in this category'}
+                          </p>
 
-                      {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-orange-600/5 to-amber-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                    </CardContent>
-                  </Card>
-                </Link>
-              </motion.div>
-            ))}
+                          {/* Category Stats */}
+                          <div className="flex items-center justify-between pt-2">
+                            <Badge variant="outline" className={`${colorScheme.text} ${colorScheme.border}`}>
+                              <Package className="w-3 h-3 mr-1" />
+                              {(category.productCount || 0).toLocaleString()}
+                            </Badge>
+                            
+                            <ArrowRight className={`w-4 h-4 text-gray-400 ${colorScheme.hover} group-hover:translate-x-1 transition-all`} />
+                          </div>
+                        </div>
+
+                        {/* Hover Overlay */}
+                        <div className={`absolute inset-0 bg-gradient-to-r ${colorScheme.bg}/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </motion.div>
         ) : (
           <motion.div 
@@ -342,57 +362,60 @@ export default function CategoriesPage() {
             animate={{ opacity: 1 }}
             transition={{ staggerChildren: 0.05 }}
           >
-            {filteredCategories.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ scale: 1.02 }}
-              >
-                <Link href={`/categories/${category.slug}`}>
-                  <Card className="group bg-white shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden">
-                    <CardContent className="p-6">
-                      <div className="flex items-center space-x-6">
-                        <div className="w-16 h-16 bg-gradient-to-r from-orange-600 to-amber-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <CategoryIcon category={category} size={32} className="text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors">
-                                {category.name}
-                              </h3>
-                              <p className="text-gray-600 mt-1 leading-relaxed">
-                                {category.description || 'Explore our wide range of products and services in this category'}
-                              </p>
+            {filteredCategories.map((category, index) => {
+              const colorScheme = getCategoryColor(index);
+              return (
+                <motion.div
+                  key={category.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <Link href={`/categories/${category.slug}`}>
+                    <Card className="group bg-white shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden">
+                      <CardContent className="p-6">
+                        <div className="flex items-center space-x-6">
+                          <div className={`w-16 h-16 bg-gradient-to-r ${colorScheme.bg} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                            <CategoryIcon category={category} size={32} className="text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <h3 className={`font-bold text-xl text-gray-900 ${colorScheme.hover} transition-colors`}>
+                                  {category.name}
+                                </h3>
+                                <p className="text-gray-600 mt-1 leading-relaxed">
+                                  {category.description || 'Explore our wide range of products and services in this category'}
+                                </p>
+                              </div>
+                              {category.featured && (
+                                <Badge className={`bg-gradient-to-r ${colorScheme.bg} text-white border-0`}>
+                                  Featured
+                                </Badge>
+                              )}
                             </div>
-                            {category.featured && (
-                              <Badge className="bg-gradient-to-r from-orange-600 to-amber-600 text-white border-0">
-                                Featured
+                            <div className="flex items-center space-x-4 mt-4">
+                              <Badge variant="outline" className={`${colorScheme.text} ${colorScheme.border}`}>
+                                <Package className="w-3 h-3 mr-1" />
+                                {(category.productCount || 0).toLocaleString()} products
                               </Badge>
-                            )}
+                              {category.isActive && (
+                                <Badge variant="outline" className="text-green-600 border-green-600">
+                                  <TrendingUp className="w-3 h-3 mr-1" />
+                                  Active
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex items-center space-x-4 mt-4">
-                            <Badge variant="outline" className="text-orange-600 border-orange-600">
-                              <Package className="w-3 h-3 mr-1" />
-                              {(category.productCount || 0).toLocaleString()} products
-                            </Badge>
-                            {category.isActive && (
-                              <Badge variant="outline" className="text-green-600 border-green-600">
-                                <TrendingUp className="w-3 h-3 mr-1" />
-                                Active
-                              </Badge>
-                            )}
-                          </div>
+                          <ArrowRight className={`h-5 w-5 text-gray-400 ${colorScheme.hover} group-hover:translate-x-1 transition-all`} />
                         </div>
-                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              </motion.div>
-            ))}
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </motion.div>
         )}
 

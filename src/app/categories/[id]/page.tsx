@@ -15,6 +15,25 @@ import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
 import { categoriesApi, type CategoryWithProducts } from '../../../lib/api/categories';
 
+// Color palette for subcategories
+const subcategoryColors = [
+  { bg: 'from-blue-500 to-cyan-500', hover: 'group-hover:text-blue-600', border: 'border-blue-600', text: 'text-blue-600' },
+  { bg: 'from-green-500 to-emerald-500', hover: 'group-hover:text-green-600', border: 'border-green-600', text: 'text-green-600' },
+  { bg: 'from-purple-500 to-pink-500', hover: 'group-hover:text-purple-600', border: 'border-purple-600', text: 'text-purple-600' },
+  { bg: 'from-red-500 to-rose-500', hover: 'group-hover:text-red-600', border: 'border-red-600', text: 'text-red-600' },
+  { bg: 'from-indigo-500 to-blue-500', hover: 'group-hover:text-indigo-600', border: 'border-indigo-600', text: 'text-indigo-600' },
+  { bg: 'from-teal-500 to-cyan-500', hover: 'group-hover:text-teal-600', border: 'border-teal-600', text: 'text-teal-600' },
+  { bg: 'from-orange-500 to-amber-500', hover: 'group-hover:text-orange-600', border: 'border-orange-600', text: 'text-orange-600' },
+  { bg: 'from-pink-500 to-rose-500', hover: 'group-hover:text-pink-600', border: 'border-pink-600', text: 'text-pink-600' },
+  { bg: 'from-violet-500 to-purple-500', hover: 'group-hover:text-violet-600', border: 'border-violet-600', text: 'text-violet-600' },
+  { bg: 'from-lime-500 to-green-500', hover: 'group-hover:text-lime-600', border: 'border-lime-600', text: 'text-lime-600' },
+];
+
+// Function to get color for subcategory
+const getSubcategoryColor = (index: number) => {
+  return subcategoryColors[index % subcategoryColors.length];
+};
+
 export default function CategoryDetailPage() {
   const params = useParams();
   const [categoryData, setCategoryData] = useState<CategoryWithProducts | null>(null);
@@ -222,56 +241,59 @@ export default function CategoryDetailPage() {
             </div>
             
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {(categoryData.subcategories || []).map((subcategory, index) => (
-                <Link 
-                  key={subcategory.id} 
-                  href={`/categories/${categoryData.slug}/${subcategory.slug}`}
-                  className="group block"
-                >
-                  <div className="h-full bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-xl shadow-slate-500/10 hover:shadow-2xl hover:shadow-orange-500/20 hover:-translate-y-3 hover:rotate-1 transition-all duration-500 overflow-hidden relative">
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 via-transparent to-amber-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    
-                    <div className="relative p-8">
-                      <div className="flex items-start gap-5">
-                        <div className="relative">
-                          <div className="w-16 h-16 bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-xl shadow-orange-500/30 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                            <Package className="h-8 w-8 text-white" />
+              {(categoryData.subcategories || []).map((subcategory, index) => {
+                const colorScheme = getSubcategoryColor(index);
+                return (
+                  <Link 
+                    key={subcategory.id} 
+                    href={`/categories/${categoryData.slug}/${subcategory.slug}`}
+                    className="group block"
+                  >
+                    <div className="h-full bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-xl shadow-slate-500/10 hover:shadow-2xl hover:shadow-orange-500/20 hover:-translate-y-3 hover:rotate-1 transition-all duration-500 overflow-hidden relative">
+                      {/* Gradient overlay */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${colorScheme.bg}/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                      
+                      <div className="relative p-8">
+                        <div className="flex items-start gap-5">
+                          <div className="relative">
+                            <div className={`w-16 h-16 bg-gradient-to-br ${colorScheme.bg} rounded-2xl flex items-center justify-center shadow-xl shadow-orange-500/30 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500`}>
+                              <Package className="h-8 w-8 text-white" />
+                            </div>
+                            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">{index + 1}</span>
+                            </div>
                           </div>
-                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs font-bold">{index + 1}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex-1">
-                          <h3 className="font-black text-xl text-slate-900 mb-3 group-hover:text-orange-600 transition-colors duration-300 leading-tight">
-                            {subcategory.name}
-                          </h3>
                           
-                          <p className="text-slate-600 text-sm mb-6 line-clamp-3 leading-relaxed">
-                            {subcategory.description || `Explore premium ${subcategory.name.toLowerCase()} from trusted suppliers with competitive pricing and fast delivery.`}
-                          </p>
-                          
-                          <div className="flex items-center justify-between">
-                            <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 font-semibold px-3 py-1 rounded-xl shadow-lg">
-                              {subcategory.productCount || 0} items
-                            </Badge>
+                          <div className="flex-1">
+                            <h3 className={`font-black text-xl text-slate-900 mb-3 ${colorScheme.hover} transition-colors duration-300 leading-tight`}>
+                              {subcategory.name}
+                            </h3>
                             
-                            <div className="text-xs text-slate-500 flex items-center gap-2 font-medium">
-                              <TrendingUp className="h-4 w-4 text-emerald-500" />
-                              Trending
+                            <p className="text-slate-600 text-sm mb-6 line-clamp-3 leading-relaxed">
+                              {subcategory.description || `Explore premium ${subcategory.name.toLowerCase()} from trusted suppliers with competitive pricing and fast delivery.`}
+                            </p>
+                            
+                            <div className="flex items-center justify-between">
+                              <Badge className={`bg-gradient-to-r ${colorScheme.bg} text-white border-0 font-semibold px-3 py-1 rounded-xl shadow-lg`}>
+                                {subcategory.productCount || 0} items
+                              </Badge>
+                              
+                              <div className="text-xs text-slate-500 flex items-center gap-2 font-medium">
+                                <TrendingUp className="h-4 w-4 text-emerald-500" />
+                                Trending
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
+                      
+                      {/* Enhanced Hover Border */}
+                      <div className={`absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-gradient-to-r group-hover:${colorScheme.border} transition-all duration-500 pointer-events-none`}></div>
+                      <div className="absolute inset-0 rounded-2xl ring-2 ring-transparent group-hover:ring-orange-200/50 transition-all duration-500 pointer-events-none"></div>
                     </div>
-                    
-                    {/* Enhanced Hover Border */}
-                    <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-gradient-to-r group-hover:from-orange-400 group-hover:to-amber-400 transition-all duration-500 pointer-events-none"></div>
-                    <div className="absolute inset-0 rounded-2xl ring-2 ring-transparent group-hover:ring-orange-200/50 transition-all duration-500 pointer-events-none"></div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}
