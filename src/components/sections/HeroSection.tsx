@@ -71,7 +71,7 @@ export function HeroSection() {
   }, [searchQuery]);
 
   return (
-    <section className="relative min-h-screen bg-white overflow-hidden">
+    <section className="relative min-h-screen bg-white overflow-hidden flex items-center justify-center">
       {/* Full Width SVG Hero */}
       <Image
         src="/img/vikareta-hero.svg"
@@ -81,95 +81,76 @@ export function HeroSection() {
         priority
       />
 
-      {/* Search Bar - Mid Right */}
-      <div className="absolute top-1/3 right-6 left-1/2 z-20">
-        <div className="relative">
-          <form onSubmit={handleSearch} className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 overflow-hidden hover:bg-white/15 transition-all duration-300 w-full">
-            <div className="flex">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/80" />
-                <Input
-                  type="text"
-                  placeholder="Search products, services & businesses..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => searchResults.length > 0 && setShowResults(true)}
-                  onBlur={() => setTimeout(() => setShowResults(false), 200)}
-                  className="h-10 pl-11 pr-4 border-0 bg-transparent focus:ring-0 focus:outline-none rounded-none text-white placeholder:text-white/70"
-                />
-                {isSearching && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="animate-spin rounded-full h-3 w-3 border-2 border-white/50 border-t-transparent"></div>
-                  </div>
-                )}
-              </div>
-              <Button type="submit" className="h-10 px-5 bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white font-medium rounded-none border-l border-white/20">
-                Search
-              </Button>
+      {/* Centered Search Bar */}
+      <div className="relative z-20 w-full max-w-2xl mx-auto px-4">
+        <form onSubmit={handleSearch} className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 overflow-hidden hover:bg-white/15 transition-all duration-300">
+          <div className="flex">
+            <div className="flex-1 relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/80" />
+              <Input
+                type="text"
+                placeholder="Search products, services & businesses..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchResults.length > 0 && setShowResults(true)}
+                onBlur={() => setTimeout(() => setShowResults(false), 200)}
+                className="h-12 pl-12 pr-4 border-0 bg-transparent focus:ring-0 focus:outline-none rounded-none text-white placeholder:text-white/70 text-lg"
+              />
+              {isSearching && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/50 border-t-transparent"></div>
+                </div>
+              )}
             </div>
-          </form>
+            <Button type="submit" className="h-12 px-8 bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white font-medium rounded-none border-l border-white/20 text-lg">
+              Search
+            </Button>
+          </div>
+        </form>
 
-          {/* Search Results Dropdown */}
-          {showResults && searchResults.length > 0 && (
-            <div className="absolute top-full mt-2 w-full bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 overflow-hidden z-30">
-              {searchResults.map((result, index) => (
-                <button
-                  key={`${result.type}-${result.id || index}`}
-                  onClick={() => {
-                    if (result.type === 'products') {
-                      router.push(`/products/${result.id}`);
-                    } else if (result.type === 'services') {
-                      router.push(`/services/${result.id}`);
-                    } else if (result.type === 'businesses') {
-                      router.push(`/businesses/${result.id}`);
-                    }
-                    setShowResults(false);
-                    setSearchQuery('');
-                  }}
-                  className="w-full px-5 py-3 text-left hover:bg-white/10 transition-colors duration-200 border-b border-white/20 last:border-b-0 text-white"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${
-                      result.type === 'products' ? 'bg-blue-400' :
-                      result.type === 'services' ? 'bg-green-400' : 'bg-purple-400'
-                    }`}></div>
-                    <div className="flex-1">
-                      <div className="font-medium text-white truncate">
-                        {result.name || result.title || result.businessName}
-                      </div>
-                      <div className="text-sm text-white/70 capitalize">
-                        {result.type.slice(0, -1)} • {result.category || result.industry || 'General'}
-                      </div>
+        {/* Search Results Dropdown */}
+        {showResults && searchResults.length > 0 && (
+          <div className="absolute top-full mt-2 w-full bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 overflow-hidden z-30">
+            {searchResults.map((result, index) => (
+              <button
+                key={`${result.type}-${result.id || index}`}
+                onClick={() => {
+                  if (result.type === 'products') {
+                    router.push(`/products/${result.id}`);
+                  } else if (result.type === 'services') {
+                    router.push(`/services/${result.id}`);
+                  } else if (result.type === 'businesses') {
+                    router.push(`/businesses/${result.id}`);
+                  }
+                  setShowResults(false);
+                  setSearchQuery('');
+                }}
+                className="w-full px-5 py-3 text-left hover:bg-white/10 transition-colors duration-200 border-b border-white/20 last:border-b-0 text-white"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${
+                    result.type === 'products' ? 'bg-blue-400' :
+                    result.type === 'services' ? 'bg-green-400' : 'bg-purple-400'
+                  }`}></div>
+                  <div className="flex-1">
+                    <div className="font-medium text-white truncate">
+                      {result.name || result.title || result.businessName}
+                    </div>
+                    <div className="text-sm text-white/70 capitalize">
+                      {result.type.slice(0, -1)} • {result.category || result.industry || 'General'}
                     </div>
                   </div>
-                </button>
-              ))}
-              <button
-                onClick={handleSearch}
-                className="w-full px-5 py-3 text-center text-orange-300 hover:bg-white/10 transition-colors duration-200 border-t border-white/20 font-medium"
-              >
-                View all results
+                </div>
               </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Hero Text - Left Side */}
-      <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-20 max-w-lg">
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-6 leading-tight drop-shadow-lg">
-          Your B2B
-          <span className="block text-orange-500 drop-shadow-lg">
-            Success Story
-          </span>
-          <span className="block text-3xl md:text-4xl font-bold text-gray-900 drop-shadow-lg">
-            Starts Here
-          </span>
-        </h1>
-        <p className="text-xl text-orange-800 leading-relaxed drop-shadow-md max-w-md">
-          Connect with India's <br/> most trusted Businesses, discover premium services and products <br/>
-          and access professional services—all in one platform.
-        </p>
+            ))}
+            <button
+              onClick={handleSearch}
+              className="w-full px-5 py-3 text-center text-orange-300 hover:bg-white/10 transition-colors duration-200 border-t border-white/20 font-medium"
+            >
+              View all results
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -5,8 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import {
   CheckCircle,
-  ArrowRight,
-  ArrowLeft,
   Loader2,
   AlertCircle,
   User,
@@ -17,12 +15,8 @@ import {
   Shield,
   Settings,
   Mail,
-  Phone,
-  MapPin,
-  Briefcase,
   Eye,
   EyeOff,
-  Camera,
   X
 } from 'lucide-react';
 import { onboardingService } from '../../services/onboarding.service';
@@ -68,6 +62,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [showSkipDialog, setShowSkipDialog] = useState(false);
+  const [skipAction, setSkipAction] = useState<(() => void) | null>(null);
 
   useEffect(() => {
     loadOnboardingStatus();
@@ -94,8 +90,25 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   const handleBasicProfileSubmit = async () => {
+    // Basic validation
+    if (!basicProfile.firstName?.trim() || !basicProfile.lastName?.trim() || !basicProfile.email?.trim()) {
+      setError('Please fill in all required fields');
+      return;
+    }
+
+    if (!basicProfile.password || basicProfile.password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      return;
+    }
+
+    if (basicProfile.password !== basicProfile.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
     try {
       setLoading(true);
+      setError(null);
       await onboardingService.completeProfile(basicProfile as BasicProfileForm);
       await loadOnboardingStatus();
     } catch (err) {
@@ -106,8 +119,20 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   const handleBusinessBasicSubmit = async () => {
+    // Basic validation
+    if (!businessBasic.companyName?.trim() || !businessBasic.businessType || !businessBasic.industry?.trim()) {
+      setError('Please fill in all required fields');
+      return;
+    }
+
+    if (!businessBasic.email?.trim() || !businessBasic.phone?.trim()) {
+      setError('Business contact information is required');
+      return;
+    }
+
     try {
       setLoading(true);
+      setError(null);
       await onboardingService.updateBusinessBasic(businessBasic as BusinessBasicForm);
       await loadOnboardingStatus();
     } catch (err) {
@@ -130,8 +155,26 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   const handleBusinessBankSubmit = async () => {
+    // Basic validation
+    if (!businessBank.accountName?.trim() || !businessBank.accountNumber?.trim() || !businessBank.bankName?.trim()) {
+      setError('Please fill in all required bank details');
+      return;
+    }
+
+    if (!businessBank.ifscCode?.trim() || businessBank.ifscCode.length !== 11) {
+      setError('Please enter a valid IFSC code (11 characters)');
+      return;
+    }
+
+    // Basic IFSC validation (should start with 4 letters)
+    if (!/^[A-Z]{4}/.test(businessBank.ifscCode.toUpperCase())) {
+      setError('IFSC code should start with 4 letters');
+      return;
+    }
+
     try {
       setLoading(true);
+      setError(null);
       await onboardingService.updateBusinessBank(businessBank as BusinessBankForm);
       await loadOnboardingStatus();
     } catch (err) {
@@ -153,9 +196,37 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     }
   };
 
+  const handleSkipStep = (action: () => void) => {
+    setSkipAction(() => action);
+    setShowSkipDialog(true);
+  };
+
+  const confirmSkip = () => {
+    if (skipAction) {
+      skipAction();
+    }
+    setShowSkipDialog(false);
+    setSkipAction(null);
+  };
+
   const handleFileUpload = async (file: File) => {
     try {
       setUploadingFile(true);
+      setError(null);
+
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setError('File size must be less than 10MB');
+        return null;
+      }
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+      if (!allowedTypes.includes(file.type)) {
+        setError('Only JPEG, PNG, GIF, and PDF files are allowed');
+        return null;
+      }
+
       const documentUrl = await onboardingService.uploadFile(file);
       return documentUrl;
     } catch (err) {
@@ -167,8 +238,15 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   const handleDocumentSubmit = async (documentData: BusinessDocumentForm) => {
+    // Validation
+    if (!documentData.documentType || !documentData.documentUrl) {
+      setError('Please select document type and upload a file');
+      return;
+    }
+
     try {
       setLoading(true);
+      setError(null);
       await onboardingService.uploadDocument(documentData);
       await loadOnboardingStatus();
     } catch (err) {
@@ -210,6 +288,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           onChange={setBasicProfile}
           onSubmit={handleBasicProfileSubmit}
           loading={loading}
+          onSkip={() => setCurrentStep('businessBasic')}
+          handleSkipStep={handleSkipStep}
         />;
       case 'businessBasic':
         return <BusinessBasicStep
@@ -217,6 +297,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           onChange={setBusinessBasic}
           onSubmit={handleBusinessBasicSubmit}
           loading={loading}
+          onSkip={() => setCurrentStep('businessTax')}
+          handleSkipStep={handleSkipStep}
         />;
       case 'businessTax':
         return <BusinessTaxStep
@@ -224,6 +306,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           onChange={setBusinessTax}
           onSubmit={handleBusinessTaxSubmit}
           loading={loading}
+          onSkip={() => setCurrentStep('businessBank')}
+          handleSkipStep={handleSkipStep}
         />;
       case 'businessBank':
         return <BusinessBankStep
@@ -231,6 +315,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           onChange={setBusinessBank}
           onSubmit={handleBusinessBankSubmit}
           loading={loading}
+          onSkip={() => setCurrentStep('businessDocuments')}
+          handleSkipStep={handleSkipStep}
         />;
       case 'businessDocuments':
         return <BusinessDocumentsStep
@@ -238,6 +324,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           onSubmit={handleDocumentSubmit}
           loading={loading}
           uploadingFile={uploadingFile}
+          onSkip={() => setCurrentStep('businessSettings')}
+          handleSkipStep={handleSkipStep}
         />;
       case 'businessSettings':
         return <BusinessSettingsStep
@@ -245,6 +333,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           onChange={setBusinessSettings}
           onSubmit={handleBusinessSettingsSubmit}
           loading={loading}
+          handleSkipStep={handleSkipStep}
         />;
       default:
         return <div>Step not implemented</div>;
@@ -402,6 +491,33 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             {currentStepData && getStepComponent(currentStep)}
           </motion.div>
         </AnimatePresence>
+
+        {/* Skip Confirmation Dialog */}
+        {showSkipDialog && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <Card className="p-6 max-w-md mx-4">
+              <h3 className="text-lg font-semibold mb-2">Skip This Step?</h3>
+              <p className="text-gray-600 mb-4">
+                Are you sure you want to skip this step? You can always come back and complete it later.
+              </p>
+              <div className="flex space-x-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowSkipDialog(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmSkip}
+                  className="flex-1"
+                >
+                  Skip Step
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -412,12 +528,16 @@ function BasicProfileStep({
   data,
   onChange,
   onSubmit,
-  loading
+  loading,
+  onSkip,
+  handleSkipStep
 }: {
   data: Partial<BasicProfileForm>;
   onChange: (data: Partial<BasicProfileForm>) => void;
   onSubmit: () => void;
   loading: boolean;
+  onSkip?: () => void;
+  handleSkipStep: (action: () => void) => void;
 }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -508,9 +628,15 @@ function BasicProfileStep({
         </div>
 
         <div className="flex justify-end space-x-3 pt-4">
-          <Button variant="outline" disabled={loading}>
-            Skip for Now
-          </Button>
+          {onSkip && (
+            <Button
+              variant="outline"
+              onClick={() => handleSkipStep(onSkip)}
+              disabled={loading}
+            >
+              Skip for Now
+            </Button>
+          )}
           <Button onClick={onSubmit} disabled={loading}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
             Save & Continue
@@ -525,12 +651,16 @@ function BusinessBasicStep({
   data,
   onChange,
   onSubmit,
-  loading
+  loading,
+  onSkip,
+  handleSkipStep
 }: {
   data: Partial<BusinessBasicForm>;
   onChange: (data: Partial<BusinessBasicForm>) => void;
   onSubmit: () => void;
   loading: boolean;
+  onSkip?: () => void;
+  handleSkipStep: (action: () => void) => void;
 }) {
   return (
     <Card className="p-6">
@@ -614,9 +744,15 @@ function BusinessBasicStep({
         </div>
 
         <div className="flex justify-end space-x-3 pt-4">
-          <Button variant="outline" disabled={loading}>
-            Skip for Now
-          </Button>
+          {onSkip && (
+            <Button
+              variant="outline"
+              onClick={() => handleSkipStep(onSkip)}
+              disabled={loading}
+            >
+              Skip for Now
+            </Button>
+          )}
           <Button onClick={onSubmit} disabled={loading}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
             Save & Continue
@@ -631,12 +767,16 @@ function BusinessTaxStep({
   data,
   onChange,
   onSubmit,
-  loading
+  loading,
+  onSkip,
+  handleSkipStep
 }: {
   data: Partial<BusinessTaxForm>;
   onChange: (data: Partial<BusinessTaxForm>) => void;
   onSubmit: () => void;
   loading: boolean;
+  onSkip?: () => void;
+  handleSkipStep: (action: () => void) => void;
 }) {
   return (
     <Card className="p-6">
@@ -696,9 +836,15 @@ function BusinessTaxStep({
         )}
 
         <div className="flex justify-end space-x-3 pt-4">
-          <Button variant="outline" disabled={loading}>
-            Skip for Now
-          </Button>
+          {onSkip && (
+            <Button
+              variant="outline"
+              onClick={() => handleSkipStep(onSkip)}
+              disabled={loading}
+            >
+              Skip for Now
+            </Button>
+          )}
           <Button onClick={onSubmit} disabled={loading}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
             Save & Continue
@@ -713,12 +859,16 @@ function BusinessBankStep({
   data,
   onChange,
   onSubmit,
-  loading
+  loading,
+  onSkip,
+  handleSkipStep
 }: {
   data: Partial<BusinessBankForm>;
   onChange: (data: Partial<BusinessBankForm>) => void;
   onSubmit: () => void;
   loading: boolean;
+  onSkip?: () => void;
+  handleSkipStep: (action: () => void) => void;
 }) {
   return (
     <Card className="p-6">
@@ -785,9 +935,15 @@ function BusinessBankStep({
         </div>
 
         <div className="flex justify-end space-x-3 pt-4">
-          <Button variant="outline" disabled={loading}>
-            Skip for Now
-          </Button>
+          {onSkip && (
+            <Button
+              variant="outline"
+              onClick={() => handleSkipStep(onSkip)}
+              disabled={loading}
+            >
+              Skip for Now
+            </Button>
+          )}
           <Button onClick={onSubmit} disabled={loading}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
             Save & Continue
@@ -802,12 +958,16 @@ function BusinessDocumentsStep({
   onFileUpload,
   onSubmit,
   loading,
-  uploadingFile
+  uploadingFile,
+  onSkip,
+  handleSkipStep
 }: {
   onFileUpload: (file: File) => Promise<string | null>;
   onSubmit: (data: BusinessDocumentForm) => void;
   loading: boolean;
   uploadingFile: boolean;
+  onSkip?: () => void;
+  handleSkipStep: (action: () => void) => void;
 }) {
   const [documents, setDocuments] = useState<Partial<BusinessDocumentForm>[]>([]);
 
@@ -917,9 +1077,15 @@ function BusinessDocumentsStep({
         </Button>
 
         <div className="flex justify-end space-x-3 pt-4">
-          <Button variant="outline" disabled={loading}>
-            Skip for Now
-          </Button>
+          {onSkip && (
+            <Button
+              variant="outline"
+              onClick={() => handleSkipStep(onSkip)}
+              disabled={loading}
+            >
+              Skip for Now
+            </Button>
+          )}
           <Button onClick={handleSubmit} disabled={loading || documents.length === 0}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
             Upload Documents
@@ -934,12 +1100,16 @@ function BusinessSettingsStep({
   data,
   onChange,
   onSubmit,
-  loading
+  loading,
+  onSkip,
+  handleSkipStep
 }: {
   data: Partial<BusinessSettingsForm>;
   onChange: (data: Partial<BusinessSettingsForm>) => void;
   onSubmit: () => void;
   loading: boolean;
+  onSkip?: () => void;
+  handleSkipStep: (action: () => void) => void;
 }) {
   return (
     <Card className="p-6">
@@ -1091,13 +1261,10 @@ function BusinessSettingsStep({
           </div>
         </div>
 
-        <div className="flex justify-end space-x-3 pt-4">
-          <Button variant="outline" disabled={loading}>
-            Skip for Now
-          </Button>
+        <div className="flex justify-end pt-4">
           <Button onClick={onSubmit} disabled={loading}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-            Save Settings
+            Complete Setup
           </Button>
         </div>
       </div>
