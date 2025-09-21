@@ -163,3 +163,89 @@
 .focus-visible {
   @apply outline-none ring-2 ring-orange-500 ring-opacity-50;
 }
+
+/* Custom animations for Vikareta Story SVG */
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes data-flow {
+  0% {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  10%, 90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(200px);
+    opacity: 0;
+  }
+}
+
+@keyframes connection-draw {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes building-rise {
+  0% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+}
+
+@keyframes text-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vikareta-float {
+  animation: float-gentle 3s ease-in-out infinite;
+}
+
+.vikareta-pulse {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.vikareta-data-flow {
+  animation: data-flow 4s linear infinite;
+}
+
+.vikareta-building {
+  animation: building-rise 1.5s ease-out;
+}
+
+.vikareta-text {
+  animation: text-reveal 1s ease-out;
+}

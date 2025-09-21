@@ -91,13 +91,9 @@ const useSecureSSOAuth = () => {
 // Animation variants
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
-  animate: { 
-    opacity: 1, 
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut"
-    }
+  visible: {
+    opacity: 1,
+    y: 0
   }
 };
 
@@ -116,11 +112,7 @@ const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   show: { 
     opacity: 1, 
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut"
-    }
+    y: 0
   }
 };
 
@@ -600,8 +592,9 @@ function LoginPageContent() {
   return (
     <motion.div 
       initial="initial"
-      animate="animate"
+      animate="visible"
       variants={pageVariants}
+      transition={{ duration: 0.6, ease: "easeOut" }}
       className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 relative overflow-hidden"
     >
       {/* Animated background elements */}
@@ -639,7 +632,7 @@ function LoginPageContent() {
           className="max-w-md w-full"
         >
           {/* Header */}
-          <motion.div variants={itemVariants} className="text-center mb-6 sm:mb-8">
+          <motion.div variants={itemVariants} transition={{ duration: 0.5, ease: "easeOut" }} className="text-center mb-6 sm:mb-8">
             <Link href="/" className="inline-block mb-4 sm:mb-6">
               <Logo 
                 className="h-16 w-auto sm:h-20 md:h-24 mx-auto" 
@@ -1214,7 +1207,7 @@ function LoginPageContent() {
           </motion.div>
 
           {/* Sign Up Link */}
-          <motion.div variants={itemVariants} className="text-center mt-8">
+          <motion.div variants={itemVariants} transition={{ duration: 0.5, ease: "easeOut" }} className="text-center mt-8">
             <p className="text-gray-600">
               Don't have an account?{' '}
               <Link href="/auth/register" className="text-amber-600 hover:text-amber-700 font-semibold">

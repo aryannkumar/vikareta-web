@@ -43,12 +43,8 @@ import { useState, useEffect } from 'react';
 
 const pageVariants = {
   initial: { opacity: 0 },
-  animate: { 
-    opacity: 1,
-    transition: {
-      duration: 0.8,
-      ease: "easeOut"
-    }
+  visible: {
+    opacity: 1
   }
 };
 
@@ -68,11 +64,7 @@ const itemVariants = {
   show: { 
     opacity: 1, 
     y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut"
-    }
+    scale: 1
   }
 };
 
@@ -197,8 +189,9 @@ export default function BusinessProfilePage(props: any) {
     return (
       <motion.div 
         initial="initial"
-        animate="animate"
+        animate="visible"
         variants={pageVariants}
+        transition={{ duration: 0.8, ease: "easeOut" }}
         className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center"
       >
         <div className="text-center">
@@ -227,8 +220,9 @@ export default function BusinessProfilePage(props: any) {
     return (
       <motion.div 
         initial="initial"
-        animate="animate"
+        animate="visible"
         variants={pageVariants}
+        transition={{ duration: 0.8, ease: "easeOut" }}
         className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900"
       >
         <div className="container mx-auto px-6 py-20 text-center">
@@ -311,8 +305,9 @@ export default function BusinessProfilePage(props: any) {
   return (
     <motion.div 
       initial="initial"
-      animate="animate"
+      animate="visible"
       variants={pageVariants}
+      transition={{ duration: 0.8, ease: "easeOut" }}
       className="min-h-screen bg-gray-50"
     >
       {/* Enhanced Hero Section */}

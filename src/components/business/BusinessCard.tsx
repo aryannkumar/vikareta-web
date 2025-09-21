@@ -21,25 +21,14 @@ const cardVariants = {
   show: { 
     opacity: 1, 
     y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut"
-    }
+    scale: 1
   },
   hover: {
     y: -8,
-    scale: 1.02,
-    transition: {
-      duration: 0.3,
-      ease: "easeOut"
-    }
+    scale: 1.02
   },
   tap: {
-    scale: 0.98,
-    transition: {
-      duration: 0.1
-    }
+    scale: 0.98
   }
 };
 

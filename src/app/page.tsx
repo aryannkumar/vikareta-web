@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, ShieldCheck, FileCheck2, Boxes, Package, Store, CheckCircle, Search, MessageCircle, Settings, Play, Star } from 'lucide-react';
-import { ProcurementJourney } from '@/components/sections/ProcurementJourney';
+import { HeroSection } from '@/components/sections/HeroSection';
 import { CategoryGrid } from '@/components/sections/CategoryGrid';
 import { TestimonialsSection } from '@/components/sections/TestimonialsSection';
 import { CTASection } from '@/components/sections/CTASection';
@@ -24,6 +24,33 @@ export default function HomePage() {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [data, setData] = useState<HomePageData>({ categories: [], featuredProducts: [], featuredServices: [], loading: true, error: null });
+
+  // Scroll-based animation refs
+  const howItWorksRef = useRef<HTMLDivElement>(null);
+  const categoriesRef = useRef<HTMLDivElement>(null);
+  const productsRef = useRef<HTMLDivElement>(null);
+  const servicesRef = useRef<HTMLDivElement>(null);
+  const testimonialsRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+
+  // Global scroll progress
+  const { scrollYProgress } = useScroll();
+  const globalY = useTransform(scrollYProgress, [0, 1], [0, -200]);
+
+  // Section-specific scroll animations
+  const { scrollY } = useScroll();
+  const howItWorksY = useTransform(scrollY, [0, 1000], [0, -50]);
+  const categoriesY = useTransform(scrollY, [500, 1500], [50, -50]);
+  const productsY = useTransform(scrollY, [1000, 2000], [50, -50]);
+  const servicesY = useTransform(scrollY, [1500, 2500], [50, -50]);
+
+  // In-view animations
+  const howItWorksInView = useInView(howItWorksRef, { once: true, margin: "-100px" });
+  const categoriesInView = useInView(categoriesRef, { once: true, margin: "-100px" });
+  const productsInView = useInView(productsRef, { once: true, margin: "-100px" });
+  const servicesInView = useInView(servicesRef, { once: true, margin: "-100px" });
+  const testimonialsInView = useInView(testimonialsRef, { once: true, margin: "-100px" });
+  const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < 768);
@@ -60,361 +87,517 @@ export default function HomePage() {
     })();
   }, []);
 
+  // Connected section animations
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 100, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.8,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6 }
+    }
+  };
+
   return (
     <div className="relative">
-      {/* Hero: matte, no glassmorphism */}
-      <section className="relative overflow-hidden pt-28 pb-20 lg:pt-36 lg:pb-28 bg-white dark:bg-gray-950">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 relative">
-          <div className="grid lg:grid-cols-2 gap-16 items-center min-h-[70vh]">
-            <div className="space-y-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-orange-50 border border-orange-200 text-orange-700"
-              >
-                <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
-                <span className="text-orange-700 font-semibold text-sm">Enterprise Procurement</span>
-                <span className="text-orange-600/80 text-sm">Simplified & Streamlined</span>
-              </motion.div>
+      {/* Hero Section */}
+      <motion.div style={{ y: globalY }}>
+        <HeroSection />
+      </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05, duration: 0.6 }}
-                className="space-y-6"
-              >
-                <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-none">
-                  <span className="block text-gray-900 dark:text-white">Procure</span>
-                  <motion.span
-                    className="block text-orange-700 dark:text-amber-400"
-                    animate={{ scale: [1, 1.02, 1] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-                  >
-                    Smarter & Faster
-                  </motion.span>
-                  <span className="block text-gray-900 dark:text-white text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mt-2">
-                    with Trusted Businesses
-                  </span>
-                </h1>
+      {/* How it works - Connected with parallax */}
+      <motion.section
+        ref={howItWorksRef}
+        className="relative py-16 bg-gradient-to-br from-white via-orange-50/30 to-amber-50/50 border-l border-r border-orange-100/20 overflow-hidden"
+        style={{ y: howItWorksY }}
+      >
+        {/* Connecting gradient overlay from hero */}
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-orange-50/50 to-transparent pointer-events-none" />
 
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1, duration: 0.6 }}
-                  className="text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed"
-                >
-                  B2B procurement platform that unifies sourcing, RFQs, supplier management, and compliance—built for{' '}
-                  <span className="text-orange-600 font-semibold">speed</span>,{' '}
-                  <span className="text-amber-600 font-semibold">transparency</span>, and{' '}
-                  <span className="text-orange-700 font-semibold">enterprise-scale savings</span>.
-                </motion.p>
+        {/* Floating connection elements */}
+        <motion.div
+          className="absolute top-10 left-10 w-20 h-20 bg-orange-200/20 rounded-full blur-xl"
+          animate={{
+            x: [0, 50, 0],
+            y: [0, -30, 0],
+            scale: [1, 1.2, 1]
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-20 right-20 w-16 h-16 bg-amber-200/20 rounded-full blur-xl"
+          animate={{
+            x: [0, -40, 0],
+            y: [0, 20, 0],
+            scale: [1, 0.8, 1]
+          }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
 
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15, duration: 0.6 }}
-                  className="flex flex-col sm:flex-row gap-4 pt-2"
-                >
-                  <motion.button
-                    onClick={() => router.push('/rfqs')}
-                    className="group relative bg-orange-600 hover:bg-orange-700 text-white px-10 py-4 rounded-xl font-semibold shadow-sm hover:shadow-md transition-all duration-200 text-lg"
-                    whileHover={{ scale: 1.05, y: -3 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="relative flex items-center justify-center gap-3">
-                      <Play className="h-6 w-6" />
-                      <span>Start Procurement Journey</span>
-                      <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform duration-200" />
-                    </div>
-                  </motion.button>
-
-                  <motion.button
-                    onClick={() => router.push('/contact')}
-                    className="group relative border border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-10 py-4 rounded-xl font-semibold transition-all duration-200 text-lg dark:text-orange-400 dark:border-orange-400 dark:hover:bg-orange-400 dark:hover:text-gray-900"
-                    whileHover={{ scale: 1.05, y: -3 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="relative flex items-center justify-center gap-3">
-                      <MessageCircle className="h-6 w-6" />
-                      <span>Talk to Procurement Expert</span>
-                    </div>
-                  </motion.button>
-                </motion.div>
-              </motion.div>
-            </div>
-
-            <div className="relative">
-              <div className="relative z-10 p-8 lg:p-12 rounded-3xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 overflow-hidden">
-                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2, duration: 0.6 }}>
-                  <ProcurementJourney isMobile={isMobile} />
-                </motion.div>
-              </div>
-              {/* No glossy floating accents */}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="py-20 bg-white dark:bg-gray-900 border-l border-r border-gray-100/20 dark:border-gray-800/20">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <motion.h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">How Procurement Works</motion.h2>
-            <motion.p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Simple, streamlined process from requirement to delivery—designed for enterprise efficiency
+        <motion.div
+          className="container mx-auto px-6"
+          variants={sectionVariants}
+          initial="hidden"
+          animate={howItWorksInView ? "visible" : "hidden"}
+        >
+          <motion.div
+            variants={itemVariants}
+            className="text-center mb-10"
+          >
+            <motion.h2
+              className="text-3xl md:text-4xl font-bold mb-3 text-gray-900"
+              animate={howItWorksInView ? { scale: [0.9, 1.05, 1] } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              How Procurement Works
+            </motion.h2>
+            <motion.p
+              className="text-base text-gray-600 max-w-2xl mx-auto"
+              animate={howItWorksInView ? { opacity: [0, 1] } : {}}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              Simple, streamlined process from requirement to delivery
             </motion.p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-4 gap-6">
             {[
-              { step: '01', title: 'Post Requirements', description: 'Create detailed RFQs with specifications, quantities, and delivery requirements', icon: Search },
-              { step: '02', title: 'Receive Quotes', description: 'Get competitive quotes from verified suppliers within 24-48 hours', icon: MessageCircle },
-              { step: '03', title: 'Compare & Select', description: 'Evaluate suppliers based on price, quality, compliance, and delivery terms', icon: CheckCircle },
-              { step: '04', title: 'Manage Orders', description: 'Track orders, manage payments, and ensure compliance with enterprise standards', icon: Settings },
+              { step: '01', title: 'Post Requirements', description: 'Create detailed RFQs with specifications and requirements', icon: Search },
+              { step: '02', title: 'Receive Quotes', description: 'Get competitive quotes from verified suppliers', icon: MessageCircle },
+              { step: '03', title: 'Compare & Select', description: 'Evaluate suppliers based on price and quality', icon: CheckCircle },
+              { step: '04', title: 'Manage Orders', description: 'Track orders and ensure compliance', icon: Settings },
             ].map((item, index) => (
-              <motion.div key={item.step} className="relative group" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.05 }}>
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 h-full">
-                  <div className="relative mb-6">
-                    <div className="w-16 h-16 bg-orange-600 rounded-2xl flex items-center justify-center mb-4">
-                      <item.icon className="h-8 w-8 text-white" />
-                    </div>
-                    <div className="absolute -top-2 -right-2 bg-white dark:bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center shadow-lg border-2 border-orange-200 dark:border-orange-800">
-                      <span className="text-sm font-bold text-orange-600">{item.step}</span>
-                    </div>
+              <motion.div
+                key={item.step}
+                variants={itemVariants}
+                className="relative group"
+                whileHover={{
+                  y: -5,
+                  scale: 1.02,
+                  transition: { duration: 0.3 }
+                }}
+              >
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-200/50 h-full shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="relative mb-4">
+                    <motion.div
+                      className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-3 shadow-md"
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      <item.icon className="h-6 w-6 text-white" />
+                    </motion.div>
+                    <motion.div
+                      className="absolute -top-1 -right-1 bg-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg border-2 border-orange-200"
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: index * 0.5 }}
+                    >
+                      <span className="text-xs font-bold text-orange-600">{item.step}</span>
+                    </motion.div>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{item.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{item.description}</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
                 </div>
+
+                {/* Connection line between steps */}
+                {index < 3 && (
+                  <motion.div
+                    className="hidden md:block absolute top-16 left-full w-6 h-0.5 bg-gradient-to-r from-orange-400 to-orange-500"
+                    initial={{ scaleX: 0 }}
+                    animate={howItWorksInView ? { scaleX: 1 } : { scaleX: 0 }}
+                    transition={{ duration: 0.8, delay: 0.5 + index * 0.2 }}
+                    style={{ transformOrigin: 'left' }}
+                  />
+                )}
               </motion.div>
             ))}
           </div>
 
-          <div className="text-center mt-12">
-            <motion.button onClick={() => router.push('/rfqs')} className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-xl font-semibold">
-              Get Started with RFQ
+          <motion.div
+            variants={itemVariants}
+            className="text-center mt-8"
+          >
+            <motion.button
+              onClick={() => router.push('/rfqs')}
+              className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-sm"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span className="flex items-center gap-2">
+                Get Started with RFQ
+                <ArrowRight className="h-4 w-4" />
+              </span>
             </motion.button>
-          </div>
-        </div>
-      </section>
+          </motion.div>
+        </motion.div>
+      </motion.section>
 
-      {/* Categories */}
-      <CategoryGrid />
+      {/* Categories - Connected transition */}
+      <motion.div
+        ref={categoriesRef}
+        style={{ y: categoriesY }}
+      >
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={categoriesInView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <CategoryGrid />
+        </motion.div>
+      </motion.div>
 
-      {/* Featured Products - render only if real data exists */}
+      {/* Featured Products - Connected with smooth parallax */}
       {data.featuredProducts.length > 0 && (
-      <section className="py-24 bg-white border-l border-r border-orange-100/30">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900">Featured Products</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">From verified suppliers for business-grade needs</p>
-          </div>
+      <motion.section
+        ref={productsRef}
+        className="relative py-20 bg-gradient-to-br from-white via-orange-50/20 to-amber-50/30 border-l border-r border-orange-100/30 overflow-hidden"
+        style={{ y: productsY }}
+      >
+        {/* Connecting elements from previous section */}
+        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-orange-50/30 to-transparent pointer-events-none" />
 
-          {(
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {data.featuredProducts
-                .filter((p: any) => p && (p.images?.length || p.image) && p.name && typeof p.price === 'number')
-                .slice(0, 4)
-                .map((product: any, index: number) => (
-                  <motion.div key={product.id || index} className="group bg-white rounded-3xl p-6 border border-gray-200 hover:border-orange-200 transition-colors duration-200 overflow-hidden" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.05 }} whileHover={{ y: -4 }}>
-                    <div className="relative overflow-hidden rounded-2xl mb-6">
-                      {product.images?.[0] && (
-                        <motion.img src={product.images[0]} alt={product.name} className="w-full h-48 object-cover" />
+        <motion.div
+          className="container mx-auto px-6"
+          variants={sectionVariants}
+          initial="hidden"
+          animate={productsInView ? "visible" : "hidden"}
+        >
+          <motion.div
+            variants={itemVariants}
+            className="text-center mb-12"
+          >
+            <motion.h2
+              className="text-4xl md:text-5xl font-bold mb-4 text-gray-900"
+              animate={productsInView ? { scale: [0.9, 1.02, 1] } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              Featured Products
+            </motion.h2>
+            <motion.p
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
+              animate={productsInView ? { opacity: [0, 1] } : {}}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              Premium products from verified suppliers for your business needs
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+            variants={sectionVariants}
+          >
+            {data.featuredProducts
+              .filter((p: any) => p && (p.images?.length || p.image) && p.name && typeof p.price === 'number')
+              .slice(0, 4)
+              .map((product: any, index: number) => (
+                <motion.div
+                  key={product.id || index}
+                  variants={itemVariants}
+                  className="group bg-white rounded-2xl p-5 border border-gray-200 hover:border-orange-200 transition-all duration-300 overflow-hidden shadow-lg hover:shadow-xl"
+                  whileHover={{
+                    y: -6,
+                    scale: 1.02,
+                    transition: { duration: 0.3 }
+                  }}
+                >
+                  <div className="relative overflow-hidden rounded-xl mb-4">
+                    {product.images?.[0] && (
+                      <motion.img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="w-full h-40 object-cover"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
+
+                    <div className="absolute top-2 left-2 flex gap-1">
+                      {typeof product.discount === 'number' && (
+                        <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">-{product.discount}%</div>
                       )}
+                      {product.supplier?.verified && (
+                        <div className="bg-green-600 text-white px-2 py-1 rounded text-xs font-bold">✓ Verified</div>
+                      )}
+                    </div>
+                  </div>
 
-                      <div className="absolute top-3 left-3 flex gap-2">
-                        {typeof product.discount === 'number' && (
-                          <div className="bg-red-600 text-white px-3 py-1 rounded-md text-sm font-bold">-{product.discount}%</div>
-                        )}
-                        {product.supplier?.verified && (
-                          <div className="bg-green-600 text-white px-3 py-1 rounded-md text-xs font-bold">Verified</div>
-                        )}
-                      </div>
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className="font-bold text-lg text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors leading-tight">{product.name}</h3>
+                      {(product.description || product.shortDescription) && (
+                        <p className="text-gray-600 text-sm line-clamp-1 leading-relaxed mt-1">{product.description || product.shortDescription}</p>
+                      )}
                     </div>
 
-                    <div className="space-y-4">
-                      <div>
-                        <h3 className="font-bold text-xl text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors leading-tight">{product.name}</h3>
-                        {(product.description || product.shortDescription) && (
-                          <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed mt-2">{product.description || product.shortDescription}</p>
+                    <div className="flex justify-between items-center">
+                      <div className="flex flex-col">
+                        {typeof product.price === 'number' && (
+                          <span className="text-2xl font-bold text-orange-700">₹{product.price.toLocaleString()}</span>
+                        )}
+                        {typeof product.originalPrice === 'number' && (
+                          <span className="text-sm text-gray-500 line-through">₹{product.originalPrice.toLocaleString()}</span>
                         )}
                       </div>
-
-                      <div className="flex justify-between items-center">
-                        <div className="flex flex-col">
-                          {typeof product.price === 'number' && (
-                            <span className="text-3xl font-bold text-orange-700">₹{product.price.toLocaleString()}</span>
-                          )}
-                          {typeof product.originalPrice === 'number' && (
-                            <span className="text-sm text-gray-500 line-through">₹{product.originalPrice.toLocaleString()}</span>
-                          )}
+                      {(typeof product.rating === 'number' || typeof product.reviews?.average === 'number') && (
+                        <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-200">
+                          <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                          <span className="text-xs font-bold text-yellow-700">{typeof product.rating === 'number' ? product.rating : product.reviews?.average}</span>
                         </div>
-                        {(typeof product.rating === 'number' || typeof product.reviews?.average === 'number') && (
-                          <div className="flex items-center gap-2 bg-yellow-50 px-3 py-2 rounded-xl border border-yellow-200">
-                            <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                            <span className="text-sm font-bold text-yellow-700">{typeof product.rating === 'number' ? product.rating : product.reviews?.average}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                            <Store className="h-3 w-3 text-white" />
-                          </div>
-                          {(product.supplier?.name || product.brand) && (
-                            <span className="text-sm text-gray-600 font-medium truncate">{product.supplier?.name || product.brand}</span>
-                          )}
-                        </div>
-                        {typeof product.inStock === 'boolean' && (
-                          <div className="flex items-center gap-2">
-                            <span className={`text-xs px-2 py-1 rounded-full font-semibold ${product.inStock ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
-                              {product.inStock ? 'In Stock' : 'Limited'}
-                            </span>
-                          </div>
-                        )}
-                      </div>
+                      )}
                     </div>
-                  </motion.div>
-                ))}
-            </div>
-          )}
 
-          <div className="text-center mt-20">
-            <div className="bg-white rounded-3xl p-12 border border-orange-100/50">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to Find Your Perfect Products?</h3>
-              <p className="text-gray-600 mb-8 max-w-2xl mx-auto">Browse our complete catalog of products from verified suppliers.</p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <motion.button className="bg-orange-600 hover:bg-orange-700 text-white px-10 py-4 rounded-2xl font-bold" onClick={() => router.push('/products')}>
-                  <div className="flex items-center gap-3">
-                    <Package className="h-6 w-6" />
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                          <Store className="h-2.5 w-2.5 text-white" />
+                        </div>
+                        {(product.supplier?.name || product.brand) && (
+                          <span className="text-xs text-gray-600 font-medium truncate">{product.supplier?.name || product.brand}</span>
+                        )}
+                      </div>
+                      {typeof product.inStock === 'boolean' && (
+                        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${product.inStock ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                          {product.inStock ? 'In Stock' : 'Limited'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+          </motion.div>
+
+          <motion.div
+            variants={itemVariants}
+            className="text-center mt-12"
+          >
+            <div className="bg-white rounded-2xl p-8 border border-orange-100/50 shadow-lg max-w-2xl mx-auto">
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Ready to Find Your Perfect Products?</h3>
+              <p className="text-gray-600 mb-6 text-sm">Browse our complete catalog of products from verified suppliers.</p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <motion.button
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-sm"
+                  onClick={() => router.push('/products')}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Package className="h-4 w-4" />
                     <span>Browse All Products</span>
-                    <ArrowRight className="h-6 w-6" />
+                    <ArrowRight className="h-4 w-4" />
                   </div>
                 </motion.button>
-                <motion.button className="border border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-10 py-4 rounded-2xl font-bold" onClick={() => router.push('/rfqs')}>
-                  <div className="flex items-center gap-3">
-                    <Search className="h-6 w-6" />
-                    <span>Request Custom Quote</span>
+                <motion.button
+                  className="border border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 text-sm"
+                  onClick={() => router.push('/rfqs')}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Search className="h-4 w-4" />
+                    <span>Request Quote</span>
                   </div>
                 </motion.button>
               </div>
             </div>
-          </div>
-        </div>
-  </section>
-  )}
+          </motion.div>
+        </motion.div>
+      </motion.section>
+      )}
 
-      {/* Featured Services - render only if real data exists */}
+      {/* Featured Services - Connected with smooth flow */}
       {data.featuredServices.length > 0 && (
-      <section className="py-24 bg-white border-l border-r border-orange-100/30">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900">Featured Services</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">Certified providers offering specialized solutions</p>
-          </div>
+      <motion.section
+        ref={servicesRef}
+        className="relative py-20 bg-gradient-to-br from-white via-amber-50/20 to-orange-50/30 border-l border-r border-orange-100/30 overflow-hidden"
+        style={{ y: servicesY }}
+      >
+        {/* Connecting elements */}
+        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-amber-50/30 to-transparent pointer-events-none" />
 
-          {(
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {data.featuredServices
-                .filter((s: any) => s && (s.images?.length || s.image) && s.name)
-                .slice(0, 3)
-                .map((service: any, index: number) => (
-                  <motion.div key={service.id || index} className="group bg-white rounded-3xl p-8 border border-gray-200 hover:border-orange-200 transition-colors duration-200 overflow-hidden" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.05 }} whileHover={{ y: -4 }}>
-                    <div className="relative overflow-hidden rounded-2xl mb-6">
-                      {service.images?.[0] && (
-                        <motion.img src={service.images[0]} alt={service.name} className="w-full h-48 object-cover" />
-                      )}
+        <motion.div
+          className="container mx-auto px-6"
+          variants={sectionVariants}
+          initial="hidden"
+          animate={servicesInView ? "visible" : "hidden"}
+        >
+          <motion.div
+            variants={itemVariants}
+            className="text-center mb-12"
+          >
+            <motion.h2
+              className="text-4xl md:text-5xl font-bold mb-4 text-gray-900"
+              animate={servicesInView ? { scale: [0.9, 1.02, 1] } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              Featured Services
+            </motion.h2>
+            <motion.p
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
+              animate={servicesInView ? { opacity: [0, 1] } : {}}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              Certified providers offering specialized business solutions
+            </motion.p>
+          </motion.div>
 
-                    <motion.div className="absolute top-3 left-3 bg-orange-600 text-white px-3 py-1.5 rounded-md text-xs font-bold" initial={{ scale: 0, x: -20 }} animate={{ scale: 1, x: 0 }}>
+          <motion.div
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+            variants={sectionVariants}
+          >
+            {data.featuredServices
+              .filter((s: any) => s && (s.images?.length || s.image) && s.name)
+              .slice(0, 3)
+              .map((service: any, index: number) => (
+                <motion.div
+                  key={service.id || index}
+                  variants={itemVariants}
+                  className="group bg-white rounded-2xl p-5 border border-gray-200 hover:border-orange-200 transition-all duration-300 overflow-hidden shadow-lg hover:shadow-xl"
+                  whileHover={{
+                    y: -6,
+                    scale: 1.02,
+                    transition: { duration: 0.3 }
+                  }}
+                >
+                  <div className="relative overflow-hidden rounded-xl mb-4">
+                    {service.images?.[0] && (
+                      <motion.img
+                        src={service.images[0]}
+                        alt={service.name}
+                        className="w-full h-40 object-cover"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
+
+                    <motion.div
+                      className="absolute top-2 left-2 bg-orange-600 text-white px-2 py-1 rounded text-xs font-bold"
+                      initial={{ scale: 0, x: -20 }}
+                      animate={{ scale: 1, x: 0 }}
+                      transition={{ delay: 0.5 + index * 0.1 }}
+                    >
                       {service.serviceType || service.category}
                     </motion.div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className="font-bold text-lg text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors leading-tight">{service.name}</h3>
+                      {service.description && (
+                        <p className="text-gray-600 line-clamp-2 leading-relaxed mt-1">{service.description}</p>
+                      )}
                     </div>
 
-                    <div className="space-y-4">
-                      <div>
-                        <h3 className="font-bold text-2xl text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors leading-tight">{service.name}</h3>
-                        {service.description && (
-                          <p className="text-gray-600 line-clamp-3 leading-relaxed mt-3">{service.description}</p>
+                    <div className="flex justify-between items-center">
+                      <div className="flex flex-col">
+                        {typeof (service.basePrice ?? service.price) === 'number' && (
+                          <span className="text-2xl font-bold text-orange-700">₹{((service.basePrice ?? service.price) as number).toLocaleString()}</span>
                         )}
+                        <span className="text-sm text-gray-500 font-medium">Starting from</span>
                       </div>
-
-                      <div className="flex justify-between items-center">
-                        <div className="flex flex-col">
-                          {typeof (service.basePrice ?? service.price) === 'number' && (
-                            <span className="text-3xl font-bold text-orange-700">₹{((service.basePrice ?? service.price) as number).toLocaleString()}</span>
-                          )}
-                          <span className="text-sm text-gray-500 font-medium">Starting from</span>
-                        </div>
-                        {typeof service.rating === 'number' && (
-                          <div className="flex items-center gap-2 bg-yellow-50 px-3 py-2 rounded-xl border border-yellow-200">
-                            <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                            <span className="text-sm font-bold text-yellow-700">{service.rating}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <Store className="h-4 w-4 text-white" />
-                          </div>
-                          {service.provider?.name && (
-                            <span className="text-sm text-gray-600 font-medium block leading-tight">{service.provider.name}</span>
-                          )}
-                        </div>
-                        {service.deliveryTime && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs px-3 py-1 rounded-full font-semibold bg-green-100 text-green-700">{service.deliveryTime}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {service.features?.length > 0 && (
-                        <div className="flex flex-wrap gap-2 pt-2">
-                          {service.features.slice(0, 3).map((feature: string, idx: number) => (
-                            <span key={idx} className="text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded-lg font-medium">
-                              {feature}
-                            </span>
-                          ))}
+                      {typeof service.rating === 'number' && (
+                        <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-200">
+                          <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                          <span className="text-xs font-bold text-yellow-700">{service.rating}</span>
                         </div>
                       )}
                     </div>
-                  </motion.div>
-                ))}
-            </div>
-          )}
 
-          <div className="text-center mt-20">
-            <div className="bg-white rounded-3xl p-12 border border-orange-100/50">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Need Specialized Business Services?</h3>
-              <p className="text-gray-600 mb-8 max-w-2xl mx-auto">Connect with certified professionals offering tailored solutions for your business operations and growth objectives.</p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <motion.button className="bg-orange-600 hover:bg-orange-700 text-white px-10 py-4 rounded-2xl font-bold" onClick={() => router.push('/services')}>
-                  <div className="flex items-center gap-3">
-                    <Store className="h-6 w-6" />
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                          <Store className="h-2.5 w-2.5 text-white" />
+                        </div>
+                        {service.provider?.name && (
+                          <span className="text-xs text-gray-600 font-medium truncate">{service.provider.name}</span>
+                        )}
+                      </div>
+                      {service.deliveryTime && (
+                        <span className="text-xs px-2 py-1 rounded-full font-semibold bg-green-100 text-green-700">{service.deliveryTime}</span>
+                      )}
+                    </div>
+
+                    {service.features?.length > 0 && (
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {service.features.slice(0, 3).map((feature: string, idx: number) => (
+                          <span key={idx} className="text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded font-medium">
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+          </motion.div>
+
+          <motion.div
+            variants={itemVariants}
+            className="text-center mt-12"
+          >
+            <div className="bg-white rounded-2xl p-8 border border-orange-100/50 shadow-lg max-w-2xl mx-auto">
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Need Specialized Business Services?</h3>
+              <p className="text-gray-600 mb-6 text-sm">Connect with certified professionals offering tailored solutions for your business.</p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <motion.button
+                  className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-sm"
+                  onClick={() => router.push('/services')}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Store className="h-4 w-4" />
                     <span>Explore Services</span>
-                    <ArrowRight className="h-6 w-6" />
+                    <ArrowRight className="h-4 w-4" />
                   </div>
                 </motion.button>
-                <motion.button className="border border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-10 py-4 rounded-2xl font-bold" onClick={() => router.push('/rfqs')}>
-                  <div className="flex items-center gap-3">
-                    <MessageCircle className="h-6 w-6" />
-                    <span>Post Service Requirements</span>
+                <motion.button
+                  className="border border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 text-sm"
+                  onClick={() => router.push('/rfqs')}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="h-4 w-4" />
+                    <span>Post Requirements</span>
                   </div>
                 </motion.button>
               </div>
             </div>
-          </div>
-        </div>
-  </section>
-  )}
+          </motion.div>
+        </motion.div>
+      </motion.section>
+      )}
 
-      {/* Testimonials */}
-      <TestimonialsSection />
+      {/* Testimonials - Connected flow */}
+      <motion.div
+        ref={testimonialsRef}
+        initial={{ opacity: 0 }}
+        animate={testimonialsInView ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        <TestimonialsSection />
+      </motion.div>
 
-      {/* CTA */}
-      <CTASection />
+      {/* CTA - Final connected section */}
+      <motion.div
+        ref={ctaRef}
+        initial={{ opacity: 0, y: 50 }}
+        animate={ctaInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+        transition={{ duration: 0.8 }}
+      >
+        <CTASection />
+      </motion.div>
     </div>
   );
 }

@@ -231,12 +231,8 @@ const BusinessesHero = ({ stats }: { stats?: Partial<HomepageStats> }) => {
 
 const pageVariants = {
   initial: { opacity: 0 },
-  animate: { 
-    opacity: 1,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut"
-    }
+  visible: {
+    opacity: 1
   }
 };
 
@@ -255,11 +251,7 @@ const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   show: { 
     opacity: 1, 
-    y: 0,
-    transition: {
-      duration: typeof window !== 'undefined' && window.innerWidth < 768 ? 0.3 : 0.5,
-      ease: "easeOut"
-    }
+    y: 0
   }
 };
 
@@ -433,8 +425,9 @@ export default function BusinessesPage() {
   return (
     <motion.div 
       initial="initial"
-      animate="animate"
+      animate="visible"
       variants={pageVariants}
+      transition={{ duration: 0.6, ease: "easeOut" }}
       className="min-h-screen bg-gray-50"
     >
       <BusinessesHero stats={homepageStats || undefined} />
