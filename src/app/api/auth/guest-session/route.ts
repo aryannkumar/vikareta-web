@@ -31,7 +31,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(data || { message: 'Failed to create guest session' }, { status: resp.status });
     }
 
-    return NextResponse.json(data);
+    // Transform backend response to match expected VikaretaAuthData format
+    const transformedData = {
+      user: data.data?.user,
+      tokens: {
+        accessToken: data.data?.accessToken,
+        refreshToken: '', // Guest sessions don't have refresh tokens in the response
+        tokenType: 'Bearer' as const,
+        expiresAt: Date.now() + (60 * 60 * 1000) // 1 hour from now
+      },
+      sessionId: data.data?.user?.id,
+      domain: 'main' as const
+    };
+
+    return NextResponse.json(transformedData);
   } catch (err: any) {
     return NextResponse.json({ message: err?.message || 'Internal error' }, { status: 500 });
   }

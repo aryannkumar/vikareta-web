@@ -15,7 +15,21 @@ export async function GET(req: NextRequest) {
 
   const dataText = await resp.text();
   const data = dataText ? (() => { try { return JSON.parse(dataText); } catch { return { message: dataText }; } })() : {};
-  const res = NextResponse.json(data, { status: resp.status });
+
+  if (!resp.ok) {
+    return NextResponse.json(data, { status: resp.status });
+  }
+
+  // Transform backend response to match expected format for SSO client
+  const transformedData = {
+    user: data.data?.user,
+    accessToken: '', // Will be set via cookies
+    refreshToken: '', // Will be set via cookies
+    sessionId: data.data?.user?.id,
+    subscription: data.data?.subscription
+  };
+
+  const res = NextResponse.json(transformedData, { status: resp.status });
 
   // Forward Set-Cookie headers from backend if present (handle combined header values)
   const rawSetCookie = resp.headers.get('set-cookie');

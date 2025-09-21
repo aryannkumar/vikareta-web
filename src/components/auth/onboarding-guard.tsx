@@ -28,7 +28,7 @@ export function OnboardingGuard({ children, redirectTo = '/onboarding' }: Onboar
 
       // Only check onboarding for business users
       if (user.userType !== 'business') {
-        setOnboardingStatus({ completed: true, userType: 'normal', progress: 100 });
+        setOnboardingStatus({ completed: true, userType: user.userType === 'guest' ? 'normal' : 'normal', progress: 100 });
         return;
       }
 
@@ -87,12 +87,12 @@ export function OnboardingGuard({ children, redirectTo = '/onboarding' }: Onboar
     );
   }
 
-  // If not authenticated, don't render anything (auth guard should handle this)
-  if (!isAuthenticated || !user) {
-    return null;
+  // Allow access for unauthenticated users and non-business users
+  if (!isAuthenticated || !user || user.userType !== 'business') {
+    return <>{children}</>;
   }
 
-  // If onboarding is not completed, don't render children (redirect will happen)
+  // If onboarding is not completed, show redirect message
   if (onboardingStatus && !onboardingStatus.completed) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -104,6 +104,6 @@ export function OnboardingGuard({ children, redirectTo = '/onboarding' }: Onboar
     );
   }
 
-  // Render children if onboarding is completed or not required
+  // Render children if onboarding is completed
   return <>{children}</>;
 }
