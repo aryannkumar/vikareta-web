@@ -7,6 +7,7 @@ import { VikaretaAuthProvider } from '@/lib/auth/vikareta';
 import { ToastProvider } from '@/components/ui/toast-provider';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { OnboardingGuard } from '@/components/auth/onboarding-guard';
 import Entrance from '@/components/Animated';
 import MotionBoot from '@/components/motion/MotionBoot';
 
@@ -94,9 +95,11 @@ export default function RootLayout({
               <div className="flex flex-col min-h-screen">
                 <Header />
                 <main className="flex-1">
-                  <Entrance>
-                    {children}
-                  </Entrance>
+                  <OnboardingGuard>
+                    <Entrance>
+                      {children}
+                    </Entrance>
+                  </OnboardingGuard>
                 </main>
                 <Footer />
               </div>
