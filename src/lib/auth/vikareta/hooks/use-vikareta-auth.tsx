@@ -21,13 +21,11 @@ export interface UseVikaretaAuthReturn {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  isGuest: boolean;
   
   // Actions
   login: (credentials: { email: string; password: string }) => Promise<boolean>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<boolean>;
-  createGuestSession: () => Promise<boolean>;
   clearError: () => void;
   
   // Utilities
@@ -153,28 +151,6 @@ export function useVikaretaAuth(): UseVikaretaAuthReturn {
   }, []);
 
   /**
-   * Create a guest session
-   */
-  const createGuestSession = useCallback(async (): Promise<boolean> => {
-    try {
-      setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
-      
-      const result = await vikaretaSSOClient.createGuestSession();
-      setAuthState(result);
-      
-      return result.isAuthenticated;
-    } catch (error) {
-      console.error('Create guest session failed:', error);
-      setAuthState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to create guest session'
-      }));
-      return false;
-    }
-  }, []);
-
-  /**
    * Check if user has specific role(s)
    */
   const hasRole = useCallback((role: string | string[]): boolean => {
@@ -192,13 +168,6 @@ export function useVikaretaAuth(): UseVikaretaAuthReturn {
   const clearError = useCallback(() => {
     setAuthState(prev => ({ ...prev, error: null }));
   }, []);
-
-  /**
-   * Check if current user is a guest
-   */
-  const isGuest = useCallback((): boolean => {
-    return authState.user?.userType === 'guest' || authState.user?.isGuest === true;
-  }, [authState.user]);
 
   /**
    * Check if user can access specific domain
@@ -281,13 +250,11 @@ export function useVikaretaAuth(): UseVikaretaAuthReturn {
     isAuthenticated: authState.isAuthenticated,
     isLoading: authState.isLoading,
     error: authState.error,
-    isGuest: isGuest(),
     
     // Actions
     login,
     logout,
     refreshToken,
-    createGuestSession,
     clearError,
     
     // Utilities

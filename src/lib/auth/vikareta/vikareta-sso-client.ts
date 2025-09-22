@@ -73,19 +73,7 @@ export class VikaretaSSOClient {
           }
         }
       } catch {
-        // Ignore bootstrap failures; fall through to guest session creation
-      }
-
-      // If no authenticated session found, create a guest session for better UX
-      console.log('No authenticated session found, creating guest session...');
-      try {
-        const guestState = await this.createGuestSession();
-        if (guestState.user) {
-          console.log('Guest session created successfully');
-          return guestState;
-        }
-      } catch (error) {
-        console.warn('Failed to create guest session:', error);
+        // Ignore bootstrap failures
       }
 
       return { user: null, isAuthenticated: false, isLoading: false, error: null, sessionId: null };
@@ -200,62 +188,6 @@ export class VikaretaSSOClient {
   isAuthenticated(): boolean {
     const state = vikaretaCrossDomainAuth.getStoredAuthData();
     return state.isAuthenticated && state.user !== null;
-  }
-
-  /**
-   * Create a guest session
-   */
-  async createGuestSession(): Promise<VikaretaAuthState> {
-    try {
-      const response = await fetch('/api/auth/guest-session', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(this.getCSRFToken() && { 'X-XSRF-TOKEN': this.getCSRFToken()! })
-        }
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: data.message || 'Failed to create guest session',
-          sessionId: null
-        };
-      }
-
-      // Validate response data
-      if (!isVikaretaAuthData(data)) {
-        throw new Error('Invalid guest session response');
-      }
-
-      // Store auth data securely
-      await vikaretaCrossDomainAuth.storeAuthData(data);
-
-      // Sync across domains
-      await vikaretaCrossDomainAuth.syncSSOAcrossDomains(data);
-
-      return {
-        user: data.user,
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-        sessionId: data.sessionId || null
-      };
-    } catch (error) {
-      console.error('Create guest session failed:', error);
-      return {
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to create guest session',
-        sessionId: null
-      };
-    }
   }
 
   /**

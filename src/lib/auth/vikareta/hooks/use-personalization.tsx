@@ -54,17 +54,17 @@ export interface UsePersonalizationReturn {
 }
 
 /**
- * Personalization hook for guest users
- * Only works when user is authenticated as guest
+ * Personalization hook for all users
+ * Works for both authenticated and unauthenticated users
  */
 export function usePersonalization(): UsePersonalizationReturn {
-  const { user, isAuthenticated, isGuest } = useVikaretaAuth();
+  const { user, isAuthenticated } = useVikaretaAuth();
   const [personalization, setPersonalization] = useState<GuestPersonalizationData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Only load personalization for guest users
-  const canUsePersonalization = isAuthenticated && isGuest && user?.id.startsWith('guest_');
+  // Allow personalization for all users (authenticated or not)
+  const canUsePersonalization = true;
 
   /**
    * Load personalization data

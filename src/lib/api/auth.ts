@@ -121,33 +121,6 @@ export class AuthService {
     return data;
   }
 
-  // Create guest session
-  static async createGuestSession(): Promise<AuthTokens> {
-    // Use Next.js API route instead of direct backend call for proper CSRF handling
-    const response = await fetch('/api/auth/guest-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.message || 'Failed to create guest session');
-    }
-
-    const data = await response.json();
-
-    // Store tokens in localStorage for client-side use
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-    }
-
-    return data;
-  }
-
   // Logout from all devices (not available in backend, use regular logout)
   static async logoutAll(): Promise<void> {
     // Backend doesn't have logout-all endpoint, so we'll just logout current session

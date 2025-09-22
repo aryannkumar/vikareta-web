@@ -22,17 +22,14 @@ interface RecentlyViewedProps {
 
 export function RecentlyViewed({ maxItems = 5, onProductClick }: RecentlyViewedProps) {
   const { personalization, addToRecentlyViewed } = usePersonalization();
-  const { isGuest } = useVikaretaAuth();
 
   // This would typically be called when viewing a product
   const handleProductView = (productId: string) => {
-    if (isGuest) {
-      addToRecentlyViewed(productId);
-    }
+    addToRecentlyViewed(productId);
     onProductClick?.(productId);
   };
 
-  if (!isGuest || !personalization?.browsingHistory.recentlyViewed.length) {
+  if (!personalization?.browsingHistory.recentlyViewed.length) {
     return null;
   }
 
@@ -102,7 +99,6 @@ interface ProductRecommendationsProps {
 
 export function ProductRecommendations({ maxItems = 6, onProductClick }: ProductRecommendationsProps) {
   const { getRecommendations } = usePersonalization();
-  const { isGuest } = useVikaretaAuth();
   const [recommendations, setRecommendations] = useState<{
     recentlyViewed: string[];
     recommendedProducts: string[];
@@ -111,12 +107,10 @@ export function ProductRecommendations({ maxItems = 6, onProductClick }: Product
   } | null>(null);
 
   useEffect(() => {
-    if (isGuest) {
-      getRecommendations().then(setRecommendations);
-    }
-  }, [isGuest, getRecommendations]);
+    getRecommendations().then(setRecommendations);
+  }, [getRecommendations]);
 
-  if (!isGuest || !recommendations?.recommendedProducts.length) {
+  if (!recommendations?.recommendedProducts.length) {
     return null;
   }
 
@@ -188,9 +182,8 @@ interface SearchSuggestionsProps {
 
 export function SearchSuggestions({ onSearchSelect }: SearchSuggestionsProps) {
   const { personalization } = usePersonalization();
-  const { isGuest } = useVikaretaAuth();
 
-  if (!isGuest || !personalization?.browsingHistory.searchHistory.length) {
+  if (!personalization?.browsingHistory.searchHistory.length) {
     return null;
   }
 
@@ -233,22 +226,19 @@ export function SearchSuggestions({ onSearchSelect }: SearchSuggestionsProps) {
   );
 }
 
-interface GuestCartProps {
+interface CartProps {
   onProductClick?: (productId: string) => void;
   onUpdateQuantity?: (productId: string, quantity: number) => void;
   onRemoveItem?: (productId: string) => void;
 }
 
-export function GuestCart({ onProductClick, onUpdateQuantity, onRemoveItem }: GuestCartProps) {
+export function Cart({ onProductClick, onUpdateQuantity, onRemoveItem }: CartProps) {
   const { getCartItems, updateCartQuantity, removeFromCart } = usePersonalization();
-  const { isGuest } = useVikaretaAuth();
   const [cartItems, setCartItems] = useState(getCartItems());
 
   useEffect(() => {
-    if (isGuest) {
-      setCartItems(getCartItems());
-    }
-  }, [isGuest, getCartItems]);
+    setCartItems(getCartItems());
+  }, [getCartItems]);
 
   const handleUpdateQuantity = async (productId: string, quantity: number) => {
     if (quantity <= 0) {
@@ -270,10 +260,6 @@ export function GuestCart({ onProductClick, onUpdateQuantity, onRemoveItem }: Gu
       onRemoveItem?.(productId);
     }
   };
-
-  if (!isGuest) {
-    return null;
-  }
 
   if (!cartItems.length) {
     return (
@@ -399,20 +385,17 @@ export function GuestCart({ onProductClick, onUpdateQuantity, onRemoveItem }: Gu
   );
 }
 
-interface PersonalizationSettingsProps {
+interface UserSettingsProps {
   onSettingsChange?: () => void;
 }
 
-export function PersonalizationSettings({ onSettingsChange }: PersonalizationSettingsProps) {
+export function UserSettings({ onSettingsChange }: UserSettingsProps) {
   const { getPreferences, updatePreferences } = usePersonalization();
-  const { isGuest } = useVikaretaAuth();
   const [preferences, setPreferences] = useState(getPreferences());
 
   useEffect(() => {
-    if (isGuest) {
-      setPreferences(getPreferences());
-    }
-  }, [isGuest, getPreferences]);
+    setPreferences(getPreferences());
+  }, [getPreferences]);
 
   const handlePreferenceChange = async (key: keyof NonNullable<typeof preferences>, value: any) => {
     if (!preferences) return;
@@ -429,7 +412,7 @@ export function PersonalizationSettings({ onSettingsChange }: PersonalizationSet
     }
   };
 
-  if (!isGuest || !preferences) {
+  if (!preferences) {
     return null;
   }
 
@@ -437,9 +420,9 @@ export function PersonalizationSettings({ onSettingsChange }: PersonalizationSet
     <Card hover className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          Personalization Settings
+          User Settings
           <Badge variant="info" animated>
-            Guest
+            Preferences
           </Badge>
         </CardTitle>
       </CardHeader>

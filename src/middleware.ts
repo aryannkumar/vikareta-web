@@ -7,21 +7,21 @@ export function middleware(request: NextRequest) {
   // Public routes that don't require authentication
   const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
 
-  // Guest-allowed routes (limited access for guest users)
-  const guestRoutes = ['/', '/products', '/categories', '/search', '/cart', '/checkout'];
+  // Publicly accessible routes (no authentication required)
+  const publiclyAccessibleRoutes = ['/', '/products', '/categories', '/search', '/cart', '/checkout'];
 
   // Check if the current route is public
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
-  // Check if the current route allows guest access
-  const isGuestRoute = guestRoutes.some(route => pathname.startsWith(route));
+  // Check if the current route is publicly accessible
+  const isPubliclyAccessibleRoute = publiclyAccessibleRoutes.some(route => pathname.startsWith(route));
 
   // Use unified Vikareta SSO access token cookie or Authorization header
   const token = request.cookies.get('accessToken')?.value ||
                 (request.headers.get('authorization')?.replace('Bearer ', '') || null);
 
   // If accessing a protected route without a token, redirect to login
-  if (!isPublicRoute && !isGuestRoute && !token) {
+  if (!isPublicRoute && !isPubliclyAccessibleRoute && !token) {
     const loginUrl = new URL('/login', request.url);
     return NextResponse.redirect(loginUrl);
   }
@@ -32,8 +32,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(homeUrl);
   }
 
-  // Allow guest access to guest routes without token
-  if (isGuestRoute && !token) {
+  // Allow public access to publicly accessible routes without token
+  if (isPubliclyAccessibleRoute && !token) {
     return NextResponse.next();
   }
 
