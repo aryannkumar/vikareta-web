@@ -326,28 +326,6 @@ function LoginPageContent() {
     return `+${cleaned}`;
   };
 
-  // Password strength checker
-  const getPasswordStrength = (password: string) => {
-    let strength = 0;
-    const checks = {
-      length: password.length >= 8,
-      uppercase: /[A-Z]/.test(password),
-      lowercase: /[a-z]/.test(password),
-      number: /\d/.test(password),
-      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
-    };
-
-    strength = Object.values(checks).filter(Boolean).length;
-
-    return {
-      score: strength,
-      checks,
-      label: strength <= 2 ? 'Weak' : strength <= 3 ? 'Fair' : strength <= 4 ? 'Good' : 'Strong',
-      color: strength <= 2 ? 'text-red-500' : strength <= 3 ? 'text-yellow-500' : strength <= 4 ? 'text-blue-500' : 'text-green-500',
-      bgColor: strength <= 2 ? 'bg-red-500' : strength <= 3 ? 'bg-yellow-500' : strength <= 4 ? 'bg-blue-500' : 'bg-green-500'
-    };
-  };
-
   // Enhanced form validation with better feedback
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -840,63 +818,6 @@ function LoginPageContent() {
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </motion.button>
                     </div>
-
-                    {/* Password Strength Indicator */}
-                    {formData.password && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0, y: -10 }}
-                        animate={{ opacity: 1, height: 'auto', y: 0 }}
-                        exit={{ opacity: 0, height: 0, y: -10 }}
-                        className="mt-4 space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-100"
-                        transition={{ duration: 0.3 }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-700">Password strength:</span>
-                          <motion.span
-                            className={`text-sm font-semibold ${getPasswordStrength(formData.password).color}`}
-                            key={getPasswordStrength(formData.password).label}
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            {getPasswordStrength(formData.password).label}
-                          </motion.span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                          <motion.div
-                            className={`h-3 rounded-full ${getPasswordStrength(formData.password).bgColor}`}
-                            initial={{ width: 0 }}
-                            animate={{ width: `${(getPasswordStrength(formData.password).score / 5) * 100}%` }}
-                            transition={{ duration: 0.5, ease: 'easeOut' }}
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          {[
-                            { key: 'length', label: '8+ chars', check: getPasswordStrength(formData.password).checks.length },
-                            { key: 'uppercase', label: 'Uppercase', check: getPasswordStrength(formData.password).checks.uppercase },
-                            { key: 'lowercase', label: 'Lowercase', check: getPasswordStrength(formData.password).checks.lowercase },
-                            { key: 'number', label: 'Number', check: getPasswordStrength(formData.password).checks.number },
-                            { key: 'special', label: 'Special', check: getPasswordStrength(formData.password).checks.special }
-                          ].map((item, index) => (
-                            <motion.div
-                              key={item.key}
-                              className={`flex items-center ${item.check ? 'text-green-600' : 'text-gray-400'}`}
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ duration: 0.3, delay: index * 0.1 }}
-                            >
-                              <motion.div
-                                animate={{ rotate: item.check ? 0 : 0 }}
-                                transition={{ duration: 0.2 }}
-                              >
-                                <Check className="w-3 h-3 mr-2 flex-shrink-0" />
-                              </motion.div>
-                              {item.label}
-                            </motion.div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
 
                     {errors.password && (
                       <motion.div

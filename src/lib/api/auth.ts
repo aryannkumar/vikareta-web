@@ -95,34 +95,57 @@ export class AuthService {
 
   // Login user
   static async login(credentials: LoginCredentials): Promise<AuthTokens> {
-    const response = await apiClient.post<AuthTokens>('/auth/login', credentials);
-    if (!response.success) {
-      throw new Error(response.error || 'Login failed');
+    // Use Next.js API route instead of direct backend call for proper CSRF handling
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(credentials),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || errorData.message || 'Login failed');
     }
+
+    const data = await response.json();
 
     // Store tokens in localStorage for client-side use
     if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
     }
 
-    return response.data;
+    return data;
   }
 
   // Create guest session
   static async createGuestSession(): Promise<AuthTokens> {
-    const response = await apiClient.post<AuthTokens>('/auth/create-guest-session');
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to create guest session');
+    // Use Next.js API route instead of direct backend call for proper CSRF handling
+    const response = await fetch('/api/auth/guest-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || errorData.message || 'Failed to create guest session');
     }
+
+    const data = await response.json();
 
     // Store tokens in localStorage for client-side use
     if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
     }
 
-    return response.data;
+    return data;
   }
 
   // Logout from all devices (not available in backend, use regular logout)
@@ -210,27 +233,49 @@ export class AuthService {
   }
 
   // Send OTP
-  static async sendOTP(phone: string): Promise<void> {
-    const response = await apiClient.post('/auth/send-otp', { phone });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to send OTP');
+  static async sendOTP(identifier: string): Promise<void> {
+    // Use Next.js API route instead of direct backend call
+    const response = await fetch('/api/auth/send-otp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ identifier }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || errorData.message || 'Failed to send OTP');
     }
   }
 
   // Verify OTP
-  static async verifyOTP(phone: string, otp: string): Promise<AuthTokens> {
-    const response = await apiClient.post<AuthTokens>('/auth/verify-otp', { phone, otp });
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to verify OTP');
+  static async verifyOTP(identifier: string, otp: string): Promise<AuthTokens> {
+    // Use Next.js API route instead of direct backend call
+    const response = await fetch('/api/auth/verify-otp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ identifier, otp }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || errorData.message || 'Failed to verify OTP');
     }
+
+    const data = await response.json();
 
     // Store tokens
     if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
     }
 
-    return response.data;
+    return data;
   }
 
   // Send verification email

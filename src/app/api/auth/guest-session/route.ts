@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
     const transformedData = {
       user: data.data?.user,
       tokens: {
-        accessToken: data.data?.accessToken,
-        refreshToken: '', // Guest sessions don't have refresh tokens in the response
+        accessToken: data.data?.accessToken || '',
+        refreshToken: 'guest_session_token', // Dummy token for validation - guest sessions don't refresh
         tokenType: 'Bearer' as const,
         expiresAt: Date.now() + (60 * 60 * 1000) // 1 hour from now
       },
