@@ -110,23 +110,41 @@ export class VikaretaSSOClient {
         };
       }
 
+      // Handle our API response format: { success: true, data: { accessToken, user } }
+      const authData = data.data || data;
+      const user = authData.user;
+      const accessToken = authData.accessToken;
+      const refreshToken = authData.refreshToken || '';
+
       // Validate response data
-      if (!isVikaretaAuthData(data)) {
-        throw new Error('Invalid authentication response');
+      if (!user || !isVikaretaUser(user)) {
+        throw new Error('Invalid authentication response - missing or invalid user data');
       }
 
+      // Build auth data in expected format
+      const vikaretaAuthData: VikaretaAuthData = {
+        user,
+        tokens: {
+          accessToken,
+          refreshToken,
+          tokenType: 'Bearer'
+        },
+        sessionId: authData.sessionId || null,
+        domain: vikaretaCrossDomainAuth.getCurrentDomain()
+      };
+
       // Store auth data securely
-  await vikaretaCrossDomainAuth.storeAuthData(data);
+  await vikaretaCrossDomainAuth.storeAuthData(vikaretaAuthData);
 
       // Sync across domains
-      await vikaretaCrossDomainAuth.syncSSOAcrossDomains(data);
+      await vikaretaCrossDomainAuth.syncSSOAcrossDomains(vikaretaAuthData);
 
       return {
-        user: data.user,
+        user: vikaretaAuthData.user,
         isAuthenticated: true,
         isLoading: false,
         error: null,
-        sessionId: data.sessionId || null
+        sessionId: vikaretaAuthData.sessionId || null
       };
     } catch (error) {
       console.error('Login failed:', error);
@@ -208,7 +226,7 @@ export class VikaretaSSOClient {
       }
 
       const data = await response.json();
-      return data && data.user && isVikaretaUser(data.user);
+      return data && data.success && data.user && isVikaretaUser(data.user);
     } catch (error) {
       console.error('Session validation failed:', error);
       return false;
@@ -241,32 +259,33 @@ export class VikaretaSSOClient {
 
       const data = await response.json();
 
-      // Validate refresh response
-      if (!data || !data.user || !isVikaretaUser(data.user)) {
+      // Validate refresh response - handle our API format
+      const authData = data.data || data;
+      if (!authData || !authData.user || !isVikaretaUser(authData.user)) {
         console.error('Invalid refresh response');
         return false;
       }
 
       // Security: Verify user hasn't changed during refresh
-      if (data.user.id !== currentUser.id) {
+      if (authData.user.id !== currentUser.id) {
         console.error('User ID mismatch during token refresh - potential security issue');
         vikaretaCrossDomainAuth.clearAuthData();
         return false;
       }
 
       // Update stored auth data
-      const authData: VikaretaAuthData = {
-        user: data.user,
+      const vikaretaAuthData: VikaretaAuthData = {
+        user: authData.user,
         tokens: {
-          accessToken: data.accessToken || '',
-          refreshToken: data.refreshToken || '',
+          accessToken: authData.accessToken || '',
+          refreshToken: authData.refreshToken || '',
           tokenType: 'Bearer'
         },
-        sessionId: data.sessionId,
+        sessionId: authData.sessionId,
         domain: vikaretaCrossDomainAuth.getCurrentDomain()
       };
 
-  await vikaretaCrossDomainAuth.storeAuthData(authData);
+  await vikaretaCrossDomainAuth.storeAuthData(vikaretaAuthData);
       return true;
     } catch (error) {
       console.error('Token refresh failed:', error);

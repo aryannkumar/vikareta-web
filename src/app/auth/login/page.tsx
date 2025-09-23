@@ -19,33 +19,30 @@ import {
   ArrowLeft,
   Check
 } from 'lucide-react';
-import { AuthService, type User } from '../../../lib/api/auth';
+import { useVikaretaAuthContext } from '@/lib/auth/vikareta';
 
   // Secure SSO auth implementation using HttpOnly cookies
 const useSecureSSOAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, user, isLoading, checkSession } = useVikaretaAuthContext();
 
-  const login = async (loginData: any) => {
-    setIsLoading(true);
+  const secureLogin = async (loginData: any) => {
     try {
       console.log('Main Site Login: Attempting login with data:', { 
         email: loginData.email?.substring(0, 5) + '***',
         hasPassword: !!loginData.password 
       });
 
-      // Use AuthService instead of direct fetch
-      const result = await AuthService.login(loginData);
+      // Use global auth context instead of direct fetch
+      const result = await login(loginData);
 
       console.log('Main Site Login: API response data:', { 
-        success: true, 
-        hasUser: !!result.user,
-        userType: result.user?.userType 
+        success: result, 
+        hasUser: !!user,
+        userType: user?.userType 
       });
       
-      if (result.user) {
-        setUser(result.user);
-        return { success: true, user: result.user };
+      if (result && user) {
+        return { success: true, user: user };
       } else {
         throw new Error('Login failed');
       }
@@ -55,32 +52,11 @@ const useSecureSSOAuth = () => {
         success: false,
         error: { message: error instanceof Error ? error.message : 'Login failed' }
       };
-    } finally {
-      setIsLoading(false);
     }
   };
-
-  const checkSession = async (): Promise<User | null> => {
-    try {
-      // Use AuthService instead of direct fetch
-      const result = await AuthService.getProfile();
-      if (result.user) {
-        setUser(result.user);
-        return result.user;
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  };
-
-  // Check session on mount
-  useEffect(() => {
-    checkSession();
-  }, []);
 
   return {
-    login,
+    login: secureLogin,
     user,
     isLoading,
     checkSession
@@ -468,7 +444,8 @@ function LoginPageContent() {
 
       try {
         if (effectiveUser && hasDashboardAccess(effectiveUser)) {
-          await syncSSOToSubdomainsFn();
+          // SSO sync is now handled by the global auth system
+          // await syncSSOToSubdomainsFn();
         }
       } catch (err) {
         console.warn('SSO Login: Failed to sync SSO to subdomains', err);
