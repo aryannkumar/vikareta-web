@@ -219,6 +219,15 @@ class ApiClient {
       };
     }
 
+    // Add Authorization header if token is available in localStorage
+    const authToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (authToken) {
+      config.headers = {
+        ...config.headers,
+        'Authorization': `Bearer ${authToken}`,
+      };
+    }
+
     // No need to add auth token - using HttpOnly cookies
 
     // Add CSRF token for state-changing requests (from cookie)

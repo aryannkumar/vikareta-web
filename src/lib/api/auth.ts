@@ -58,6 +58,12 @@ export interface RegisterData {
   address?: string;
 }
 
+export interface RegisterResponse {
+  user: User;
+  accessToken: string;
+  refreshToken?: string;
+}
+
 export interface TwoFactorSetup {
   secret: string;
   qrCode: string;
@@ -85,11 +91,21 @@ export interface SocialLoginData {
 
 export class AuthService {
   // Register a new user
-  static async register(data: RegisterData): Promise<User> {
-    const response = await apiClient.post<User>('/auth/register', data);
+  static async register(data: RegisterData): Promise<RegisterResponse> {
+    const response = await apiClient.post<RegisterResponse>('/auth/register', data);
     if (!response.success) {
       throw new Error(response.error || 'Registration failed');
     }
+
+    // Store tokens in localStorage for client-side use (similar to login)
+    if (typeof window !== 'undefined' && response.data) {
+      localStorage.setItem('accessToken', response.data.accessToken);
+      if (response.data.refreshToken) {
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+      }
+      console.log('Registration successful, tokens stored in localStorage');
+    }
+
     return response.data;
   }
 
