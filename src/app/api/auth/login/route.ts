@@ -44,10 +44,19 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Build cookie header for backend, ensuring XSRF-TOKEN is present alongside any incoming cookies
+    // Build cookie header for backend, ensuring a single fresh XSRF-TOKEN
+    let sanitizedCookie = cookieHeader || '';
+    if (sanitizedCookie) {
+      // Remove any existing XSRF-TOKEN occurrences
+      sanitizedCookie = sanitizedCookie
+        .split(';')
+        .map(part => part.trim())
+        .filter(part => !/^XSRF-TOKEN=/.test(part))
+        .join('; ');
+    }
     const backendCookie = finalCsrfToken
-      ? `${cookieHeader || ''}${cookieHeader ? '; ' : ''}XSRF-TOKEN=${finalCsrfToken}`
-      : cookieHeader;
+      ? `${sanitizedCookie}${sanitizedCookie ? '; ' : ''}XSRF-TOKEN=${finalCsrfToken}`
+      : sanitizedCookie;
 
     const resp = await fetch(`${apiBase}/api/v1/auth/login`, {
       method: 'POST',
