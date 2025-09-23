@@ -128,13 +128,16 @@ export class AuthService {
 
     const data = await response.json();
 
+    // The response is { success: true, message: ..., data: { accessToken, user } }
+    const authData = data.data;
+
     // Store tokens in localStorage for client-side use
     if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('accessToken', authData.accessToken);
+      localStorage.setItem('refreshToken', authData.refreshToken || '');
     }
 
-    return data;
+    return authData;
   }
 
   // Logout from all devices (not available in backend, use regular logout)
@@ -258,13 +261,16 @@ export class AuthService {
 
     const data = await response.json();
 
+    // The response is { success: true, message: ..., data: { accessToken, user } }
+    const authData = data.data;
+
     // Store tokens
     if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('accessToken', authData.accessToken);
+      localStorage.setItem('refreshToken', authData.refreshToken || '');
     }
 
-    return data;
+    return authData;
   }
 
   // Send verification email

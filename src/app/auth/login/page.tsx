@@ -394,9 +394,14 @@ function LoginPageContent() {
         const result = await login(loginData);
 
         if (result && (result as any).success) {
-          // Always require OTP verification for login (email or phone)
-          setStep('otp');
-          await sendOtp();
+          // Require OTP verification only for phone login
+          if (authMethod === 'phone') {
+            setStep('otp');
+            await sendOtp();
+          } else {
+            // For email login, proceed directly to success
+            handleLoginSuccess(result.user);
+          }
         } else {
           toast.error('Login Failed', 'Please check your credentials and try again.');
         }
