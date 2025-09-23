@@ -95,6 +95,9 @@ export function useUserPreferences() {
 
   // Load trending categories
   const loadTrendingCategories = useCallback(async (period: 'daily' | 'weekly' | 'monthly' = 'weekly', limit: number = 10) => {
+    // Skip for unauthenticated users to avoid CORS issues
+    if (!isAuthenticated || !user) return;
+
     try {
       setState(prev => ({ ...prev, loading: { ...prev.loading, trending: true } }));
       const trending = await userPreferencesApi.getTrendingCategories(period, limit);
@@ -107,26 +110,12 @@ export function useUserPreferences() {
       console.error('Failed to load trending categories:', error);
       setState(prev => ({ ...prev, loading: { ...prev.loading, trending: false } }));
     }
-  }, []);
+  }, [isAuthenticated, user]);
 
   // Load personalized categories
   const loadPersonalizedCategories = useCallback(async (limit: number = 12) => {
-    if (!isAuthenticated || !user) {
-      // For non-authenticated users, load default categories
-      try {
-        setState(prev => ({ ...prev, loading: { ...prev.loading, categories: true } }));
-        const categories = await userPreferencesApi.getPersonalizedCategories(limit);
-        setState(prev => ({
-          ...prev,
-          personalizedCategories: categories,
-          loading: { ...prev.loading, categories: false }
-        }));
-      } catch (error) {
-        console.error('Failed to load personalized categories:', error);
-        setState(prev => ({ ...prev, loading: { ...prev.loading, categories: false } }));
-      }
-      return;
-    }
+    // Skip for unauthenticated users to avoid CORS issues
+    if (!isAuthenticated || !user) return;
 
     try {
       setState(prev => ({ ...prev, loading: { ...prev.loading, categories: true } }));
@@ -295,12 +284,6 @@ export function useUserPreferences() {
       }));
     }
   }, [isAuthenticated, user, loadAllPersonalizationData]);
-
-  // Load trending categories and personalized categories for all users
-  useEffect(() => {
-    loadTrendingCategories();
-    loadPersonalizedCategories();
-  }, [loadTrendingCategories, loadPersonalizedCategories]);
 
   return {
     // State
